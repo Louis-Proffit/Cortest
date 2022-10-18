@@ -1,0 +1,19 @@
+{# templates/epreuve/choixEchelle.html.twig #}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Choix de l'échelle</title>
+    </head>
+    <body>
+        <h1>Choix de l'échelle</h1>
+        <ul>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 0 }) }}> Échelle simple </a> </li>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 1 }) }}> Échelle composite </a> </li>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 0 }) }}> Subtest </a> </li>
+        </ul>
+
+        
+    </body>
+</html>

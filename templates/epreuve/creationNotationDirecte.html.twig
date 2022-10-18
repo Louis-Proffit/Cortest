@@ -1,0 +1,24 @@
+{# templates/epreuve/creationNotation.html.twig #}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Création des questions :</title>
+    </head>
+    <body>
+        <h1>Questions déjà créées :</h1>
+        <ul>
+        {% for previousQuestion in previousQuestions %}
+            <! pathNextPage is the name of the route to the next page >
+            <li> Numéro : {{ previousQuestion.numQuestion }}, intitulé : {{ previousQuestion.intitule }}, réponse A : {{ previousQuestion.repA }}, réponse B : {{ previousQuestion.repB }} </li>
+        {% endfor %}
+        </ul>
+
+        <h1> Nouvelle question : </h1>
+
+        {{ form(form) }}
+
+        
+    </body>
+</html>

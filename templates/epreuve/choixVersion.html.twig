@@ -1,0 +1,20 @@
+{# templates/epreuve/choixVersion.html.twig #}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Choix de la version</title>
+    </head>
+    <body>
+        <h1>Choix de la version</h1>
+        <ul>
+        {% for version in versions %}
+            <! pathNextPage is the name of the route to the next page >
+            <li> Code : {{ version.epreuve.code }}, code de la version : {{ version.version }}, statut : {{ version.statut }}, descriptif : {{ version.descriptif }}, <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version }) }}> Compléter </a> </li>
+        {% endfor %}
+        </ul>
+
+        
+    </body>
+</html>

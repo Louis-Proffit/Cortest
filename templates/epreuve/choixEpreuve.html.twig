@@ -1,0 +1,20 @@
+{# templates/epreuve/choixEpreuve.html.twig #}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Choix de l'épreuve</title>
+    </head>
+    <body>
+        <h1>Choix de l'épreuve</h1>
+        <ul>
+        {% for epreuve in epreuves %}
+            <! pathNextPage is the name of the route to the next page >
+            <li> Code : {{ epreuve.code }}, étiquette : {{ epreuve.etiquette }}, descriptif : {{ epreuve.descriptif }}, <a href =  {{  path(pathNextPage, { 'idEpreuve': epreuve.code}) }}> Create new version </a> </li>
+        {% endfor %}
+        </ul>
+
+        
+    </body>
+</html>
