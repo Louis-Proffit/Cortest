@@ -3,6 +3,11 @@ controllers:
     resource: ../src/Controller/
     type: attribute
 
+scanner:
+    path: /opticScanner
+    controller: App\Controller\OpticScannerController::form
+    methods: GET|HEAD
+
 epreuveShow:
     path: /creationEpreuve
     controller: App\Controller\EpreuveController::show
