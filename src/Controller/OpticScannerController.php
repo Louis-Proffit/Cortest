@@ -11,6 +11,7 @@ use App\template;
 use App\Repository\EpreuveRepository;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,43 +20,21 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use TypeError;
 
 class OpticScannerController extends AbstractController
 {
-    private $fd;
     private $logger;
 
-    /**
-     * @param $fd
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-
-    #[Route('opticScanner/open', methods: ['POST'])]
-    public function open(Request $request): Response
+    #[Route("/scanner", name: "scanner_route")]
+    function scanner(Request $request): Response
     {
-        $this->fd = dio_open("COM1", O_RDWR);
-        $this->logger->info("Opening com port");
-        return $this->redirectToRoute('scanner');
+        return $this->render("scanner/scanner.html.twig");
     }
 
-    #[Route('opticScanner/close', methods: ['POST'])]
-    public function close(Request $request): Response
-    {
-        if ($this->fd != null) {
-            dio_close($this->fd);
-        }
-        $this->logger->info("Closing com port");
-        return $this->redirectToRoute('scanner');
-    }
-
-
-    #[Route('/opticScanner', methods: ['GET', 'HEAD'])]
-    public function form(Request $request): Response
-    {
-        return $this->render('optic_scanner.html.twig');
-    }
 }

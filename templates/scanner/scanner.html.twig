@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+<button id="open">Ouvrir un port</button>
+<button id="close">Fermer le port</button>
+<button id="send">Envoyer</button>
+<div class="inputField">
+    <label for="input">Entrée</label>
+    <input id="input">
+</div>
+<div class="outputField">
+    <label for="output">Sortie</label>
+    <input id="output" readonly="readonly">
+</div>
+
+<script src="{{ asset('serial.js') }}"></script>
+</html>
