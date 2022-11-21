@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Runtime\Pdf;
+namespace App\Tests;
 
+use App\Runtime\Pdf\PdfMaker;
 use PHPUnit\Framework\TestCase;
 
 class PdfMakerTest extends TestCase

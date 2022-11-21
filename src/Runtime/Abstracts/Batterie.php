@@ -12,6 +12,8 @@ abstract class Batterie
         $this->grille = $grille;
     }
 
+    abstract function compute();
+
     /**
      * @return Grille la grille du candidat à corriger
      */
