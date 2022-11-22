@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Runtime;
+namespace App\Core;
 
 use PHPStan\BetterReflection\Reflection\Exception\ClassDoesNotExist;
 use PHPStan\BetterReflection\Reflection\Exception\FunctionDoesNotExist;

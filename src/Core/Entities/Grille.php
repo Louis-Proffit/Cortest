@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Runtime\Abstracts;
+namespace App\Core\Entities;
 
 abstract class Grille
 {

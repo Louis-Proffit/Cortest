@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Runtime\Pdf;
+namespace App\Core\Pdf;
 
 class PdfMaker
 {
