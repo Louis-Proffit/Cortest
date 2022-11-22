@@ -1,0 +1,406 @@
+???()
+
+
+@AXF
+
+caractŠres de d‚but de document                01 FF FF FF
+caractŠres de d‚but d'enregistrement           02 FF FF FF
+caractŠres de fin d'enregistrement             0D 0A 03 FF
+caractŠres de fin de document                  04 FF FF FF
+caractŠres de d‚but de message d'erreur        15 FF FF FF
+caractŠres de fin de message d'erreur          0D 0A 03 FF
+caractŠre de remplissage                       2E
+quantit‚ de caractŠres de synchro              00
+caractŠre de synchro                           2D
+longueur d'enregistrement  lsb                 00
+longueur d'enregistrement msb                  00
+vitesse de transmission baudrate               05
+longueur data sept ou huit bits                03
+validation parit‚                              00
+parit‚ paire ou impaire                        01
+nombre de stop bits    un ou deux              01
+envoi du nb marques lues   oui non             00
+envoi du nb d'horloges lues oui non            00
+son case bonne                                 00
+son case rejet                                 00
+envoi prompt … la mise secteur oui non         00
+envoi des messages d'erreur  oui non           01
+attente d'un ‚cho            oui non           00
+d‚lai avant envoi donn‚es (cinquante ms)       00
+d‚lai aprŠs chaque caractŠre (une ms)          00
+d‚lai aprŠs chaque record    (une ms)          00
+caractŠre pour r‚‚mission enregistrement       52
+num‚ro de programme                            00
+v‚rification marques horloges                  00
+caractŠre pour appeler un document             4C
+caractŠre pour appeler enregist. suivant       00
+caractŠre pour envoi case bonne                47
+caractŠre pour envoi case rejet                53
+distance avant arrˆt papier                    32
+caractŠre pour ret‚l‚charger                   1B
+caractŠre pour demande de version              56
+caractŠre demande d'impression interne         50
+saut du caractŠre de status                    00
+longueur de l'enregistrement d'‚dition         00
+longueur de l'enregistrement d'‚dition hex ms  00
+
+@PROGRAM
+
+;   ===================================================
+;   ===================================================
+;  
+;  
+   NAME      'QCM INTERIEUR'
+   FILL      FROM 500 TO 1200 WITH 2E
+   WRITEC    1 '@'
+   WRITEC    2 '_'
+;Contr“le du nombre de marques horloges
+;Changer le 1 par le nb d'horloges du document
+;bug à iris feuille avec marque en bas des marques horloges
+   IFMEMORY  55 > 66 GOTO 5
+   IFMEMORY  55 # 66 GOTO 100
+;Contr“le des marques de cadrage
+;changer ligne colonne et saut de groupe en fonction document
+   IFERROR   101 SERIAL 3F 0 0 0 0 0 0 ABORT
+   FIELD     498 1 1 39 1 1 1 20 HOR DOWN 0 1 1 1 2
+;   FIELD     498 1 66 38 1 1 1 20 HOR DOWN 0 1 1 1 2
+;d‚tection du type de page
+   IFERROR   102 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   WRITEC    300 ' '
+   FIELD     300 1 1 2 1 1 1 20 HOR UP 0 1 1 2 2
+   IFFOUND   '1' INTO 300 LENGTH 1 GOTO 10
+   IFFOUND   '2' INTO 300 LENGTH 1 GOTO 1
+   MESSAGE   102 SERIAL ABORT
+   NEXTDOC  
+;
+LABEL 1
+   IFMEMORY  56 > 65 GOTO 100
+;D‚but de programme
+   IFERROR   102 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+;   WRITEC    499 '1'
+   WRITEC    500 '200000000000000'
+   GOSUB     107
+;LECTURE BANDEAU HAUT ALPHA
+;   IFERROR   104 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 9 38 38 1 5 20 VER RIGHT 0 0 1 26 1
+;NIVEAU SCOLAIRE
+   FIELD     0 1 42 33 1 1 1 20 VER RIGHT 0 0 1 8 2
+;date naissance
+;   IFERROR   105 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 40 31 1 1 1 20 VER RIGHT 0 1 1 4 1
+   FIELD     0 1 40 30 1 1 1 20 VER RIGHT 0 1 1 10 1
+   FIELD     0 1 40 29 1 1 1 20 VER RIGHT 0 1 1 2 1
+   FIELD     0 1 40 28 3 1 1 20 VER RIGHT 0 1 1 10 1
+;SEXE CONCOURS SGAP
+;   IFERROR   106 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 41 22 1 1 1 20 VER LEFT 0 0 1 2 2
+   FIELD     0 1 46 22 1 1 6 20 VER LEFT 0 0 1 4 1
+   FIELD     0 1 40 19 2 1 1 20 VER RIGHT 0 0 1 10 1
+;DATE EXAMEN
+;   IFERROR   107 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 40 15 6 1 1 20 VER RIGHT 0 0 1 10 1
+;type concours
+;   IFERROR   108 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 55 37 2 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 33 3 1 1 20 VER RIGHT 0 0 1 10 1
+;   IFERROR   109 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   IFERROR   109 SERIAL 3F 0 0 0 0 0 0 IGNORE
+   FIELD     0 1 55 28 5 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 21 4 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 15 6 1 1 20 VER RIGHT 0 0 1 10 1
+;complément avec blanc sur 160
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@'
+   GOTO      198
+;
+LABEL 5
+;Contr“le des marques de cadrage
+;changer ligne colonne et saut de groupe en fonction document
+   IFERROR   101 SERIAL 3F 0 0 0 0 0 0 ABORT
+   FIELD     498 1 1 39 1 65 1 20 HOR DOWN 0 1 1 1 2
+   FIELD     498 1 66 38 1 1 1 20 HOR DOWN 0 1 1 1 2
+;d‚tection du type de page
+   IFERROR   102 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   WRITEC    300 ' '
+   FIELD     300 1 1 2 1 1 1 20 HOR UP 0 1 1 2 2
+;   IFFOUND   '1' INTO 300 LENGTH 1 GOTO 6
+   IFFOUND   '2' INTO 300 LENGTH 1 GOTO 6
+   MESSAGE   102 SERIAL ABORT
+   NEXTDOC
+LABEL 6  
+   IFMEMORY  56 > 65 GOTO 100
+;D‚but de programme
+;   IFERROR   102 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   IFERROR   102 SERIAL 3F 0 0 0 0 0 0 IGNORE
+;   WRITEC    499 '1'
+   WRITEC    500 '200000000000000'
+   GOSUB     107
+;LECTURE BANDEAU HAUT ALPHA
+;   IFERROR   104 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 9 38 38 1 5 20 VER RIGHT 0 0 1 26 1
+;NIVEAU SCOLAIRE
+   FIELD     0 1 42 33 1 1 1 20 VER RIGHT 0 0 1 8 2
+;date naissance
+;   IFERROR   105 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 40 31 1 1 1 20 VER RIGHT 0 1 1 4 1
+   FIELD     0 1 40 30 1 1 1 20 VER RIGHT 0 1 1 10 1
+   FIELD     0 1 40 29 1 1 1 20 VER RIGHT 0 1 1 2 1
+   FIELD     0 1 40 28 3 1 1 20 VER RIGHT 0 1 1 10 1
+;SEXE CONCOURS SGAP
+;   IFERROR   106 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 41 22 1 1 1 20 VER LEFT 0 0 1 2 2
+   FIELD     0 1 46 22 1 1 6 20 VER LEFT 0 0 1 4 1
+   FIELD     0 1 40 19 2 1 1 20 VER RIGHT 0 0 1 10 1
+;DATE EXAMEN
+;   IFERROR   107 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 40 15 6 1 1 20 VER RIGHT 0 0 1 10 1
+;type concours
+;   IFERROR   108 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   FIELD     0 1 55 37 2 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 33 3 1 1 20 VER RIGHT 0 0 1 10 1
+;   IFERROR   109 SERIAL 3F 0 0 0 0 0 0 CONTINUE
+   IFERROR   109 SERIAL 3F 0 0 0 0 0 0 IGNORE
+   FIELD     0 1 55 28 5 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 21 4 1 1 20 VER RIGHT 0 0 1 10 1
+   FIELD     0 1 55 15 6 1 1 20 VER RIGHT 0 0 1 10 1
+;complément avec blanc sur 160
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@'
+   GOTO      198
+;
+;
+;LECTURE DE la page qcm
+LABEL 10
+   IFMEMORY  56 # 66 GOTO 100
+;lecture du code … barre
+   WRITEC    500 '100000000000000'
+   GOSUB     107
+;VERSO A LIRE EN PREMIER
+;QCM 1
+   FIELD     0 1 66 83 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 2
+   FIELD     0 1 66 75 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 3
+   FIELD     0 1 66 67 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 4
+   FIELD     0 1 66 59 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 5
+   FIELD     0 1 66 51 66 1 2 40 HOR UP 0 0 5 5 1
+;RECTO EN DEUXI7ME
+;QCM 1
+   FIELD     0 1 66 6 46 1 2 40 HOR UP 0 0 5 5 1
+;QCM 2
+   FIELD     0 1 66 14 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 3
+   FIELD     0 1 66 22 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 4
+   FIELD     0 1 66 30 66 1 2 40 HOR UP 0 0 5 5 1
+;QCM 5
+   FIELD     0 1 66 38 66 1 2 40 HOR UP 0 0 5 5 1
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+;   WRITEC    0 '@@@@@@@@@@@@@@@@@@@@'
+   GOTO      198
+;
+LABEL 198
+;
+LABEL 199
+   MEMORY    100 = MEMORY 54
+   MEMORY    100 - 500
+   MEMORY    100 TO 0 LENGTH 3
+   SEND      500 0
+   NEXTDOC  
+;    
+;  ++++++++++++++++++++++++++++++++++++++++++++++
+;  subroutines :
+LABEL 100
+   MESSAGE   100 SERIAL ABORT
+   GOTO      199
+;code barre non lu
+;LABEL 101
+;   WRITEC    501 '00000000??????'
+;   MESSAGE   102 SERIAL CONTINUE
+;   GOTO      1
+;
+;CONTR™LE SI REPENTIR EST PRIoritaire
+LABEL 102
+   MEMORY    3 = 39
+   MEMORY    60 = 300
+   MEMORY    58 = 100
+   MEMORY    101 = 0
+LABEL 103
+   MEMORY    101 + 1
+   IFMEMORY  101 > MEMORY 100 GOTO 105
+   IFFOUND   '1' INTO 250 LENGTH 1 GOTO 106
+   IF        ()0 # ()1 LENGTH 1 GOTO 104
+   COPY      FROM 0 TO 0 LENGTH 1
+   MEMORY    58 + 1
+   MEMORY    60 + 1
+   MEMORY    3 - 2
+   RFIELD   
+   GOTO      103
+LABEL 104
+;   IF        ()0 = ()2 LENGTH 1 GOTO 106
+   MEMORY    102 = MEMORY 58
+   MEMORY    58 = MEMORY 60
+   COPY      FROM 0 TO 0 LENGTH 1
+   MEMORY    58 = MEMORY 102
+   MEMORY    58 + 1
+   MEMORY    60 + 1
+   MEMORY    3 - 2
+   RFIELD   
+   GOTO      103
+;
+LABEL 105
+   RETURN   
+;
+LABEL 106
+   WRITEC    0 '@'
+;   MEMORY    58 = MEMORY 102
+   MEMORY    58 + 1
+   MEMORY    60 + 1
+   MEMORY    3 - 2
+   RFIELD   
+   GOTO      103
+;
+;contr“le des deux codes … barre
+LABEL 107
+;   WRITEC    300 '000000000'
+   WRITEC    300 '????????0000'
+   BARCODE   300 1 N
+   WRITEC    310 '         '
+   WRITEC    310 '???????'
+   BARCODE   310 2 N
+;   IF        ()300 # ()310 LENGTH 8 GOTO 108
+   COPY      FROM 312 TO 501 LENGTH 6
+   COPY      FROM 300 TO 507 LENGTH 8
+   RETURN   
+;CODE BARRE NON LU
+LABEL 108
+   WRITEC    507 '????????'
+   RETURN   
+;  end of subroutines
+;  ++++++++++++++++++++++++++++++++++++++++++++++
+
+@DEFINITION
+
+
+TABLEA  1,*
+  0123456789
+
+TABLET  2  16,8,4,2,1
+DEF '?'
+0   '@'
+1   'A'
+2   'B'
+3   'C'
+4   'D'
+5   'E'
+6   'F'
+7   'G'
+8   'H'
+9   'I'
+10  'J'
+11  'K'
+12  'L'
+13  'M'
+14  'N'
+15  'O'
+16  'P'
+17  'Q'
+18  'R'
+19  'S'
+20  'T'
+21  'U'
+22  'V'
+23  'W'
+24  'X'
+25  'Y'
+26  'Z'
+27  '['
+28  '\'
+29  ']'
+30  '^'
+31  '_'
+/
+
+TABLEA  3,*
+  9876543210
+
+TABLET  4  1,2,4,8,16
+DEF '?'
+0   '@'
+1   'A'
+2   'B'
+3   'C'
+4   'D'
+5   'E'
+6   'F'
+7   'G'
+8   'H'
+9   'I'
+10  'J'
+11  'K'
+12  'L'
+13  'M'
+14  'N'
+15  'O'
+16  'P'
+17  'Q'
+18  'R'
+19  'S'
+20  'T'
+21  'U'
+22  'V'
+23  'W'
+24  'X'
+25  'Y'
+26  'Z'
+27  '['
+28  '\'
+29  ']'
+30  '^'
+31  '_'
+/
+
+TABLEA  5,*
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+TABLEA  6,*
+  EIRS
+
+TABLEM  101,*
+  Erreur marques de cadrage
+
+TABLEM  102,*
+  Erreur type de feuille
+
+TABLEM  103,*
+  Erreur qcm
+
+TABLEM  104,*
+  Erreur sur nom et pr‚nom
+
+TABLEM  105,*
+  Erreur date de naissance
+
+TABLEM  106,*
+  Erreur sexe, concours, Sgap
+
+TABLEM  107,*
+  Erreur date examen
+
+TABLEM  108,*
+  Erreur type concours, batterie
+
+TABLEM  109,*
+  Erreur r‚serve ou 1 et 2
+
+TABLEM  100,*
+  Erreur nombre marques horloges
+
+@END
