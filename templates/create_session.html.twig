@@ -1,0 +1,13 @@
+<html>
+<div>
+    <label for="date">Date</label><input type="date" id="date" name="date">
+    <label for="grille">Grille</label><input list="grilles" id="grille" type="search">
+    <datalist id="grilles">
+        {% for grille in grilles %}
+        <option value="{{ grille.fileName }}" id="grille-{{ grille.id }}">
+            {% endfor %}
+    </datalist>
+    <button onclick="">Créer</button>
+</div>
+</html>
+

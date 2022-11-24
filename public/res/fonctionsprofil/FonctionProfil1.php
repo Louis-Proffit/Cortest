@@ -1,8 +1,8 @@
 <?php
 
-use App\Core\Entities\Batterie;
+use App\Core\Entities\FonctionProfil;
 
-class Batterie1 extends Batterie
+class FonctionProfil1 extends FonctionProfil
 {
 
     function compute($grille): Profil1

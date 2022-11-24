@@ -1,0 +1,16 @@
+<html>
+
+<form action="{{ path('create_batterie_form') }}" method="post">
+    <label for="batterie">Batterie</label>
+    <input name="batterie" id="batterie">
+    <label for="grille">Grille</label>
+    <input name="grille" id="grille" list="grilles">
+    <datalist id="grilles">
+        {% for grille in grilles %}
+            <li>{{ grille }}</li>
+        {% endfor %}
+    </datalist>
+    <input type="submit">
+</form>
+
+</html>

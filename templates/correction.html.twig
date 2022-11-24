@@ -1,0 +1,11 @@
+
+{% for epreuve_candidat in epreuve_candidats %}
+    {{ dump(epreuve_candidat) }}
+
+    <div>
+        <input type="checkbox" id="candidat">
+        <label for="candidat">{{ epreuve_candidat.nom }}</label>
+    </div>
+
+{% endfor %}
+
