@@ -44,7 +44,10 @@ class EpreuveEchelleController extends AbstractController
     #[Route('/creationEchelle/{idEpreuve}/{idVersion}', name: 'choixTypeEchelle')]
     public function choixTypeEchelle(Request $request, int $idEpreuve, int $idVersion): Response
     {
-        return $this->render('epreuve/choixVersion.html.twig', ['pathNextPage' => 'creationEchelle', 'idEpreuve' => $idEpreuve, 'idVersion' => $idVersion ]);
+        $epreuveRepo = new EpreuveRepository($this->doctrine);
+        $epreuve = $epreuveRepo->findOneBy(['code' => $idEpreuve]);
+        $version = $epreuve->getVersion($idVersion);
+        return $this->render('epreuve/choixEchelle.html.twig', ['pathNextPage' => 'creationEchelle', 'version' => $version ]);
     }
 
     #[Route('/creationEchelle/{idEpreuve}/{idVersion}/{typeEchelle}', name:'creationEchelle')]

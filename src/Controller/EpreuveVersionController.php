@@ -43,7 +43,7 @@ class EpreuveVersionController extends AbstractController
         $version = new EpreuveVersion(epreuve: $epreuve);
         $choices = ['choices' => ['Non Requis' => 0, 'Optionnel' => 1, 'Requis' => 2]];
         $form = $this->createFormBuilder($version)
-            ->add('version', IntegerType::class)
+            ->add('codeVersion', IntegerType::class)
             ->add('descriptif', TextType::class)
             ->add('nom', ChoiceType::class, $choices)
             ->add('prenom', ChoiceType::class, $choices)

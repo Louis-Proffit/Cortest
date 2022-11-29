@@ -47,7 +47,7 @@ class EpreuveVersionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('v')
             ->andWhere('v.epreuve = :val')
             ->setParameter('val', $value)
-            ->orderBy('v.version', 'DESC')
+            ->orderBy('v.codeVersion', 'DESC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

@@ -9,10 +9,14 @@
     <body>
         <h1>Choix de la version</h1>
         <ul>
-        {% for version in versions %}
-            <! pathNextPage is the name of the route to the next page >
-            <li> Code : {{ version.epreuve.code }}, code de la version : {{ version.version }}, statut : {{ version.statut }}, descriptif : {{ version.descriptif }}, <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version }) }}> Compléter </a> </li>
-        {% endfor %}
+        {% if versions %}
+            {% for version in versions %}
+                <! pathNextPage is the name of the route to the next page >
+                <li> Code : {{ version.epreuve.code }}, code de la version : {{ version.codeVersion }}, statut : {{ version.statut }}, descriptif : {{ version.descriptif }}, <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.codeVersion }) }}> Compléter </a> </li>
+            {% endfor %}
+        {% else %}
+            <p> Aucune version disponible </p>
+        {% endif %}
         </ul>
 
         

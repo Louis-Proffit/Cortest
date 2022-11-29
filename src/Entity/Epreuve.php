@@ -91,7 +91,7 @@ class Epreuve
     {
         for ($i = 0; $i < count($this->versions); ++$i)
         {
-            if ($this->versions[$i]->getVersion() == $idVersion)
+            if ($this->versions[$i]->getCodeVersion() == $idVersion)
             {
                 return $this->versions[$i];
             }

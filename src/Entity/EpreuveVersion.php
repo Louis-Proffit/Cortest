@@ -15,7 +15,7 @@ class EpreuveVersion
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $version = null;
+    private ?int $codeVersion = null;
 
     /*
      * 0 correspond à 'En cours de création', 1 à 'Activé', 2 à 'Désactivé' 
@@ -75,9 +75,9 @@ class EpreuveVersion
     #[ORM\JoinColumn(nullable: false)]
     private ?Epreuve $epreuve = null;
 
-    public function __construct(Epreuve $epreuve = null, int $version = null, int $statut = null, $descriptif = null) {
+    public function __construct(Epreuve $epreuve = null, int $codeVersion = null, int $statut = null, $descriptif = null) {
         $this->epreuve = $epreuve;
-        $this->version = $version;
+        $this->codeVersion = $codeVersion;
         $this->statut = $statut;
         $this->descriptif = $descriptif;
         $this->nom = 0;
@@ -102,14 +102,14 @@ class EpreuveVersion
         return $this->id;
     }
 
-    public function getVersion(): ?int
+    public function getCodeVersion(): ?int
     {
-        return $this->version;
+        return $this->codeVersion;
     }
 
-    public function setVersion(int $version): self
+    public function setCodeVersion(int $codeVersion): self
     {
-        $this->version = $version;
+        $this->codeVersion = $codeVersion;
 
         return $this;
     }

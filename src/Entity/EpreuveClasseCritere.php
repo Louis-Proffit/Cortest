@@ -23,6 +23,9 @@ class EpreuveClasseCritere
     #[ORM\Column(length: 255)]
     private ?string $valeur = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $valeurSup = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +63,18 @@ class EpreuveClasseCritere
     public function setValeur(string $valeur): self
     {
         $this->valeur = $valeur;
+
+        return $this;
+    }
+
+    public function getValeurSup(): ?string
+    {
+        return $this->valeurSup;
+    }
+
+    public function setValeurSup(?string $valeurSup): self
+    {
+        $this->valeurSup = $valeurSup;
 
         return $this;
     }
