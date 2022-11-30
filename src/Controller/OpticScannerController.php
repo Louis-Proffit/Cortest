@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/EpreuveController.php
 namespace App\Controller;
 
 use App\Entity\Epreuve;

@@ -8,15 +8,18 @@
     "ext-ctype": "*",
     "ext-dio": "*",
     "ext-iconv": "*",
+    "api/cortest": "dev-main",
     "doctrine/doctrine-bundle": "^2.7",
     "doctrine/doctrine-migrations-bundle": "^3.2",
     "doctrine/orm": "^2.13",
+    "jms/serializer": "^3.18",
     "symfony/asset": "6.1.*",
     "symfony/console": "6.1.*",
     "symfony/dotenv": "6.1.*",
     "symfony/flex": "^2",
     "symfony/framework-bundle": "6.1.*",
     "symfony/http-kernel": "6.1.*",
+    "symfony/monolog-bundle": "^3.8",
     "symfony/proxy-manager-bridge": "6.1.*",
     "symfony/runtime": "6.1.*",
     "symfony/security-bundle": "6.1.*",
@@ -47,6 +50,12 @@
       "App\\Tests\\": "tests/"
     }
   },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "./openapi"
+    }
+  ],
   "replace": {
     "symfony/polyfill-ctype": "*",
     "symfony/polyfill-iconv": "*",
@@ -61,6 +70,8 @@
       "cache:clear": "symfony-cmd",
       "assets:install %PUBLIC_DIR%": "symfony-cmd"
     },
+    "generate-openapi-bundle": "php openapi/openapi-generator.php",
+    "generate-openapi-client": "php public/api/openapi-generator.php",
     "post-install-cmd": [
       "@auto-scripts"
     ],

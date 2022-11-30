@@ -3,45 +3,6 @@ controllers:
   resource: ../src/Controller/
   type: attribute
 
-epreuveShow:
-  path: /creationEpreuve
-  controller: App\Controller\EpreuveController::show
-  methods: GET|HEAD
+open_api_server:
+  resource: "@OpenAPIServerBundle/Resources/config/routing.yaml"
 
-epreuvePost:
-  path: /creationEpreuve
-  controller: App\Controller\EpreuveController::form
-  methods: POST
-
-epreuveVersionShow:
-  path: /creationVersion
-  controller: App\Controller\EpreuveVersionController::show
-  methods: GET|HEAD
-
-epreuveVersionPost:
-  path: /creationVersion/{idEpreuve}
-  controller: App\Controller\EpreuveVersionController::creationVersion
-
-epreuveNotationDirecteChoixEpreuve:
-  path: /creationNotation
-  controller: App\Controller\EpreuveNotationDirecteController::choixEpreuveNotation
-
-epreuveNotationDirecteChoixVersion:
-  path: /creationNotation/{idEpreuve}
-  controller: App\Controller\EpreuveNotationDirecteController::choixVersionNotation
-
-epreuveNotationDirecteEdit:
-  path: /creationNotation/{idEpreuve}/{idVersion}
-  controller: App\Controller\EpreuveNotationDirecteController::creationNotationDirecte
-
-epreuveEchelleChoixEpreuve:
-  path: /creationEchelle
-  controller: App\Controller\EpreuveEchelleController::choixEpreuveEchelle
-
-epreuveEchelleChoixVersion:
-  path: /creationEchelle/{idEpreuve}
-  controller: App\Controller\EpreuveEchelleController::choixVersionEchelle
-
-epreuveEchelleEdit:
-  path: /creationEchelle/{idEpreuve}/{idVersion}
-  controller: App\Controller\EpreuveEchelleController::creationEchelle
