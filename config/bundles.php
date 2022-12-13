@@ -10,4 +10,5 @@ return [
     JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
     App\OpenApiBundle\OpenAPIServerBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
 ];

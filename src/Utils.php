@@ -2,7 +2,10 @@
 
 namespace App;
 
-function list_files(string $dir)
+class Utils
 {
-    return array_diff(scandir($dir), array(".", ".."));
+    function list_files(string $dir)
+    {
+        return array_diff(scandir($dir), array(".", ".."));
+    }
 }

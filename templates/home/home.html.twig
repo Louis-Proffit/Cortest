@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Principales actions de l'application{% endblock %}
+
+{% block body %}
+    
+    <a href="{{ path('score', { 'id': 0}) }}"> Réponse à calculer </a>
+    <a href="{{ path('reponse', { 'id': 0}) }}"> Score à calculer </a>    
+
+{% endblock %}
