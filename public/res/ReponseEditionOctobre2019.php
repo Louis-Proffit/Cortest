@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Core\Entities;
+namespace Res;
+
+use App\Core\Entities\Reponse;
 
 class ReponseEditionOctobre2019 extends Reponse
 {

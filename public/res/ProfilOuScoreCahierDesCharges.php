@@ -1,7 +1,8 @@
 <?php
 
+namespace Res;
 
-namespace App\Core\Entities;
+use App\Core\Entities\ProfilOuScore;
 
 class ProfilOuScoreCahierDesCharges extends ProfilOuScore
 {

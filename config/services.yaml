@@ -20,6 +20,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Res\:
+        resource: '../public/res/'
+
     App\Api\CortestApi:
         tags:
             - { name: "open_api_server.api", api: "default" }

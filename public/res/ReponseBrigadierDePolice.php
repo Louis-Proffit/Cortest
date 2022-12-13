@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Core\Entities;
+namespace Res;
 
 use App\Core\Entities\Reponse;
-use JMS\Serializer\Annotation\SerializedName;
 
 class ReponseBrigadierDePolice extends Reponse
 {

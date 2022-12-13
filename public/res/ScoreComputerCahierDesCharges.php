@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Core\Entities;
+namespace Res;
+
+use App\Core\Entities\EtalonnageComputer;
+use App\Core\Entities\ProfilOuScore;
 
 class ScoreComputerCahierDesCharges extends EtalonnageComputer
 {
