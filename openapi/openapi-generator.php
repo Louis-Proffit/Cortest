@@ -1,6 +1,6 @@
 <?php
 // OpenAPI Specification
-$exe = "java -jar openapi-generator-cli-6.2.1.jar";
+$exe = "java -jar openapi-generator-cli.jar";
 $urlToOpenApiYaml = "spec.json";
 $generatorName = "php-symfony";
 $outputPath = "openapi";
