@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\CandidatReponseRepository;
+use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CandidatReponseRepository::class)]
+#[ORM\Entity(repositoryClass: SessionRepository::class)]
 class Session
 {
     #[ORM\Id]

@@ -3,8 +3,11 @@
 {% block title %}Principales actions de l'application{% endblock %}
 
 {% block body %}
-    
-    <a href="{{ path('score', { 'id': 0}) }}"> Réponse à calculer </a>
-    <a href="{{ path('reponse', { 'id': 0}) }}"> Score à calculer </a>    
+
+    <a href="{{ path("calcul_base") }}">Corriger une session de base</a>
+    <br>
+    <a href="{{ path('calculer_score', { 'id': 0}) }}"> Réponse à calculer </a>
+    <br>
+    <a href="{{ path('calculer_reponse', { 'id': 0}) }}"> Score à calculer </a>
 
 {% endblock %}
