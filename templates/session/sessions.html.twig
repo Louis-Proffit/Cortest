@@ -1,0 +1,11 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    {% for session in sessions %}
+        <li><a href="{{ path("consulter_session", {"id":session.id}) }}">{{ session.date_saisie|date('d-m-Y') }}</a></li>
+    {% endfor %}
+{% endblock %}
+
+{% block title %}
+    Sessions
+{% endblock %}
+

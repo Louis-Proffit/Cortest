@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CandidatReponseRepository;
 use App\Repository\SessionRepository;
 use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,5 +24,8 @@ class Session
 
     #[ORM\ManyToOne(targetEntity: DefinitionGrille::class)]
     public DefinitionGrille $grille;
+
+    #[ORM\OneToMany(mappedBy: "session", targetEntity: CandidatReponse::class)]
+    public Collection $candidats;
 
 }

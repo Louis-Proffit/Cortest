@@ -18,17 +18,19 @@ class CandidatReponse
     public Session $session;
 
     #[ORM\Column(type: Types::JSON)]
-    public string $reponses;
+    public array $reponses;
 
     /**
      * @param int $id
      * @param Session $session
-     * @param string $reponses
+     * @param array $reponses
      */
-    public function __construct(int $id, Session $session, string $reponses)
+    public function __construct(int $id, Session $session, array $reponses)
     {
         $this->id = $id;
         $this->session = $session;
         $this->reponses = $reponses;
     }
+
+
 }

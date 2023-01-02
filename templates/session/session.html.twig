@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+{% block body %}
+
+    <h1>Session du {{ session.date_saisie|date('d-m-Y') }}</h1>
+
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Prenom</th>
+            <th scope="col">Nom de jeune fille</th>
+            <th scope="col">Date de naissance</th>
+            <th scope="col">Sexe</th>
+            <th scope="col">Concours</th>
+            <th scope="col">SGAP</th>
+            <th scope="col">Reponses</th>
+            <th scope="col">Scores</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for candidat in session.candidats %}
+            <tr>
+                <td>{{ candidat.reponses["nom"] }}</td>
+                <td>{{ candidat.reponses["prenom"] }}</td>
+                <td>{{ candidat.reponses["nom_jeune_fille"] }}</td>
+                <td>{{ candidat.reponses["date_naissance_jour"] }}-{{ candidat.reponses["date_naissance_mois"] }}
+                    -{{ candidat.reponses["date_naissance_an"] }}</td>
+                <td>{{ candidat.reponses["sexe"]|sexe }}</td> {# TODO convert sexe #}
+                <td>{{ candidat.reponses["concours"] }}</td>
+                <td>{{ candidat.reponses["sgap"]|sgap }}</td> {# TODO convert sgap #}
+                <td>{{ candidat.reponses["reponses"] }}</td>
+                <td>Score ?</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block title %}
+    Consulter une session
+{% endblock %}
+
