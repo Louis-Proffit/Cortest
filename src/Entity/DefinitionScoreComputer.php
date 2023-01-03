@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\ScoreComputerRepository;
+use App\Repository\DefinitionScoreComputerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ScoreComputerRepository::class)]
+#[ORM\Entity(repositoryClass: DefinitionScoreComputerRepository::class)]
 class DefinitionScoreComputer
 {
     #[ORM\Id]
@@ -20,8 +20,8 @@ class DefinitionScoreComputer
     public DefinitionScore $score;
 
     #[ORM\Column]
-    public $nom;
+    public string $nom;
 
     #[ORM\Column]
-    public $nom_php;
+    public string $nom_php;
 }

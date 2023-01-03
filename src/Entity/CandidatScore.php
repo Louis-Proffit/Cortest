@@ -22,20 +22,4 @@ class CandidatScore
 
     #[ORM\Column(type: Types::JSON)]
     public string $score;
-
-    /**
-     * @param int $id
-     * @param CandidatReponse $reponses
-     * @param DefinitionScoreComputer $computer
-     * @param string $score
-     */
-    public function __construct(int $id, CandidatReponse $reponses, DefinitionScoreComputer $computer, string $score)
-    {
-        $this->id = $id;
-        $this->reponses = $reponses;
-        $this->scoreComputer = $computer;
-        $this->score = $score;
-    }
-
-
 }

@@ -1,15 +1,17 @@
 <?php
 
-namespace Res;
+namespace Res\ScoreComputer;
 
-use App\Core\Entities\EtalonnageComputer;
 use App\Core\Entities\ProfilOuScore;
+use App\Core\Entities\ScoreComputer;
+use Res\DefinitionGrille\GrilleReponseEditionOctobre2019;
+use Res\DefinitionScoreOuProfil\ProfilOuScoreCahierDesCharges;
 
-class ScoreComputerCahierDesCharges extends EtalonnageComputer
+class ScoreComputerCahierDesCharges extends ScoreComputer
 {
 
     /**
-     * @param ReponseEditionOctobre2019 $reponses
+     * @param GrilleReponseEditionOctobre2019 $reponses
      */
     function compute($reponses): ProfilOuScore
     {

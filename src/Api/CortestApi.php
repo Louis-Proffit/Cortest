@@ -2,7 +2,7 @@
 
 namespace App\Api;
 
-use App\Core\Entities\Reponse;
+use App\Core\Entities\GrilleReponse;
 use App\Entity\CandidatReponse;
 use App\Entity\CandidatScore;
 use App\Entity\DefinitionScoreComputer;
@@ -10,7 +10,7 @@ use App\Entity\Session;
 use App\OpenApiBundle\Api\DefaultApiInterface;
 use App\OpenApiBundle\Model\ReponsesACalculer;
 use App\OpenApiBundle\Model\ScoresACalculer;
-use App\Repository\FilesRepository;
+use App\Repository\RuntimeResourcesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use Psr\Log\LoggerInterface;
@@ -20,14 +20,14 @@ class CortestApi implements DefaultApiInterface
 {
     private LoggerInterface $logger;
     private ManagerRegistry $doctrine;
-    private FilesRepository $files_repository;
+    private RuntimeResourcesRepository $files_repository;
 
     /**
      * @param ManagerRegistry $doctrine
-     * @param FilesRepository $filesRepository
+     * @param RuntimeResourcesRepository $filesRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(ManagerRegistry $doctrine, FilesRepository $filesRepository, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $doctrine, RuntimeResourcesRepository $filesRepository, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;
         $this->files_repository = $filesRepository;
@@ -50,7 +50,7 @@ class CortestApi implements DefaultApiInterface
             $this->logger->debug("Echec de la traduction des réponses");
             $responseCode = Response::HTTP_CONFLICT;
         } else {
-            /** @var Reponse $reponse */
+            /** @var GrilleReponse $reponse */
             foreach ($reponses as $reponse) {
                 $manager->persist(
                     new CandidatReponse(0, $session, $serializer->serialize($reponse, "json"))

@@ -1,10 +1,10 @@
 <?php
 
-namespace Res;
+namespace Res\DefinitionGrille;
 
-use App\Core\Entities\Reponse;
+use App\Core\Entities\GrilleReponse;
 
-class ReponseEditionOctobre2019 extends Reponse
+class GrilleReponseEditionOctobre2019 extends GrilleReponse
 {
     public string $nom;
     public string $prenom;

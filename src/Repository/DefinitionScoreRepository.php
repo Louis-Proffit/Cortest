@@ -8,12 +8,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Session>
+ * @extends ServiceEntityRepository<DefinitionScore>
  *
- * @method Session|null find($id, $lockMode = null, $lockVersion = null)
- * @method Session|null findOneBy(array $criteria, array $orderBy = null)
- * @method Session[]    findAll()
- * @method Session[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method DefinitionScore|null find($id, $lockMode = null, $lockVersion = null)
+ * @method DefinitionScore|null findOneBy(array $criteria, array $orderBy = null)
+ * @method DefinitionScore[]    findAll()
+ * @method DefinitionScore[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DefinitionScoreRepository extends ServiceEntityRepository
 {

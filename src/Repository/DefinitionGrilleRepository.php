@@ -8,12 +8,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Session>
+ * @extends ServiceEntityRepository<DefinitionGrille>
  *
- * @method Session|null find($id, $lockMode = null, $lockVersion = null)
- * @method Session|null findOneBy(array $criteria, array $orderBy = null)
- * @method Session[]    findAll()
- * @method Session[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method DefinitionGrille|null find($id, $lockMode = null, $lockVersion = null)
+ * @method DefinitionGrille|null findOneBy(array $criteria, array $orderBy = null)
+ * @method DefinitionGrille[]    findAll()
+ * @method DefinitionGrille[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DefinitionGrilleRepository extends ServiceEntityRepository
 {

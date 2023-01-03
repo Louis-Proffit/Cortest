@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\EtalonnageComputerRepository;
+use App\Repository\DefinitionEtalonnageComputerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: EtalonnageComputerRepository::class)]
+#[ORM\Entity(repositoryClass: DefinitionEtalonnageComputerRepository::class)]
 class DefinitionEtalonnageComputer
 {
     #[ORM\Id]

@@ -2,18 +2,27 @@
 
 namespace App\Controller;
 
+use App\Core\Entities\ProfilOuScore;
+use App\Core\Entities\ScoreComputer;
 use App\Entity\CandidatReponse;
 use App\Entity\CandidatScore;
+use App\Entity\DefinitionEtalonnageComputer;
+use App\Entity\DefinitionScoreComputer;
 use App\Entity\Session;
-use App\Entity\UploadSessionBase;
+use App\Form\SessionProfilForm;
+use App\Form\SessionProfilFormType;
+use App\Form\SessionScoreForm;
+use App\Form\UploadSessionBase;
 use App\Form\UploadSessionBaseType;
+use App\Repository\RuntimeResourcesRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Res\ReponseEditionOctobre2019;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -32,8 +41,6 @@ class BaseController extends AbstractController
     {
         $manager = $doctrine->getManager();
         $sessions = $manager->getRepository(Session::class)->findAll();
-
-        $logger->info("Sessions à choisir : " . count($sessions));
 
         $uploadSessionBase = new UploadSessionBase();
         $form = $this->createForm(UploadSessionBaseType::class, $uploadSessionBase, ["sessions" => $sessions]);
@@ -96,13 +103,22 @@ class BaseController extends AbstractController
         return $this->file("test.pdf", "score_candidat.pdf", ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
-    #[Route('/score/{id}', name: 'calculer_score')]
+    #[Route("/candiat_score/{id}", name: "consulter_candidat_score")]
+    public function consulterScore(ManagerRegistry $doctrine, int $id): Response
+    {
+        $candidat_score = $doctrine->getManager()->find(CandidatScore::class, $id);
+
+        return $this->render("session/candidat_score.html.twig", ["candidat_score" => $candidat_score]);
+    }
+
+    // TODO renomer les routes pour être cohérent avec les routes du ui
+    /*#[Route('/score/{id}', name: 'calculer_score')]
     public function scoreCalculator(Request $request, int $id): Response
     {
         return $this->render('home/home.html.twig', [
             'last_username' => 'user'
         ]);
-    }
+    }*/
 
     #[Route('/reponse/{id}', name: 'calculer_reponse')]
     public function reponseCalculator(Request $request, int $id): Response

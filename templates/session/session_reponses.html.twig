@@ -1,10 +1,8 @@
 {% extends "base.html.twig" %}
 {% block body %}
 
-    <h2>Session du {{ session.date_saisie|date('d-m-Y') }}</h2>
+    <h1>Session du {{ session.date_saisie|date('d-m-Y') }}</h1>
 
-    <br>
-    <a href="{{ path("session_score_form", {"session_id":session.id}) }}">Calculer les scores</a>
     <br>
     <table class="table">
         <thead>
@@ -16,7 +14,8 @@
             <th scope="col">Sexe</th>
             <th scope="col">Concours</th>
             <th scope="col">SGAP</th>
-            <th scope="col">Reponses brutes</th>
+            <th scope="col">Reponses</th>
+            <th scope="col">Consutler scores</th>
         </tr>
         </thead>
         <tbody>
@@ -27,10 +26,11 @@
                 <td>{{ candidat.reponses["nom_jeune_fille"] }}</td>
                 <td>{{ candidat.reponses["date_naissance_jour"] }}-{{ candidat.reponses["date_naissance_mois"] }}
                     -{{ candidat.reponses["date_naissance_an"] }}</td>
-                <td>{{ candidat.reponses["sexe"]|sexe }}</td>
+                <td>{{ candidat.reponses["sexe"]|sexe }}</td> {# TODO convert sexe #}
                 <td>{{ candidat.reponses["concours"] }}</td>
-                <td>{{ candidat.reponses["sgap"]|sgap }}</td>
+                <td>{{ candidat.reponses["sgap"]|sgap }}</td> {# TODO convert sgap #}
                 <td>{{ candidat.reponses["reponses"] }}</td>
+                <td><a href="{{ path("consulter_candidat_score", {"id":candidat.id}) }}"></a></td>
             </tr>
         {% endfor %}
         </tbody>

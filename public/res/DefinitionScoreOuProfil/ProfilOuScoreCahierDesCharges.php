@@ -1,6 +1,6 @@
 <?php
 
-namespace Res;
+namespace Res\DefinitionScoreOuProfil;
 
 use App\Core\Entities\ProfilOuScore;
 

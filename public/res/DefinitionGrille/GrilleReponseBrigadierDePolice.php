@@ -1,10 +1,10 @@
 <?php
 
-namespace Res;
+namespace Res\DefinitionGrille;
 
-use App\Core\Entities\Reponse;
+use App\Core\Entities\GrilleReponse;
 
-class ReponseBrigadierDePolice extends Reponse
+class GrilleReponseBrigadierDePolice extends GrilleReponse
 {
     public int $numero_de_candidat;
     public int $sgap;

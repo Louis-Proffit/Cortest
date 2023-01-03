@@ -8,7 +8,18 @@ use Twig\TwigFilter;
 class CortestExtension extends AbstractExtension
 {
 
-    public function getFilters():array
+    private array $sgaps;
+
+    /**
+     * @param array $sgaps
+     */
+    public function __construct(array $sgaps)
+    {
+        $this->sgaps = $sgaps;
+    }
+
+
+    public function getFilters(): array
     {
         return [
             new TwigFilter('sexe', [$this, 'formatSexe']),
@@ -18,19 +29,19 @@ class CortestExtension extends AbstractExtension
 
     public function formatSexe(int $sex_index): string
     {
-       if($sex_index == 0) {
-           return "Homme";
-       } else {
-           return "Femme";
-       }
+        if ($sex_index == 0) {
+            return "Homme";
+        } else {
+            return "Femme";
+        }
     }
 
     public function formatSgap(int $sgap_index): string
     {
-        if($sgap_index == 0) {
-            return "SGAP 1";
+        if (array_key_exists($sgap_index, $this->sgaps)) {
+            return $this->sgaps[$sgap_index];
         } else {
-            return "Autre SGAP";
+            return "SGAP inconnu";
         }
     }
 }
