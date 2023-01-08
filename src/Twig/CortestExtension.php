@@ -2,20 +2,17 @@
 
 namespace App\Twig;
 
+use App\Constants\Sgaps;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 class CortestExtension extends AbstractExtension
 {
 
-    private array $sgaps;
-
-    /**
-     * @param array $sgaps
-     */
-    public function __construct(array $sgaps)
+    public function __construct(
+        private readonly Sgaps $sgaps
+    )
     {
-        $this->sgaps = $sgaps;
     }
 
 
@@ -38,10 +35,6 @@ class CortestExtension extends AbstractExtension
 
     public function formatSgap(int $sgap_index): string
     {
-        if (array_key_exists($sgap_index, $this->sgaps)) {
-            return $this->sgaps[$sgap_index];
-        } else {
-            return "SGAP inconnu";
-        }
+        return $this->sgaps->nom($sgap_index);
     }
 }

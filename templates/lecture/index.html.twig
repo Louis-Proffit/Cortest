@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Saisir des notes</h1>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="card col">
+            <div class="card-body">
+                <h5 class="card-title">Lecteur optique</h5>
+                <p class="card-text">Utilisation du lecteur optique</p>
+                <a type="button" class="btn btn-primary" href="{{ path("lecture_scanner") }}">Choisir</a>
+            </div>
+        </div>
+        <div class="card col">
+            <div class="card-body">
+                <h5 class="card-title">.JSON</h5>
+                <p class="card-text">Lecture d'un fichier de notes au format .json</p>
+                <a type="button" class="btn btn-primary" href="{{ path("lecture_fichier") }}">Choisir</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

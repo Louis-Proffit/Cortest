@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\DefinitionGrille;
 use App\Entity\DefinitionScoreComputer;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method DefinitionScoreComputer[]    findAll()
  * @method DefinitionScoreComputer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DefinitionScoreComputerRepository extends ServiceEntityRepository
+class DefinitionScoreComputerRepository extends LazyServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

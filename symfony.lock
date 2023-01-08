@@ -106,6 +106,18 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/mailer": {
+        "version": "6.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "2bf89438209656b85b9a49238c4467bff1b1f939"
+        },
+        "files": [
+            "./config/packages/mailer.yaml"
+        ]
+    },
     "symfony/maker-bundle": {
         "version": "1.46",
         "recipe": {
@@ -125,21 +137,6 @@
         },
         "files": [
             "./config/packages/monolog.yaml"
-        ]
-    },
-    "symfony/phpunit-bridge": {
-        "version": "6.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "5.3",
-            "ref": "97cb3dc7b0f39c7cfc4b7553504c9d7b7795de96"
-        },
-        "files": [
-            "./.env.test",
-            "./bin/phpunit",
-            "./phpunit.xml.dist",
-            "./tests/bootstrap.php"
         ]
     },
     "symfony/routing": {
@@ -179,6 +176,9 @@
             "./config/packages/twig.yaml",
             "./templates/base.html.twig"
         ]
+    },
+    "symfony/ux-react": {
+        "version": "v2.6.1"
     },
     "symfony/validator": {
         "version": "6.1",
@@ -223,5 +223,20 @@
             "./package.json",
             "./webpack.config.js"
         ]
+    },
+    "symfonycasts/reset-password-bundle": {
+        "version": "1.14",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "97c1627c0384534997ae1047b93be517ca16de43"
+        },
+        "files": [
+            "./config/packages/reset_password.yaml"
+        ]
+    },
+    "twig/extra-bundle": {
+        "version": "v3.5.0"
     }
 }

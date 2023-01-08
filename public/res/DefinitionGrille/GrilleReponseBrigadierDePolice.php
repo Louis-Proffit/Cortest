@@ -9,10 +9,10 @@ class GrilleReponseBrigadierDePolice extends GrilleReponse
     public int $numero_de_candidat;
     public int $sgap;
 
-    public function fill(string $raw)
+    public function fill(array $raw)
     {
-        $this->numero_de_candidat = 10;
-        $this->sgap = 5;
-        $this->reponses = array_fill(1, 120, '@');
+        $this->numero_de_candidat = $this->getOrDefault("numero_candidat", $raw, 0);
+        $this->sgap = $this->getOrDefault("sgap", $raw, 0);
+        $this->reponses = $this->getOrDefault("reponses", $raw, array());
     }
 }

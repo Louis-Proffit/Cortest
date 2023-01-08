@@ -23,18 +23,14 @@ services:
     Res\:
         resource: '../public/Res/'
 
-    App\Api\CortestApi:
-        tags:
-            - { name: "open_api_server.api", api: "default" }
-
     App\Repository\RuntimeResourcesRepository:
         arguments:
             $definition_grilles_reponses_folder: DefinitionGrille
             $definition_profil_ou_score_folder: DefinitionScoreOuProfil
             $score_computer_folder: ScoreComputer
-            $etalonnage_computer_folder: EtalonnageComputer
+            $etalonnage_computer_folder: ProfilComputer
 
-    App\Twig\CortestExtension:
+    App\Constants\Sgaps:
         arguments:
             $sgaps:
                 1: Bordeaux

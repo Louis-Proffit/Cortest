@@ -1,0 +1,10 @@
+{% macro session_dl(session) %}
+    <dl class="row">
+        <dt class="col-md-3">Feuille de réponse</dt>
+        <dd class="col-md-9">{{ session.grille.nom }}</dd>
+        <dt class="col-md-3">Date</dt>
+        <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
+        <dt class="col-md-3">SGAP</dt>
+        <dd class="col-md-9">{{ session.sgap_index|sgap }}</dd>
+    </dl>
+{% endmacro %}

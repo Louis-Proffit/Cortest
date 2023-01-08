@@ -1,3 +1,2 @@
-body {
-    background-color: white;
-}
+@import '~mdb-ui-kit/css/mdb.min.css';
+@import "font-awesome/css/font-awesome.css";

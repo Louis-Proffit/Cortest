@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\CandidatReponseRepository;
 use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
@@ -18,9 +17,10 @@ class Session
     public int $id;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    public DateTime $date_saisie;
+    public DateTime $date;
 
-    // TODO other fields, indice de batterie par exemple
+    #[ORM\Column]
+    public int $sgap_index;
 
     #[ORM\ManyToOne(targetEntity: DefinitionGrille::class)]
     public DefinitionGrille $grille;

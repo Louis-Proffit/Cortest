@@ -24,11 +24,11 @@ class GrilleReponseEditionOctobre2019 extends GrilleReponse
     public int $autre_1;
     public int $autre_2;
 
-    public function fill(string $raw)
+    public function fill(array $raw)
     {
-        $this->reponses = array_fill(1, 640, '@');
-        $this->nom = "Proffit";
-        $this->prenom = "Louis";
-        $this->nom_jeune_fille = "Oui";
+        $this->reponses = $this->getOrDefault("reponses", $raw, array_fill(1, 10, '@'));
+        $this->nom = $this->getOrDefault("nom", $raw, "");
+        $this->prenom = $this->getOrDefault("prenom", $raw, "");
+        $this->nom_jeune_fille = $this->getOrDefault("nom_jeune_fille", $raw, '');
     }
 }

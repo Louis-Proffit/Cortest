@@ -1,0 +1,80 @@
+{% macro table(scores_ou_profils) %}
+
+    <table class="table" style="white-space: nowrap">
+        <thead>
+        <tr>
+            <th>Collationnement</th>
+            <th>Verbal Mot</th>
+            <th>Spatial</th>
+            <th>Verbal Syntaxique</th>
+            <th>Raisonnement</th>
+            <th>Dic</th>
+            <th>Anxiete</th>
+            <th>Irritabilite</th>
+            <th>Impusilvite</th>
+            <th>Introspection</th>
+            <th>Entetement</th>
+            <th>Mefiance</th>
+            <th>Depression</th>
+            <th>Gene</th>
+            <th>Manque Altruisme</th>
+            <th>Sociabilite</th>
+            <th>Spontaneite</th>
+            <th>Ascendance</th>
+            <th>Assurance</th>
+            <th>Interet Intelletuel</th>
+            <th>Nouveaute</th>
+            <th>Creativite</th>
+            <th>Rigueur</th>
+            <th>Planification</th>
+            <th>Perseverance</th>
+            <th>Sincerite</th>
+            <th>Obsessionalite</th>
+            <th>Agressivite</th>
+            <th>Depressivite</th>
+            <th>Paranoidie</th>
+            <th>Narcissisme</th>
+            <th>Intolerance A La Frustration</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for score_ou_profil in scores_ou_profils %}
+            <tr>
+                <td>{{ score_ou_profil.collationnement }}</td>
+                <td>{{ score_ou_profil.verbal_mot }}</td>
+                <td>{{ score_ou_profil.spatial }}</td>
+                <td>{{ score_ou_profil.verbal_syntaxique }}</td>
+                <td>{{ score_ou_profil.raisonnement }}</td>
+                <td>{{ score_ou_profil.dic }}</td>
+                <td>{{ score_ou_profil.anxiete }}</td>
+                <td>{{ score_ou_profil.irritabilite }}</td>
+                <td>{{ score_ou_profil.impusilvite }}</td>
+                <td>{{ score_ou_profil.introspection }}</td>
+                <td>{{ score_ou_profil.entetement }}</td>
+                <td>{{ score_ou_profil.mefiance }}</td>
+                <td>{{ score_ou_profil.depression }}</td>
+                <td>{{ score_ou_profil.gene }}</td>
+                <td>{{ score_ou_profil.manque_altruisme }}</td>
+                <td>{{ score_ou_profil.sociabilite }}</td>
+                <td>{{ score_ou_profil.spontaneite }}</td>
+                <td>{{ score_ou_profil.ascendance }}</td>
+                <td>{{ score_ou_profil.assurance }}</td>
+                <td>{{ score_ou_profil.interet_intelletuel }}</td>
+                <td>{{ score_ou_profil.nouveaute }}</td>
+                <td>{{ score_ou_profil.creativite }}</td>
+                <td>{{ score_ou_profil.rigueur }}</td>
+                <td>{{ score_ou_profil.planification }}</td>
+                <td>{{ score_ou_profil.perseverance }}</td>
+                <td>{{ score_ou_profil.sincerite }}</td>
+                <td>{{ score_ou_profil.obsessionalite }}</td>
+                <td>{{ score_ou_profil.agressivite }}</td>
+                <td>{{ score_ou_profil.depressivite }}</td>
+                <td>{{ score_ou_profil.paranoidie }}</td>
+                <td>{{ score_ou_profil.narcissisme }}</td>
+                <td>{{ score_ou_profil.intolerance_a_la_frustration }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endmacro %}
