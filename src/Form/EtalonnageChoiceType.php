@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ParametresCalculProfilType extends AbstractType
+class EtalonnageChoiceType extends AbstractType
 {
     const SCORE_ID_OPTION = "score_id";
 
@@ -20,7 +20,7 @@ class ParametresCalculProfilType extends AbstractType
     {
     }
 
-    private function etalo(Etalonnage $definition_etalonnage_computer): string
+    private function etalonnage(Etalonnage $definition_etalonnage_computer): string
     {
         return $definition_etalonnage_computer->nom;
     }

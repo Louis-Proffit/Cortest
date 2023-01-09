@@ -20,16 +20,6 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    Res\:
-        resource: '../public/Res/'
-
-    App\Repository\RuntimeResourcesRepository:
-        arguments:
-            $definition_grilles_reponses_folder: DefinitionGrille
-            $definition_profil_ou_score_folder: DefinitionScoreOuProfil
-            $score_computer_folder: ScoreComputer
-            $etalonnage_computer_folder: ProfilComputer
-
     App\Constants\Sgaps:
         arguments:
             $sgaps:

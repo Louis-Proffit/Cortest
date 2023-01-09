@@ -4,7 +4,7 @@ namespace App\Form\Data;
 
 use App\Entity\Correcteur;
 
-class ParametresCalculScore
+class CorrecteurChoice
 {
     public Correcteur $correcteur;
 }

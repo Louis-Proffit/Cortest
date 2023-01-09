@@ -4,7 +4,7 @@ namespace App\Form\Data;
 
 use App\Entity\Etalonnage;
 
-class ParametresCalculProfil
+class EtalonnageChoice
 {
     public Etalonnage $etalonnage;
 }

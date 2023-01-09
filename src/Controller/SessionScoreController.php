@@ -7,8 +7,8 @@ use App\Core\Res\Correcteur\CorrecteurManager;
 use App\Core\Res\Grille\GrilleRepository;
 use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
 use App\Entity\Session;
-use App\Form\Data\ParametresCalculScore;
-use App\Form\ParametresCalculScoreType;
+use App\Form\Data\CorrecteurChoice;
+use App\Form\CorrecteurChoiceType;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,10 +31,10 @@ class SessionScoreController extends AbstractController
         /** @var Session $session */
         $session = $session_repository->find($session_id);
 
-        $parametres_calcul_score = new ParametresCalculScore();
-        $form = $this->createForm(ParametresCalculScoreType::class,
+        $parametres_calcul_score = new CorrecteurChoice();
+        $form = $this->createForm(CorrecteurChoiceType::class,
             $parametres_calcul_score,
-            [ParametresCalculScoreType::GRILLE_ID_OPTION => $session->grille_id]
+            [CorrecteurChoiceType::GRILLE_ID_OPTION => $session->grille_id]
         );
 
         $form->handleRequest($request);
@@ -59,4 +59,6 @@ class SessionScoreController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
 }

@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ParametresCalculScoreType extends AbstractType
+class CorrecteurChoiceType extends AbstractType
 {
     const GRILLE_ID_OPTION = "grille_id";
 
@@ -20,18 +20,13 @@ class ParametresCalculScoreType extends AbstractType
     {
     }
 
-    private function definitionScoreComputerDisplay(Correcteur $correcteur): string
-    {
-        return $correcteur->nom;
-    }
-
-    private function definitionScoreComputerChoices(int $grille_id): array
+    private function definitionCorrecteurChoice(int $grille_id): array
     {
         $correcteurs = $this->repository->findBy(["grille_id" => $grille_id]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
-            $result[$this->definitionScoreComputerDisplay($correcteur)] = $correcteur;
+            $result[$correcteur->nom] = $correcteur;
         }
 
         return $result;
@@ -43,7 +38,7 @@ class ParametresCalculScoreType extends AbstractType
             "correcteur",
             ChoiceType::class,
             [
-                "choices" => $this->definitionScoreComputerChoices($options[self::GRILLE_ID_OPTION])
+                "choices" => $this->definitionCorrecteurChoice($options[self::GRILLE_ID_OPTION])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
