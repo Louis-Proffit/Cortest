@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Grilles disponibles</h1>
+    <br>
+    <p class="lead">Liste des grilles utilisables par l'application Cortest.</p>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Propriétes</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for grille in grilles %}
+            <tr>
+                <td>{{ grille.nom }}</td>
+                <td>
+                    {% for property in grille.properties %}
+                        {{ property.nom }}
+                        {{ not loop.last ? ' - ' : '' }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

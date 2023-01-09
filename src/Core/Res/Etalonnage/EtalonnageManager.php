@@ -2,19 +2,27 @@
 
 namespace App\Core\Res\Etalonnage;
 
-use App\Core\Res\ProfilOuScore\ProfilOuScore;
+use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
 use App\Entity\Etalonnage;
 
 class EtalonnageManager
 {
 
-    public function etalonner(Etalonnage $etalonnage, ProfilOuScore $profil_ou_score, array $scores): array
+    public function __construct(
+        private readonly ProfilOuScoreRepository $profil_ou_score_repository
+    )
+    {
+    }
+
+    public function etalonner(Etalonnage $etalonnage, array $scores): array
     {
         $etalonne = [];
 
-        foreach ($scores as $score) {
+        foreach ($scores as $reponse_id => $score) {
 
             $result = [];
+
+            $profil_ou_score = $this->profil_ou_score_repository->get($etalonnage->score_id);
 
             foreach ($profil_ou_score->getProperties() as $property) {
 
@@ -25,7 +33,7 @@ class EtalonnageManager
 
                 foreach ($etalonnage_item as $bound) {
 
-                    if($score_item >= $bound) {
+                    if ($score_item >= $bound) {
                         $index++;
                     } else {
                         break;
@@ -37,7 +45,7 @@ class EtalonnageManager
 
             }
 
-            $etalonne[] = $result;
+            $etalonne[$reponse_id] = $result;
 
         }
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Session;
+use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Session[]    findAll()
  * @method Session[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SessionRepository extends ServiceEntityRepository
+class SessionRepository extends LazyServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

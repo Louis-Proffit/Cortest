@@ -5,16 +5,18 @@ namespace App\Controller;
 use App\Core\Pdf\PdfManager;
 use App\Core\Res\Correcteur\CorrecteurManager;
 use App\Core\Res\Etalonnage\EtalonnageManager;
-use App\Core\Res\Grille\GrilleRepository;
-use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
+use App\Core\Res\ProfilGraphique\ProfilGraphiqueRepository;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
 use App\Form\EtalonnageChoiceType;
+use App\Repository\CandidatReponseRepository;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -111,36 +113,29 @@ class SessionProfilController extends AbstractController
 
     #[Route("/consulter/{session_id}/{correcteur_id}/{etalonnage_id}", name: "consulter")]
     public function consulter(
-        CorrecteurManager       $correcteur_manager,
-        EtalonnageManager       $etalonnage_manager,
-        SessionRepository       $session_repository,
-        GrilleRepository        $grille_repository,
-        EtalonnageRepository    $etalonnage_repository,
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        CorrecteurRepository    $correcteur_repository,
-        int                     $session_id,
-        int                     $correcteur_id,
-        int                     $etalonnage_id
+        CorrecteurManager    $correcteur_manager,
+        EtalonnageManager    $etalonnage_manager,
+        SessionRepository    $session_repository,
+        EtalonnageRepository $etalonnage_repository,
+        CorrecteurRepository $correcteur_repository,
+        int                  $session_id,
+        int                  $correcteur_id,
+        int                  $etalonnage_id
     ): Response
     {
         $session = $session_repository->find($session_id);
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
-        $grille = $grille_repository->get($correcteur->grille_id);
-        $profil_ou_score = $profil_ou_score_repository->get($correcteur->score_id);
 
         $reponses = $session->reponses_candidats->toArray();
 
         $scores = $correcteur_manager->corriger(
-            grille: $grille,
-            score: $profil_ou_score,
             correcteur: $correcteur,
-            session: $session
+            reponses_candidats: $session->reponses_candidats->toArray()
         );
 
         $profils = $etalonnage_manager->etalonner(
             etalonnage: $etalonnage,
-            profil_ou_score: $profil_ou_score,
             scores: $scores
         );
 
@@ -149,6 +144,7 @@ class SessionProfilController extends AbstractController
                 "reponses" => $reponses,
                 "scores" => $scores,
                 "session" => $session,
+                "correcteur" => $correcteur,
                 "etalonnage" => $etalonnage]);
     }
 
@@ -157,16 +153,109 @@ class SessionProfilController extends AbstractController
      * @throws SyntaxError
      * @throws LoaderError
      */
-    #[Route("/file/{session_id}", name: "download")]
-    public function download(
-        SessionRepository $session_repository,
-        PdfManager        $pdf_manager,
-        int               $session_id
+    #[Route("/session/download/{session_id}/{correcteur_id}/{etalonnage_id}", name: "session_download")]
+    public function downloadZip(
+        SessionRepository         $session_repository,
+        EtalonnageRepository      $etalonnage_repository,
+        CorrecteurRepository      $correcteur_repository,
+        CorrecteurManager         $correcteur_manager,
+        EtalonnageManager         $etalonnage_manager,
+        ProfilGraphiqueRepository $profil_graphique_manager,
+        PdfManager                $pdf_manager,
+        Request                   $request,
+        int                       $session_id,
+        int                       $correcteur_id,
+        int                       $etalonnage_id
     ): Response
     {
-        return $pdf_manager->createZipFile(
-            session: $session_repository->find($session_id),
-            template: "feuilles_profil/test.tex.twig"
-        );
+        $session = $session_repository->find($session_id);
+        $correcteur = $correcteur_repository->find($correcteur_id);
+        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+
+        $form = $this->createFormBuilder()
+            ->add("profil_graphique", ChoiceType::class, [
+                "choices" => $profil_graphique_manager->nomToProfilGraphique()
+            ])
+            ->add("submit", SubmitType::class, ["label" => "Valider"])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $profil_graphique = $form->getData()["profil_graphique"];
+
+            $scores = $correcteur_manager->corriger($correcteur, $session->reponses_candidats->toArray());
+            $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+
+            return $pdf_manager->createZipFile(
+                session: $session,
+                correcteur: $correcteur,
+                etalonnage: $etalonnage,
+                scores: $scores,
+                profils: $profils,
+                profil_graphique: $profil_graphique,
+            );
+
+        }
+        return $this->render("profil_graphique/form.html.twig",
+            ["form" => $form, "correcteur" => $correcteur, "etalonnage" => $etalonnage, "session" => $session]);
+
+    }
+
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "download")]
+    public function downloadFile(
+        ProfilGraphiqueRepository $profil_graphique_manager,
+        CandidatReponseRepository $candidat_reponse_repository,
+        CorrecteurRepository      $correcteur_repository,
+        EtalonnageRepository      $etalonnage_repository,
+        CorrecteurManager         $correcteur_manager,
+        EtalonnageManager         $etalonnage_manager,
+        PdfManager                $pdf_manager,
+        Request                   $request,
+        int                       $candidat_reponse_id,
+        int                       $correcteur_id,
+        int                       $etalonnage_id
+    ): Response
+    {
+        $correcteur = $correcteur_repository->find($correcteur_id);
+        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+        $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
+
+        $form = $this->createFormBuilder()
+            ->add("profil_graphique", ChoiceType::class, [
+                "choices" => $profil_graphique_manager->nomToProfilGraphique()
+            ])
+            ->add("submit", SubmitType::class, ["label" => "Valider"])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $profil_graphique = $form->getData()["profil_graphique"];
+
+
+            $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
+            $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+
+
+            return $pdf_manager->createPdfFile(
+                profil_graphique: $profil_graphique,
+                candidat_reponse: $candidat_reponse,
+                correcteur: $correcteur,
+                etalonnage: $etalonnage,
+                score: $scores[$candidat_reponse_id],
+                profil: $profils[$candidat_reponse_id]
+            );
+
+        }
+        return $this->render("profil_graphique/form.html.twig",
+            ["form" => $form, "correcteur" => $correcteur, "etalonnage" => $etalonnage, "session" => $candidat_reponse->session]);
     }
 }

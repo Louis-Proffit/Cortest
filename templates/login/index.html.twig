@@ -1,17 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+    <br>
     <h1>Connexion</h1>
-
+    <br>
     <form action="{{ path('login') }}" method="post">
-        <label for="username">Identifiant</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}">
-
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="_password">
-
-        <input type="hidden" name="_target_path" value="/home"> #}
-
-        <button type="submit">login</button>
+        <div class="mb-3">
+            <label for="username" class="form-label">Identifiant</label>
+            <input type="text" id="username" name="_username" value="{{ last_username }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input type="password" id="password" name="_password" class="form-control">
+        </div>
+        <input type="hidden" name="_target_path" value="{{ path("home") }}">
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Connexion</button>
+        </div>
     </form>
 {% endblock %}

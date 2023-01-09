@@ -28,6 +28,11 @@ class ProfilOuScoreRepository
         return $this->values[$index];
     }
 
+    public function all(): array
+    {
+        return $this->values;
+    }
+
     public function nomToIndex(): array
     {
         $result = [];

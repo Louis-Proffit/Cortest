@@ -65,11 +65,13 @@ class CorrecteurController extends AbstractController
     ): Response
     {
         $form = $this->createFormBuilder()
-            ->add("profil_ou_score_id", ChoiceType::class, [
-                "choices" => $profil_ou_score_repository->nomToIndex()
-            ])
             ->add("grille_id", ChoiceType::class, [
-                "choices" => $grille_repository->nomToIndex()
+                "choices" => $grille_repository->nomToIndex(),
+                "label" => "Grille (entrée)"
+            ])
+            ->add("profil_ou_score_id", ChoiceType::class, [
+                "choices" => $profil_ou_score_repository->nomToIndex(),
+                "label" => "Profil (sortie)"
             ])
             ->add("submit", SubmitType::class, ["label" => "Valider"])
             ->getForm();

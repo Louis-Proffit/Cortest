@@ -14,44 +14,44 @@ class ProfilOuScoreCahierDesCharges implements ProfilOuScore
     public function __construct()
     {
         $this->properties = [
-            new Property(nom: "collationnement", nom_php: "collationnement"),
-            new Property(nom: "verbal_mot", nom_php: "verbal_mot"),
-            new Property(nom: "spatial", nom_php: "spatial"),
-            new Property(nom: "verbal_syntaxique", nom_php: "verbal_syntaxique"),
-            new Property(nom: "raisonnement", nom_php: "raisonnement"),
-            new Property(nom: "dic", nom_php: "dic"),
-            new Property(nom: "anxiete", nom_php: "anxiete"),
-            new Property(nom: "irritabilite", nom_php: "irritabilite"),
-            new Property(nom: "impusilvite", nom_php: "impusilvite"),
-            new Property(nom: "introspection", nom_php: "introspection"),
-            new Property(nom: "entetement", nom_php: "entetement"),
-            new Property(nom: "mefiance", nom_php: "mefiance"),
-            new Property(nom: "depression", nom_php: "depression"),
-            new Property(nom: "gene", nom_php: "gene"),
-            new Property(nom: "manque_altruisme", nom_php: "manque_altruisme"),
-            new Property(nom: "sociabilite", nom_php: "sociabilite"),
-            new Property(nom: "spontaneite", nom_php: "spontaneite"),
-            new Property(nom: "ascendance", nom_php: "ascendance"),
-            new Property(nom: "assurance", nom_php: "assurance"),
-            new Property(nom: "interet_intelletuel", nom_php: "interet_intelletuel"),
-            new Property(nom: "nouveaute", nom_php: "nouveaute"),
-            new Property(nom: "creativite", nom_php: "creativite"),
-            new Property(nom: "rigueur", nom_php: "rigueur"),
-            new Property(nom: "planification", nom_php: "planification"),
-            new Property(nom: "perseverance", nom_php: "perseverance"),
-            new Property(nom: "sincerite", nom_php: "sincerite"),
-            new Property(nom: "obsessionalite", nom_php: "obsessionalite"),
-            new Property(nom: "agressivite", nom_php: "agressivite"),
-            new Property(nom: "depressivite", nom_php: "depressivite"),
-            new Property(nom: "paranoidie", nom_php: "paranoidie"),
-            new Property(nom: "narcissisme", nom_php: "narcissisme"),
-            new Property(nom: "intolerance_a_la_frustration", nom_php: "intolerance_a_la_frustration")
+            new Property(nom: "Collationnement", nom_php: "collationnement"),
+            new Property(nom: "Verbal mot", nom_php: "verbal_mot"),
+            new Property(nom: "Spatial", nom_php: "spatial"),
+            new Property(nom: "Verbal syntaxique", nom_php: "verbal_syntaxique"),
+            new Property(nom: "Raisonnement", nom_php: "raisonnement"),
+            new Property(nom: "Dic", nom_php: "dic"),
+            new Property(nom: "Anxiete", nom_php: "anxiete"),
+            new Property(nom: "Irritabilite", nom_php: "irritabilite"),
+            new Property(nom: "Impusilvite", nom_php: "impusilvite"),
+            new Property(nom: "Introspection", nom_php: "introspection"),
+            new Property(nom: "Entetement", nom_php: "entetement"),
+            new Property(nom: "Mefiance", nom_php: "mefiance"),
+            new Property(nom: "Depression", nom_php: "depression"),
+            new Property(nom: "Gene", nom_php: "gene"),
+            new Property(nom: "Manque d'altruisme", nom_php: "manque_altruisme"),
+            new Property(nom: "Sociabilite", nom_php: "sociabilite"),
+            new Property(nom: "Spontaneite", nom_php: "spontaneite"),
+            new Property(nom: "Ascendance", nom_php: "ascendance"),
+            new Property(nom: "Assurance", nom_php: "assurance"),
+            new Property(nom: "Interêt intelletuel", nom_php: "interet_intelletuel"),
+            new Property(nom: "Nouveaute", nom_php: "nouveaute"),
+            new Property(nom: "Creativite", nom_php: "creativite"),
+            new Property(nom: "Rigueur", nom_php: "rigueur"),
+            new Property(nom: "Planification", nom_php: "planification"),
+            new Property(nom: "Perseverance", nom_php: "perseverance"),
+            new Property(nom: "Sincerite", nom_php: "sincerite"),
+            new Property(nom: "Obsessionalite", nom_php: "obsessionalite"),
+            new Property(nom: "Agressivite", nom_php: "agressivite"),
+            new Property(nom: "Depressivite", nom_php: "depressivite"),
+            new Property(nom: "Paranoidie", nom_php: "paranoidie"),
+            new Property(nom: "Narcissisme", nom_php: "narcissisme"),
+            new Property(nom: "Intolerance à la frustration", nom_php: "intolerance_a_la_frustration")
         ];
     }
 
     function getNom(): string
     {
-        return "Cahier des charges";
+        return "Profil cahier des charges";
     }
 
     function getProperties(): array

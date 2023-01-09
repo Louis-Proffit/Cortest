@@ -1,0 +1,33 @@
+\documentclass[10pt, letterpaper, twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, total={7in, 8in}]{geometry}
+\usepackage{pgfplots}
+\usepackage{tabularx}
+\usepackage{textcomp}
+
+\begin{document}
+
+    \begin{center}
+        \textbf{Bilan Psycotechnique} \\
+        \textbf{BSR2P}
+    \end{center}
+
+    \noindent\fbox{
+        \begin{minipage}{\linewidth}
+            \begin{tabular}{m{1.2in} m{2.1in} m{1.2in} m{2.1in}}
+                \underline{Nom:} & {{ reponse.raw["nom"] }} & \underline{Prénom:} & {{ reponse.raw["prenom"] }} \\
+                \underline{Nom de jeune Fille:} & {{ reponse.raw["nom_jeune_fille"] }} & \underline{Sexe:} & {{ reponse.raw["sexe"]|sexe }} \\
+                \underline{Date de naissance:} & {{ reponse.raw["date_naissance"] }} & \underline{Niveau scolaire:} & XXX \\
+                \underline{N\textdegree \space d'identification:} & XXX & \underline{Type du concours:} & XXX \\
+                \underline{SGAP ou CS:} & {{ reponse.raw["sgap"]|sgap }} & \underline{Version Batterie:} & XXXX \\
+                \underline{Date d'examen:} & {{ session.date|date('d/m/Y') }} & \underline{Note Globale:} & XXX \\
+
+            \end{tabular}
+        \end{minipage}
+    }
+
+    \begin{center}
+        \textbf{PROFIL DU CANDIDAT} \\
+    \end{center}
+
+\end{document}

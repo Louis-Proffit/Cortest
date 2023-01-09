@@ -23,17 +23,4 @@ class EtalonnageRepository extends LazyServiceEntityRepository
     {
         parent::__construct($registry, Etalonnage::class);
     }
-
-    /**
-     * @param DefinitionScore $definition_score
-     * @return Etalonnage[]
-     */
-    public function findByScoreDefinition(DefinitionScore $definition_score): array
-    {
-        return $this->createQueryBuilder('d')
-            ->join("d.score", "g", Join::WITH, "g.id = :score_id")
-            ->setParameter("score_id", $definition_score->id)
-            ->getQuery()
-            ->execute();
-    }
 }

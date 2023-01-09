@@ -22,17 +22,4 @@ class CorrecteurRepository extends LazyServiceEntityRepository
     {
         parent::__construct($registry, Correcteur::class);
     }
-
-    /**
-     * @param DefinitionGrille $definition_grille
-     * @return Correcteur[]
-     */
-    public function findByGrilleDefinition(DefinitionGrille $definition_grille): array
-    {
-       return $this->createQueryBuilder('d')
-            ->join("d.grille", "g", Join::WITH, "g.id = :grille_id")
-            ->setParameter("grille_id", $definition_grille->id)
-            ->getQuery()
-            ->execute();
-    }
 }

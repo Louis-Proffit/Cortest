@@ -29,9 +29,9 @@
     <br>
     <hr class="hr hr-blurry">
     <br>
-    <h3>Candidats</h3>
+    <h3>Réponses des candidats</h3>
     <br>
-    <table class="table">
+    <table class="table d-md-inline-block overflow-auto">
         <thead>
         <tr>
             <th scope="col">Nom</th>
@@ -50,10 +50,9 @@
                 <td>{{ reponse.raw["nom"] }}</td>
                 <td>{{ reponse.raw["prenom"] }}</td>
                 <td>{{ reponse.raw["nom_jeune_fille"] }}</td>
-                <td>{{ reponse.raw["date_naissance_jour"] }}-{{ reponse.raw["date_naissance_mois"] }}
-                    -{{ reponse.raw["date_naissance_an"] }}</td>
+                <td>{{ reponse.raw["date_naissance"] }}</td>
                 <td>{{ reponse.raw["sexe"]|sexe }}</td>
-                <td>{{ reponse.raw["concours"] }}</td>
+                <td>{{ reponse.raw["type_concours"] }}</td>
                 <td>{{ reponse.raw["reponses"]|join("-") }}</td>
                 <td><a class="btn btn-primary"
                        href="{{ path("session_supprimer_reponse", {"session_id":session.id, "id":reponse.id}) }}">Supprimer</a>

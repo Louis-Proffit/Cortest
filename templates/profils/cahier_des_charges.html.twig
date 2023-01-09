@@ -1,7 +1,7 @@
 {% extends "base.html.twig" %}
 
 {% import 'sessions/macro_session.html.twig' as macro_session %}
-{% import 'scores_profils/cahier_des_charges.html.twig' as cahier_des_charges %}
+{% import 'profil_ou_score/cahier_des_charges.html.twig' as cahier_des_charges %}
 
 {% block content %}
     <br>
@@ -9,7 +9,8 @@
     <br>
     <div class="row">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("profil_download", {"session_id":session.id}) }}">Télécharger</a>
+            <a class="btn btn-primary"
+               href="{{ path("profil_session_download", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Télécharger</a>
         </div>
     </div>
     <br>
@@ -26,12 +27,13 @@
     <h3>Classes</h3>
     <br>
     <div class="row">
-        <div class="table-responsive col-md-3">
-            <table class="table">
+        <div class="table-responsive col-md-4">
+            <table class="table text-nowrap">
                 <thead>
                 <tr>
                     <th>Nom</th>
                     <th>Prenom</th>
+                    <th>Feuille de profil</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -39,6 +41,9 @@
                     <tr>
                         <td>{{ reponse.raw["nom"] }}</td>
                         <td>{{ reponse.raw["prenom"] }}</td>
+                        <td>
+                            <a href="{{ path("profil_download", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
