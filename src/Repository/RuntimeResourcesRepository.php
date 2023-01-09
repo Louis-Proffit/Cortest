@@ -5,10 +5,10 @@ namespace App\Repository;
 use App\Core\Entities\EtalonnageComputer;
 use App\Core\Entities\GrilleReponse;
 use App\Core\Entities\ScoreComputer;
-use App\Entity\DefinitionProfilComputer;
+use App\Entity\Etalonnage;
 use App\Entity\DefinitionGrille;
 use App\Entity\DefinitionScore;
-use App\Entity\DefinitionScoreComputer;
+use App\Entity\Correcteur;
 use Psr\Log\LoggerInterface;
 
 class RuntimeResourcesRepository
@@ -53,12 +53,12 @@ class RuntimeResourcesRepository
             $definition_grille->nom_php);
     }
 
-    public function scoreComputerExists(DefinitionScoreComputer $definition): bool
+    public function scoreComputerExists(Correcteur $definition): bool
     {
         return $this->fileExists(getcwd(), $this->score_computer_folder, $definition->nom_php);
     }
 
-    public function scoreComputer(DefinitionScoreComputer $definition): ScoreComputer
+    public function scoreComputer(Correcteur $definition): ScoreComputer
     {
         return $this->requireAndGetInstance(getcwd(), $this->score_computer_folder, $definition->nom_php);
     }
@@ -68,17 +68,17 @@ class RuntimeResourcesRepository
         return $this->directoryPath(getcwd(), $this->etalonnage_computer_folder);
     }
 
-    public function etalonnageComputerPath(DefinitionProfilComputer $definition): string
+    public function etalonnageComputerPath(Etalonnage $definition): string
     {
         return $this->path(getcwd(), $this->etalonnage_computer_folder, $definition->nom_php);
     }
 
-    public function etalonnageComputerExists(DefinitionProfilComputer $definition): bool
+    public function etalonnageComputerExists(Etalonnage $definition): bool
     {
         return $this->fileExists(getcwd(), $this->etalonnage_computer_folder, $definition->nom_php);
     }
 
-    public function etalonnageComputer(DefinitionProfilComputer $definition): EtalonnageComputer
+    public function etalonnageComputer(Etalonnage $definition): EtalonnageComputer
     {
         return $this->requireAndGetInstance(getcwd(), $this->etalonnage_computer_folder, $definition->nom_php);
     }

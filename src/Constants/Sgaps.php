@@ -20,7 +20,13 @@ class Sgaps
         return array_key_exists($index, $this->sgaps) ? $this->sgaps[$index] : "SGAP indéfini";
     }
 
-    public function nomToIndex():array {
+    public function sample(): int
+    {
+        return array_keys($this->sgaps)[0];
+    }
+
+    public function nomToIndex(): array
+    {
         return array_flip($this->sgaps);
     }
 

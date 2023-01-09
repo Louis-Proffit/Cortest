@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Configurer les bornes</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {% for nom,row in form.values %}
+        <div class="mb-3">
+            <div class="form-label">{{ nom }}</div>
+            <div class="input-group">
+                {% for value in row.values %}
+                    <div class="input-group-text">Classe {{ loop.index }}</div>
+                    {{ form_widget(value) }}
+                    {% if loop.last %}
+                        <div class="input-group-text">Classe {{ loop.index + 1 }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    {{ form_end(form) }}
+
+{% endblock %}
+

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\DefinitionProfilComputer;
+use App\Entity\Etalonnage;
 use App\Repository\RuntimeResourcesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

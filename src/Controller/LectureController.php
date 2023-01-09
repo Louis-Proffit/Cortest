@@ -35,22 +35,19 @@ class LectureController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $logger->debug("Fichier de correction reçu : " . $uploadSessionBase->contents);
 
-            /** @var Session $session */
-            $session = $manager->find(Session::class, $uploadSessionBase->session_id);
-
             /** @var array $decoded */
             $decoded = json_decode($uploadSessionBase->contents, associative: true);
 
             foreach ($decoded as $candidat_reponse_json) {
 
                 $manager->persist(
-                    new CandidatReponse(id: 0, session: $session, reponses: $candidat_reponse_json)
+                    new CandidatReponse(id: 0, session: $uploadSessionBase->session, reponses: $candidat_reponse_json)
                 );
             }
 
             $manager->flush();
 
-            return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session_id]);
+            return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session->id]);
         }
 
         return $this->render('lecture/from_file.html.twig', [

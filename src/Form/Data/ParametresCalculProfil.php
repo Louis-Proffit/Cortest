@@ -2,9 +2,9 @@
 
 namespace App\Form\Data;
 
-use App\Entity\DefinitionProfilComputer;
+use App\Entity\Etalonnage;
 
 class ParametresCalculProfil
 {
-    public DefinitionProfilComputer $definition_etalonnage_computer;
+    public Etalonnage $etalonnage;
 }

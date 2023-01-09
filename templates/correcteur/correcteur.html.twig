@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Consulter un correcteur</h1>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("correcteur_supprimer", {"id":correcteur.id}) }}">Supprimer</a>
+        </div>
+    </div>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Nom</dt>
+        <dd class="col-md-9">{{ correcteur.nom }}</dd>
+        <dt class="col-md-3">Grille</dt>
+        <dd class="col-md-9">{{ grille.nom }}</dd>
+        <dt class="col-md-3">Score</dt>
+        <dd class="col-md-9">{{ score.nom }}</dd>
+    </dl>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Expression</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for property in score.properties %}
+            <tr>
+                <td>{{ property.nom }}</td>
+                <td>{{ correcteur.values[property.nom] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+

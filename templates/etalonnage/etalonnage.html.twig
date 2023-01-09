@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Consulter un étalonnage</h1>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("etalonnage_supprimer", {"id":etalonnage.id}) }}">Supprimer</a>
+        </div>
+    </div>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Nom</dt>
+        <dd class="col-md-9">{{ etalonnage.nom }}</dd>
+        <dt class="col-md-3">Score</dt>
+        <dd class="col-md-9">{{ score.nom }}</dd>
+        <dt class="col-md-3">Nombre de classes</dt>
+        <dd class="col-md-9">{{ etalonnage.nombre_classes }}</dd>
+    </dl>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            {% for i in range(1, etalonnage.nombre_classes - 1) %}
+                <th scope="col">Borne {{ i }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for property in score.properties %}
+            <tr>
+                <td>{{ property.nom }}</td>
+                {% set row = etalonnage.values[property.nom_php] %}
+                {% for value in row.values %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+

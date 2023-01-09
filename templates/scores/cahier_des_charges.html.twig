@@ -1,7 +1,6 @@
 {% extends "base.html.twig" %}
 
 {% import 'sessions/macro_session.html.twig' as macro_session %}
-{% import 'scores/macro_score.html.twig' as macro_score %}
 {% import 'scores_profils/cahier_des_charges.html.twig' as cahier_des_charges %}
 
 {% block content %}
@@ -10,7 +9,9 @@
     <br>
     <div class="row">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path('profil_form', {"session_id":session.id, "score_computer_id":score_computer.id}) }}">Calculer les profils</a>
+            <a class="btn btn-primary"
+               href="{{ path('profil_form', {"session_id":session.id, "correcteur_id":correcteur.id}) }}">Calculer
+                les profils</a>
         </div>
     </div>
     <br>
@@ -23,9 +24,11 @@
         </dd>
         <dt class="col-md-3">Correcteur</dt>
         <dd class="col-md-9">
-            {{ macro_score.score_computer_dl(score_computer) }}
+            <dl class="row">
+                <dt class="col-md-3">Nom</dt>
+                <dd class="col-md-9">{{ correcteur.nom }}</dd>
+            </dl>
         </dd>
-
     </dl>
     <hr class="hr hr-blurry">
     <br>
@@ -43,8 +46,8 @@
                 <tbody>
                 {% for reponse in reponses %}
                     <tr>
-                        <td>{{ reponse.nom }}</td>
-                        <td>{{ reponse.prenom }}</td>
+                        <td>{{ reponse.raw["nom"] }}</td>
+                        <td>{{ reponse.raw["prenom"] }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

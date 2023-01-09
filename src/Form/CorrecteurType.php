@@ -8,17 +8,16 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class EtalonnageType extends AbstractType
+class CorrecteurType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add("nom", TextType::class)
+        $builder->add("nom", TextType::class)
             ->add(
                 "values", CollectionType::class, [
-                    "entry_type" => EtalonnageRowType::class,
-                    "entry_options" => ["label" => false],
+                    "entry_type" => TextType::class,
+                    "entry_options" => ["label" => false]
                 ]
             )
             ->add("submit", SubmitType::class, ["label" => "Valider"]);

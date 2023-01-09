@@ -18,7 +18,7 @@ class CandidatReponse
     public Session $session;
 
     #[ORM\Column(type: Types::JSON)]
-    public array $reponses;
+    public array $raw;
 
     /**
      * @param int $id
@@ -29,7 +29,7 @@ class CandidatReponse
     {
         $this->id = $id;
         $this->session = $session;
-        $this->reponses = $reponses;
+        $this->raw = $reponses;
     }
 
 

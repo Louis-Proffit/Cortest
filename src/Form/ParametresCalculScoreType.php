@@ -2,10 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\DefinitionGrille;
-use App\Entity\DefinitionScoreComputer;
-use App\Repository\DefinitionScoreComputerRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Correcteur;
+use App\Repository\CorrecteurRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,26 +12,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ParametresCalculScoreType extends AbstractType
 {
-    const DEFINITION_GRILLE_OPTION = "definition_grille";
+    const GRILLE_ID_OPTION = "grille_id";
 
     public function __construct(
-        private readonly DefinitionScoreComputerRepository $repository
+        private readonly CorrecteurRepository $repository
     )
     {
     }
 
-    private function definitionScoreComputerDisplay(DefinitionScoreComputer $definition_score_computer): string
+    private function definitionScoreComputerDisplay(Correcteur $correcteur): string
     {
-        return $definition_score_computer->nom;
+        return $correcteur->nom;
     }
 
-    private function definitionScoreComputerChoices(DefinitionGrille $definition_grille): array
+    private function definitionScoreComputerChoices(int $grille_id): array
     {
-        $definition_score_computers = $this->repository->findByGrilleDefinition($definition_grille);
+        $correcteurs = $this->repository->findBy(["grille_id" => $grille_id]);
 
         $result = [];
-        foreach ($definition_score_computers as $definition_score_computer) {
-            $result[$this->definitionScoreComputerDisplay($definition_score_computer)] = $definition_score_computer;
+        foreach ($correcteurs as $correcteur) {
+            $result[$this->definitionScoreComputerDisplay($correcteur)] = $correcteur;
         }
 
         return $result;
@@ -42,18 +40,18 @@ class ParametresCalculScoreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            "definition_score_computer",
+            "correcteur",
             ChoiceType::class,
             [
-                "choices" => $this->definitionScoreComputerChoices($options[self::DEFINITION_GRILLE_OPTION])
+                "choices" => $this->definitionScoreComputerChoices($options[self::GRILLE_ID_OPTION])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::DEFINITION_GRILLE_OPTION);
-        $resolver->setAllowedTypes(self::DEFINITION_GRILLE_OPTION, DefinitionGrille::class);
+        $resolver->define(self::GRILLE_ID_OPTION);
+        $resolver->setAllowedTypes(self::GRILLE_ID_OPTION, "int");
     }
 
 }

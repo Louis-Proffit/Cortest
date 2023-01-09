@@ -5,7 +5,12 @@
     <br>
     <h1>Sessions enregistrées</h1>
     <br>
-
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("session_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
     <table class="table">
         <thead>
         <tr>
@@ -20,7 +25,7 @@
             <tr>
                 <td>{{ session.date|date('d-m-Y') }}</td>
                 <td>{{ session.sgap_index|sgap }}</td>
-                <td>{{ session.grille.nom }}</td>
+                <td>{{ grilles[session.id] }}</td>
                 <td><a class="btn btn-link" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a></td>
             </tr>
         {% endfor %}

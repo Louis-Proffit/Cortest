@@ -3,11 +3,11 @@
 {% block content %}
 
     <br>
-    <h1>Etalonnages disponibles</h1>
+    <h1>Correcteurs disponibles</h1>
     <br>
     <div class="row">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("etalonnage_creer") }}">Ajouter</a>
+            <a class="btn btn-primary" href="{{ path("correcteur_creer") }}">Ajouter</a>
         </div>
     </div>
     <br>
@@ -15,17 +15,19 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
+            <th scope="col">Nom de la grille applicable</th>
             <th scope="col">Nom du score applicable</th>
             <th scope="col">Consulter</th>
         </tr>
         </thead>
         <tbody>
-        {% for etalonnage in etalonnages %}
+        {% for correcteur in correcteurs %}
             <tr>
-                <td>{{ etalonnage.nom }}</td>
-                <td>{{ scores[etalonnage.id] }}</td>
+                <td>{{ correcteur.nom }}</td>
+                <td>{{ grilles[correcteur.id] }}</td>
+                <td>{{ scores[correcteur.id] }}</td>
                 <td>
-                    <a href="{{ path("etalonnage_consulter", {"id":etalonnage.id}) }}" class="btn btn-link">
+                    <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link">
                         Consulter</a>
                 </td>
             </tr>

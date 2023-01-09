@@ -8,10 +8,7 @@
     <br>
     <div class="row">
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-primary" href="{{ path("session_modifier", {"id":session.id}) }}">Modifier</a>
-        </div>
-        <div class="mb-3 col-md-auto">
-            <a class="btn btn-primary" href="{{ path("session_supprimer_session", {"id":session.id}) }}">Supprimer</a>
+            <a class="btn btn-primary" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-primary" href="{{ path("score_form", {"session_id":session.id}) }}">Calculer les
@@ -43,16 +40,16 @@
         </tr>
         </thead>
         <tbody>
-        {% for reponse in session.candidats %}
+        {% for reponse in session.reponses_candidats %}
             <tr>
-                <td>{{ reponse.reponses["nom"] }}</td>
-                <td>{{ reponse.reponses["prenom"] }}</td>
-                <td>{{ reponse.reponses["nom_jeune_fille"] }}</td>
-                <td>{{ reponse.reponses["date_naissance_jour"] }}-{{ reponse.reponses["date_naissance_mois"] }}
-                    -{{ reponse.reponses["date_naissance_an"] }}</td>
-                <td>{{ reponse.reponses["sexe"]|sexe }}</td>
-                <td>{{ reponse.reponses["concours"] }}</td>
-                <td>{{ reponse.reponses["reponses"] }}</td>
+                <td>{{ reponse.raw["nom"] }}</td>
+                <td>{{ reponse.raw["prenom"] }}</td>
+                <td>{{ reponse.raw["nom_jeune_fille"] }}</td>
+                <td>{{ reponse.raw["date_naissance_jour"] }}-{{ reponse.raw["date_naissance_mois"] }}
+                    -{{ reponse.raw["date_naissance_an"] }}</td>
+                <td>{{ reponse.raw["sexe"]|sexe }}</td>
+                <td>{{ reponse.raw["concours"] }}</td>
+                <td>{{ reponse.raw["reponses"]|join("-") }}</td>
                 <td><a class="btn btn-primary"
                        href="{{ path("session_supprimer_reponse", {"session_id":session.id, "id":reponse.id}) }}">Supprimer</a>
                 </td>

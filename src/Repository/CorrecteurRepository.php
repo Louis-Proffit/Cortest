@@ -3,29 +3,29 @@
 namespace App\Repository;
 
 use App\Entity\DefinitionGrille;
-use App\Entity\DefinitionScoreComputer;
+use App\Entity\Correcteur;
 use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<DefinitionScoreComputer>
+ * @extends ServiceEntityRepository<Correcteur>
  *
- * @method DefinitionScoreComputer|null find($id, $lockMode = null, $lockVersion = null)
- * @method DefinitionScoreComputer|null findOneBy(array $criteria, array $orderBy = null)
- * @method DefinitionScoreComputer[]    findAll()
- * @method DefinitionScoreComputer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Correcteur|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Correcteur|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Correcteur[]    findAll()
+ * @method Correcteur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DefinitionScoreComputerRepository extends LazyServiceEntityRepository
+class CorrecteurRepository extends LazyServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, DefinitionScoreComputer::class);
+        parent::__construct($registry, Correcteur::class);
     }
 
     /**
      * @param DefinitionGrille $definition_grille
-     * @return DefinitionScoreComputer[]
+     * @return Correcteur[]
      */
     public function findByGrilleDefinition(DefinitionGrille $definition_grille): array
     {

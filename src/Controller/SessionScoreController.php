@@ -2,14 +2,13 @@
 
 namespace App\Controller;
 
-use App\Core\Computer\GrilleComputer;
-use App\Core\Computer\ScoreComputer;
-use App\Core\Entities\GrilleReponse;
-use App\Entity\CandidatReponse;
+
+use App\Core\Res\Correcteur\CorrecteurManager;
+use App\Core\Res\Grille\GrilleRepository;
+use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
 use App\Entity\Session;
 use App\Form\Data\ParametresCalculScore;
 use App\Form\ParametresCalculScoreType;
-use App\Repository\RuntimeResourcesRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,11 +21,12 @@ class SessionScoreController extends AbstractController
 
     #[Route('/form/{session_id}', name: "form")]
     public function sessionScoreForm(
+        GrilleRepository $grille_repository,
+        ProfilOuScoreRepository $profil_ou_score_repository,
         SessionRepository $session_repository,
-        GrilleComputer    $grille_computer,
-        ScoreComputer     $score_computer,
-        Request           $request,
-        int               $session_id): Response
+        CorrecteurManager $correcteur_manager,
+        Request $request,
+        int $session_id): Response
     {
         /** @var Session $session */
         $session = $session_repository->find($session_id);
@@ -34,23 +34,24 @@ class SessionScoreController extends AbstractController
         $parametres_calcul_score = new ParametresCalculScore();
         $form = $this->createForm(ParametresCalculScoreType::class,
             $parametres_calcul_score,
-            [ParametresCalculScoreType::DEFINITION_GRILLE_OPTION => $session->grille]
+            [ParametresCalculScoreType::GRILLE_ID_OPTION => $session->grille_id]
         );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $definition_score_computer = $parametres_calcul_score->definition_score_computer;
+            $correcteur = $parametres_calcul_score->correcteur;
+            $grille = $grille_repository->get($correcteur->grille_id);
+            $score = $profil_ou_score_repository->get($correcteur->score_id);
 
-            $reponses = $grille_computer->computeAll($session->candidats->toArray(), $session->grille);
-            $scores = $score_computer->computeAll($reponses, $definition_score_computer);
+            $scores = $correcteur_manager->corriger($grille, $score, $correcteur, $session);
 
             return $this->render("scores/cahier_des_charges.html.twig",
                 ["scores" => $scores,
-                    "reponses" => $reponses,
+                    "reponses" => $session->reponses_candidats->toArray(),
                     "session" => $session,
-                    "score_computer" => $definition_score_computer]);
+                    "correcteur" => $correcteur]);
 
         }
 

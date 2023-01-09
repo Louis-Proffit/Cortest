@@ -28,7 +28,7 @@ class SerialisationDeserialisationTest extends KernelTestCase
 
         /** @var CandidatReponse $candidat_reponse */
         foreach ($all as $candidat_reponse) {
-            var_dump(unserialize($candidat_reponse->reponses));
+            var_dump(unserialize($candidat_reponse->raw));
         }
 
         self::assertTrue(true);

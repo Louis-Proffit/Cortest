@@ -2,91 +2,133 @@
 
 namespace App\Controller;
 
-use App\Entity\DefinitionProfilComputer;
+use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
+use App\Entity\Etalonnage;
+use App\Form\EtalonnageRowType;
 use App\Form\EtalonnageType;
-use App\Repository\DefinitionProfilComputerRepository;
-use App\Repository\DefinitionScoreRepository;
-use App\Repository\RuntimeResourcesRepository;
+use App\Repository\EtalonnageRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/etalonnage", name: "etalonnage_")]
 class EtalonnageController extends AbstractController
 {
-    #[Route("/", name: 'consulter')]
+    #[Route("/consulter-liste", name: 'consulter_liste')]
     public function consulterEtalonnages(
-        DefinitionProfilComputerRepository $profil_computer_repository,
-        RuntimeResourcesRepository         $runtime_resources_repository): Response
+        EtalonnageRepository    $etalonnage_repository,
+        ProfilOuScoreRepository $profil_ou_score_repository
+    ): Response
     {
-        $etalonnages = $profil_computer_repository->findAll();
+        $etalonnages = $etalonnage_repository->findAll();
 
-        $etalonnage_file_exist = array_combine(
-            array_map(fn(DefinitionProfilComputer $definition) => $definition->id, $etalonnages),
-            array_map(
-                fn(DefinitionProfilComputer $definition) => $runtime_resources_repository->etalonnageComputerExists($definition),
-                $etalonnages
-            )
-        );
+        $scores = [];
+
+        foreach ($etalonnages as $etalonnage) {
+            $scores[$etalonnage->id] = $profil_ou_score_repository->get($etalonnage->score_id)->getNom();
+        }
+
         return $this->render('etalonnage/index.html.twig',
-            ["etalonnages" => $etalonnages, "etalonnage_file_exists" => $etalonnage_file_exist]);
+            ["etalonnages" => $etalonnages, "scores" => $scores]);
     }
 
-    #[Route("/file/{id}", name: "file")]
-    public function consulterEtalonnageFile(
-        DefinitionProfilComputerRepository $definition_etalonnage_computer_repository,
-        RuntimeResourcesRepository         $runtime_resources_repository,
-        int                                $id): Response
+    #[Route("/consulter/{id}", name: 'consulter')]
+    public function consulterEtalonnage(
+        EtalonnageRepository    $etalonnage_repository,
+        ProfilOuScoreRepository $profil_ou_score_repository,
+        int                     $id
+    ): Response
     {
-        /** @var DefinitionProfilComputer $etalonnage_computer */
-        $etalonnage_computer = $definition_etalonnage_computer_repository->find($id);
-        $file_path = $runtime_resources_repository->etalonnageComputerPath($etalonnage_computer);
-
-        return $this->file($file_path, null, ResponseHeaderBag::DISPOSITION_INLINE);
+        $etalonnage = $etalonnage_repository->find($id);
+        $score = $profil_ou_score_repository->get($etalonnage->score_id);
+        return $this->render("etalonnage/etalonnage.html.twig", ["etalonnage" => $etalonnage, "score" => $score]);
     }
 
     #[Route("/creer", name: "creer")]
     public function creerEtalonnage(
-        ManagerRegistry           $doctrine,
-        DefinitionScoreRepository $definition_score_repository,
-        RuntimeResourcesRepository $runtime_resources_repository,
-        Request                   $request
+        ProfilOuScoreRepository $profil_ou_score_repository,
+        Request                 $request
     ): Response
     {
-        $etalonnage = new DefinitionProfilComputer(
+        $form = $this->createFormBuilder()
+            ->add("profil_ou_score_id", ChoiceType::class, [
+                "choices" => $profil_ou_score_repository->nomToIndex()
+            ])
+            ->add("nombre_classes", IntegerType::class, ["label" => "Nombre de classes"])
+            ->add("submit", SubmitType::class, ["label" => "Valider"])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $profil_ou_score_id = $form->getData()["profil_ou_score_id"];
+            $nombre_classes = $form->getData()["nombre_classes"];
+
+            return $this->redirectToRoute("etalonnage_creer_avec_profil_ou_score",
+                ["profil_ou_score_id" => $profil_ou_score_id, "nombre_classes" => $nombre_classes]);
+        }
+
+        return $this->render("etalonnage/creer_choisir_grille_et_score.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/creer-avec-profil-ou-score/{profil_ou_score_id}/{nombre_classes}", name: "creer_avec_profil_ou_score")]
+    public function creerEtalonnageAvecProfilOuScore(
+        ManagerRegistry         $doctrine,
+        ProfilOuScoreRepository $profil_ou_score_repository,
+        Request                 $request,
+        int                     $nombre_classes,
+        int                     $profil_ou_score_id
+    )
+    {
+        $profil_ou_score = $profil_ou_score_repository->get($profil_ou_score_id);
+
+        $etalonnage = new Etalonnage(
             id: 0,
-            score: $definition_score_repository->findAll()[0],
+            score_id: $profil_ou_score_id,
             nom: "",
-            nom_php: ""
+            nombre_classes: $nombre_classes,
+            values: $profil_ou_score->generateEtalonnageValues($nombre_classes)
         );
 
-        $form = $this->createForm(
-            EtalonnageType::class,
-            $etalonnage
-        );
+        $form = $this->createForm(EtalonnageType::class, $etalonnage);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
             $doctrine->getManager()->persist($etalonnage);
-
-            /** @var UploadedFile $file */
-            $file = $form->get("file")->getData();
-            $path = $runtime_resources_repository->etalonnageComputerDirectoryPath();
-            $file->move($path, $file->getClientOriginalName());
-
             $doctrine->getManager()->flush();
 
-            return $this->redirectToRoute("etalonnage_consulter");
+            return $this->redirectToRoute("etalonnage_consulter", ["id" => $etalonnage->id]);
 
         }
 
-        return $this->render("etalonnage/creer.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/form.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/supprimer/{id}", name: "supprimer")]
+    public function supprimer(
+        ManagerRegistry      $doctrine,
+        EtalonnageRepository $etalonnage_repository,
+        int                  $id,
+    )
+    {
+        $etalonnage = $etalonnage_repository->find($id);
+
+        if($etalonnage != null) {
+            $doctrine->getManager()->remove($etalonnage);
+            $doctrine->getManager()->flush();
+        }
+
+        return $this->redirectToRoute("etalonnage_consulter_liste");
     }
 
 }
