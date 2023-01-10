@@ -2,7 +2,7 @@
 
 namespace App\Tests\Core\Res\Correcteur\CortestDsl;
 
-use App\Core\Res\Correcteur\CortestDsl\CortestExpressionLanguage;
+use App\Core\Res\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use PHPUnit\Framework\TestCase;
 
 class CortestExpressionLanguageTest extends TestCase

@@ -43,7 +43,7 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             CorrecteurEtEtalonnageChoiceType::class,
             $parametres_calcul_profil,
-            [CorrecteurEtEtalonnageChoiceType::GRILLE_ID_OPTION => $session->grille_id]);
+            [CorrecteurEtEtalonnageChoiceType::GRILLE_CLASS_OPTION => $session->grilleClass]);
 
         $form->handleRequest($request);
 
@@ -79,7 +79,7 @@ class SessionProfilController extends AbstractController
 
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if ($session->grille_id != $correcteur->grille_id) {
+        if ($session->grilleClass != $correcteur->grilleClass) {
             throw new HttpException(Response::HTTP_BAD_REQUEST,
                 "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
         }
@@ -131,7 +131,7 @@ class SessionProfilController extends AbstractController
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,
-            reponses_candidats: $session->reponses_candidats->toArray()
+            reponses: $session->reponses_candidats->toArray()
         );
 
         $profils = $etalonnage_manager->etalonner(

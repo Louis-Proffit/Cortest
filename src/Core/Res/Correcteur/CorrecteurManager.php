@@ -2,14 +2,12 @@
 
 namespace App\Core\Res\Correcteur;
 
-use App\Core\Res\Correcteur\CortestDsl\CortestExpressionLanguage;
+use App\Core\Res\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\Res\Grille\Grille;
-use App\Core\Res\ProfilOuScore\ProfilOuScore;
+use App\Core\Res\Grille\GrilleRepository;
 use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
 use App\Entity\CandidatReponse;
 use App\Entity\Correcteur;
-use App\Entity\Session;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class CorrecteurManager
 {
@@ -22,10 +20,10 @@ class CorrecteurManager
 
     /**
      * @param Correcteur $correcteur
-     * @param CandidatReponse[] $reponses_candidats
+     * @param CandidatReponse[] $reponses
      * @return array
      */
-    public function corriger(Correcteur $correcteur, array $reponses_candidats): array
+    public function corriger(Correcteur $correcteur, array $reponses): array
     {
         $expression_language = new CortestExpressionLanguage();
 
@@ -33,25 +31,29 @@ class CorrecteurManager
 
         $corrige = [];
 
-
-        foreach ($reponses_candidats as $reponse) {
+        foreach ($reponses as $id => $reponse) {
             $result = [];
 
             foreach ($profil_ou_score->getProperties() as $property) {
 
                 $result[$property->nom_php] = $expression_language->evaluate(
                     $correcteur->values[$property->nom_php],
-                    [
-                        "reponses" => str_split($reponse->raw["reponses"])
-                    ]
+                    $this->getComputationEnv($reponse->getGrille())
                 );
 
             }
 
-            $corrige[$reponse->id] = $result;
+            $corrige[$id] = $result;
         }
 
         return $corrige;
+    }
+
+    private function getComputationEnv(Grille $grille): array
+    {
+        return [
+            "reponses" => $grille->reponses
+        ];
     }
 
 }

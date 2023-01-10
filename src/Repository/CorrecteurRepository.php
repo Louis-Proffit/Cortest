@@ -2,10 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\DefinitionGrille;
 use App\Entity\Correcteur;
 use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

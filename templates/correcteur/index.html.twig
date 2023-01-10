@@ -24,7 +24,7 @@
         {% for correcteur in correcteurs %}
             <tr>
                 <td>{{ correcteur.nom }}</td>
-                <td>{{ grilles[correcteur.id] }}</td>
+                <td>{{ grilles[correcteur.id].nom }}</td>
                 <td>{{ scores[correcteur.id] }}</td>
                 <td>
                     <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link">

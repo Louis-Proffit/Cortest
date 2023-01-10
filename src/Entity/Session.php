@@ -23,7 +23,7 @@ class Session
     public int $sgap_index;
 
     #[ORM\Column]
-    public int $grille_id;
+    public string $grilleClass;
 
     #[ORM\OneToMany(mappedBy: "session", targetEntity: CandidatReponse::class)]
     public Collection $reponses_candidats;
@@ -32,15 +32,15 @@ class Session
      * @param int $id
      * @param DateTime $date
      * @param int $sgap_index
-     * @param int $grille_id
+     * @param string $grilleClass
      * @param Collection $reponses_candidats
      */
-    public function __construct(int $id, DateTime $date, int $sgap_index, int $grille_id, Collection $reponses_candidats)
+    public function __construct(int $id, DateTime $date, int $sgap_index, string $grilleClass, Collection $reponses_candidats)
     {
         $this->id = $id;
         $this->date = $date;
         $this->sgap_index = $sgap_index;
-        $this->grille_id = $grille_id;
+        $this->grilleClass = $grilleClass;
         $this->reponses_candidats = $reponses_candidats;
     }
 

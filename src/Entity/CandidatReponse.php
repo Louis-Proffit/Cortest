@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Core\Res\Grille\Grille;
 use App\Repository\CandidatReponseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,6 +31,16 @@ class CandidatReponse
         $this->id = $id;
         $this->session = $session;
         $this->raw = $reponses;
+    }
+
+    public function getGrille(): Grille
+    {
+        /** @var Grille $instance */
+        $instance = new ($this->session->grilleClass)();
+
+        $instance->fill($this->raw);
+
+        return $instance;
     }
 
 

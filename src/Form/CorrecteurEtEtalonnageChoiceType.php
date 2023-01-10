@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CorrecteurEtEtalonnageChoiceType extends AbstractType
 {
-    const GRILLE_ID_OPTION = "grille_id";
+    const GRILLE_CLASS_OPTION = "grille_id";
 
 
     public function __construct(
@@ -26,9 +26,9 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
     {
     }
 
-    private function correcteurAndEtalonnageChoices(int $grille_id): array
+    private function correcteurAndEtalonnageChoices(string $grilleClass): array
     {
-        $correcteurs = $this->correcteur_repository->findBy(["grille_id" => $grille_id]);
+        $correcteurs = $this->correcteur_repository->findBy(["grilleClass" => $grilleClass]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
@@ -56,8 +56,8 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::GRILLE_ID_OPTION);
-        $resolver->setAllowedTypes(self::GRILLE_ID_OPTION, "int");
+        $resolver->define(self::GRILLE_CLASS_OPTION);
+        $resolver->setAllowedTypes(self::GRILLE_CLASS_OPTION, "int");
     }
 
 }

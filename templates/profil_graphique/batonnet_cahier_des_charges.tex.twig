@@ -1,7 +1,6 @@
 \documentclass[10pt, letterpaper, twoside]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[a4paper, total={7in, 8in}]{geometry}
-\usepackage{pgfplots}
 \usepackage{tabularx}
 \usepackage{textcomp}
 
@@ -21,7 +20,6 @@
                 \underline{N\textdegree \space d'identification:} & XXX & \underline{Type du concours:} & XXX \\
                 \underline{SGAP ou CS:} & {{ reponse.raw["sgap"]|sgap }} & \underline{Version Batterie:} & XXXX \\
                 \underline{Date d'examen:} & {{ session.date|date('d/m/Y') }} & \underline{Note Globale:} & XXX \\
-
             \end{tabular}
         \end{minipage}
     }

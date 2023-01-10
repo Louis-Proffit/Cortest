@@ -15,7 +15,7 @@ class Correcteur
     public int $id;
 
     #[ORM\Column]
-    public int $grille_id;
+    public string $grilleClass;
 
     #[ORM\Column]
     public int $score_id;
@@ -28,15 +28,15 @@ class Correcteur
 
     /**
      * @param int $id
-     * @param int $grille_id
+     * @param string $grilleClass
      * @param int $score_id
      * @param string $nom
      * @param array $values
      */
-    public function __construct(int $id, int $grille_id, int $score_id, string $nom, array $values)
+    public function __construct(int $id, string $grilleClass, int $score_id, string $nom, array $values)
     {
         $this->id = $id;
-        $this->grille_id = $grille_id;
+        $this->grilleClass = $grilleClass;
         $this->score_id = $score_id;
         $this->nom = $nom;
         $this->values = $values;

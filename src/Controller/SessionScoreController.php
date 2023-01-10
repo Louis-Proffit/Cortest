@@ -9,6 +9,7 @@ use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
 use App\Entity\Session;
 use App\Form\Data\CorrecteurChoice;
 use App\Form\CorrecteurChoiceType;
+use App\Repository\CorrecteurRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,6 @@ class SessionScoreController extends AbstractController
     #[Route('/form/{session_id}', name: "form")]
     public function sessionScoreForm(
         SessionRepository $session_repository,
-        CorrecteurManager $correcteur_manager,
         Request           $request,
         int               $session_id): Response
     {
@@ -32,7 +32,7 @@ class SessionScoreController extends AbstractController
         $parametres_calcul_score = new CorrecteurChoice();
         $form = $this->createForm(CorrecteurChoiceType::class,
             $parametres_calcul_score,
-            [CorrecteurChoiceType::GRILLE_ID_OPTION => $session->grille_id]
+            [CorrecteurChoiceType::GRILLE_CLASS_OPTION => $session->grilleClass]
         );
 
         $form->handleRequest($request);
@@ -41,19 +41,36 @@ class SessionScoreController extends AbstractController
 
             $correcteur = $parametres_calcul_score->correcteur;
 
-            $scores = $correcteur_manager->corriger($correcteur, $session->reponses_candidats->toArray());
-
-            return $this->render("scores/cahier_des_charges.html.twig",
-                ["scores" => $scores,
-                    "reponses" => $session->reponses_candidats->toArray(),
-                    "session" => $session,
-                    "correcteur" => $correcteur]);
-
+            return $this->redirectToRoute("score_consulter",
+                ["session_id" => $session_id, "correcteur_id" => $correcteur->id]);
         }
 
         return $this->render('scores/score_form.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route("/consulter/{session_id}/{correcteur_id}", name: "consulter")]
+    public function consulter(
+        SessionRepository $session_repository,
+        CorrecteurRepository $correcteur_repository,
+        CorrecteurManager $correcteur_manager,
+        int $session_id,
+        int $correcteur_id
+    ): Response
+    {
+        $session = $session_repository->find($session_id);
+        $correcteur = $correcteur_repository->find($correcteur_id);
+
+        $reponses = $session->reponses_candidats->toArray();
+
+        $scores = $correcteur_manager->corriger($correcteur, $reponses);
+
+        return $this->render("scores/cahier_des_charges.html.twig",
+            ["scores" => $scores,
+                "reponses" => $session->reponses_candidats->toArray(),
+                "session" => $session,
+                "correcteur" => $correcteur]);
     }
 
 
