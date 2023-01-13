@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CorrecteurChoiceType extends AbstractType
 {
-    const GRILLE_ID_OPTION = "grille_id";
+    const GRILLE_CLASS_OPTION = "grille_id";
 
     public function __construct(
         private readonly CorrecteurRepository $repository
@@ -20,9 +20,9 @@ class CorrecteurChoiceType extends AbstractType
     {
     }
 
-    private function definitionCorrecteurChoice(int $grille_id): array
+    private function definitionCorrecteurChoice(string $grilleClass): array
     {
-        $correcteurs = $this->repository->findBy(["grille_id" => $grille_id]);
+        $correcteurs = $this->repository->findBy(["grilleClass" => $grilleClass]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
@@ -38,15 +38,15 @@ class CorrecteurChoiceType extends AbstractType
             "correcteur",
             ChoiceType::class,
             [
-                "choices" => $this->definitionCorrecteurChoice($options[self::GRILLE_ID_OPTION])
+                "choices" => $this->definitionCorrecteurChoice($options[self::GRILLE_CLASS_OPTION])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::GRILLE_ID_OPTION);
-        $resolver->setAllowedTypes(self::GRILLE_ID_OPTION, "int");
+        $resolver->define(self::GRILLE_CLASS_OPTION);
+        $resolver->setAllowedTypes(self::GRILLE_CLASS_OPTION, "string");
     }
 
 }

@@ -2,23 +2,30 @@
 
 namespace App\Core\Res\Grille\Values;
 
+use App\Core\Res\Grille\CortestGrille;
+use App\Core\Res\Grille\CortestProperty;
 use App\Core\Res\Grille\Grille;
-use App\Core\Res\Property;
 
-class GrilleBrigadierDePolice implements Grille
+#[CortestGrille(nom: "Grille brigadier de police", tests: [])]
+class GrilleBrigadierDePolice extends Grille
 {
 
-    public function getNom(): string
+    #[CortestProperty(nom: "Numéro de candidat")]
+    public int $numero_candidat;
+
+    #[CortestProperty(nom: "SGAP")]
+    public int $sgap;
+
+    protected function getClass(): string
     {
-        return "Grille d'accès au grade 'Brigadier de Police'";
+        return GrilleBrigadierDePolice::class;
     }
 
-    public function getProperties(): array
+    public function fill(array $raw): void
     {
-        return [
-            new Property("Numéro de candidat", "numero_candidat"),
-            new Property("SGAP", "sgap"),
-            new Property("Réponses", "reponses"),
-        ];
+        parent::fill($raw);
+        $this->numero_candidat = $raw["numero_candidat"];
+        $this->sgap = $raw["sgap"];
+        $this->reponses = $raw["reponses"];
     }
 }

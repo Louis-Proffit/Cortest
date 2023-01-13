@@ -25,7 +25,7 @@
             <tr>
                 <td>{{ session.date|date('d-m-Y') }}</td>
                 <td>{{ session.sgap_index|sgap }}</td>
-                <td>{{ grilles[session.id] }}</td>
+                <td>{{ grilles[session.id].nom }}</td>
                 <td><a class="btn btn-link" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a></td>
             </tr>
         {% endfor %}

@@ -8,40 +8,34 @@ use App\Core\Res\Grille\Values\GrilleOctobre2019;
 class GrilleRepository
 {
 
-    private array $values;
+    private array $classes;
 
-    public function __construct(
-        GrilleOctobre2019       $grille_octobre_2019,
-        GrilleBrigadierDePolice $grille_brigadier_de_police
-    )
+    public function __construct()
     {
-        $this->values = [
-            0 => $grille_octobre_2019,
-            1 => $grille_brigadier_de_police
+        $this->classes = [
+            GrilleOctobre2019::class,
+            GrilleBrigadierDePolice::class
         ];
     }
 
-    public function get(int $index): Grille
+    public function sampleClass(): string
     {
-        return $this->values[$index];
+        return $this->classes[0];
     }
 
-    public function sample(): int
+    public function instanceOfAll(): array
     {
-        return array_keys($this->values)[0];
+        return array_map(fn($clazz) => new $clazz(), $this->classes);
     }
 
-    public function all(): array
-    {
-        return $this->values;
-    }
-
-    public function nomToIndex(): array
+    public function nomToClassName(): array
     {
         $result = [];
 
-        foreach ($this->values as $index => $grille) {
-            $result[$grille->getNom()] = $index;
+        foreach ($this->classes as $clazz) {
+            /** @var Grille $instance */
+            $instance = new $clazz();
+            $result[$instance->getNom()] = $clazz;
         }
 
         return $result;

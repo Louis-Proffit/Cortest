@@ -23,8 +23,7 @@ class SessionReponseController extends AbstractController
 
     #[Route('/consulter-liste', name: "consulter_liste")]
     public function sessionsConsulter(
-        SessionRepository $session_repository,
-        GrilleRepository  $grille_repository
+        SessionRepository $session_repository
     ): Response
     {
         /** @var array $session */
@@ -32,7 +31,7 @@ class SessionReponseController extends AbstractController
         $grilles = [];
 
         foreach ($sessions as $session) {
-            $grilles[$session->id] = $grille_repository->get($session->grille_id)->getNom();
+            $grilles[$session->id] = new ($session->grilleClass)();
         }
 
         return $this->render('sessions/sessions.html.twig', ["sessions" => $sessions, "grilles" => $grilles]);
@@ -49,7 +48,7 @@ class SessionReponseController extends AbstractController
             id: 0,
             date: new DateTime("now"),
             sgap_index: $sgaps->sample(),
-            grille_id: $grille_repository->sample(),
+            grilleClass: $grille_repository->sampleClass(),
             reponses_candidats: new ArrayCollection()
         );
 

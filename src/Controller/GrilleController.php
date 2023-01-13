@@ -16,7 +16,7 @@ class GrilleController extends AbstractController
         GrilleRepository $grille_repository
     ): Response
     {
-        $grilles = $grille_repository->all();
+        $grilles = $grille_repository->instanceOfAll();
 
         return $this->render("grille/index.html.twig", ["grilles" => $grilles]);
     }
