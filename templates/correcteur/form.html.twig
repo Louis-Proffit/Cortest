@@ -3,18 +3,9 @@
 {% block content %}
 
     <br>
-    <h1>Configurer un correcteur</h1>
+    <h1>Choisir une grille et un score</h1>
     <br>
-    {{ form_start(form) }}
-    {{ form_row(form.nom) }}
-    {% for nom,row in form.values %}
-        <div class="mb-3">
-            <div class="form-label">{{ nom }}</div>
-            {{ form_widget(row) }}
-        </div>
-    {% endfor %}
-
-    {{ form_end(form) }}
+    {{ form(form) }}
 
 {% endblock %}
 

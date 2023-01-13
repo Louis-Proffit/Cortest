@@ -20,27 +20,27 @@ class Session
     public DateTime $date;
 
     #[ORM\Column]
-    public int $sgap_index;
+    public string $grille_class;
 
-    #[ORM\Column]
-    public string $grilleClass;
+    #[ORM\ManyToOne(targetEntity: Sgap::class)]
+    public Sgap $sgap;
 
-    #[ORM\OneToMany(mappedBy: "session", targetEntity: CandidatReponse::class)]
+    #[ORM\OneToMany(mappedBy: "session", targetEntity: ReponseCandidat::class)]
     public Collection $reponses_candidats;
 
     /**
      * @param int $id
      * @param DateTime $date
-     * @param int $sgap_index
-     * @param string $grilleClass
+     * @param string $grille_class
+     * @param Sgap $sgap
      * @param Collection $reponses_candidats
      */
-    public function __construct(int $id, DateTime $date, int $sgap_index, string $grilleClass, Collection $reponses_candidats)
+    public function __construct(int $id, DateTime $date, string $grille_class, Sgap $sgap, Collection $reponses_candidats)
     {
         $this->id = $id;
         $this->date = $date;
-        $this->sgap_index = $sgap_index;
-        $this->grilleClass = $grilleClass;
+        $this->grille_class = $grille_class;
+        $this->sgap = $sgap;
         $this->reponses_candidats = $reponses_candidats;
     }
 

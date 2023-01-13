@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
+use App\Core\Correcteur\CorrecteurManager;
+use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Pdf\PdfManager;
-use App\Core\Res\Correcteur\CorrecteurManager;
-use App\Core\Res\Etalonnage\EtalonnageManager;
-use App\Core\Res\ProfilGraphique\ProfilGraphiqueRepository;
+use App\Core\ProfilGraphique\ProfilGraphiqueRepository;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
 use App\Form\EtalonnageChoiceType;
-use App\Repository\CandidatReponseRepository;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
+use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -25,12 +25,12 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-#[Route("/session-profil", name: "profil_")]
+#[Route("/calcul/profil", name: "calcul_profil_")]
 class SessionProfilController extends AbstractController
 {
 
-    #[Route("/form-from-reponse/{session_id}", name: "form_from_reponse")]
-    public function sessionProfilFormFromReponse(
+    #[Route("/session/form/{session_id}", name: "session_form")]
+    public function form(
         SessionRepository $session_repository,
         Request           $request,
         int               $session_id,
@@ -43,17 +43,17 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             CorrecteurEtEtalonnageChoiceType::class,
             $parametres_calcul_profil,
-            [CorrecteurEtEtalonnageChoiceType::GRILLE_CLASS_OPTION => $session->grilleClass]);
+            [CorrecteurEtEtalonnageChoiceType::OPTION_SESSION => $session]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $parametres_calcul_profil->correcteur_et_etalonnage->correcteur;
-            $etalonnage = $parametres_calcul_profil->correcteur_et_etalonnage->etalonnage;
+            $correcteur = $parametres_calcul_profil->both->correcteur;
+            $etalonnage = $parametres_calcul_profil->both->etalonnage;
 
             return $this->redirectToRoute(
-                "profil_consulter",
+                "calcul_profil_index",
                 [
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur->id,
@@ -62,12 +62,12 @@ class SessionProfilController extends AbstractController
             );
         }
 
-        return $this->render('profils/profil_form.html.twig', [
+        return $this->render('profil/form.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/form-from-score/{session_id}/{correcteur_id}', name: "form")]
+    #[Route('/score/form/{session_id}/{correcteur_id}', name: "score_form")]
     public function sessionProfilForm(
         SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
@@ -76,10 +76,9 @@ class SessionProfilController extends AbstractController
         int                  $correcteur_id): Response
     {
         $session = $session_repository->find($session_id);
-
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if ($session->grilleClass != $correcteur->grilleClass) {
+        if ($session->grille_class != $correcteur->grille_class) {
             throw new HttpException(Response::HTTP_BAD_REQUEST,
                 "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
         }
@@ -88,7 +87,7 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             EtalonnageChoiceType::class,
             $parametres_calcul_profil,
-            [EtalonnageChoiceType::SCORE_ID_OPTION => $correcteur->score_id]);
+            [EtalonnageChoiceType::OPTION_PROFIL => $correcteur->profil]);
 
         $form->handleRequest($request);
 
@@ -97,7 +96,7 @@ class SessionProfilController extends AbstractController
             $etalonnage = $parametres_calcul_profil->etalonnage;
 
             return $this->redirectToRoute(
-                "profil_consulter",
+                "calcul_profil_index",
                 [
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur_id,
@@ -106,12 +105,12 @@ class SessionProfilController extends AbstractController
             );
         }
 
-        return $this->render('profils/profil_form.html.twig', [
+        return $this->render('profil/form.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route("/consulter/{session_id}/{correcteur_id}/{etalonnage_id}", name: "consulter")]
+    #[Route("/index/{session_id}/{correcteur_id}/{etalonnage_id}", name: "index")]
     public function consulter(
         CorrecteurManager    $correcteur_manager,
         EtalonnageManager    $etalonnage_manager,
@@ -127,11 +126,21 @@ class SessionProfilController extends AbstractController
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
 
+        if ($session->grille_class !== $correcteur->grille_class) {
+            throw new HttpException(Response::HTTP_BAD_REQUEST,
+                "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
+        }
+
+        if ($correcteur->profil->id !== $etalonnage->profil->id) {
+            throw new HttpException(Response::HTTP_BAD_REQUEST,
+                "L'étalonnage ne s'applique pas au profil calculé",);
+        }
+
         $reponses = $session->reponses_candidats->toArray();
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,
-            reponses: $session->reponses_candidats->toArray()
+            reponses_candidat: $reponses
         );
 
         $profils = $etalonnage_manager->etalonner(
@@ -139,9 +148,8 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        return $this->render("profils/cahier_des_charges.html.twig",
+        return $this->render("profil/index.html.twig",
             ["profils" => $profils,
-                "reponses" => $reponses,
                 "scores" => $scores,
                 "session" => $session,
                 "correcteur" => $correcteur,
@@ -211,7 +219,7 @@ class SessionProfilController extends AbstractController
     #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "download")]
     public function downloadFile(
         ProfilGraphiqueRepository $profil_graphique_manager,
-        CandidatReponseRepository $candidat_reponse_repository,
+        ReponseCandidatRepository $candidat_reponse_repository,
         CorrecteurRepository      $correcteur_repository,
         EtalonnageRepository      $etalonnage_repository,
         CorrecteurManager         $correcteur_manager,

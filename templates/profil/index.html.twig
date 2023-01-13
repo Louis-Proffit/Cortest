@@ -1,0 +1,63 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <br>
+    <h1>Profils</h1>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("calcul_profil_session_download", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Télécharger</a>
+        </div>
+    </div>
+    <br>
+    <h3>Informations générales</h3>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Session</dt>
+        <dd class="col-md-9">
+            <dl class="row">
+                <dt class="col-md-3">Date</dt>
+                <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
+                <dt class="col-md-3">SGAP</dt>
+                <dd class="col-md-9">{{ session.sgap.nom }}</dd>
+            </dl>
+        </dd>
+    </dl>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Classes</h3>
+    <br>
+    <div class="table-responsive">
+        <table class="table text-nowrap">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Feuille de profil</th>
+                {% for echelle in correcteur.echelles %}
+                    <th>{{ echelle.echelle.nom }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for reponse in session.reponses_candidats %}
+                <tr>
+                    <td>{{ reponse.raw["nom"] }}</td>
+                    <td>{{ reponse.raw["prenom"] }}</td>
+                    <td>
+                        <a href="{{ path("calcul_profil_download", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
+                    </td>
+                    {% for score in scores[reponse.id] %}
+                        <td>
+                            {{ score }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+

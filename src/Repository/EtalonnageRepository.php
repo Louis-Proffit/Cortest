@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Etalonnage[]    findAll()
  * @method Etalonnage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class EtalonnageRepository extends LazyServiceEntityRepository
+class EtalonnageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

@@ -2,18 +2,18 @@
 
 namespace App\Controller;
 
-use App\Core\Res\Grille\GrilleRepository;
-use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
+use App\Core\Grille\GrilleRepository;
 use App\Entity\Correcteur;
+use App\Entity\EchelleCorrecteur;
+use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
+use App\Form\Data\CorrecteurCreer;
 use App\Repository\CorrecteurRepository;
+use App\Repository\ProfilRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,117 +21,107 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route("/correcteur", name: "correcteur_")]
 class CorrecteurController extends AbstractController
 {
-    #[Route("/consulter-liste", name: 'consulter_liste')]
-    public function consulterCorrecteurs(
-        CorrecteurRepository    $correcteur_repository,
-        ProfilOuScoreRepository $profil_ou_score_repository
+    #[Route("/index", name: 'index')]
+    public function index(
+        CorrecteurRepository $correcteur_repository
     ): Response
     {
         $correcteurs = $correcteur_repository->findAll();
 
         $grilles = [];
-        $scores = [];
 
         foreach ($correcteurs as $correcteur) {
-            $scores[$correcteur->id] = $profil_ou_score_repository->get($correcteur->score_id)->getNom();
-            $grilles[$correcteur->id] = new ($correcteur->grilleClass)();
+            $grilles[$correcteur->id] = new ($correcteur->grille_class)();
         }
 
         return $this->render('correcteur/index.html.twig',
-            ["correcteurs" => $correcteurs, "scores" => $scores, "grilles" => $grilles]);
+            ["correcteurs" => $correcteurs, "grilles" => $grilles]);
     }
 
     #[Route("/consulter/{id}", name: 'consulter')]
-    public function consulterCorrecteur(
-        CorrecteurRepository    $correcteur_repository,
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        int                     $id
+    public function consulter(
+        CorrecteurRepository $correcteur_repository,
+        int                  $id
     ): Response
     {
         $correcteur = $correcteur_repository->find($id);
-        $grille = new ($correcteur->grilleClass)();
-        $score = $profil_ou_score_repository->get($correcteur->score_id);
+        $grille = new ($correcteur->grille_class)();
         return $this->render("correcteur/correcteur.html.twig",
-            ["correcteur" => $correcteur, "score" => $score, "grille" => $grille]);
+            ["correcteur" => $correcteur, "grille" => $grille]);
     }
 
-    #[
-        Route("/creer", name: "creer")]
-    public function creerCorrecteur(
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        GrilleRepository        $grille_repository,
-        Request                 $request
+    #[Route("/creer", name: "creer")]
+    public function creer(
+        EntityManagerInterface $entity_manager,
+        ProfilRepository       $profil_repository,
+        GrilleRepository       $grille_repository,
+        Request                $request
     ): Response
     {
-        $form = $this->createFormBuilder()
-            ->add("grilleClass", ChoiceType::class, [
-                "choices" => $grille_repository->nomToClassName(),
-                "label" => "Grille (entrée)"
-            ])
-            ->add("profil_ou_score_id", ChoiceType::class, [
-                "choices" => $profil_ou_score_repository->nomToIndex(),
-                "label" => "Profil (sortie)"
-            ])
-            ->add("submit", SubmitType::class, ["label" => "Valider"])
-            ->getForm();
+        $profils = $profil_repository->findAll();
+        $grilles = $grille_repository->classNames();
 
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() and $form->isValid()) {
-
-            $profil_ou_score_id = $form->getData()["profil_ou_score_id"];
-            $grilleClass = $form->getData()["grilleClass"];
-
-            return $this->redirectToRoute("correcteur_creer_avec_grille_et_score",
-                ["score_id" => $profil_ou_score_id, "grilleClass" => $grilleClass]);
+        if (empty($profils)) {
+            $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un");
+            return $this->redirectToRoute("profil_index");
         }
 
-        return $this->render("correcteur/creer_choisir_grille_et_score.html.twig", ["form" => $form]);
-    }
-
-    #[Route("/creer-avec-grille-et-score/{score_id}/{grilleClass}", name: "creer_avec_grille_et_score")]
-    public function creerCorrecteurAvecProfilOuScore(
-        ManagerRegistry         $doctrine,
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        Request                 $request,
-        int                     $score_id,
-        string                  $grilleClass
-    )
-    {
-        $profil_ou_score = $profil_ou_score_repository->get($score_id);
-
-        $correcteur = new Correcteur(
-            id: 0,
-            grilleClass: $grilleClass,
-            score_id: $score_id,
-            nom: "",
-            values: $profil_ou_score->generateCorrecteurValues()
+        $correcteurCreer = new CorrecteurCreer(
+            profil: $profils[0],
+            grille_class: $grilles[0],
+            nom: ""
         );
-
-        $form = $this->createForm(CorrecteurType::class, $correcteur);
+        $form = $this->createForm(CorrecteurCreerType::class, $correcteurCreer);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $doctrine->getManager()->persist($correcteur);
-            $doctrine->getManager()->flush();
+            $profil = $correcteurCreer->profil;
 
-            return $this->redirectToRoute("correcteur_consulter_liste");
+            /** @var EchelleCorrecteur[] $echelles */
+            $echelles = [];
+            foreach ($profil->echelles as $echelle) {
 
+                $echelleCorrecteur = new EchelleCorrecteur();
+                $echelleCorrecteur->echelle = $echelle;
+                $echelleCorrecteur->id = 0;
+                $echelleCorrecteur->expression = "0";
+
+                $echelles[] = $echelleCorrecteur;
+            }
+
+            $correcteur = new Correcteur(
+                id: 0,
+                grille_class: $correcteurCreer->grille_class,
+                profil: $profil,
+                nom: $correcteurCreer->nom,
+                echelles: new ArrayCollection($echelles)
+            );
+
+            foreach ($echelles as $echelle) {
+                $echelle->correcteur = $correcteur;
+                $entity_manager->persist($echelle);
+            }
+
+            $entity_manager->persist($correcteur);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("correcteur_modifier", ["id" => $correcteur->id]);
         }
 
         return $this->render("correcteur/form.html.twig", ["form" => $form]);
     }
 
-    /*
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
         ManagerRegistry      $doctrine,
         CorrecteurRepository $correcteur_repository,
         Request              $request,
-        int                  $id)
+        int                  $id,
+    ): Response
     {
+
         $correcteur = $correcteur_repository->find($id);
 
         $form = $this->createForm(CorrecteurType::class, $correcteur);
@@ -140,31 +130,35 @@ class CorrecteurController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $doctrine->getManager()->persist($correcteur);
             $doctrine->getManager()->flush();
 
-            return $this->redirectToRoute("correcteur_consulter_liste");
+            return $this->redirectToRoute("correcteur_index");
 
         }
 
-        return $this->render("correcteur/form.html.twig", ["form" => $form]);
-    }*/
+        return $this->render("correcteur/modifier.html.twig", ["form" => $form]);
+    }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ManagerRegistry      $doctrine,
-        CorrecteurRepository $correcteur_repository,
-        int                  $id,
-    )
+        EntityManagerInterface $entity_manager,
+        CorrecteurRepository   $correcteur_repository,
+        int                    $id,
+    ): Response
     {
         $correcteur = $correcteur_repository->find($id);
 
         if ($correcteur != null) {
-            $doctrine->getManager()->remove($correcteur);
-            $doctrine->getManager()->flush();
+            $entity_manager->remove($correcteur);
+
+            foreach ($correcteur->echelles as $echelle) {
+                $entity_manager->remove($echelle);
+            }
+
+            $entity_manager->flush();
         }
 
-        return $this->redirectToRoute("correcteur_consulter_liste");
+        return $this->redirectToRoute("correcteur_index");
     }
 
 }

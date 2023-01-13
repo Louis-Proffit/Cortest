@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Res\Grille\GrilleRepository;
+use App\Core\Grille\GrilleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

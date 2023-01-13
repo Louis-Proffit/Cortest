@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Etalonnage;
+use App\Entity\Profil;
 use App\Repository\EtalonnageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -12,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EtalonnageChoiceType extends AbstractType
 {
-    const SCORE_ID_OPTION = "score_id";
+    const OPTION_PROFIL = "profil";
 
     public function __construct(
         private readonly EtalonnageRepository $repository
@@ -25,12 +26,12 @@ class EtalonnageChoiceType extends AbstractType
         return $definition_etalonnage_computer->nom;
     }
 
-    private function definitionEtalonnageComputerChoices(int $score_id): array
+    private function etalonnageChoices(Profil $profil): array
     {
-        $etalonnages = $this->repository->findBy(["score_id" => $score_id]);
 
         $result = [];
-        foreach ($etalonnages as $etalonnage) {
+        /** @var Etalonnage $etalonnage */
+        foreach ($profil->etalonnages as $etalonnage) {
             $result[$etalonnage->nom] = $etalonnage;
         }
 
@@ -43,15 +44,15 @@ class EtalonnageChoiceType extends AbstractType
             "etalonnage",
             ChoiceType::class,
             [
-                "choices" => $this->definitionEtalonnageComputerChoices($options[self::SCORE_ID_OPTION])
+                "choices" => $this->etalonnageChoices($options[self::OPTION_PROFIL])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::SCORE_ID_OPTION);
-        $resolver->setAllowedTypes(self::SCORE_ID_OPTION, "int");
+        $resolver->define(self::OPTION_PROFIL);
+        $resolver->setAllowedTypes(self::OPTION_PROFIL, Profil::class);
     }
 
 }

@@ -3,8 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\EtalonnageRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 
 #[ORM\Entity(repositoryClass: EtalonnageRepository::class)]
 class Etalonnage
@@ -14,8 +15,8 @@ class Etalonnage
     #[ORM\Column]
     public int $id;
 
-    #[ORM\Column]
-    public int $score_id;
+    #[ORM\ManyToOne(targetEntity: Profil::class)]
+    public Profil $profil;
 
     #[ORM\Column]
     public string $nom;
@@ -23,22 +24,24 @@ class Etalonnage
     #[ORM\Column]
     public int $nombre_classes;
 
-    #[ORM\Column(type: Types::JSON)]
-    public array $values;
+    #[ORM\OneToMany(mappedBy: "etalonnage", targetEntity: EchelleEtalonnage::class)]
+    public Collection $echelles;
 
     /**
      * @param int $id
-     * @param int $score_id
+     * @param Profil $profil
      * @param string $nom
      * @param int $nombre_classes
-     * @param array $values
+     * @param Collection $echelles
      */
-    public function __construct(int $id, int $score_id, string $nom, int $nombre_classes, array $values)
+    public function __construct(int $id, Profil $profil, string $nom, int $nombre_classes, Collection $echelles)
     {
         $this->id = $id;
-        $this->score_id = $score_id;
+        $this->profil = $profil;
         $this->nom = $nom;
         $this->nombre_classes = $nombre_classes;
-        $this->values = $values;
+        $this->echelles = $echelles;
     }
+
+
 }

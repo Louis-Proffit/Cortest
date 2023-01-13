@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Configurer les bornes</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {% for echelleEtalonnage in form.echelles %}
+        <div class="mb-3">
+            <div class="form-label">{{ echelleEtalonnage.echelle.nom }}</div>
+            <div class="input-group">
+                {% for bound in echelleEtalonnage.bounds %}
+                    <div class="input-group-text">Classe {{ loop.index }}</div>
+                    {{ form_widget(bound) }}
+                    {% if loop.last %}
+                        <div class="input-group-text">Classe {{ loop.index + 1 }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    {{ form_end(form) }}
+
+{% endblock %}
+

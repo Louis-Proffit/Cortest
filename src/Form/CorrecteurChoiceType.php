@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Correcteur;
+use App\Entity\Session;
 use App\Repository\CorrecteurRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -12,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CorrecteurChoiceType extends AbstractType
 {
-    const GRILLE_CLASS_OPTION = "grille_id";
+    const OPTION_SESSION = "session";
 
     public function __construct(
         private readonly CorrecteurRepository $repository
@@ -20,9 +21,9 @@ class CorrecteurChoiceType extends AbstractType
     {
     }
 
-    private function definitionCorrecteurChoice(string $grilleClass): array
+    private function definitionCorrecteurChoice(Session $session): array
     {
-        $correcteurs = $this->repository->findBy(["grilleClass" => $grilleClass]);
+        $correcteurs = $this->repository->findBy(["grille_class" => $session->grille_class]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
@@ -38,15 +39,15 @@ class CorrecteurChoiceType extends AbstractType
             "correcteur",
             ChoiceType::class,
             [
-                "choices" => $this->definitionCorrecteurChoice($options[self::GRILLE_CLASS_OPTION])
+                "choices" => $this->definitionCorrecteurChoice($options[self::OPTION_SESSION])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::GRILLE_CLASS_OPTION);
-        $resolver->setAllowedTypes(self::GRILLE_CLASS_OPTION, "string");
+        $resolver->define(self::OPTION_SESSION);
+        $resolver->setAllowedTypes(self::OPTION_SESSION, Session::class);
     }
 
 }

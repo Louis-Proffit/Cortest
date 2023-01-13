@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\CandidatReponse;
+use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\Data\ParametresLectureFichier;
 use App\Form\ParametresLectureFichierType;
@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route("/lecture", name: "lecture_")]
 class LectureController extends AbstractController
 {
-    #[Route("/", name: "home")]
+    #[Route("/index", name: "index")]
     public function lectureHome(): Response
     {
         return $this->render("lecture/index.html.twig");
@@ -38,11 +38,20 @@ class LectureController extends AbstractController
             /** @var array $decoded */
             $decoded = json_decode($uploadSessionBase->contents, associative: true);
 
-            foreach ($decoded as $candidat_reponse_json) {
+            foreach ($decoded as $reponses_candidat_json) {
 
-                $manager->persist(
-                    new CandidatReponse(id: 0, session: $uploadSessionBase->session, reponses: $candidat_reponse_json)
+                /** @var string $reponse_string */
+                $reponse_string = $reponses_candidat_json["reponses"];
+
+                $reponse_array = str_split($reponse_string);
+
+                $reponse_candidat = new ReponseCandidat(
+                    id: 0,
+                    session: $uploadSessionBase->session,
+                    reponses: $reponse_array,
+                    raw: $reponses_candidat_json
                 );
+                $manager->persist($reponse_candidat);
             }
 
             $manager->flush();

@@ -1,0 +1,35 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+    <br>
+    <h1>Sessions enregistrées</h1>
+    <br>
+    <div class="lead">Liste des sessions enregistrées sur Cortest</div>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("session_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>SGAP</th>
+            <th>Consulter</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for session in sessions %}
+            <tr>
+                <td>{{ session.date|date('d-m-Y') }}</td>
+                <td>{{ session.sgap.nom }}</td>
+                <td><a class="btn btn-link" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

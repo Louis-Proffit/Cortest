@@ -1,0 +1,66 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <br>
+    <h1>Scores</h1>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path('calcul_profil_score_form', {"session_id":session.id, "correcteur_id":correcteur.id}) }}">Calculer
+                les profils</a>
+        </div>
+    </div>
+    <br>
+    <h3>Informations générales</h3>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Session</dt>
+        <dd class="col-md-9">
+            <dl class="row">
+                <dt class="col-md-3">Date</dt>
+                <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
+                <dt class="col-md-3">SGAP</dt>
+                <dd class="col-md-9">{{ session.sgap.nom }}</dd>
+            </dl>
+        </dd>
+        <dt class="col-md-3">Correcteur</dt>
+        <dd class="col-md-9">
+            <dl class="row">
+                <dt class="col-md-3">Nom</dt>
+                <dd class="col-md-9">{{ correcteur.nom }}</dd>
+            </dl>
+        </dd>
+    </dl>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Scores</h3>
+    <br>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prenom</th>
+                {% for echelle in correcteur.echelles %}
+                    <th>{{ echelle.echelle.nom }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for reponse in session.reponses_candidats %}
+                <tr>
+                    <td>{{ reponse.raw["nom"] }}</td>
+                    <td>{{ reponse.raw["prenom"] }}</td>
+                    {% for score in scores[reponse.id] %}
+                        <td>{{ score }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+{% endblock %}
+

@@ -5,10 +5,18 @@
     <br>
     <h1>Consulter un correcteur</h1>
     <br>
-    <div class="row">
+    <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
+               href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}">Modifier</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
                href="{{ path("correcteur_supprimer", {"id":correcteur.id}) }}">Supprimer</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("correcteur_index") }}">Retour à la liste</a>
         </div>
     </div>
     <br>
@@ -17,8 +25,8 @@
         <dd class="col-md-9">{{ correcteur.nom }}</dd>
         <dt class="col-md-3">Grille</dt>
         <dd class="col-md-9">{{ grille.nom }}</dd>
-        <dt class="col-md-3">Score</dt>
-        <dd class="col-md-9">{{ score.nom }}</dd>
+        <dt class="col-md-3">Profil</dt>
+        <dd class="col-md-9">{{ correcteur.profil.nom }}</dd>
     </dl>
     <table class="table">
         <thead>
@@ -28,10 +36,10 @@
         </tr>
         </thead>
         <tbody>
-        {% for property in score.properties %}
+        {% for echelleController in correcteur.echelles %}
             <tr>
-                <td>{{ property.nom }}</td>
-                <td>{{ correcteur.values[property.nom] }}</td>
+                <td>{{ echelleController.echelle.nom }}</td>
+                <td>{{ echelleController.expression }}</td>
             </tr>
         {% endfor %}
         </tbody>

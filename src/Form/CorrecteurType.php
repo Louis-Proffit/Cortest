@@ -15,8 +15,8 @@ class CorrecteurType extends AbstractType
     {
         $builder->add("nom", TextType::class)
             ->add(
-                "values", CollectionType::class, [
-                    "entry_type" => TextType::class,
+                "echelles", CollectionType::class, [
+                    "entry_type" => EchelleCorrecteurType::class,
                     "entry_options" => ["label" => false]
                 ]
             )

@@ -2,18 +2,12 @@
 
 namespace App\Twig;
 
-use App\Constants\Sgaps;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 class CortestExtension extends AbstractExtension
 {
 
-    public function __construct(
-        private readonly Sgaps $sgaps
-    )
-    {
-    }
 
 
     public function getFilters(): array

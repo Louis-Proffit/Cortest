@@ -16,8 +16,8 @@ class EtalonnageType extends AbstractType
         $builder
             ->add("nom", TextType::class)
             ->add(
-                "values", CollectionType::class, [
-                    "entry_type" => EtalonnageRowType::class,
+                "echelles", CollectionType::class, [
+                    "entry_type" => EchelleEtalonnageType::class,
                     "entry_options" => ["label" => false],
                 ]
             )

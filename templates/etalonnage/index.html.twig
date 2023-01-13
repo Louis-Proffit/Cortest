@@ -5,6 +5,8 @@
     <br>
     <h1>Etalonnages disponibles</h1>
     <br>
+    <div class="lead">Liste des étalonnages disponibles</div>
+    <br>
     <div class="row">
         <div class="col">
             <a class="btn btn-primary" href="{{ path("etalonnage_creer") }}">Ajouter</a>
@@ -15,7 +17,8 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Nom du score applicable</th>
+            <th scope="col">Nom du profil</th>
+            <th scope="col">Nombre de classes</th>
             <th scope="col">Consulter</th>
         </tr>
         </thead>
@@ -23,7 +26,8 @@
         {% for etalonnage in etalonnages %}
             <tr>
                 <td>{{ etalonnage.nom }}</td>
-                <td>{{ scores[etalonnage.id] }}</td>
+                <td>{{ etalonnage.profil.nom }}</td>
+                <td>{{ etalonnage.nombre_classes }}</td>
                 <td>
                     <a href="{{ path("etalonnage_consulter", {"id":etalonnage.id}) }}" class="btn btn-link">
                         Consulter</a>

@@ -2,8 +2,8 @@
 
 namespace App\Constraint;
 
-use App\Core\Res\Correcteur\CorrecteurManager;
-use App\Core\Res\Grille\GrilleRepository;
+use App\Core\Correcteur\CorrecteurManager;
+use App\Core\Grille\GrilleRepository;
 use App\Entity\Correcteur;
 use Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

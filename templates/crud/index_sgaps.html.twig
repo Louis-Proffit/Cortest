@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Sgaps disponibles</h1>
+    <br>
+    <p class="lead">Liste des sgaps utilisée par l'application Cortest.</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("sgap_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Index</th>
+            <th>Nom</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sgap in items %}
+            <tr>
+                <td>{{ sgap.index }}</td>
+                <td>{{ sgap.nom }}</td>
+                <td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Configurer un correcteur</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    <br>
+    <div class="alert alert-info">
+        <h5 class="alert-heading fw-bold">
+            vrai1
+        </h5>
+        La fonction <b>vrai1</b> donne 1 point à une question si le candidat a répondu 1, 0 sinon.
+    </div>
+    <br>
+    <div class="alert alert-info">
+        <h5 class="alert-heading fw-bold">
+            vrai2
+        </h5>
+        La fonction <b>vrai2</b> donne 1 point à une question si le candidat a répondu 2, 0 sinon.
+    </div>
+    <br>
+    {% for echelleCorrecteur in form.echelles %}
+        <div class="mb-3">
+            <div class="form-label">{{ echelleCorrecteur.vars.value.echelle.nom }}</div>
+            {{ form_widget(echelleCorrecteur.expression) }}
+        </div>
+    {% endfor %}
+
+    {{ form_end(form) }}
+
+{% endblock %}
+

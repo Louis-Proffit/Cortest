@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-use App\Entity\CandidatReponse;
+use App\Entity\ReponseCandidat;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -24,9 +24,9 @@ class SerialisationDeserialisationTest extends KernelTestCase
 
     public function testDeserialisation()
     {
-        $all = $this->manager->getRepository(CandidatReponse::class)->findAll();
+        $all = $this->manager->getRepository(ReponseCandidat::class)->findAll();
 
-        /** @var CandidatReponse $candidat_reponse */
+        /** @var ReponseCandidat $candidat_reponse */
         foreach ($all as $candidat_reponse) {
             var_dump(unserialize($candidat_reponse->raw));
         }

@@ -3,8 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Etalonnage;
-use App\Form\Data\CorrecteurChoice;
-use App\Form\Data\CorrecteurEtEtalonnageChoice;
+use App\Entity\Session;
 use App\Form\Data\CorrecteurEtEtalonnagePair;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
@@ -16,28 +15,27 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CorrecteurEtEtalonnageChoiceType extends AbstractType
 {
-    const GRILLE_CLASS_OPTION = "grille_id";
-
+    const OPTION_SESSION = "session";
 
     public function __construct(
-        private readonly CorrecteurRepository $correcteur_repository,
-        private readonly EtalonnageRepository $etalonnage_repository
+        private readonly CorrecteurRepository $correcteur_repository
     )
     {
     }
 
-    private function correcteurAndEtalonnageChoices(string $grilleClass): array
+    private function correcteurAndEtalonnageChoices(Session $session): array
     {
-        $correcteurs = $this->correcteur_repository->findBy(["grilleClass" => $grilleClass]);
+        $correcteurs = $this->correcteur_repository->findBy(["grille_class" => $session->grille_class]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
 
             $sub_result = [];
 
-            $etalonnages = $this->etalonnage_repository->findBy(["score_id" => $correcteur->score_id]);
+            $profil = $correcteur->profil;
 
-            foreach ($etalonnages as $etalonnage) {
+            /** @var Etalonnage $etalonnage */
+            foreach ($profil->etalonnages as $etalonnage) {
                 $sub_result[$etalonnage->nom] = new CorrecteurEtEtalonnagePair($correcteur, $etalonnage);
             }
 
@@ -49,15 +47,15 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("correcteur_et_etalonnage", ChoiceType::class, [
-            "choices" => $this->correcteurAndEtalonnageChoices($options["grille_id"])
+        $builder->add("both", ChoiceType::class, [
+            "choices" => $this->correcteurAndEtalonnageChoices($options[self::OPTION_SESSION])
         ])->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::GRILLE_CLASS_OPTION);
-        $resolver->setAllowedTypes(self::GRILLE_CLASS_OPTION, "int");
+        $resolver->define(self::OPTION_SESSION);
+        $resolver->setAllowedTypes(self::OPTION_SESSION, Session::class);
     }
 
 }

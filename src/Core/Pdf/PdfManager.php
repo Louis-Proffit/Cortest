@@ -2,11 +2,10 @@
 
 namespace App\Core\Pdf;
 
-use App\Core\Res\ProfilGraphique\ProfilGraphique;
-use App\Core\Res\ProfilGraphique\ProfilGraphiqueRepository;
-use App\Entity\CandidatReponse;
+use App\Core\ProfilGraphique\ProfilGraphique;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
+use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use FilesystemIterator;
 use Psr\Log\LoggerInterface;
@@ -32,7 +31,7 @@ class PdfManager
     {
     }
 
-    private function fileName(CandidatReponse $candidat_reponse): string
+    private function fileName(ReponseCandidat $candidat_reponse): string
     {
         return $candidat_reponse->raw["nom"] . "_" . $candidat_reponse->raw["prenom"];
     }
@@ -49,7 +48,7 @@ class PdfManager
      */
     public function getFeuilleProfilContent(
         ProfilGraphique $profil_graphique,
-        CandidatReponse $candidat_reponse,
+        ReponseCandidat $candidat_reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
         array           $score,
@@ -134,7 +133,7 @@ class PdfManager
      * @throws LoaderError
      */
     private function producePdfAndGetPath(ProfilGraphique $profil_graphique,
-                                          CandidatReponse $candidat_reponse,
+                                          ReponseCandidat $candidat_reponse,
                                           Correcteur      $correcteur,
                                           Etalonnage      $etalonnage,
                                           array           $score,
@@ -186,7 +185,7 @@ class PdfManager
     public
     function createPdfFile(
         ProfilGraphique $profil_graphique,
-        CandidatReponse $candidat_reponse,
+        ReponseCandidat $candidat_reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
         array           $score,
@@ -236,7 +235,7 @@ class PdfManager
             $zip = new ZipArchive();
             $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-            /** @var CandidatReponse $reponses_candidat */
+            /** @var ReponseCandidat $reponses_candidat */
             foreach ($session->reponses_candidats as $reponses_candidat) {
 
                 $fileNameWithoutExtension = $this->fileName($reponses_candidat);

@@ -5,6 +5,8 @@
     <br>
     <h1>Correcteurs disponibles</h1>
     <br>
+    <div class="lead">Liste des correcteurs disponibles pour l'application Cortest</div>
+    <br>
     <div class="row">
         <div class="col">
             <a class="btn btn-primary" href="{{ path("correcteur_creer") }}">Ajouter</a>
@@ -15,8 +17,8 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Nom de la grille applicable</th>
-            <th scope="col">Nom du score applicable</th>
+            <th scope="col">Nom de la grille</th>
+            <th scope="col">Nom du profil</th>
             <th scope="col">Consulter</th>
         </tr>
         </thead>
@@ -25,7 +27,7 @@
             <tr>
                 <td>{{ correcteur.nom }}</td>
                 <td>{{ grilles[correcteur.id].nom }}</td>
-                <td>{{ scores[correcteur.id] }}</td>
+                <td>{{ correcteur.profil.nom }}</td>
                 <td>
                     <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link">
                         Consulter</a>

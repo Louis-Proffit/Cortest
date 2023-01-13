@@ -2,18 +2,17 @@
 
 namespace App\Controller;
 
-use App\Core\Res\ProfilOuScore\ProfilOuScoreRepository;
+use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
-use App\Form\EtalonnageRowType;
+use App\Form\Data\EtalonnageCreer;
+use App\Form\EtalonnageCreerType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
+use App\Repository\ProfilRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,82 +20,100 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route("/etalonnage", name: "etalonnage_")]
 class EtalonnageController extends AbstractController
 {
-    #[Route("/consulter-liste", name: 'consulter_liste')]
-    public function consulterEtalonnages(
-        EtalonnageRepository    $etalonnage_repository,
-        ProfilOuScoreRepository $profil_ou_score_repository
+
+    #[Route("/index", name: 'index')]
+    public function index(
+        EtalonnageRepository $etalonnage_repository
     ): Response
     {
         $etalonnages = $etalonnage_repository->findAll();
 
-        $scores = [];
-
-        foreach ($etalonnages as $etalonnage) {
-            $scores[$etalonnage->id] = $profil_ou_score_repository->get($etalonnage->score_id)->getNom();
-        }
-
         return $this->render('etalonnage/index.html.twig',
-            ["etalonnages" => $etalonnages, "scores" => $scores]);
+            ["etalonnages" => $etalonnages]);
     }
 
     #[Route("/consulter/{id}", name: 'consulter')]
-    public function consulterEtalonnage(
-        EtalonnageRepository    $etalonnage_repository,
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        int                     $id
+    public function consulter(
+        EtalonnageRepository $etalonnage_repository,
+        int                  $id
     ): Response
     {
         $etalonnage = $etalonnage_repository->find($id);
-        $score = $profil_ou_score_repository->get($etalonnage->score_id);
-        return $this->render("etalonnage/etalonnage.html.twig", ["etalonnage" => $etalonnage, "score" => $score]);
+        return $this->render("etalonnage/etalonnage.html.twig", ["etalonnage" => $etalonnage]);
     }
 
     #[Route("/creer", name: "creer")]
-    public function creerEtalonnage(
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        Request                 $request
+    public function creer(
+        EntityManagerInterface $entity_manager,
+        ProfilRepository       $profil_repository,
+        Request                $request
     ): Response
     {
-        $form = $this->createFormBuilder()
-            ->add("profil_ou_score_id", ChoiceType::class, [
-                "choices" => $profil_ou_score_repository->nomToIndex()
-            ])
-            ->add("nombre_classes", IntegerType::class, ["label" => "Nombre de classes"])
-            ->add("submit", SubmitType::class, ["label" => "Valider"])
-            ->getForm();
+        $profils = $profil_repository->findAll();
+
+        if (empty($profils)) {
+            $this->addFlash("warning", "Pas de profils disponibles, créez en un");
+            return $this->redirectToRoute("profil_index");
+        }
+
+        $etalonnageCreer = new EtalonnageCreer(
+            profil: $profils[0],
+            nombre_classes: 0,
+            nom: ""
+        );
+
+        $form = $this->createForm(EtalonnageCreerType::class, $etalonnageCreer);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $profil_ou_score_id = $form->getData()["profil_ou_score_id"];
-            $nombre_classes = $form->getData()["nombre_classes"];
+            $nombreClasses = $etalonnageCreer->nombre_classes;
+            $profil = $etalonnageCreer->profil;
 
-            return $this->redirectToRoute("etalonnage_creer_avec_profil_ou_score",
-                ["profil_ou_score_id" => $profil_ou_score_id, "nombre_classes" => $nombre_classes]);
+            /** @var EchelleEtalonnage[] $echelles */
+            $echelles = [];
+
+            foreach ($profil->echelles as $echelle) {
+                $echelleEtalonnage = new EchelleEtalonnage();
+                $echelleEtalonnage->echelle = $echelle;
+                $echelleEtalonnage->bounds = range(1, $nombreClasses - 1);
+                $echelleEtalonnage->id = 0;
+                $echelles[] = $echelleEtalonnage;
+            }
+
+            $etalonnage = new Etalonnage(
+                id: 0,
+                profil: $profil,
+                nom: $etalonnageCreer->nom,
+                nombre_classes: $nombreClasses,
+                echelles: new ArrayCollection($echelles)
+            );
+
+            foreach ($echelles as $echelle) {
+                $echelle->etalonnage = $etalonnage;
+                $entity_manager->persist($echelle);
+            }
+
+            $entity_manager->persist($etalonnage);
+            $entity_manager->flush();
+
+
+            return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
         }
 
-        return $this->render("etalonnage/creer_choisir_grille_et_score.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/modifier.html.twig", ["form" => $form]);
     }
 
-    #[Route("/creer-avec-profil-ou-score/{profil_ou_score_id}/{nombre_classes}", name: "creer_avec_profil_ou_score")]
-    public function creerEtalonnageAvecProfilOuScore(
-        ManagerRegistry         $doctrine,
-        ProfilOuScoreRepository $profil_ou_score_repository,
-        Request                 $request,
-        int                     $nombre_classes,
-        int                     $profil_ou_score_id
-    )
+    #[Route("/modifier/{id}", name: "modifier")]
+    public function modifier(
+        EtalonnageRepository $etalonnage_repository,
+        ManagerRegistry      $doctrine,
+        Request              $request,
+        int                  $id,
+    ): Response
     {
-        $profil_ou_score = $profil_ou_score_repository->get($profil_ou_score_id);
-
-        $etalonnage = new Etalonnage(
-            id: 0,
-            score_id: $profil_ou_score_id,
-            nom: "",
-            nombre_classes: $nombre_classes,
-            values: $profil_ou_score->generateEtalonnageValues($nombre_classes)
-        );
+        $etalonnage = $etalonnage_repository->find($id);
 
         $form = $this->createForm(EtalonnageType::class, $etalonnage);
 
@@ -104,31 +121,34 @@ class EtalonnageController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $doctrine->getManager()->persist($etalonnage);
             $doctrine->getManager()->flush();
 
             return $this->redirectToRoute("etalonnage_consulter", ["id" => $etalonnage->id]);
 
         }
 
-        return $this->render("etalonnage/form.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/modifier.html.twig", ["form" => $form]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ManagerRegistry      $doctrine,
-        EtalonnageRepository $etalonnage_repository,
-        int                  $id,
-    )
+        EntityManagerInterface $entity_manager,
+        EtalonnageRepository   $etalonnage_repository,
+        int                    $id,
+    ): Response
     {
         $etalonnage = $etalonnage_repository->find($id);
 
-        if($etalonnage != null) {
-            $doctrine->getManager()->remove($etalonnage);
-            $doctrine->getManager()->flush();
+        if ($etalonnage != null) {
+            $entity_manager->remove($etalonnage);
+
+            foreach ($etalonnage->echelles as $echelle) {
+                $entity_manager->remove($echelle);
+            }
+            $entity_manager->flush();
         }
 
-        return $this->redirectToRoute("etalonnage_consulter_liste");
+        return $this->redirectToRoute("etalonnage_index");
     }
 
 }

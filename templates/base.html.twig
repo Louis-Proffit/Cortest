@@ -5,7 +5,7 @@
 <head>
     <title>Cortest</title>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg" href="{{ asset('favicon.svg') }}"/>
+    <link rel="icon" type="image/svg" href="{{ asset('favicon.ico') }}"/>
 
     <title>{% block title %}Cortest{% endblock %}</title>
     {% block stylesheets %}
@@ -29,22 +29,25 @@
                     <div class="collapse navbar-collapse">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path("lecture_home") }}">Corriger</a>
+                                <a class="nav-link" href="{{ path("lecture_index") }}">Lire</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path("session_consulter_liste") }}">Sessions</a>
+                                <a class="nav-link" href="{{ path("session_index") }}">Sessions</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path("correcteur_consulter_liste") }}">Correcteurs</a>
+                                <a class="nav-link" href="{{ path("correcteur_index") }}">Correcteurs</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path("etalonnage_consulter_liste") }}">Etalonnages</a>
+                                <a class="nav-link" href="{{ path("etalonnage_index") }}">Etalonnages</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path("grille_consulter") }}">Grilles</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path("profil_ou_score_consulter") }}">Profils</a>
+                                <a class="nav-link" href="{{ path("profil_index") }}">Profils</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path("sgap_index") }}">SGAPs</a>
                             </li>
                         </ul>
                     </div>

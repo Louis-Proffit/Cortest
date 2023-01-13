@@ -5,18 +5,22 @@
     <br>
     <h1>Consulter un étalonnage</h1>
     <br>
-    <div class="row">
+    <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
                href="{{ path("etalonnage_supprimer", {"id":etalonnage.id}) }}">Supprimer</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("etalonnage_index") }}">Revenir à la liste</a>
         </div>
     </div>
     <br>
     <dl class="row">
         <dt class="col-md-3">Nom</dt>
         <dd class="col-md-9">{{ etalonnage.nom }}</dd>
-        <dt class="col-md-3">Score</dt>
-        <dd class="col-md-9">{{ score.nom }}</dd>
+        <dt class="col-md-3">Profil</dt>
+        <dd class="col-md-9">{{ etalonnage.profil.nom }}</dd>
         <dt class="col-md-3">Nombre de classes</dt>
         <dd class="col-md-9">{{ etalonnage.nombre_classes }}</dd>
     </dl>
@@ -30,12 +34,11 @@
         </tr>
         </thead>
         <tbody>
-        {% for property in score.properties %}
+        {% for echelle in etalonnage.echelles %}
             <tr>
-                <td>{{ property.nom }}</td>
-                {% set row = etalonnage.values[property.nom_php] %}
-                {% for value in row.values %}
-                    <td>{{ value }}</td>
+                <td>{{ echelle.echelle.nom }}</td>
+                {% for bound in echelle.bounds %}
+                    <td>{{ bound }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}

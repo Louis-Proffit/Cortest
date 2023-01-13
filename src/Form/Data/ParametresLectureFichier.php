@@ -8,7 +8,4 @@ class ParametresLectureFichier
 {
     public Session $session;
     public string $contents;
-    public string $nom;
-    public string $prenom;
-    public string $reponses;
 }

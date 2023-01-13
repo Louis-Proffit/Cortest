@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CorrecteurRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
@@ -15,31 +15,31 @@ class Correcteur
     public int $id;
 
     #[ORM\Column]
-    public string $grilleClass;
+    public string $grille_class;
 
-    #[ORM\Column]
-    public int $score_id;
+    #[ORM\ManyToOne(targetEntity: Profil::class)]
+    public Profil $profil;
 
     #[ORM\Column]
     public string $nom;
 
-    #[ORM\Column(type: Types::JSON)]
-    public array $values;
+    #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class)]
+    public Collection $echelles;
 
     /**
      * @param int $id
-     * @param string $grilleClass
-     * @param int $score_id
+     * @param string $grille_class
+     * @param Profil $profil
      * @param string $nom
-     * @param array $values
+     * @param Collection $echelles
      */
-    public function __construct(int $id, string $grilleClass, int $score_id, string $nom, array $values)
+    public function __construct(int $id, string $grille_class, Profil $profil, string $nom, Collection $echelles)
     {
         $this->id = $id;
-        $this->grilleClass = $grilleClass;
-        $this->score_id = $score_id;
+        $this->grille_class = $grille_class;
+        $this->profil = $profil;
         $this->nom = $nom;
-        $this->values = $values;
+        $this->echelles = $echelles;
     }
 
 
