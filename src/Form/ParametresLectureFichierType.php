@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Session;
-use App\Form\Data\ParametresLectureFichier;
+use App\Form\Data\ParametresLectureJSON;
 use App\Repository\SessionRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -65,10 +65,10 @@ class ParametresLectureFichierType extends AbstractType
                             'mimeTypesMessage' => 'Importer un fichier .json valide',
                         ])
                     ],
-                    'getter' => function (ParametresLectureFichier $upload, FormInterface $form) {
+                    'getter' => function (ParametresLectureJSON $upload, FormInterface $form) {
                         return null;
                     },
-                    'setter' => function (ParametresLectureFichier $upload, UploadedFile $state, FormInterface $form) {
+                    'setter' => function (ParametresLectureJSON $upload, UploadedFile $state, FormInterface $form) {
                         $upload->contents = "";
                         $handle = $state->openFile();
                         while (!$handle->eof()) {

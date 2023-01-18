@@ -2,6 +2,7 @@
 
 namespace App\Form\Data;
 
+use App\Constraint\ClassName;
 use App\Entity\Profil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -9,7 +10,7 @@ class CorrecteurCreer
 {
 
     public Profil $profil;
-    // #[ClassName]
+    #[ClassName]
     public string $grille_class;
     #[NotBlank]
     public string $nom;

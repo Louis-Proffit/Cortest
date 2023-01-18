@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Modifier le graphique</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    <br>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Options générales</h3>
+    <br>
+    {{ form_widget(form.options) }}
+    <br>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Options des échelles</h3>
+    <br>
+    {% for echelleGraphique in form.echelles %}
+        <div class="mb-3">
+            <h5>{{ echelleGraphique.vars.value.echelle.nom }}</h5>
+            <div class="row row-cols-auto">
+                <div class="col">
+                    {{ form_row(echelleGraphique.type) }}
+                </div>
+                {% for option in echelleGraphique.options %}
+                    <div class="col">
+                        {{ form_row(option) }}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    {% endfor %}
+
+    {{ form_end(form) }}
+
+{% endblock %}
+

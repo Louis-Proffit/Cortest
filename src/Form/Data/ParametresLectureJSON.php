@@ -3,9 +3,11 @@
 namespace App\Form\Data;
 
 use App\Entity\Session;
+use Symfony\Component\Validator\Constraints\Json;
 
-class ParametresLectureFichier
+class ParametresLectureJSON
 {
     public Session $session;
+    #[Json]
     public string $contents;
 }

@@ -3,8 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ReponseCandidat;
-use App\Entity\Session;
-use App\Form\Data\ParametresLectureFichier;
+use App\Form\Data\ParametresLectureJSON;
 use App\Form\ParametresLectureFichierType;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -27,7 +26,7 @@ class LectureController extends AbstractController
     {
         $manager = $doctrine->getManager();
 
-        $uploadSessionBase = new ParametresLectureFichier();
+        $uploadSessionBase = new ParametresLectureJSON();
         $form = $this->createForm(ParametresLectureFichierType::class, $uploadSessionBase);
 
         $form->handleRequest($request);
@@ -67,6 +66,9 @@ class LectureController extends AbstractController
     #[Route("/scanner", name: "scanner")]
     public function scanner(): Response
     {
+        $fd = dio_open("COM3:", O_RDWR);
+        // $x = dio_read($fd, 10);
+        dio_close($fd);
         return $this->render("lecture/from_scanner.html.twig", ["form" => null]);
     }
 

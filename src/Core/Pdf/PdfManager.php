@@ -2,9 +2,11 @@
 
 namespace App\Core\Pdf;
 
-use App\Core\ProfilGraphique\ProfilGraphique;
+use App\Core\Renderer\RendererRepository;
 use App\Entity\Correcteur;
+use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
+use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use FilesystemIterator;
@@ -23,10 +25,11 @@ class PdfManager
 {
 
     public function __construct(
-        private readonly Environment     $twig,
-        private readonly LoggerInterface $logger,
-        private readonly string          $latexCompilerExecutable = "pdflatex",
-        private readonly string          $tmp_dir = "tmp"
+        private readonly Environment        $twig,
+        private readonly LoggerInterface    $logger,
+        private readonly RendererRepository $renderer_repository,
+        private readonly string             $latexCompilerExecutable = "pdflatex",
+        private readonly string             $tmp_dir = "tmp"
     )
     {
     }
@@ -41,31 +44,37 @@ class PdfManager
         return "Profils_Session_" . $session->date->format("Y-m-d") . ".zip";
     }
 
-    /**
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     */
+
     public function getFeuilleProfilContent(
-        ProfilGraphique $profil_graphique,
-        ReponseCandidat $candidat_reponse,
+        Graphique       $graphique,
+        ReponseCandidat $reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
         array           $score,
         array           $profil,
     ): string
     {
+        $renderer = $this->renderer_repository->fromIndex($graphique->renderer_index);
 
-        return $this->twig->render(
-            $profil_graphique->getTemplate(),
-            [
-                "session" => $candidat_reponse->session,
-                "reponse" => $candidat_reponse,
-                "score" => $score,
-                "profil" => $profil,
-                "etalonnage" => $etalonnage,
-                "correcteur" => $correcteur
-            ]);
+        $echelleOptions = [];
+
+        /** @var EchelleGraphique $echelleGraphique */
+        foreach ($graphique->echelles as $echelleGraphique) {
+
+            $echelleOptions[$echelleGraphique->echelle->nom_php] = $echelleGraphique->options;
+
+        }
+
+        return $renderer->render(
+            environment: $this->twig,
+            reponse: $reponse,
+            correcteur: $correcteur,
+            etalonnage: $etalonnage,
+            options: $graphique->options,
+            echelleOptions: $echelleOptions,
+            score: $score,
+            profil: $profil
+        );
     }
 
     private function deleteFolderWithContent(string $dir): void
@@ -127,12 +136,8 @@ class PdfManager
         return $this->latexCompilerExecutable . " --output-directory=" . $outputDirectory . " " . $texFileName;
     }
 
-    /**
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws LoaderError
-     */
-    private function producePdfAndGetPath(ProfilGraphique $profil_graphique,
+
+    private function producePdfAndGetPath(Graphique       $graphique,
                                           ReponseCandidat $candidat_reponse,
                                           Correcteur      $correcteur,
                                           Etalonnage      $etalonnage,
@@ -142,8 +147,8 @@ class PdfManager
                                           string          $fileNameWithoutExtension): string
     {
         $content = $this->getFeuilleProfilContent(
-            profil_graphique: $profil_graphique,
-            candidat_reponse: $candidat_reponse,
+            graphique: $graphique,
+            reponse: $candidat_reponse,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             score: $score,
@@ -177,14 +182,9 @@ class PdfManager
     }
 
 
-    /**
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     */
     public
     function createPdfFile(
-        ProfilGraphique $profil_graphique,
+        Graphique       $graphique,
         ReponseCandidat $candidat_reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
@@ -195,7 +195,7 @@ class PdfManager
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
             $fileNameWithoutExtension = $this->fileName($candidat_reponse);
             $filePath = $this->producePdfAndGetPath(
-                profil_graphique: $profil_graphique,
+                graphique: $graphique,
                 candidat_reponse: $candidat_reponse,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage,
@@ -214,19 +214,14 @@ class PdfManager
         return false;
     }
 
-    /**
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws LoaderError
-     */
     public
     function createZipFile(
-        Session         $session,
-        Correcteur      $correcteur,
-        Etalonnage      $etalonnage,
-        array           $scores,
-        array           $profils,
-        ProfilGraphique $profil_graphique): BinaryFileResponse|false
+        Session    $session,
+        Correcteur $correcteur,
+        Etalonnage $etalonnage,
+        array      $scores,
+        array      $profils,
+        Graphique  $graphique): BinaryFileResponse|false
     {
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
 
@@ -241,7 +236,7 @@ class PdfManager
                 $fileNameWithoutExtension = $this->fileName($reponses_candidat);
 
                 $pdfFilePath = $this->producePdfAndGetPath(
-                    profil_graphique: $profil_graphique,
+                    graphique: $graphique,
                     candidat_reponse: $reponses_candidat,
                     correcteur: $correcteur,
                     etalonnage: $etalonnage,

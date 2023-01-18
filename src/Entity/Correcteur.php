@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use App\Constraint\ClassName;
 use App\Repository\CorrecteurRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
 class Correcteur
@@ -14,13 +16,15 @@ class Correcteur
     #[ORM\Column]
     public int $id;
 
+    #[ClassName]
     #[ORM\Column]
     public string $grille_class;
 
     #[ORM\ManyToOne(targetEntity: Profil::class)]
     public Profil $profil;
 
-    #[ORM\Column]
+    #[NotBlank]
+    #[ORM\Column(unique: true)]
     public string $nom;
 
     #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class)]

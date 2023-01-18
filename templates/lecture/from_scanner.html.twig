@@ -1,8 +1,26 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+
+    <script>
+
+        async function requestPort() {
+            const ports = await navigator.serial.getPorts();
+            console.log(ports)
+
+            const port = await navigator.serial.requestPort();
+
+            console.log(port)
+
+            port.write(new Uint8Array([86, 13, 10]));
+            console.log("Commande v envoyée au lecteur")
+        }
+    </script>
+{% endblock %}
+
 {% block content %}
     <br>
     <h1>Lecture de notes par lecteur optique</h1>
     <br>
-    <p class="lead">Cette option n'est pas encore développée. Elle ne tardera pas</p>
+    <button class="btn btn-primary" onclick="requestPort()">Scanner les lecteurs</button>
 {% endblock %}

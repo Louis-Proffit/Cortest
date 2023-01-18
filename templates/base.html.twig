@@ -41,6 +41,9 @@
                                 <a class="nav-link" href="{{ path("etalonnage_index") }}">Etalonnages</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ path("graphique_index") }}">Graphiques</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ path("grille_consulter") }}">Grilles</a>
                             </li>
                             <li class="nav-item">
@@ -49,6 +52,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path("sgap_index") }}">SGAPs</a>
                             </li>
+                            {% if 'ROLE_ADMINISTRATEUR' in app.token.roleNames %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path("admin_index") }}">Admin</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -60,7 +68,7 @@
     </header>
 
     <br>
-    <div class="container">
+    <div class="container min-vh-100">
         {% block content %}{% endblock %}
     </div>
     <br>

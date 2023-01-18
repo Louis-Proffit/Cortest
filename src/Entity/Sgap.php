@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\SgapRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 #[ORM\Entity(repositoryClass: SgapRepository::class)]
 class Sgap
@@ -13,11 +15,12 @@ class Sgap
     #[ORM\Column]
     public int $id;
 
-
-    #[ORM\Column]
+    #[PositiveOrZero]
+    #[ORM\Column(unique: true)]
     public int $index;
 
-    #[ORM\Column]
+    #[NotBlank]
+    #[ORM\Column(unique: true)]
     public string $nom;
 
     /**

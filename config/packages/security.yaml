@@ -23,8 +23,13 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/login, roles: 'PUBLIC_ACCESS' }
-        - { path: ^/, roles: 'PUBLIC_ACCESS' }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }
+        - { path: ^/, roles: ROLE_CORRECTEUR }
+
+    role_hierarchy:
+        ROLE_ADMINISTRATEUR: ROLE_PSYCOLOGUE
+        ROLE_PSYCOLOGUE: ROLE_CORRECTEUR
 
 when@test:
     security:

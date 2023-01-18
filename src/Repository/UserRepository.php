@@ -15,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method CortestUser[]    findAll()
  * @method CortestUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends LazyServiceEntityRepository
+class UserRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

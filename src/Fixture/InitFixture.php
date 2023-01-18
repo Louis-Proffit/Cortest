@@ -2,6 +2,7 @@
 
 namespace App\Fixture;
 
+use App\Entity\CortestUser;
 use App\Entity\Echelle;
 use App\Entity\Profil;
 use App\Entity\Sgap;
@@ -25,7 +26,38 @@ class InitFixture extends Fixture
         }
 
         $manager->persist(
-            new Profil(id: 0, nom: "Profil cahier des charges", echelles: new ArrayCollection($echelles))
+            new Profil(id: 0,
+                nom: "Profil cahier des charges",
+                echelles: new ArrayCollection($echelles),
+                etalonnages: new ArrayCollection(),
+                graphiques: new ArrayCollection())
+        );
+
+        $manager->persist(
+            new CortestUser(
+                id: 0,
+                username: "admin",
+                password: "admin",
+                role: CortestUser::ROLE_ADMINISTRATEUR
+            ),
+        );
+
+        $manager->persist(
+            new CortestUser(
+                id: 0,
+                username: "psycologue",
+                password: "psycologue",
+                role: CortestUser::ROLE_PSYCOLOGUE
+            ),
+        );
+
+        $manager->persist(
+            new CortestUser(
+                id: 0,
+                username: "correcteur",
+                password: "correcteur",
+                role: CortestUser::ROLE_CORRECTEUR
+            ),
         );
 
         $manager->flush();

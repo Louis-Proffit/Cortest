@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ReponseCandidatRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Type;
 
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
 class ReponseCandidat
@@ -17,6 +19,9 @@ class ReponseCandidat
     #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'candidats')]
     public Session $session;
 
+    #[All([
+        new Type("int")
+    ])]
     #[ORM\Column]
     public array $reponses;
 

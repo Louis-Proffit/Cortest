@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Constraint\ClassName;
 use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
@@ -19,6 +20,7 @@ class Session
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     public DateTime $date;
 
+    #[ClassName]
     #[ORM\Column]
     public string $grille_class;
 

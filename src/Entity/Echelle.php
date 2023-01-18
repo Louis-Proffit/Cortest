@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Constraint\PhpIdentifier;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -16,12 +17,12 @@ class Echelle
     public int $id;
 
     #[NotBlank]
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     public string $nom;
 
     #[NotBlank]
-    // #[PhpArrayIndex]
-    #[ORM\Column]
+    #[PhpIdentifier]
+    #[ORM\Column(unique: true)]
     public string $nom_php;
 
     /**

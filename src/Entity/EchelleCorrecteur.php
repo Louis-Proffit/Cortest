@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Constraint\Compilable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,7 +15,7 @@ class EchelleCorrecteur
     #[ORM\Column]
     public int $id;
 
-    // #[Compilable]
+    #[Compilable]
     #[ORM\Column]
     public string $expression;
 

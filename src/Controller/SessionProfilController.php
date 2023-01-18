@@ -5,18 +5,18 @@ namespace App\Controller;
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Pdf\PdfManager;
-use App\Core\ProfilGraphique\ProfilGraphiqueRepository;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
+use App\Form\Data\GraphiqueChoice;
 use App\Form\EtalonnageChoiceType;
+use App\Form\GraphiqueChoiceType;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
+use App\Repository\GraphiqueRepository;
 use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -163,35 +163,38 @@ class SessionProfilController extends AbstractController
      */
     #[Route("/session/download/{session_id}/{correcteur_id}/{etalonnage_id}", name: "session_download")]
     public function downloadZip(
-        SessionRepository         $session_repository,
-        EtalonnageRepository      $etalonnage_repository,
-        CorrecteurRepository      $correcteur_repository,
-        CorrecteurManager         $correcteur_manager,
-        EtalonnageManager         $etalonnage_manager,
-        ProfilGraphiqueRepository $profil_graphique_manager,
-        PdfManager                $pdf_manager,
-        Request                   $request,
-        int                       $session_id,
-        int                       $correcteur_id,
-        int                       $etalonnage_id
+        SessionRepository    $session_repository,
+        EtalonnageRepository $etalonnage_repository,
+        CorrecteurRepository $correcteur_repository,
+        GraphiqueRepository  $graphique_repository,
+        CorrecteurManager    $correcteur_manager,
+        EtalonnageManager    $etalonnage_manager,
+        PdfManager           $pdf_manager,
+        Request              $request,
+        int                  $session_id,
+        int                  $correcteur_id,
+        int                  $etalonnage_id
     ): Response
     {
         $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
 
-        $form = $this->createFormBuilder()
-            ->add("profil_graphique", ChoiceType::class, [
-                "choices" => $profil_graphique_manager->nomToProfilGraphique()
-            ])
-            ->add("submit", SubmitType::class, ["label" => "Valider"])
-            ->getForm();
+        $graphiques = $graphique_repository->findAll();
+
+        if (empty($graphiques)) {
+            $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphique_choice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+        ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
-
-            $profil_graphique = $form->getData()["profil_graphique"];
 
             $scores = $correcteur_manager->corriger($correcteur, $session->reponses_candidats->toArray());
             $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
@@ -202,12 +205,12 @@ class SessionProfilController extends AbstractController
                 etalonnage: $etalonnage,
                 scores: $scores,
                 profils: $profils,
-                profil_graphique: $profil_graphique,
+                graphique: $graphique_choice->graphique,
             );
 
         }
-        return $this->render("profil_graphique/form.html.twig",
-            ["form" => $form, "correcteur" => $correcteur, "etalonnage" => $etalonnage, "session" => $session]);
+
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
 
     }
 
@@ -218,7 +221,7 @@ class SessionProfilController extends AbstractController
      */
     #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "download")]
     public function downloadFile(
-        ProfilGraphiqueRepository $profil_graphique_manager,
+        GraphiqueRepository       $graphique_repository,
         ReponseCandidatRepository $candidat_reponse_repository,
         CorrecteurRepository      $correcteur_repository,
         EtalonnageRepository      $etalonnage_repository,
@@ -235,26 +238,31 @@ class SessionProfilController extends AbstractController
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
         $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
 
-        $form = $this->createFormBuilder()
-            ->add("profil_graphique", ChoiceType::class, [
-                "choices" => $profil_graphique_manager->nomToProfilGraphique()
-            ])
-            ->add("submit", SubmitType::class, ["label" => "Valider"])
-            ->getForm();
+        $graphiques = $graphique_repository->findAll();
+
+        if (empty($graphiques)) {
+            $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphique_choice = new GraphiqueChoice(
+            graphique: $graphiques[0]
+        );
+
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+        ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
-
-            $profil_graphique = $form->getData()["profil_graphique"];
-
 
             $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
             $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
 
 
             return $pdf_manager->createPdfFile(
-                profil_graphique: $profil_graphique,
+                graphique: $graphique_choice->graphique,
                 candidat_reponse: $candidat_reponse,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage,
@@ -263,7 +271,7 @@ class SessionProfilController extends AbstractController
             );
 
         }
-        return $this->render("profil_graphique/form.html.twig",
-            ["form" => $form, "correcteur" => $correcteur, "etalonnage" => $etalonnage, "session" => $candidat_reponse->session]);
+
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
     }
 }

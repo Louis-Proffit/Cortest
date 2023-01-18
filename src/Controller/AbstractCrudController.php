@@ -71,7 +71,7 @@ abstract class AbstractCrudController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() and $form->isValid()) {
+        if ($form->isSubmitted() and $form->isValid() and $this->postValidate($entity_manager, $form, $item)) {
 
             $entity_manager->flush();
 
@@ -79,6 +79,11 @@ abstract class AbstractCrudController extends AbstractController
         }
 
         return $this->renderModifier($form);
+    }
+
+    protected function postValidate(EntityManagerInterface $entity_manager, FormInterface $form, $item): bool
+    {
+        return true;
     }
 
     #[Route("/supprimer", name: "supprimer")]

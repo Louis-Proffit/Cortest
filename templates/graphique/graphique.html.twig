@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Consulter un graphique</h1>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("graphique_modifier", {"id":graphique.id}) }}">Modifier</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("graphique_supprimer", {"id":graphique.id}) }}">Supprimer</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("graphique_index") }}">Revenir à la liste</a>
+        </div>
+    </div>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Nom</dt>
+        <dd class="col-md-9">{{ graphique.nom }}</dd>
+        <dt class="col-md-3">Profil</dt>
+        <dd class="col-md-9">{{ graphique.profil.nom }}</dd>
+        <dt class="col-md-3">Target</dt>
+        <dd class="col-md-9">{{ renderer.nom }}</dd>
+        <dt class="col-md-3">Options</dt>
+        <dd class="col-sm-9">
+            <dl class="row">
+                {% for option in renderer.options %}
+                    <dt class="col-md-3">{{ option.nom }}</dt>
+                    <dd class="col-md-9">{{ graphique.options[option.nom_php] }}</dd>
+                {% endfor %}
+            </dl>
+        </dd>
+    </dl>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            {% for option in renderer.echelleOptions %}
+                <th scope="col">{{ option.nom }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for echelleGraphique in graphique.echelles %}
+            <tr>
+                <td>{{ echelleGraphique.echelle.nom }}</td>
+                {% for option in renderer.echelleOptions %}
+                    <td>{{ echelleGraphique.options[option.nom_php] }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+

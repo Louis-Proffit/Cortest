@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Graphiques disponibles</h1>
+    <br>
+    <div class="lead">Liste des graphiques disponibles</div>
+    <br>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("graphique_creer") }}">Ajouter</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Profil</th>
+            <th scope="col">Consulter</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for graphique in graphiques %}
+            <tr>
+                <td>{{ graphique.nom }}</td>
+                <td>{{ graphique.profil.nom }}</td>
+                <td>
+                    <a href="{{ path("graphique_consulter", {"id":graphique.id}) }}" class="btn btn-link">
+                        Consulter</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
