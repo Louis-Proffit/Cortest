@@ -28,7 +28,7 @@ class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
     public int $id;
 
     #[NotBlank]
-    #[Length(max: 100)]
+    #[Length(max: 100 )]
     #[ORM\Column(length: 100, unique: true)]
     public string $username;
 

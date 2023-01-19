@@ -22,7 +22,7 @@ class SgapController extends AbstractCrudController
     {
         return new Sgap(
             id: 0,
-            index: 0,
+            indice: 0,
             nom: ""
         );
     }

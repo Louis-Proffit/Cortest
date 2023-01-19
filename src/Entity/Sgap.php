@@ -17,7 +17,7 @@ class Sgap
 
     #[PositiveOrZero]
     #[ORM\Column(unique: true)]
-    public int $index;
+    public int $indice;
 
     #[NotBlank]
     #[ORM\Column(unique: true)]
@@ -25,13 +25,13 @@ class Sgap
 
     /**
      * @param int $id
-     * @param int $index
+     * @param int $indice
      * @param string $nom
      */
-    public function __construct(int $id, int $index, string $nom)
+    public function __construct(int $id, int $indice, string $nom)
     {
         $this->id = $id;
-        $this->index = $index;
+        $this->indice = $indice;
         $this->nom = $nom;
     }
 }

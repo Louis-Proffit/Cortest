@@ -66,26 +66,26 @@ class InitFixture extends Fixture
     private function getSgaps(): array
     {
         return [
-            new Sgap(id: 0, index: 1, nom: "Bordeaux"),
-            new Sgap(id: 0, index: 2, nom: "Dijon"),
-            new Sgap(id: 0, index: 3, nom: "Lille"),
-            new Sgap(id: 0, index: 4, nom: "Lyon"),
-            new Sgap(id: 0, index: 5, nom: "Marseille"),
-            new Sgap(id: 0, index: 6, nom: "Metz"),
-            new Sgap(id: 0, index: 7, nom: "Rennes"),
-            new Sgap(id: 0, index: 8, nom: "Toulouse"),
-            new Sgap(id: 0, index: 9, nom: "Tours"),
-            new Sgap(id: 0, index: 10, nom: "Paris"),
-            new Sgap(id: 0, index: 11, nom: "Versailles"),
-            new Sgap(id: 0, index: 12, nom: "Guadeloupe"),
-            new Sgap(id: 0, index: 13, nom: "Guyane"),
-            new Sgap(id: 0, index: 14, nom: "Martinique"),
-            new Sgap(id: 0, index: 15, nom: "La Réunion"),
-            new Sgap(id: 0, index: 16, nom: "Saint-Pierre et Miquelon"),
-            new Sgap(id: 0, index: 17, nom: "Polynésie"),
-            new Sgap(id: 0, index: 18, nom: "Nouvelle Calédonie, Wallis et Futuna"),
-            new Sgap(id: 0, index: 19, nom: "Mayotte"),
-            new Sgap(id: 0, index: 70, nom: "Lognes BFIE")
+            new Sgap(id: 0, indice: 1, nom: "Bordeaux"),
+            new Sgap(id: 0, indice: 2, nom: "Dijon"),
+            new Sgap(id: 0, indice: 3, nom: "Lille"),
+            new Sgap(id: 0, indice: 4, nom: "Lyon"),
+            new Sgap(id: 0, indice: 5, nom: "Marseille"),
+            new Sgap(id: 0, indice: 6, nom: "Metz"),
+            new Sgap(id: 0, indice: 7, nom: "Rennes"),
+            new Sgap(id: 0, indice: 8, nom: "Toulouse"),
+            new Sgap(id: 0, indice: 9, nom: "Tours"),
+            new Sgap(id: 0, indice: 10, nom: "Paris"),
+            new Sgap(id: 0, indice: 11, nom: "Versailles"),
+            new Sgap(id: 0, indice: 12, nom: "Guadeloupe"),
+            new Sgap(id: 0, indice: 13, nom: "Guyane"),
+            new Sgap(id: 0, indice: 14, nom: "Martinique"),
+            new Sgap(id: 0, indice: 15, nom: "La Réunion"),
+            new Sgap(id: 0, indice: 16, nom: "Saint-Pierre et Miquelon"),
+            new Sgap(id: 0, indice: 17, nom: "Polynésie"),
+            new Sgap(id: 0, indice: 18, nom: "Nouvelle Calédonie, Wallis et Futuna"),
+            new Sgap(id: 0, indice: 19, nom: "Mayotte"),
+            new Sgap(id: 0, indice: 70, nom: "Lognes BFIE")
         ];
     }
 
