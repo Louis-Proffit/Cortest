@@ -34,7 +34,6 @@ interface Renderer
 
     public function initializeEchelleOption(EchelleGraphique $echelle_graphique): array;
 
-
     public function initializeOptions(): array;
 
     public function getNom(): string;

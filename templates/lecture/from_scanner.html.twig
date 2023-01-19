@@ -4,16 +4,55 @@
 
     <script>
 
+        async function write(port, towrite) {
+            const writer = port.writable.getWriter();
+
+            await writer.write(towrite);
+
+
+            // Allow the serial port to be closed later.
+            writer.releaseLock();
+        }
+
+        async function read(port) {
+            const reader = port.readable.getReader();
+
+            // Listen to data coming from the serial device.
+            while (true) {
+                const {value, done} = await reader.read();
+                if (done) {
+                    // Allow the serial port to be closed later.
+                    reader.releaseLock();
+                    break;
+                }
+                // value is a Uint8Array.
+                console.log(value);
+            }
+        }
+
         async function requestPort() {
-            const ports = await navigator.serial.getPorts();
+            const ports = await navigator.serial.getPorts()
             console.log(ports)
 
-            const port = await navigator.serial.requestPort();
+            // https://developer.chrome.com/articles/serial/
+            // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort
+            const port = await navigator.serial.requestPort()
+
+
+            await port.open({baudRate: 19200});
 
             console.log(port)
 
-            port.write(new Uint8Array([86, 13, 10]));
+            // baud : vitesse de communication. Nous : 19200
+            // v : numéro de version
+            // l (laden) : Charge une feuille -> erreur ou valide
+            // g (gut) : bac du bas
+            // s (schlecht) : bac du haut
+
+            await write(port, new Uint8Array([86, 13, 10]))
             console.log("Commande v envoyée au lecteur")
+
+            await port.close()
         }
     </script>
 {% endblock %}
