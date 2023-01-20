@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Core\Grille\GrilleRepository;
+use App\Core\Grille\Values\GrilleOctobre2019;
 use App\Entity\Session;
 use App\Form\SessionType;
+use App\Repository\ConcoursRepository;
 use App\Repository\SessionRepository;
 use App\Repository\SgapRepository;
 use DateTime;
@@ -21,12 +24,13 @@ class SessionController extends AbstractController
 
     #[Route('/index', name: "index")]
     public function index(
-        SessionRepository $session_repository
+        SessionRepository $session_repository,
+        GrilleRepository  $grille_repository,
     ): Response
     {
         /** @var array $session */
         $sessions = $session_repository->findAll();
-        $grilles = [];
+        $grilles = $grille_repository->classNameToNom();
 
         return $this->render('session/index.html.twig', ["sessions" => $sessions, "grilles" => $grilles]);
     }
@@ -35,6 +39,7 @@ class SessionController extends AbstractController
     public function creer(
         EntityManagerInterface $entity_manager,
         SgapRepository         $sgap_repository,
+        ConcoursRepository     $concours_repository,
         Request                $request): Response
     {
         $sgaps = $sgap_repository->findAll();
@@ -47,7 +52,12 @@ class SessionController extends AbstractController
         $session = new Session(
             id: 0,
             date: new DateTime("now"),
-            grille_class: "",
+            grille_class: GrilleOctobre2019::class,
+            numero_ordre: 0,
+            observations: "",
+            concours: $concours_repository->findOneBy([]),
+            type_concours: 0,
+            version_batterie: 0,
             sgap: $sgaps[0],
             reponses_candidats: new ArrayCollection()
         );
@@ -71,7 +81,7 @@ class SessionController extends AbstractController
     }
 
     #[Route('/modifier/{id}', name: "modifier")]
-    public function sessionModifier(
+    public function modifier(
         EntityManagerInterface $entity_manager,
         SessionRepository      $session_repository,
         Request                $request,
@@ -97,7 +107,7 @@ class SessionController extends AbstractController
     }
 
     #[Route('/consulter/{id}', name: "consulter")]
-    public function sessionConsulter(SessionRepository $session_repository, int $id): Response
+    public function consulter(SessionRepository $session_repository, int $id): Response
     {
         $session = $session_repository->find($id);
 
@@ -108,9 +118,9 @@ class SessionController extends AbstractController
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimerSession(ManagerRegistry $doctrine,
-                                     SessionRepository $session_repository,
-                                     int $id)
+    public function supprimer(ManagerRegistry $doctrine,
+                              SessionRepository $session_repository,
+                              int $id): Response
     {
 
         $session = $session_repository->find($id);

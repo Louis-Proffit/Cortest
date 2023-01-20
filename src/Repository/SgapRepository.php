@@ -20,4 +20,17 @@ class SgapRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Sgap::class);
     }
+
+    public function choices(): array
+    {
+        $items = $this->findAll();
+
+        $result = [];
+
+        foreach ($items as $sgap) {
+            $result[$sgap->nom] = $sgap;
+        }
+
+        return $result;
+    }
 }

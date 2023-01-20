@@ -5,6 +5,11 @@ namespace App\Controller;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ParametresLectureJSON;
 use App\Form\ParametresLectureFichierType;
+use App\Form\ReponseCandidatType;
+use App\Repository\NiveauScolaireRepository;
+use App\Repository\SessionRepository;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +26,49 @@ class LectureController extends AbstractController
         return $this->render("lecture/index.html.twig");
     }
 
-    #[Route("/fichier", name: 'fichier')]
+    #[Route("/form", name: "form")]
+    public function form(
+        SessionRepository        $session_repository,
+        NiveauScolaireRepository $niveau_scolaire_repository,
+        Request                  $request,
+        EntityManagerInterface   $entity_manager,
+    ): Response
+    {
+        $reponse = new ReponseCandidat(
+            id: 0,
+            session: $session_repository->findOneBy([]),
+            reponses: array(),
+            nom: "",
+            prenom: "",
+            nom_jeune_fille: "",
+            niveau_scolaire: $niveau_scolaire_repository->findOneBy([]),
+            date_de_naissance: new DateTime("now"),
+            sexe: 1,
+            reserve: "",
+            autre_1: "",
+            autre_2: "",
+            code_barre: 0,
+            raw: null
+        );
+
+        $form = $this->createForm(ReponseCandidatType::class, $reponse);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $entity_manager->persist($reponse);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("session_consulter", ["id" => $reponse->session->id]);
+
+        }
+
+        return $this->render("lecture/from_form.html.twig", ["form" => $form]);
+    }
+
+    #[
+        Route("/fichier", name: 'fichier')]
     public function fichier(ManagerRegistry $doctrine, Request $request, LoggerInterface $logger): Response
     {
         $manager = $doctrine->getManager();
@@ -44,12 +91,15 @@ class LectureController extends AbstractController
 
                 $reponse_array = str_split($reponse_string);
 
+                dump($reponse_array);
+
                 $reponse_candidat = new ReponseCandidat(
                     id: 0,
                     session: $uploadSessionBase->session,
                     reponses: $reponse_array,
                     raw: $reponses_candidat_json
                 );
+                // TODO
                 $manager->persist($reponse_candidat);
             }
 
@@ -78,7 +128,7 @@ class LectureController extends AbstractController
         ));
 
         // https://www.php.net/manual/en/function.dio-write.php
-        dio_write($fd, data:"v\n", len:1); // ecrit 1 bit de la chaine de caractère data
+        dio_write($fd, data: "v\n", len: 1); // ecrit 1 bit de la chaine de caractère data
 
         // https://www.php.net/manual/en/function.dio-read.php
         $x = dio_read($fd, 1); // Lit 1 bit

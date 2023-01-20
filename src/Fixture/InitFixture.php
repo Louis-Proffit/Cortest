@@ -2,6 +2,7 @@
 
 namespace App\Fixture;
 
+use App\Entity\Concours;
 use App\Entity\CortestUser;
 use App\Entity\Echelle;
 use App\Entity\Profil;
@@ -15,14 +16,17 @@ class InitFixture extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $sgaps = $this->getSgaps();
-        foreach ($sgaps as $sgap) {
+        foreach ($this->sgaps() as $sgap) {
             $manager->persist($sgap);
         }
 
-        $echelles = $this->getEchelles();
+        $echelles = $this->echelles();
         foreach ($echelles as $echelle) {
             $manager->persist($echelle);
+        }
+
+        foreach ($this->concours() as $concours) {
+            $manager->persist($concours);
         }
 
         $manager->persist(
@@ -63,7 +67,22 @@ class InitFixture extends Fixture
         $manager->flush();
     }
 
-    private function getSgaps(): array
+    private function concours(): array
+    {
+        return [
+            new Concours(id: 0, nom: "Comissaire de police"),
+            new Concours(id: 0, nom: "Officier (lieutenant de police)"),
+            new Concours(id: 0, nom: "Sélection spécialisée - Motard - Garde de sécurité ambassade"),
+            new Concours(id: 0, nom: "Gardien de la paix"),
+            new Concours(id: 0, nom: "BAC - sélection spécialisée"),
+            new Concours(id: 0, nom: "Tests brigadier (Entrée en formation)"),
+            new Concours(id: 0, nom: "Tests brigadier (EXAPRO BIER)"),
+            new Concours(id: 0, nom: "Cadet de la république"),
+            new Concours(id: 0, nom: "Adjoint de sécurité"),
+        ];
+    }
+
+    private function sgaps(): array
     {
         return [
             new Sgap(id: 0, indice: 1, nom: "Bordeaux"),
@@ -89,7 +108,7 @@ class InitFixture extends Fixture
         ];
     }
 
-    private function getEchelles(): array
+    private function echelles(): array
     {
         return [
             new Echelle(id: 0, nom: "Collationnement", nom_php: "collationnement"),

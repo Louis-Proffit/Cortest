@@ -40,13 +40,13 @@
     <br>
     <table class="table d-md-inline-block overflow-auto">
         <thead>
-        <tr>
+        <tr class="text-nowrap">
             <th scope="col">Nom</th>
             <th scope="col">Prenom</th>
             <th scope="col">Nom de jeune fille</th>
             <th scope="col">Date de naissance</th>
             <th scope="col">Sexe</th>
-            <th scope="col">Concours</th>
+            <th scope="col">Niveau scolaire</th>
             <th scope="col">Reponses brutes</th>
             <th scope="col">Supprimer</th>
         </tr>
@@ -54,13 +54,13 @@
         <tbody>
         {% for reponse in session.reponses_candidats %}
             <tr>
-                <td>{{ reponse.raw["nom"] }}</td>
-                <td>{{ reponse.raw["prenom"] }}</td>
-                <td>{{ reponse.raw["nom_jeune_fille"] }}</td>
-                <td>{{ reponse.raw["date_naissance"] }}</td>
-                <td>{{ reponse.raw["sexe"]|sexe }}</td>
-                <td>{{ reponse.raw["type_concours"] }}</td>
-                <td class="text-truncate">{{ reponse.raw["reponses"]|join("-") }}</td>
+                <td>{{ reponse.nom }}</td>
+                <td>{{ reponse.prenom }}</td>
+                <td>{{ reponse.nom_jeune_fille }}</td>
+                <td>{{ reponse.date_de_naissance|date("d/m/Y") }}</td>
+                <td>{{ reponse.sexe|sexe }}</td>
+                <td>{{ reponse.niveau_scolaire.nom }}</td>
+                <td class="text-truncate">{{ reponse.reponses|join("-") }}</td>
                 <td><a class="btn btn-primary"
                        href="{{ path("reponse_candidat_supprimer", {"id":reponse.id}) }}">Supprimer</a>
                 </td>

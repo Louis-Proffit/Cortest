@@ -3,20 +3,27 @@
 namespace App\Entity;
 
 use App\Repository\ReponseCandidatRepository;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Type;
 
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
 class ReponseCandidat
 {
+
+    public const INDEX_HOMME = 1;
+    public const INDEX_FEMME = 2;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public int $id;
 
-    #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'candidats')]
+    #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'reponses_candidats')]
     public Session $session;
 
     #[All([
@@ -25,20 +32,79 @@ class ReponseCandidat
     #[ORM\Column]
     public array $reponses;
 
-    #[ORM\Column(type: Types::JSON)]
-    public array $raw;
+    #[Length(max: 15)]
+    #[ORM\Column]
+    public string $nom;
+
+    #[Length(max: 11)]
+    #[ORM\Column]
+    public string $prenom;
+
+    #[Length(max: 12)]
+    #[ORM\Column]
+    public string $nom_jeune_fille;
+
+    #[ORM\ManyToOne(targetEntity: NiveauScolaire::class)]
+    public NiveauScolaire $niveau_scolaire;
+
+    #[ORM\Column]
+    public DateTime $date_de_naissance;
+
+    #[Choice(choices: [self::INDEX_HOMME, self::INDEX_FEMME])]
+    #[ORM\Column]
+    public int $sexe;
+
+    #[Length(max: 3)]
+    #[ORM\Column]
+    public string $reserve;
+
+    #[Length(max: 4)]
+    #[ORM\Column]
+    public string $autre_1;
+
+    #[Length(max: 6)]
+    #[ORM\Column]
+    public string $autre_2;
+
+    #[ORM\Column]
+    public int $code_barre;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    public ?array $raw;
 
     /**
      * @param int $id
      * @param Session $session
      * @param array $reponses
-     * @param array $raw
+     * @param string $nom
+     * @param string $prenom
+     * @param string $nom_jeune_fille
+     * @param NiveauScolaire $niveau_scolaire
+     * @param DateTime $date_de_naissance
+     * @param int $sexe
+     * @param string $reserve
+     * @param string $autre_1
+     * @param string $autre_2
+     * @param int $code_barre
+     * @param ?array $raw
      */
-    public function __construct(int $id, Session $session, array $reponses, array $raw)
+    public function __construct(int $id, Session $session, array $reponses, string $nom, string $prenom, string $nom_jeune_fille, NiveauScolaire $niveau_scolaire, DateTime $date_de_naissance, int $sexe, string $reserve, string $autre_1, string $autre_2, int $code_barre, ?array $raw)
     {
         $this->id = $id;
         $this->session = $session;
         $this->reponses = $reponses;
+        $this->nom = $nom;
+        $this->prenom = $prenom;
+        $this->nom_jeune_fille = $nom_jeune_fille;
+        $this->niveau_scolaire = $niveau_scolaire;
+        $this->date_de_naissance = $date_de_naissance;
+        $this->sexe = $sexe;
+        $this->reserve = $reserve;
+        $this->autre_1 = $autre_1;
+        $this->autre_2 = $autre_2;
+        $this->code_barre = $code_barre;
         $this->raw = $raw;
     }
+
+
 }

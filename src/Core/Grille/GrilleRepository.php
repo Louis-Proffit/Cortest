@@ -32,6 +32,19 @@ class GrilleRepository
         return $this->classes;
     }
 
+
+    public function classNameToNom(): array
+    {
+        $result = [];
+
+        foreach ($this->classes as $clazz) {
+            /** @var Grille $instance */
+            $instance = new $clazz();
+            $result[$clazz] = $instance->getNom();
+        }
+
+        return $result;
+    }
     public function nomToClassName(): array
     {
         $result = [];
