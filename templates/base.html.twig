@@ -43,14 +43,28 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path("graphique_index") }}">Graphiques</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path("grille_consulter") }}">Grilles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path("profil_index") }}">Profils</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path("sgap_index") }}">SGAPs</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"
+                                   role="button"
+                                   data-bs-toggle="dropdown">Listes</a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("grille_consulter") }}">Grilles</a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("profil_index") }}">Profils</a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("sgap_index") }}">SGAPs</a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("niveau_scolaire_index") }}">Niveaux
+                                            scolaires</a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("concours_index") }}">Concours</a>
+                                    </li>
+                                </ul>
                             </li>
                             {% if 'ROLE_ADMINISTRATEUR' in app.token.roleNames %}
                                 <li class="nav-item">

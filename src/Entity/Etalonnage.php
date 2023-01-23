@@ -17,7 +17,7 @@ class Etalonnage
     #[ORM\Column]
     public int $id;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class)]
+    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "etalonnages")]
     public Profil $profil;
 
     #[NotBlank]

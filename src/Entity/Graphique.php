@@ -21,7 +21,7 @@ class Graphique
     #[ORM\Column]
     public array $options;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class)]
+    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "graphiques")]
     public Profil $profil;
 
     #[ORM\OneToMany(mappedBy: "graphique", targetEntity: EchelleGraphique::class)]

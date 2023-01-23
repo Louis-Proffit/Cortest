@@ -17,7 +17,7 @@ class EchelleController extends AbstractCrudController
 
     public function __construct(EchelleRepository $echelle_repository)
     {
-        parent::__construct($echelle_repository, EchelleType::class);
+        parent::__construct($echelle_repository, EchelleType::class, self::BASE_ROUTE . "index");
     }
 
 

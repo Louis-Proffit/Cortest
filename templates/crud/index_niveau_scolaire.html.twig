@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Niveaux scolaires</h1>
+    <br>
+    <p class="lead">Liste des niveaux scolaires disponibles.</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("niveau_scolaire_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Modifier</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for niveau in items %}
+            <tr>
+                <td>{{ niveau.nom }}</td>
+                <td>
+                    <a class="btn btn-link fw-bold btn-rounded"
+                       href="{{ path("niveau_scolaire_modifier", {"id":niveau.id}) }}">Modifier</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

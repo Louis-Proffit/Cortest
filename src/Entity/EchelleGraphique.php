@@ -41,7 +41,7 @@ class EchelleGraphique
     #[ORM\ManyToOne(targetEntity: Echelle::class)]
     public Echelle $echelle;
 
-    #[ORM\ManyToOne(targetEntity: Graphique::class)]
+    #[ORM\ManyToOne(targetEntity: Graphique::class, inversedBy: "echelles")]
     public Graphique $graphique;
 
 }

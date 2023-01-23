@@ -5,6 +5,7 @@ namespace App\Fixture;
 use App\Entity\Concours;
 use App\Entity\CortestUser;
 use App\Entity\Echelle;
+use App\Entity\NiveauScolaire;
 use App\Entity\Profil;
 use App\Entity\Sgap;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -27,6 +28,10 @@ class InitFixture extends Fixture
 
         foreach ($this->concours() as $concours) {
             $manager->persist($concours);
+        }
+
+        foreach ($this->niveau_scolaire() as $niveau_scolaire) {
+            $manager->persist($niveau_scolaire);
         }
 
         $manager->persist(
@@ -65,6 +70,15 @@ class InitFixture extends Fixture
         );
 
         $manager->flush();
+    }
+
+    private function niveau_scolaire(): array
+    {
+        return [
+            new NiveauScolaire(id: 0, nom: "Baccalauréat"),
+            new NiveauScolaire(id: 0, nom: "Brevet des collèges"),
+            new NiveauScolaire(id: 0, nom: "Sans diplôme"),
+        ];
     }
 
     private function concours(): array

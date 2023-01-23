@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Concours</h1>
+    <br>
+    <p class="lead">Liste des niveaux concours disponibles.</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("concours_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Modifier</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for concours in items %}
+            <tr>
+                <td>{{ concours.nom }}</td>
+                <td>
+                    <a class="btn btn-link fw-bold btn-rounded"
+                       href="{{ path("concours_modifier", {"id":concours.id}) }}">Modifier</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

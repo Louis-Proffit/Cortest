@@ -69,7 +69,10 @@ class LectureController extends AbstractController
 
     #[
         Route("/fichier", name: 'fichier')]
-    public function fichier(ManagerRegistry $doctrine, Request $request, LoggerInterface $logger): Response
+    public function fichier(ManagerRegistry          $doctrine,
+                            NiveauScolaireRepository $niveau_scolaire_repository,
+                            Request                  $request,
+                            LoggerInterface          $logger): Response
     {
         $manager = $doctrine->getManager();
 
@@ -97,9 +100,18 @@ class LectureController extends AbstractController
                     id: 0,
                     session: $uploadSessionBase->session,
                     reponses: $reponse_array,
+                    nom: $reponses_candidat_json["nom"],
+                    prenom: $reponses_candidat_json["prenom"],
+                    nom_jeune_fille: $reponses_candidat_json["nom_jeune_fille"],
+                    niveau_scolaire: $niveau_scolaire_repository->findOneBy([]),
+                    date_de_naissance: new DateTime("now"),
+                    sexe: $reponses_candidat_json["sexe"],
+                    reserve: $reponses_candidat_json["reserve"],
+                    autre_1: $reponses_candidat_json["autre_1"],
+                    autre_2: $reponses_candidat_json["autre_2"],
+                    code_barre: $reponses_candidat_json["code_barre"],
                     raw: $reponses_candidat_json
                 );
-                // TODO
                 $manager->persist($reponse_candidat);
             }
 

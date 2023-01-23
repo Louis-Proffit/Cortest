@@ -26,7 +26,7 @@ class EchelleEtalonnage
     #[ORM\ManyToOne(targetEntity: Echelle::class)]
     public Echelle $echelle;
 
-    #[ORM\ManyToOne(targetEntity: Etalonnage::class)]
+    #[ORM\ManyToOne(targetEntity: Etalonnage::class, inversedBy: "echelles")]
     public Etalonnage $etalonnage;
 
 

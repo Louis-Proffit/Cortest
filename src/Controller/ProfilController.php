@@ -26,7 +26,8 @@ class ProfilController extends AbstractCrudController
         return new Profil(
             id: 0,
             nom: "",
-            echelles: new ArrayCollection()
+            echelles: new ArrayCollection(),
+            etalonnages: new ArrayCollection(),graphiques: new ArrayCollection()
         );
     }
 
