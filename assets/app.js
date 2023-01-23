@@ -8,6 +8,13 @@
 // any CSS you import will output into a single css file (app.scss in this case)
 import './styles/app.scss';
 import * as mdb from 'mdb-ui-kit';
+import * as bootstrap from 'bootstrap';
 
 window.mdb = mdb;
+window.bs = bootstrap;
+
+const $ = require('jquery');
+
+// create global $ and jQuery variables
+global.$ = global.jQuery = $;
 
