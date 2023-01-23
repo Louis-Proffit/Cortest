@@ -8,19 +8,19 @@
 \begin{document}
 
     \begin{center}
-        \textbf{ {{ options["titre"] }} } \\
-        \textbf{ {{ options["sous_titre"] }} }
+        \textbf{ {{ options.titre }} } \\
+        \textbf{ {{ options.sous_titre }} }
     \end{center}
 
     \noindent\fbox{
         \begin{minipage}{\linewidth}
             \begin{tabular}{m{1.2in} m{2.1in} m{1.2in} m{2.1in}}
-                \underline{Nom:}                                  & {{ reponse.raw["nom"] }}             & \underline{Prénom:}           & {{ reponse.raw["prenom"] }}    \\
-                \underline{Nom de jeune Fille:}                   & {{ reponse.raw["nom_jeune_fille"] }} & \underline{Sexe:} & {{ reponse.raw["sexe"]|sexe }} \\
-                \underline{Date de naissance:}                    & {{ reponse.raw["date_naissance"] }}  & \underline{Niveau scolaire:} & XXX \\
-                \underline{N\textdegree \space d'identification:} & XXX                                  & \underline{Type du concours:} & XXX \\
-                \underline{SGAP ou CS:}                           & {{ session.sgap.nom }}               & \underline{Version Batterie:} & XXXX                           \\
-                \underline{Date d'examen:}                        & {{ session.date|date('d/m/Y') }}     & \underline{Note Globale:} & XXX \\
+                \underline{Nom:}                                  & {{ reponse.nom }}                             & \underline{Prénom:}           & {{ reponse.prenom }}              \\
+                \underline{Nom de jeune Fille:}                   & {{ reponse.nom_jeune_fille }}                 & \underline{Sexe:}             & {{ reponse.sexe|sexe }}           \\
+                \underline{Date de naissance:}                    & {{ reponse.date_de_naissance|date('d/m/Y') }} & \underline{Niveau scolaire:} & {{ reponse.niveau_scolaire.nom }} \\
+                \underline{N\textdegree \space d'identification:} & XXX                                           & \underline{Type du concours:} & {{ session.type_concours }} \\
+                \underline{SGAP ou CS:}                           & {{ session.sgap.nom }}                        & \underline{Version Batterie:} & {{ session.version_batterie }}    \\
+                \underline{Date d'examen:}                        & {{ session.date|date('d/m/Y') }}              & \underline{Note Globale:} & XXX \\
             \end{tabular}
         \end{minipage}
     }
@@ -29,14 +29,6 @@
         \textbf{PROFIL DU CANDIDAT} \\
     \end{center}
 
-
     \vspace{1em}
-
-    \noindent\begin{tabularx}{\textwidth}{ |X X X X X| }
-                 \hline
-                 & Q = 24/1 & VM = 16/7 & SC = 0/0 & \\
-                 \hline
-    \end{tabularx}
-
 
 \end{document}

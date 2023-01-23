@@ -36,7 +36,7 @@ class PdfManager
 
     private function fileName(ReponseCandidat $candidat_reponse): string
     {
-        return $candidat_reponse->raw["nom"] . "_" . $candidat_reponse->raw["prenom"];
+        return $candidat_reponse->nom . "_" . $candidat_reponse->prenom;
     }
 
     private function outputZipFileName(Session $session): string

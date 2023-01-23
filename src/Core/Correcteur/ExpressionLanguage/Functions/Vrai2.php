@@ -3,34 +3,29 @@
 namespace App\Core\Correcteur\ExpressionLanguage\Functions;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestFunction;
+use Closure;
 
-class Vrai2 implements CortestFunction
+class Vrai2 extends CortestFunction
 {
 
-    public function nom(): string
+
+    public function __construct()
     {
-        return "Vrai/faux (vrai=2)";
+        parent::__construct(nom_affiche: "vrai2(numéro_question)",
+            nom_php: "vrai2",
+            description: "Renvoie 1 si le candidat à choisi l'item 2 à la question d'indice [indice], 0 sinon",
+            evaluator: $this->evaluer(...),
+            compiler: $this->compiler(...));
     }
 
-    public function description(): string
+    public function evaluer($arguments, $index): int
     {
-        return "Renvoie 1 si le candidat à choisi l'item 2 à la question d'indice [indice], 0 sinon";
+        return $this->innerEvaluer($arguments, $index, 0, 0, 1, 0, 0, 0);
     }
 
-    public function evaluator(): callable
-    {
-        return function ($reponses, $index) {
-            $reponse = $reponses[$index];
-            if ($reponse == 1) {
-                return 1;
-            } else {
-                return 0;
-            }
-        };
-    }
 
-    public function nom_php(): string
+    public function compiler($index): string
     {
-        return "vrai2";
+        return $this->innerCompiler($index, 0, 0, 1, 0, 0, 0);
     }
 }

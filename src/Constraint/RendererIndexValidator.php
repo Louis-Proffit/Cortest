@@ -31,7 +31,7 @@ class RendererIndexValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, RendererIndex::class);
         }
 
-        if ($this->renderer_repository->indexExists($value)) {
+        if (!$this->renderer_repository->indexExists($value)) {
             $this->context->addViolation("L'indice indiqué n'est pas celui d'un Renderer existant : " . $value);
         }
     }

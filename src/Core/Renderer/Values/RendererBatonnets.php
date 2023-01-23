@@ -98,6 +98,7 @@ class RendererBatonnets implements Renderer
             $result[$option->nom_php] = $option->default;
         }
 
+        // Pour le nom affiché, on fait un cas particulier : on initialise au nom de l'échelle
         $result[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP] = $echelle_graphique->echelle->nom;
 
         return $result;

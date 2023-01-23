@@ -19,8 +19,8 @@ class EchelleGraphiqueType extends AbstractType
 
         $builder->add("type", ChoiceType::class, [
                 "choices" => array_combine(
-                    EchelleGraphique::TYPE_OPTIONS,
-                    EchelleGraphique::TYPE_OPTIONS
+                    EchelleGraphique::TYPE_ECHELLE_OPTIONS,
+                    EchelleGraphique::TYPE_ECHELLE_OPTIONS
                 )]
         )->add("options", EchelleGraphiqueOptionsType::class, [GraphiqueType::OPTION_RENDERER => $renderer]);
     }

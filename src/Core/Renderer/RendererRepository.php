@@ -11,7 +11,7 @@ class RendererRepository
     private array $values;
 
     public function __construct(
-        private readonly RendererBatonnets $renderer_batonnets
+        RendererBatonnets $renderer_batonnets
     )
     {
         $this->values = [
@@ -39,14 +39,6 @@ class RendererRepository
         return array_combine(
             array_map(fn(Renderer $renderer) => $renderer->getNom(), $this->values),
             array_keys($this->values)
-        );
-    }
-
-    public function nomToRenderer(): array
-    {
-        return array_combine(
-            array_map(fn(Renderer $renderer) => $renderer->getNom(), $this->values),
-            $this->values
         );
     }
 }

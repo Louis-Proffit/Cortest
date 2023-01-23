@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("calcul_profil_session_download", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Télécharger</a>
+               href="{{ path("pdf_session_form", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Télécharger</a>
         </div>
     </div>
     <br>
@@ -43,10 +43,10 @@
             <tbody>
             {% for reponse in session.reponses_candidats %}
                 <tr>
-                    <td>{{ reponse.raw["nom"] }}</td>
-                    <td>{{ reponse.raw["prenom"] }}</td>
+                    <td>{{ reponse.nom }}</td>
+                    <td>{{ reponse.prenom }}</td>
                     <td>
-                        <a href="{{ path("calcul_profil_download", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
+                        <a href="{{ path("pdf_form", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
                     </td>
                     {% for score in scores[reponse.id] %}
                         <td>

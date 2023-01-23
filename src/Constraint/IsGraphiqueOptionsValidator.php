@@ -29,8 +29,8 @@ class IsGraphiqueOptionsValidator extends ConstraintValidator
      */
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$constraint instanceof IsGraphiqueEchelleOptions) {
-            throw new UnexpectedTypeException($constraint, IsGraphiqueEchelleOptions::class);
+        if (!$constraint instanceof IsGraphiqueOptions) {
+            throw new UnexpectedTypeException($constraint, IsGraphiqueOptions::class);
         }
 
         /** @var Graphique $object */
@@ -45,11 +45,12 @@ class IsGraphiqueOptionsValidator extends ConstraintValidator
 
         foreach ($object->options as $key => $value) {
 
-            $valid = true;
+            $valid = false;
 
             foreach ($renderer->getOptions() as $options) {
                 if ($options->nom_php === $key) {
-                    $valid = false;
+                    $valid = true;
+                    break;
                 }
             }
 

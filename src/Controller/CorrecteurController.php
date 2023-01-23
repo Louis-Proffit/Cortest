@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\Grille\GrilleRepository;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
@@ -115,10 +116,11 @@ class CorrecteurController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        ManagerRegistry      $doctrine,
-        CorrecteurRepository $correcteur_repository,
-        Request              $request,
-        int                  $id,
+        ManagerRegistry           $doctrine,
+        CorrecteurRepository      $correcteur_repository,
+        CortestExpressionLanguage $cortest_expression_language,
+        Request                   $request,
+        int                       $id,
     ): Response
     {
 
@@ -132,11 +134,13 @@ class CorrecteurController extends AbstractController
 
             $doctrine->getManager()->flush();
 
-            return $this->redirectToRoute("correcteur_index");
+            return $this->redirectToRoute("correcteur_consulter", ["id" => $id]);
 
         }
 
-        return $this->render("correcteur/modifier.html.twig", ["form" => $form]);
+        $fonctions = $cortest_expression_language->getCortestFunctions();
+
+        return $this->render("correcteur/modifier.html.twig", ["form" => $form, "fonctions" => $fonctions]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

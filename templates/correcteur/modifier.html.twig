@@ -8,19 +8,13 @@
     {{ form_start(form) }}
     {{ form_row(form.nom) }}
     <br>
-    <div class="alert alert-info">
-        <h5 class="alert-heading fw-bold">
-            vrai1
-        </h5>
-        La fonction <b>vrai1</b> donne 1 point à une question si le candidat a répondu 1, 0 sinon.
-    </div>
-    <br>
-    <div class="alert alert-info">
-        <h5 class="alert-heading fw-bold">
-            vrai2
-        </h5>
-        La fonction <b>vrai2</b> donne 1 point à une question si le candidat a répondu 2, 0 sinon.
-    </div>
+    {% for fonction in fonctions %}
+        <div class="alert alert-info mb-3">
+            <h5 class="alert-heading fw-bold">{{ fonction.nom_affiche }}</h5>
+            <hr>
+            {{ fonction.description|raw }}
+        </div>
+    {% endfor %}
     <br>
     {% for echelleCorrecteur in form.echelles %}
         <div class="mb-3">

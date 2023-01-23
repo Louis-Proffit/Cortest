@@ -2,15 +2,12 @@
 
 namespace App\Constraint;
 
-use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Grille\GrilleRepository;
-use App\Entity\Correcteur;
-use Exception;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Throwable;
+use TypeError;
 
 class CompilableValidator extends ConstraintValidator
 {
@@ -37,9 +34,9 @@ class CompilableValidator extends ConstraintValidator
         }
 
         try {
-            $this->cortest_expression_language->compile($value);
-        } catch (Throwable $e) {
-            $this->context->addViolation("Erreur de syntaxe " . $e);
+            $this->cortest_expression_language->compileCortest($value);
+        } catch (SyntaxError|TypeError $e) {
+            $this->context->addViolation("Erreur de syntaxe " . $e->getMessage());
         }
     }
 }

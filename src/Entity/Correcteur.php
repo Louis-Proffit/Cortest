@@ -7,6 +7,7 @@ use App\Repository\CorrecteurRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
 class Correcteur
@@ -27,6 +28,7 @@ class Correcteur
     #[ORM\Column(unique: true)]
     public string $nom;
 
+    #[Valid]
     #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class)]
     public Collection $echelles;
 

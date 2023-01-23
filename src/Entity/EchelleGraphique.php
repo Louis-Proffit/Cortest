@@ -18,7 +18,7 @@ class EchelleGraphique
     const TYPE_SUBTEST = "Subtest";
     const TYPE_EPREUVE = "Epreuve";
 
-    const TYPE_OPTIONS = [
+    const TYPE_ECHELLE_OPTIONS = [
         self::TYPE_ECHELLE_SIMPLE,
         self::TYPE_ECHELLE_COMPOSITE,
         self::TYPE_SUBTEST,
@@ -34,7 +34,7 @@ class EchelleGraphique
     #[ORM\Column]
     public array $options;
 
-    #[Choice(options: self::TYPE_OPTIONS)]
+    #[Choice(choices: self::TYPE_ECHELLE_OPTIONS)]
     #[ORM\Column]
     public string $type;
 
