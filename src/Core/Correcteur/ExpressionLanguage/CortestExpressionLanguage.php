@@ -2,11 +2,13 @@
 
 namespace App\Core\Correcteur\ExpressionLanguage;
 
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestExpressionEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Echelle;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Score;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Vrai1;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Vrai2;
+use App\Entity\EchelleCorrecteur;
 use BadMethodCallException;
 use JetBrains\PhpStorm\Deprecated;
 use Psr\Cache\CacheItemPoolInterface;
@@ -21,11 +23,11 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
 
 
     public function __construct(
-        private readonly Vrai1 $vrai_1,
-        private readonly Vrai2 $vrai_2,
-        private readonly Score $score,
+        private readonly Vrai1   $vrai_1,
+        private readonly Vrai2   $vrai_2,
+        private readonly Score   $score,
         private readonly Echelle $echelle,
-        CacheItemPoolInterface $cache = null)
+        CacheItemPoolInterface   $cache = null)
     {
         parent::__construct($cache, [$this]);
     }
@@ -60,26 +62,9 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
         throw new BadMethodCallException("Use compileCortest instead of compile");
     }
 
-    #[Deprecated]
-    public function evaluate(Expression|string $expression, array $values = []): mixed
-    {
-        throw new BadMethodCallException("Use evaluateCortest instead of evaluate");
-    }
 
-    /**
-     * @param string $expression
-     * @return string
-     * @throws SyntaxError
-     * @throws TypeError
-     */
-    public function compileCortest(string $expression): string
+    public function compileCortest(string $expression, string $type, CortestCompilationEnvironment $environment): string
     {
-        return parent::compile($expression, CortestExpressionEnvironment::COMPILE_ENVIRONMENT);
-    }
-
-    public function evaluateCortest(string $expression, CortestExpressionEnvironment $environment): float
-    {
-        return parent::parse($expression, $environment->get_names())->getNodes()->evaluate($this->functions,
-            (array)$environment->get_reponses());
+        return parent::compile($expression, $environment->compile_environment($type));
     }
 }

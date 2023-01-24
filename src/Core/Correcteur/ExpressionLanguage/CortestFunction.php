@@ -2,7 +2,7 @@
 
 namespace App\Core\Correcteur\ExpressionLanguage;
 
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestExpressionEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use Closure;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 

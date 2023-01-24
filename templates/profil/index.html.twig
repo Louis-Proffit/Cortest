@@ -4,10 +4,14 @@
     <br>
     <h1>Profils</h1>
     <br>
-    <div class="row">
+    <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("pdf_session_form", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Télécharger</a>
+               href="{{ path("pdf_session_form", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Générer les feuilles de profil .zip</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("calcul_profil_csv", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Exporter en .csv</a>
         </div>
     </div>
     <br>

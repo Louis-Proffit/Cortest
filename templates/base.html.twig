@@ -64,6 +64,9 @@
                                     <li class="dropdown-item">
                                         <a class="nav-link" href="{{ path("concours_index") }}">Concours</a>
                                     </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ path("echelle_index") }}">Echelles</a>
+                                    </li>
                                 </ul>
                             </li>
                             {% if 'ROLE_ADMINISTRATEUR' in app.token.roleNames %}

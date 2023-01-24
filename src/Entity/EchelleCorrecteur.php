@@ -25,4 +25,19 @@ class EchelleCorrecteur
     #[ORM\ManyToOne(targetEntity: Correcteur::class)]
     public Correcteur $correcteur;
 
+    /**
+     * @param int $id
+     * @param string $expression
+     * @param Echelle $echelle
+     * @param Correcteur $correcteur
+     */
+    public function __construct(int $id, string $expression, Echelle $echelle, Correcteur $correcteur)
+    {
+        $this->id = $id;
+        $this->expression = $expression;
+        $this->echelle = $echelle;
+        $this->correcteur = $correcteur;
+    }
+
+
 }

@@ -4,11 +4,16 @@
     <br>
     <h1>Scores</h1>
     <br>
-    <div class="row">
+    <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
                href="{{ path('calcul_profil_score_form', {"session_id":session.id, "correcteur_id":correcteur.id}) }}">Calculer
                 les profils</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path('calcul_score_csv', {"session_id":session.id, "correcteur_id":correcteur.id}) }}">Exporter
+                en .csv</a>
         </div>
     </div>
     <br>
@@ -50,8 +55,8 @@
             <tbody>
             {% for reponse in session.reponses_candidats %}
                 <tr>
-                    <td>{{ reponse.raw["nom"] }}</td>
-                    <td>{{ reponse.raw["prenom"] }}</td>
+                    <td>{{ reponse.nom }}</td>
+                    <td>{{ reponse.prenom }}</td>
                     {% for score in scores[reponse.id] %}
                         <td>{{ score }}</td>
                     {% endfor %}

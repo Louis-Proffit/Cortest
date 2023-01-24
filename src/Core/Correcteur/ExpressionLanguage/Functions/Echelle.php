@@ -11,7 +11,7 @@ class Echelle extends CortestFunction
         parent::__construct(nom_affiche: "echelle(nom_echelle)",
             nom_php: "echelle",
             description: '
-            <p>Renvoie le score de obtenu à l\\\'echelle [nom_echelle]</p>
+            <p>Renvoie le score obtenu à l\\\'echelle [nom_echelle]</p>
             <ul>
             <li>echelle(x) : score obtenu à l\\\'echelle x</li>
            </ul>

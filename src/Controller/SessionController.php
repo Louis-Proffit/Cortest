@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Core\Files\CsvManager;
 use App\Core\Grille\GrilleRepository;
 use App\Core\Grille\Values\GrilleOctobre2019;
+use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\ConcoursRepository;
@@ -14,9 +16,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 #[Route("/session", name: "session_")]
 class SessionController extends AbstractController
@@ -117,10 +122,22 @@ class SessionController extends AbstractController
         );
     }
 
+    #[Route("/csv/{id}", name: "csv")]
+    public function csv(
+        CsvManager        $csv_manager,
+        SessionRepository $session_repository,
+        int               $id
+    )
+    {
+        $session = $session_repository->find($id);
+
+        return $csv_manager->exportSession($session);
+    }
+
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry $doctrine,
+    public function supprimer(ManagerRegistry   $doctrine,
                               SessionRepository $session_repository,
-                              int $id): Response
+                              int               $id): Response
     {
 
         $session = $session_repository->find($id);

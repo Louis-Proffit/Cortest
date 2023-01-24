@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Pdf\PdfManager;
+use App\Core\Files\PdfManager;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
 use App\Repository\CorrecteurRepository;
