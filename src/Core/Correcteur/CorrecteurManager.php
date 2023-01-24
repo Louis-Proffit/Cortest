@@ -30,7 +30,7 @@ class CorrecteurManager
         foreach ($reponses_candidat as $reponse_candidat) {
             $result = [];
 
-            $cortest_expression_environment = new CortestExpressionEnvironment(echelles: $correcteur->echelles->toArray(),
+            $cortest_expression_environment = new CortestExpressionEnvironment(echelles: $correcteur->get_echelles_mapped_noms(),
                 reponses: $reponse_candidat->reponses,
                 cortest_expression_language: $this->cortest_expression_language);
 

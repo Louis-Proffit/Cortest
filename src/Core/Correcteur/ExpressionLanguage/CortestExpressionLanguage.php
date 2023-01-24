@@ -80,6 +80,6 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
     public function evaluateCortest(string $expression, CortestExpressionEnvironment $environment): float
     {
         return parent::parse($expression, $environment->get_names())->getNodes()->evaluate($this->functions,
-            (array)$environment)[0];
+            (array)$environment->get_reponses());
     }
 }

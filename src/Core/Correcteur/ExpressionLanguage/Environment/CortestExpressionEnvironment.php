@@ -103,4 +103,8 @@ class CortestExpressionEnvironment implements ArrayAccess
 
         return $result;
     }
+
+    public function get_reponses(){
+        return array('reponses' => $this->reponses);
+    }
 }

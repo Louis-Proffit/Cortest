@@ -48,5 +48,16 @@ class Correcteur
         $this->echelles = $echelles;
     }
 
+    public function get_echelles_mapped_noms(): array
+    {
+        $echelles_noms = array();
+        if (!$this->echelles->isEmpty()) {
+            foreach ($this->echelles->getValues() as $echelle){
+                $echelles_noms[$echelle->echelle->nom_php] = $echelle->expression;
+            }
+        }
+        return $echelles_noms;
+    }
+
 
 }
