@@ -4,7 +4,7 @@
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-
+    <script src="{{ asset('lecture-optique/port.js') }}"></script>
 
     <script>
 
@@ -29,26 +29,15 @@
 
 
         //on définit comment interpréter chaque champs
-        const chiffres = function (read) {
-            if (read.match(/[?]/)) {
-                return [read, false, function (running_fid) {
-                        askUserText(running_fid, field, "Une colonne est cochée deux fois ou plus", "?");
-                    }];
-            } else {
-                var reg = new RegExp('[0-9]{' + n + '}')
-                if (reg.test(read)) {
-                    return [read, true, null];
-                } else {
-                    return [read, false, function (running_fid) {
-                            askUserText(running_fid, field, "Le nombre est absent ou incorrect", "?");
-                        }];
-                }
-            }
-        }
 
         const reader = {
             code_barre: function (read) {
                 if (read.match(/[0-9]{8}/)) {
+                    if (hasFID(read)) {
+                        return [read, false, function (running_fid) {
+                                askUserAlreadyRead(running_fid);
+                            }];
+                    }
                     return [read, true, null];
                 } else {
                     return [read, false, function (running_fid) {
@@ -127,14 +116,14 @@
             date_naissance: function (read) {
                 if (read.match(/[?]/)) {
                     return [read, false, function (running_fid) {
-                            askUserText(running_fid, 'date_naissance', "Une colonne est cochée deux fois ou plus", "?");
+                            askUserText(running_fid, 'date_naissance', "Une colonne est cochée deux fois ou plus", "?", true);
                         }];
                 } else {
                     if (read.match(/[0-3][0-9][0-1][0-9]{3}/)) {
                         return [read[0] + read[1] + '/' + read[2] + read[3] + '/' + read[4] + read[5] + read[6] + read[7], true, null];
                     } else {
                         return [read, false, function (running_fid) {
-                                askUserText(running_fid, 'date_naissance', "Réponse absente ou invalide", "?");
+                                askUserText(running_fid, 'date_naissance', "Réponse absente ou invalide", "?", true);
                             }];
                     }
 
@@ -190,14 +179,14 @@
             date_examen: function (read) {
                 if (read.match(/[?]/)) {
                     return [read, false, function (running_fid) {
-                            askUserText(running_fid, 'date_examen', "Une colonne est cochée deux fois ou plus", "?");
+                            askUserText(running_fid, 'date_examen', "Une colonne est cochée deux fois ou plus", "?", true);
                         }];
                 } else {
                     if (read.match(/[0-3][0-9][0-1][0-9]{3}/)) {
-                        return [read[0] + read[1] + '/' + read[2] + read[3] + '/' + read[4] + read[5] + read[6] + read[7], true, null];
+                        return [read[4] + read[5] + read[6] + read[7] + '-' + read[2] + read[3] + '-' + read[0] + read[1], true, null];
                     } else {
                         return [read, false, function (running_fid) {
-                                askUserText(running_fid, 'date_examen', "Réponse absente ou invalide", "?");
+                                askUserText(running_fid, 'date_examen', "Réponse absente ou invalide", "?", true);
                             }];
                     }
 
@@ -289,7 +278,7 @@
             niveau_scolaire: {asked: true, value: false, print: true},
             date_naissance: {asked: true, value: false, print: true},
             sexe: {asked: true, value: false, print: true},
-            concours: {asked: true, value: 'E', print: false},
+            concours: {asked: true, value: 'E', print: true},
             SGAP: {asked: true, value: false, print: true},
             date_examen: {asked: true, value: false, print: true},
             type_concours: {asked: true, value: false, print: true},
@@ -302,12 +291,12 @@
         var test_void_running_fid = {
             code_barre: {read: '12834589', treated: false, value: null},
             nom: {read: 'COLLARD', treated: false, value: null},
-            prenom: {read: 'JULI?N', treated: false, value: null},
+            prenom: {read: 'JULIEN', treated: false, value: null},
             nom_jeune_fille: {read: "             ", treated: false, value: null},
             niveau_scolaire: {read: "3", treated: false, value: null},
-            date_naissance: {read: "10122001", treated: false, value: null},
+            date_naissance: {read: "10122?01", treated: false, value: null},
             sexe: {read: "1", treated: false, value: null},
-            concours: {read: "I", treated: false, value: null},
+            concours: {read: "E", treated: false, value: null},
             SGAP: {read: "23", treated: false, value: null},
             date_examen: {read: "22012023", treated: false, value: null},
             type_concours: {read: "12", treated: false, value: null},
@@ -315,7 +304,25 @@
             reserve: {read: "73840", treated: false, value: null},
             option_1: {read: "3563", treated: false, value: null},
             option_2: {read: "926384", treated: false, value: null},
-        }
+        };
+
+        var test_void_running_fid_bis = {
+            code_barre: {read: '12834589', treated: false, value: null},
+            nom: {read: 'COLLARD', treated: false, value: null},
+            prenom: {read: 'JULIEN', treated: false, value: null},
+            nom_jeune_fille: {read: "             ", treated: false, value: null},
+            niveau_scolaire: {read: "3", treated: false, value: null},
+            date_naissance: {read: "10122?01", treated: false, value: null},
+            sexe: {read: "1", treated: false, value: null},
+            concours: {read: "E", treated: false, value: null},
+            SGAP: {read: "23", treated: false, value: null},
+            date_examen: {read: "22012023", treated: false, value: null},
+            type_concours: {read: "12", treated: false, value: null},
+            batterie: {read: "876", treated: false, value: null},
+            reserve: {read: "73840", treated: false, value: null},
+            option_1: {read: "3563", treated: false, value: null},
+            option_2: {read: "926384", treated: false, value: null},
+        };
 
 
         // /18500431COLLAR?        JULIEN                 81012011E1320012354321               /
@@ -399,6 +406,18 @@
             gridOptions.api.setRowData(FIDs);
         }
 
+        function hasFID(code_barre) {
+            return FIDs.findIndex((e) => e.code_barre === code_barre) !== -1;
+        }
+
+        function hasQCMs(code_barre) {
+            return QCMs.findIndex((e) => e.code_barre === code_barre) !== -1;
+        }
+
+        function removeFID(code_barre) {
+            FIDs = FIDs.splice(FIDs.findIndex((e) => e.code_barre === code_barre), 1);
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         //bloc de travail avec le port
@@ -473,10 +492,16 @@
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         //fonction de demande d'intervention
 
-        async function askUserText(running_fid, field, message, if_not_determined) {
+        async function askUserText(running_fid, field, message, if_not_determined, date = false) {
             var value = running_fid[field].value;
             $("#manual-text .champs").text(field);
             $("#manual-text .message").text(message);
+            $("#manual-text input").attr('type', 'text');
+            if (date) {
+                console.log('date');
+                $("#manual-text input").attr('type', 'date');
+            }
+
             $("#manual-text input").val(value);
             $("#manual-text").modal("show");
             $("#manual-text .valider").off();
@@ -551,6 +576,36 @@
                     e.preventDefault();
                     $("#manual-confirm .valider").click();
                 }
+            });
+        }
+
+        async function askUserAlreadyRead(running_fid) {
+            $("#manual-already").modal("show");
+            $("#manual-already .valider").off();
+            $("#manual-already .ignorer").off();
+            $("#manual-already .valider").click(function () {
+                running_fid['code_barre'].treated = true;
+                removeFID(running_fid['code_barre'].value);
+                read_FID(running_fid);
+            });
+            $("#manual-already .ignorer").click(function () {
+                FID();
+            });
+        }
+
+        async function askUserQCM(running_qcm, question, message) {
+            $("#manual-qcm").modal("show");
+            $("#manual-qcm .message").text(message);
+            $("#manual-qcm .question").text(question + 1);
+            $("#manual-qcm .valider").off();
+            $("#manual-qcm .ignorer").off();
+            $("#manual-qcm .valider").click(function () {
+                running_qcm[question] = $('#manual-qcm input[name=reponseQCM]:checked').val();
+                read_QCM(running_qcm, question + 1);
+            });
+            $("#manual-already .ignorer").click(function () {
+                running_qcm[question] = '?';
+                read_QCM(running_qcm, question + 1);
             });
         }
 
@@ -719,12 +774,11 @@
 
 
     <!-- Modal -->
-    <div class="modal" id="manual-text" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-text" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Intervention manuelle</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Problème rencontré pour le champs <strong class='champs'></strong>.</p>
@@ -741,12 +795,11 @@
         </div>
     </div>
 
-    <div class="modal" id="manual-choice" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-choice" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Intervention manuelle</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Problème rencontré pour le champs <strong class='champs'></strong>.</p>
@@ -763,12 +816,11 @@
         </div>
     </div>
 
-    <div class="modal" id="manual-confirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-confirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Intervention manuelle</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Problème rencontré pour le champs <strong class='champs'></strong>.</p>
@@ -778,6 +830,74 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Corriger et continuer</button>
                     <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ignorer cette page et continuer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-lg" id="manual-already" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Intervention manuelle</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Cette FID a déjà été lue !</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">La recorriger</button>
+                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ignorer cette page et continuer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-lg" id="manual-qcm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Intervention manuelle</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Problème de lecture à la question <strong class="question"></strong></p>
+                    <p><em class="message"></em></p>
+                    <form>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="reponseQCM" value='A'>
+                            <label class="form-check-label">
+                                A
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="reponseQCM" value='B'>
+                            <label class="form-check-label">
+                                B
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="reponseQCM" value='C'>
+                            <label class="form-check-label">
+                                C
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="reponseQCM" value='D'>
+                            <label class="form-check-label">
+                                D
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="reponseQCM" value='E'>
+                            <label class="form-check-label">
+                                E
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Valider</button>
+                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ignorer cette question</button>
                 </div>
             </div>
         </div>

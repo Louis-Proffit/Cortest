@@ -1,65 +1,155 @@
 {% extends 'base.html.twig' %}
 
 {% block javascripts %}
+    
+    <script src="{{ asset('js/jquerry.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.js') }}"></script>
+    <script src="{{ asset('js/ag-grid.js') }}"></script>
+    
+    <script src="{{ asset('lecture-optique/port.js') }}"></script>
+    <script src="{{ asset('lecture-optique/grille_1.js') }}"></script>
+    <script src="{{ asset('lecture-optique/intervention_manuelle.js') }}"></script>
 
     <script>
+        
+        var debile = function () {};
+        var forms = [
+            formInput('test', 'Joli texte', 'blabla', 'text', debile, debile, debile),
+            formInput('ka', 'Joli date', '', 'date', debile, debile, debile),
+            formInput('chiffre', 'Joli chiffre', '12', 'number', debile, debile, debile),
+            formSelect('sel','Joli select',GrilleManager.contentFID.niveau_scolaire.choice, debile, debile, debile ),
+            formConfirm('conf', 'Joli confirm', '36', '67', debile, debile)
+        ];
+        
+        const request = {
+            code_barre: {asked: true, value: false, print: true},
+            nom: {asked: true, value: false, print: true},
+            prenom: {asked: true, value: false, print: true},
+            nom_jeune_fille: {asked: true, value: false, print: true},
+            niveau_scolaire: {asked: true, value: false, print: true},
+            date_naissance: {asked: true, value: false, print: true},
+            sexe: {asked: true, value: false, print: true},
+            concours: {asked: true, value: 'E', print: true},
+            SGAP: {asked: true, value: false, print: true},
+            date_examen: {asked: true, value: false, print: true},
+            type_concours: {asked: true, value: false, print: true},
+            batterie: {asked: true, value: false, print: true},
+            reserve: {asked: true, value: false, print: true},
+            option_1: {asked: false, value: false, print: true},
+            option_2: {asked: true, value: false, print: true},
+        };
+        
+        var gm = new GrilleManager(request);
+        
+        var agOptions = gm.getGridConfig();
+        // setup the grid after the page has finished loading
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridDiv = document.querySelector('#myGrid');
+            ag = new agGrid.Grid(gridDiv, agOptions);
+        });
+        
 
-        async function write(port, towrite) {
-            const writer = port.writable.getWriter();
 
-            await writer.write(towrite);
-
-
-            // Allow the serial port to be closed later.
-            writer.releaseLock();
-        }
-
-        async function read(port) {
-            const reader = port.readable.getReader();
-
-            // Listen to data coming from the serial device.
-            while (true) {
-                const {value, done} = await reader.read();
-                if (done) {
-                    // Allow the serial port to be closed later.
-                    reader.releaseLock();
-                    break;
-                }
-                // value is a Uint8Array.
-                console.log(value);
-            }
-        }
-
-        async function requestPort() {
-            const ports = await navigator.serial.getPorts()
-            console.log(ports)
-
-            // https://developer.chrome.com/articles/serial/
-            // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort
-            const port = await navigator.serial.requestPort()
-
-
-            await port.open({baudRate: 19200});
-
-            console.log(port)
-
-            // baud : vitesse de communication. Nous : 19200
-            // v : numéro de version
-            // l (laden) : Charge une feuille -> erreur ou valide
-            // g (gut) : bac du bas
-            // s (schlecht) : bac du haut
-
-            await write(port, new Uint8Array([86, 13, 10]))
-            console.log("Commande v envoyée au lecteur")
-
-            await port.close()
-        }
+        
     </script>
 {% endblock %}
 
 {% block content %}
     <br>
-    <h1>Lecture de notes par lecteur optique</h1>
+    <h1>Lecture de feuilles par lecteur optique</h1>
     <br>
-    <button class="btn btn-primary" onclick="requestPort()">Scanner les lecteurs</button>
+
+    <p class="lead">Session : </p>
+    <p><em>Description de la session ici</em></p>
+
+
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">1. Connection à l'appareil</h5>
+            <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
+            <button class="btn btn-primary" onclick="connect()">
+                Connecter le lecteur optique 
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">2. Lecture des pages identité</h5>
+            <p class="card-text">Placez les pages d'identification et lancez la procédure</p>
+            <div class='row'>
+                <div class='col-2'>
+                    <button class="btn btn-primary" onclick="FID()">
+                        Lire les FID 
+                    </button>
+                </div>
+                <div class='col-1'>
+                    <div id='spinner-fid' class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class='col-4'>
+                    <p class="card-text">Pages lues : <span id='nb-fid-lues'></span></p>
+                </div>
+                <div class='col-4'>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        Voir le détail
+                    </button>
+                </div>
+            </div>
+            <div class="collapse mt-3" id="collapseExample">
+                <div class="card card-body">
+
+                    <div id="myGrid" style="height: 200px;" class="ag-theme-alpine"></div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">3. Lecture des pages réponses</h5>
+            <p class="card-text">Placez les pages de réponse au QCM et lancez la procédure</p>
+            <div class='row'>
+                <div class='col-2'>
+                    <button class="btn btn-primary" onclick="QCM()">
+                        Lire les QCMs
+                    </button>
+                </div>
+                <div class='col-1'>
+                    <div id='spinner-qcm' class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class='col-4'>
+                    <p class="card-text">Pages lues : <span id='nb-qcm-lues'></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--- Modal --->
+    <div class="modal modal-xl" id="manual-FID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong class='code-barre'></strong></h1>
+                </div>
+                <div class="modal-body">
+                    <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
+                    <form class='mx-2'>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Supprimer cette page</button>
+                    <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Valider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

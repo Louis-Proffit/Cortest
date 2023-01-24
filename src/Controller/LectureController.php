@@ -132,9 +132,9 @@ class LectureController extends AbstractController {
         //si pas de session spécifiée, la demander !
         //si la session est renseignée : ($session disponible)
         //ancienne vue
-        //return $this->render("lecture/from_scanner.html.twig", ["form" => null]);
+        return $this->render("lecture/from_scanner.html.twig", ["form" => null]);
         //nouvelle vue
-        return $this->render("lecture/lecteur_optique.html.twig", ["form" => null]);
+        //return $this->render("lecture/lecteur_optique.html.twig", ["form" => null]);
     }
 
 }
