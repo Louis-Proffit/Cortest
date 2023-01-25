@@ -22,5 +22,14 @@ class ReponseCandidatRepository extends LazyServiceEntityRepository
         parent::__construct($registry, ReponseCandidat::class);
     }
 
+    public function findAllByIds(array $ids): array
+    {
+        return $this->createQueryBuilder("r")
+            ->where("r.id IN (:ids)")
+            ->setParameter("ids", $ids)
+            ->getQuery()
+            ->execute();
+    }
+
 
 }

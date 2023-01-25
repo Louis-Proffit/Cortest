@@ -2,9 +2,7 @@
 
 namespace App\Core\Files;
 
-use App\Entity\Correcteur;
 use App\Entity\Echelle;
-use App\Entity\EchelleCorrecteur;
 use App\Entity\Profil;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
@@ -15,11 +13,6 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
 class CsvManager
 {
     const CSV_TMP_FILE_NAME = "tmp/session.csv";
-
-    protected function sessionFileName(Session $session): string
-    {
-        return "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
-    }
 
     protected function scoreFileName(Session $session): string
     {
@@ -107,14 +100,18 @@ class CsvManager
         return $result;
     }
 
-    public function exportSession(Session $session): BinaryFileResponse
+    /**
+     * @param ReponseCandidat[] $reponses
+     * @param string $file_name
+     * @return BinaryFileResponse
+     */
+    public function exportReponses(array $reponses, string $file_name): BinaryFileResponse
     {
         $encoder = new CsvEncoder();
 
         $data = [];
 
-        /** @var ReponseCandidat $reponse */
-        foreach ($session->reponses_candidats as $reponse) {
+        foreach ($reponses as $reponse) {
             $toAdd = [
                 "Nom" => $reponse->nom,
                 "Prenom" => $reponse->prenom,
@@ -148,7 +145,7 @@ class CsvManager
         $result = new BinaryFileResponse(self::CSV_TMP_FILE_NAME);
         $result->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $this->sessionFileName($session)
+            $file_name
         );
 
         return $result;
