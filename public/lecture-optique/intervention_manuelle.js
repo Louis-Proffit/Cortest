@@ -2,6 +2,17 @@
  * Page qui gère les interventions utilisteur pour la correction manuelle de certaines choses
  */
 
+//si la FID a déjà été lue, on demande si relecture
+function tellFatalError(message, button, next) {
+    $('#manual-fatal .message').text(message);
+    $('#manual-fatal .button').text(button);
+    $("#manual-fatal").modal("show");
+    $("#manual-fatal .valider").off();
+    $("#manual-fatal .valider").click(function () {
+        next();
+    });
+}
+
 
 
 /*ouvre la modale de correction manuelle d'une fid
@@ -14,19 +25,15 @@
 function askFID(code_barre, forms, valider, annuler) {
     $('#manual-FID form').empty();
     $('#manual-FID .code-barre').text(code_barre);
-    for (var field in forms) {
-        var line = forms[field];
-        $('#manual-FID form').append("<div class='row mt-4 mb-4 ligne-" + field + "'>" + line.html + "</div>");
+    for (var i in forms) {
+        var line = forms[i];
+        $('#manual-FID form').append("<div class='row mt-4 mb-4 ligne-" + line.field + "'>" + line.html + "</div>");
     }
     $("#manual-FID").modal("show");
     $("#manual-FID .valider").off();
     $("#manual-FID .annuler").off();
     //vlaidation du formulaire
     $("#manual-FID .valider").click(function () {
-        for (var field in forms) {
-            var line = forms[field];
-            line.action();
-        }
         valider();
     });
     $("#manual-FID .annuler").click(function () {
@@ -47,30 +54,31 @@ function askFID(code_barre, forms, valider, annuler) {
  */
 function formInput(field, field_name, value, type, valid, left_void, unknown) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
-<div class='col-4'><input type='" + type + "' class='form-control' value='" + value + "'></div>\n\
+<div class='col-4'><input type='" + type + "' class='form-control res' value='" + value + "'></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
-  <input class='form-check-input' type='checkbox' class='vide'>\n\
+  <input class='form-check-input vide' type='checkbox'>\n\
   <label class='form-check-label'>\n\
     Laissé vide\n\
   </label>\n\
 </div></div>\n\
 <div class='col-2'><div class='form-check'>\n\
-  <input class='form-check-input' type='checkbox' class='flou'>\n\
+  <input class='form-check-input flou' type='checkbox'>\n\
   <label class='form-check-label'>\n\
     Indiscernable\n\
   </label>\n\
 </div></div>";
     return {
         html: html,
+        field: field,
         action: function () {
-            if ($(".ligne" + field + " .vide").attr('checked') === 'checked') {
+            if ($(".ligne-" + field + " .vide").prop('checked')) {
                 return left_void();
             }
-            if ($(".ligne" + field + " .flou").attr('checked') === 'checked') {
+            if ($(".ligne-" + field + " .flou").prop('checked')) {
                 return unknown();
             }
-            return valid($(".ligne" + field + " input").val());
-
+            var r = $(".ligne-" + field + " .res").val();
+            valid(r);
         }
     };
 }
@@ -90,21 +98,22 @@ function formConfirm(field, field_name, value, expected, correct, ignore) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><span>Reseigné : <strong>" + value + "</strong>  /   Attendu : <strong>" + expected + "</strong></span></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
-  <input class='form-check-input' type='radio' name='radio-" + field + "' class='correct' checked>\n\
+  <input class='form-check-input correct' type='radio' name='radio-" + field + "' checked>\n\
   <label class='form-check-label'>\n\
     Corriger\n\
   </label>\n\
 </div></div>\n\
 <div class='col-2'><div class='form-check'>\n\
-  <input class='form-check-input' type='radio' name='radio-" + field + "' class='ignore'>\n\
+  <input class='form-check-input ignore' type='radio' name='radio-" + field + "' >\n\
   <label class='form-check-label'>\n\
     Laisser\n\
   </label>\n\
 </div></div>";
     return {
         html: html,
+        field: field,
         action: function () {
-            if ($(".ligne" + field + " .correct").attr('checked') === 'checked') {
+            if ($(".ligne-" + field + " .correct").attr('checked') === 'checked') {
                 return correct();
             } else {
                 return ignore();
@@ -146,15 +155,95 @@ function formSelect(field, field_name, choice, valid, left_void, unknown) {
 </div></div>";
     return {
         html: html,
+        field: field,
         action: function () {
-            if ($(".ligne" + field + " .vide").attr('checked') === 'checked') {
+            if ($(".ligne-" + field + " .vide").prop('checked')) {
                 return left_void();
             }
-            if ($(".ligne" + field + " .flou").attr('checked') === 'checked') {
+            if ($(".ligne-" + field + " .flou").prop('checked')) {
                 return unknown();
             }
-            return valid($(".ligne" + field + " select").val());
-
+            var r = $(".ligne-" + field + " select").val();
+            return valid(r);
         }
     };
+}
+
+
+//si la FID a déjà été lue, on demande si relecture
+function askAlready(code_barre, valider, annuler) {
+    $('#manual-already .code').text(code_barre);
+    $("#manual-already").modal("show");
+    $("#manual-already .valider").off();
+    $("#manual-already .annuler").off();
+    //vlaidation du formulaire
+    $("#manual-already .valider").click(function () {
+        valider();
+    });
+    $("#manual-already .annuler").click(function () {
+        annuler();
+    });
+}
+
+
+//ligne de form de QCM
+function makeHTMLQCM(question, blanck, unknown) {
+    return "<div class='row mt-3 mb-3 qcm-" + question + "'>\n\
+<div class='col-2'>\n\
+<strong>" + (question + 1).toString() + "</strong>\n\
+</div>\n\
+                            <div class='form-check col-1'>\n\
+                                <input class='form-check-input' type='radio' value='A' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>A</label>\n\
+                            </div>\n\
+                            <div class='form-check col-1'>\n\
+                                <input class='form-check-input' type='radio' value='B' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>B</label>\n\
+                            </div>\n\
+                            <div class='form-check col-1'>\n\
+                                <input class='form-check-input' type='radio' value='C' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>C</label>\n\
+                            </div>\n\
+                            <div class='form-check col-1'>\n\
+                                <input class='form-check-input' type='radio' value='D' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>D</label>\n\
+                            </div>\n\
+                            <div class='form-check col-1'>\n\
+                                <input class='form-check-input' type='radio' value='E' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>E</label>\n\
+                            </div>\n\
+                            <div class='col-2 offset-1'>\n\
+                                <input class='form-check-input' type='radio' value='" + blanck + "' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>Vide</label>\n\
+                            </div>\n\
+                            <div class='col-2'>\n\
+                                <input class='form-check-input' type='radio' value='" + unknown + "' name='ligne-"+question+"'>\n\
+                                <label class='form-check-label'>Indiscernable</label>\n\
+                            </div>\n\
+                        </div>";
+}
+
+function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
+    $('#manual-QCM form').empty();
+    $('#manual-QCM .code-barre').text(code_barre);
+    for (var i in questions) {
+        var question = questions[i];
+        $('#manual-QCM form').append(makeHTMLQCM(question, blanck, unknown));
+    }
+    $("#manual-QCM").modal("show");
+    $("#manual-QCM .valider").off();
+    $("#manual-QCM .annuler").off();
+    //validation du formulaire
+    $("#manual-QCM .valider").click(function () {
+        var rep = [];
+        for (var i in questions) {
+            var question = questions[i];
+            var r = $('#manual-QCM .qcm-' + question + ' input:checked').val();
+            rep.push({question: question, response: r});
+        }
+        valider(rep);
+    });
+    $("#manual-QCM .annuler").click(function () {
+        annuler();
+    });
 }

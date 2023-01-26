@@ -37,6 +37,10 @@ async function tell(commande) {
 
 }
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function get(commande) {
     //on vide le cache
     answer_cache = "";
@@ -55,4 +59,16 @@ async function get(commande) {
         }
     }
     return false;
+}
+
+async function testget(commande) {
+    //on vide le cache
+    answer_cache = "";
+
+    //on écoute la réponse (pas trop longtemps quand même...)
+
+    for (let n = 0; n < 200; n++) {
+        await timeout(10);
+    }
+    return "c'est cool !";
 }
