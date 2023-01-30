@@ -31,7 +31,7 @@ class Correcteur
     public string $nom;
 
     #[Valid]
-    #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class)]
+    #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
     /**
@@ -54,7 +54,7 @@ class Correcteur
     {
         $echelles_noms = array();
         if (!$this->echelles->isEmpty()) {
-            foreach ($this->echelles->getValues() as $echelle){
+            foreach ($this->echelles->getValues() as $echelle) {
                 $echelles_noms[$echelle->echelle->nom_php] = $echelle->expression;
             }
         }
