@@ -29,6 +29,7 @@ async function read() {
 async function tell(commande) {
     //on vide le cache
     answer_cache = "";
+    console.log('Request : ' + commande);
 
     //envoie de la requete
     const writer = port.writable.getWriter();
@@ -44,6 +45,7 @@ function timeout(ms) {
 async function get(commande) {
     //on vide le cache
     answer_cache = "";
+    console.log('Request : ' + commande);
 
     //envoie de la requete
     const writer = port.writable.getWriter();
@@ -54,11 +56,17 @@ async function get(commande) {
 
     for (let n = 0; n < 300; n++) {
         await timeout(10);
-        if (answer_cache.indexOf(end) !== -1) {
-            return answer_cache;
+        if (answer_cache.slice(-1) === '\x04' || answer_cache.slice(-1) === '\x03') {
+            var cache = Object.assign({}, {text: answer_cache}).text;
+            await timeout(40);
+            if (answer_cache == cache) {
+                console.log('Response : ');
+                console.log({answer_cache});
+                return answer_cache;
+            }
         }
     }
-    return false;
+    return answer_cache;
 }
 
 async function testget(commande) {

@@ -2,13 +2,12 @@
  * Page qui gère les interventions utilisteur pour la correction manuelle de certaines choses
  */
 
-//si la FID a déjà été lue, on demande si relecture
 function tellFatalError(message, button, next) {
     $('#manual-fatal .message').text(message);
     $('#manual-fatal .button').text(button);
     $("#manual-fatal").modal("show");
-    $("#manual-fatal .valider").off();
-    $("#manual-fatal .valider").click(function () {
+    $("#manual-fatal .ignorer").off();
+    $("#manual-fatal .ignorer").click(function () {
         next();
     });
 }
@@ -187,37 +186,37 @@ function askAlready(code_barre, valider, annuler) {
 
 
 //ligne de form de QCM
-function makeHTMLQCM(question, blanck, unknown) {
+function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
     return "<div class='row mt-3 mb-3 qcm-" + question + "'>\n\
 <div class='col-2'>\n\
 <strong>" + (question + 1).toString() + "</strong>\n\
 </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='A' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='A' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>A</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='B' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='B' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>B</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='C' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='C' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>C</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='D' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='D' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>D</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='E' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='E' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>E</label>\n\
                             </div>\n\
                             <div class='col-2 offset-1'>\n\
-                                <input class='form-check-input' type='radio' value='" + blanck + "' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='" + blanck + "' name='ligne-" + question + "' " + (initial_blank ? "checked" : "") + ">\n\
                                 <label class='form-check-label'>Vide</label>\n\
                             </div>\n\
                             <div class='col-2'>\n\
-                                <input class='form-check-input' type='radio' value='" + unknown + "' name='ligne-"+question+"'>\n\
+                                <input class='form-check-input' type='radio' value='" + unknown + "' name='ligne-" + question + "' " + (inital_unknown ? "checked" : "") + ">\n\
                                 <label class='form-check-label'>Indiscernable</label>\n\
                             </div>\n\
                         </div>";
@@ -228,7 +227,7 @@ function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
     $('#manual-QCM .code-barre').text(code_barre);
     for (var i in questions) {
         var question = questions[i];
-        $('#manual-QCM form').append(makeHTMLQCM(question, blanck, unknown));
+        $('#manual-QCM form').append(makeHTMLQCM(question.numero, blanck, unknown, question.blanck, question.unknown));
     }
     $("#manual-QCM").modal("show");
     $("#manual-QCM .valider").off();
@@ -245,5 +244,60 @@ function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
     });
     $("#manual-QCM .annuler").click(function () {
         annuler();
+    });
+}
+
+//si la FID a déjà été lue, on demande si relecture
+function askCodeBarre(propal, valider, manual, ignorer) {
+    $('#manual-code-barre .scanette').val("");
+    $('#manual-code-barre .propal').text(propal);
+    $("#manual-code-barre").modal("show");
+    $("#manual-code-barre .valider").off();
+    $("#manual-code-barre .ignorer").off();
+    //vlaidation du formulaire
+    $("#manual-code-barre .valider").click(function () {
+        var rep = $("#manual-code-barre .scanette").val();
+        return valider(rep);
+    });
+    $("#manual-code-barre .ignorer").click(function () {
+        return ignorer();
+    });
+    $("#manual-code-barre .manuel").click(function () {
+        return manual();
+    });
+}
+
+function makeHTMLLink(FIDs, QCMs, i) {
+    var r = "<div class='row mb-3'><div class='col-6'><select class='form-select fid-" + i + "'>";
+    for (var j in FIDs) {
+        r += "<option value='" + FIDs[j].code_barre + "'>" + FIDs[j].code_barre + " - " + FIDs[j].nom + "</option>";
+    }
+    r += "</select></div><div class='col-6'><select class='form-select qcm-" + i + "'>";
+    for (var j in QCMs) {
+        r += "<option value='" + QCMs[j].code_barre + "'>" + QCMs[j].code_barre + "</option>";
+    }
+    r += " </select></div></div>";
+    return r;
+}
+
+
+function askManualLink(nb, FIDs, QCMs, valider, annuler) {
+    $('#manual-link .nb-a-appaires').text(nb);
+    $('#manual-link form').empty();
+    for (var i = 0; i < (nb / 2); i++) {
+        $('#manual-link form').append(makeHTMLLink(FIDs, QCMs, i));
+    }
+    $("#manual-link").modal("show");
+    $("#manual-link .valider").off();
+    $("#manual-link .annuler").off();
+    $("#manual-link .valider").click(function () {
+        var rep = [];
+        for (var i = 0; i < (nb / 2); i++) {
+            rep[i] = {fid: $("#manual-link .fid-"+i).val(), qcm: $("#manual-link .qcm-"+i).val()};
+        }
+        return valider(rep);
+    });
+    $("#manual-link .annuler").click(function () {
+        return annuler();
     });
 }
