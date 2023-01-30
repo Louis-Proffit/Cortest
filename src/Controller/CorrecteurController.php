@@ -80,29 +80,24 @@ class CorrecteurController extends AbstractController
 
             $profil = $correcteurCreer->profil;
 
-            /** @var EchelleCorrecteur[] $echelles */
-            $echelles = [];
-            foreach ($profil->echelles as $echelle) {
-
-                $echelleCorrecteur = new EchelleCorrecteur();
-                $echelleCorrecteur->echelle = $echelle;
-                $echelleCorrecteur->id = 0;
-                $echelleCorrecteur->expression = "0";
-
-                $echelles[] = $echelleCorrecteur;
-            }
-
             $correcteur = new Correcteur(
                 id: 0,
                 grille_class: $correcteurCreer->grille_class,
                 profil: $profil,
                 nom: $correcteurCreer->nom,
-                echelles: new ArrayCollection($echelles)
+                echelles: new ArrayCollection()
             );
 
-            foreach ($echelles as $echelle) {
-                $echelle->correcteur = $correcteur;
-                $entity_manager->persist($echelle);
+            foreach ($profil->echelles as $echelle) {
+
+                $echelleCorrecteur = new EchelleCorrecteur(
+                    id: 0, expression: "0", echelle: $echelle, correcteur: $correcteur
+                );
+                $echelleCorrecteur->echelle = $echelle;
+                $echelleCorrecteur->id = 0;
+                $echelleCorrecteur->expression = "0";
+
+                $correcteur->echelles->add($echelleCorrecteur);
             }
 
             $entity_manager->persist($correcteur);
@@ -111,7 +106,7 @@ class CorrecteurController extends AbstractController
             return $this->redirectToRoute("correcteur_modifier", ["id" => $correcteur->id]);
         }
 
-        return $this->render("correcteur/form.html.twig", ["form" => $form]);
+        return $this->render("correcteur/form.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
@@ -140,7 +135,8 @@ class CorrecteurController extends AbstractController
 
         $fonctions = $cortest_expression_language->getCortestFunctions();
 
-        return $this->render("correcteur/modifier.html.twig", ["form" => $form, "fonctions" => $fonctions]);
+        return $this->render("correcteur/modifier.html.twig",
+            ["form" => $form->createView(), "fonctions" => $fonctions]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

@@ -19,6 +19,9 @@
                 profils</a>
         </div>
         <div class="mb-3 col-md-auto">
+            <a class="btn btn-secondary" href="{{ path("session_csv", {"id":session.id}) }}">Exporter en .csv</a>
+        </div>
+        <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("session_index") }}">Retour à la liste</a>
         </div>
     </div>

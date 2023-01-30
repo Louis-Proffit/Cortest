@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Pdf;
+namespace App\Core\Files;
 
 use App\Core\Renderer\RendererRepository;
 use App\Entity\Correcteur;
@@ -16,9 +16,6 @@ use RecursiveIteratorIterator;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use ZipArchive;
 
 class PdfManager

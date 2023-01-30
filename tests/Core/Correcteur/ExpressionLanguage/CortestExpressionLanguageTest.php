@@ -3,7 +3,9 @@
 namespace App\Tests\Core\Correcteur\ExpressionLanguage;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestExpressionEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
+use App\Entity\Echelle;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
@@ -20,79 +22,74 @@ class CortestExpressionLanguageTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-
         $container = static::getContainer();
 
         $this->cortest_expression_language = $container->get(CortestExpressionLanguage::class);
     }
 
-    public function testArrayAccess()
-    {
-        $reponses = [0, 1, 2];
-        $environment = new CortestExpressionEnvironment(echelles: ["x" => "0"],
-            reponses: $reponses,
-            cortest_expression_language: $this->cortest_expression_language);
-
-        self::assertEquals($reponses, $environment["reponses"]);
-        self::assertEquals($reponses, ((array)$environment)["reponses"]);
-    }
-
     public function compilerProvider(): array
     {
         return [
-            ["vrai1(1)", null],
-            ["vrai2(2)", null],
-            ["vrai3(3)", SyntaxError::class],
-            ["vrai4(4)", SyntaxError::class],
-            ["vrai5(5)", SyntaxError::class],
-            ["vrai1()", TypeError::class],
-            ["vrai1(3,4)", null],
+            [["x" => "vrai1(1)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "vrai2(2)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "vrai3(3)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
+            [["x" => "vrai4(4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
+            [["x" => "vrai5(5)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
+            [["x" => "vrai1()"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], TypeError::class],
+            [["x" => "vrai1(3,4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "1", "y" => "echelle(\"x\")"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE, "y" => Echelle::TYPE_ECHELLE_COMPOSITE], null],
         ];
     }
 
     public function evaluerProvider(): array
     {
         return [
-            [["x" => "vrai1(1)"], [1, 2, 3, 4, 1, 5, 6], ["x" => 1]],
-            [["x" => "0", "y" => "echelle(\"x\")"], [], ["x" => 0, "y" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vrai1(1)"], [1, 2, 3, 4, 1, 5, 6], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE, "y" => Echelle::TYPE_ECHELLE_COMPOSITE], ["x" => "1", "y" => "echelle(\"x\")"], [1, 2, 3, 4, 1, 5, 6], ["x" => 1, "y" => 1]],
         ];
     }
 
     /**
      * @dataProvider compilerProvider
-     * @param string $expression
+     * @param array $expressions
+     * @param array $types
      * @param string|null $exception
-     * @return void
      */
-    public function testCompiler(string $expression, ?string $exception): void
+    public function testCompiler(array $expressions, array $types, ?string $exception): void
     {
-        self::markTestSkipped("TODO");
-
         if ($exception != null) {
             $this->expectException($exception);
         }
 
-        //$this->cortest_expression_language->
-
-        self::assertStringContainsString(CortestExpressionEnvironment::REPONSES,
-            $this->cortest_expression_language->compileCortest("$expression"));
+        foreach ($expressions as $echelle => $expression) {
+            self::assertNotEmpty(
+                $this->cortest_expression_language->compileCortest(
+                    expression: $expression,
+                    type: $types[$echelle],
+                    environment: new CortestCompilationEnvironment(types: $types)
+                )
+            );
+        }
     }
 
     /**
      * @dataProvider evaluerProvider
-     * @param array $echelles
+     * @param array $types
+     * @param array $expressions
      * @param array $reponses
      * @param array $expected
      * @return void
      */
-    public function testEvaluer(array $echelles, array $reponses, array $expected): void
+    public function testEvaluer(array $types, array $expressions, array $reponses, array $expected): void
     {
-        $environment = new CortestExpressionEnvironment(
-            echelles: $echelles, reponses: $reponses, cortest_expression_language: $this->cortest_expression_language
-        );
+        $environment = new CortestEvaluationEnvironment(reponses: $reponses,
+            types: $types,
+            expressions: $expressions,
+            cortest_expression_language: $this->cortest_expression_language);
 
+        $result = $environment->compute_scores();
         foreach ($expected as $echelle => $score) {
-            self::assertEquals($score, $environment->get_score($echelle));
+            self::assertEquals(expected: $score, actual: $result[$echelle]);
         }
     }
 }

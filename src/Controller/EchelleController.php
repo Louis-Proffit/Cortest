@@ -26,12 +26,12 @@ class EchelleController extends AbstractCrudController
         return new Echelle(
             id: 0,
             nom: "",
-            nom_php: ""
+            nom_php: "", type: Echelle::TYPE_ECHELLE_SIMPLE
         );
     }
 
     protected function renderIndex(array $items): Response
     {
-        return $this->render("crud/index_echelle.html.twig");
+        return $this->render("crud/index_echelle.html.twig", ["items" => $items]);
     }
 }

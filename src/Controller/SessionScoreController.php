@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Core\Correcteur\CorrecteurManager;
+use App\Core\Files\CsvManager;
 use App\Entity\Session;
 use App\Form\CorrecteurChoiceType;
 use App\Form\Data\CorrecteurChoice;
@@ -50,11 +51,11 @@ class SessionScoreController extends AbstractController
 
     #[Route("/index/{session_id}/{correcteur_id}", name: "index")]
     public function consulter(
-        SessionRepository $session_repository,
+        SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
-        CorrecteurManager $correcteur_manager,
-        int $session_id,
-        int $correcteur_id
+        CorrecteurManager    $correcteur_manager,
+        int                  $session_id,
+        int                  $correcteur_id
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -70,5 +71,23 @@ class SessionScoreController extends AbstractController
                 "correcteur" => $correcteur]);
     }
 
+    #[Route("/csv/{session_id}/{correcteur_id}", name: "csv")]
+    public function csv(
+        SessionRepository    $session_repository,
+        CorrecteurRepository $correcteur_repository,
+        CorrecteurManager    $correcteur_manager,
+        CsvManager           $csv_manager,
+        int                  $session_id,
+        int                  $correcteur_id
+    ): Response
+    {
+        $session = $session_repository->find($session_id);
+        $correcteur = $correcteur_repository->find($correcteur_id);
 
+        $reponses = $session->reponses_candidats->toArray();
+
+        $scores = $correcteur_manager->corriger($correcteur, $reponses);
+
+        return $csv_manager->exportScores($session, $correcteur->profil, $scores);
+    }
 }

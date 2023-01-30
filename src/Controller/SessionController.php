@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Files\CsvManager;
 use App\Core\Grille\GrilleRepository;
 use App\Core\Grille\Values\GrilleOctobre2019;
 use App\Entity\Session;
@@ -14,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -117,10 +119,24 @@ class SessionController extends AbstractController
         );
     }
 
+    #[Route("/csv/{id}", name: "csv")]
+    public function csv(
+        CsvManager        $csv_manager,
+        SessionRepository $session_repository,
+        int               $id
+    ): BinaryFileResponse
+    {
+        $session = $session_repository->find($id);
+
+        $file_name = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
+
+        return $csv_manager->exportReponses($session->reponses_candidats->toArray(), $file_name);
+    }
+
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry $doctrine,
+    public function supprimer(ManagerRegistry   $doctrine,
                               SessionRepository $session_repository,
-                              int $id): Response
+                              int               $id): Response
     {
 
         $session = $session_repository->find($id);

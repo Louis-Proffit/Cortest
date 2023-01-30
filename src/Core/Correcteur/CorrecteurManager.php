@@ -3,14 +3,13 @@
 namespace App\Core\Correcteur;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestExpressionEnvironment;
+use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\ReponseCandidat;
 
 class CorrecteurManager
 {
-
 
     public function __construct(
         private readonly CortestExpressionLanguage $cortest_expression_language
@@ -27,21 +26,28 @@ class CorrecteurManager
     {
         $corrige = [];
 
-        foreach ($reponses_candidat as $reponse_candidat) {
-            $result = [];
+        $echelles = $correcteur->echelles->toArray();
 
-            $cortest_expression_environment = new CortestExpressionEnvironment(echelles: $correcteur->echelles->toArray(),
+        $types = array_combine(
+            array_map(fn(EchelleCorrecteur $e) => $e->echelle->nom_php, $echelles),
+            array_map(fn(EchelleCorrecteur $e) => $e->echelle->type, $echelles)
+        );
+
+        $expressions = array_combine(
+            array_map(fn(EchelleCorrecteur $e) => $e->echelle->nom_php, $echelles),
+            array_map(fn(EchelleCorrecteur $e) => $e->expression, $echelles)
+        );
+
+        foreach ($reponses_candidat as $reponse_candidat) {
+
+            $cortest_expression_environment = new CortestEvaluationEnvironment(
                 reponses: $reponse_candidat->reponses,
+                types: $types,
+                expressions: $expressions,
                 cortest_expression_language: $this->cortest_expression_language);
 
 
-            /** @var EchelleCorrecteur $echelle */
-            foreach ($correcteur->echelles as $echelle) {
-                $nom_echelle = $echelle->echelle->nom_php;
-                $result[$nom_echelle] = $cortest_expression_environment->get_score($nom_echelle);
-            }
-
-            $corrige[$reponse_candidat->id] = $result;
+            $corrige[$reponse_candidat->id] = $cortest_expression_environment->compute_scores();
         }
 
         return $corrige;

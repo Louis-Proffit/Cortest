@@ -6,7 +6,9 @@ use App\Constraint\ClassName;
 use App\Repository\CorrecteurRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
@@ -29,7 +31,7 @@ class Correcteur
     public string $nom;
 
     #[Valid]
-    #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class)]
+    #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
     /**
@@ -46,6 +48,17 @@ class Correcteur
         $this->profil = $profil;
         $this->nom = $nom;
         $this->echelles = $echelles;
+    }
+
+    public function get_echelles_mapped_noms(): array
+    {
+        $echelles_noms = array();
+        if (!$this->echelles->isEmpty()) {
+            foreach ($this->echelles->getValues() as $echelle) {
+                $echelles_noms[$echelle->echelle->nom_php] = $echelle->expression;
+            }
+        }
+        return $echelles_noms;
     }
 
 
