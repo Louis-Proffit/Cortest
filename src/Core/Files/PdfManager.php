@@ -26,7 +26,7 @@ class PdfManager
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
-        private readonly string             $tmp_dir = "tmp"
+        private string                      $tmp_dir = "tmp"
     )
     {
     }
@@ -111,8 +111,9 @@ class PdfManager
         return $fileName . $extension;
     }
 
-    private function prepareOutputDir(): string|false
+    private function prepareOutputDir(string $rootPath=""): string|false
     {
+        $this->tmp_dir = $rootPath . $this->tmp_dir;
         $this->createTempDirIfNotExists();
 
         $outputDirectoryPath = $this->getOutputDirPath();
@@ -218,9 +219,10 @@ class PdfManager
         Etalonnage $etalonnage,
         array      $scores,
         array      $profils,
-        Graphique  $graphique): BinaryFileResponse|false
+        Graphique  $graphique,
+        string     $rootPath): BinaryFileResponse|false
     {
-        if ($outputDirectoryPath = $this->prepareOutputDir()) {
+        if ($outputDirectoryPath = $this->prepareOutputDir($rootPath . "\\")) {
 
             $zipFilePath = $this->getTempZipFilePath($outputDirectoryPath);
 
