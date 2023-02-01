@@ -66,6 +66,10 @@ class PdfManager
 
         }
 
+        $etalonnageParameters = [];
+
+        $etalonnageParameters['nombreClasses'] = $etalonnage->nombre_classes;
+
         return $renderer->render(
             environment: $this->twig,
             reponse: $reponse,
@@ -73,6 +77,7 @@ class PdfManager
             etalonnage: $etalonnage,
             options: $graphique->options,
             echelleOptions: $echelleOptions,
+            etalonnageParameters: $etalonnageParameters,
             score: $score,
             profil: $profil
         );

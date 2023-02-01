@@ -18,6 +18,7 @@ interface Renderer
         Etalonnage      $etalonnage,
         array           $options,
         array           $echelleOptions,
+        array           $etalonnageParameters,
         array           $score,
         array           $profil
     ): string;
