@@ -92,7 +92,6 @@ class PdfController extends AbstractController
             scores: $scores,
             profils: $profils,
             graphique: $graphique,
-            rootPath: $this->getParameter('kernel.project_dir'),
         );
     }
 

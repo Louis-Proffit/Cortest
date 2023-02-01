@@ -13,6 +13,7 @@ use FilesystemIterator;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
@@ -22,13 +23,16 @@ class PdfManager
 {
 
     public function __construct(
+        ContainerBagInterface               $params,
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
-        private string                      $tmp_dir = "tmp"
+        private string                      $tmp_dir = "public\\tmp"
     )
     {
+        $this->tmp_dir = $params->get('kernel.project_dir') . "\\" . $this->tmp_dir;
+
     }
 
     private function fileName(ReponseCandidat $candidat_reponse): string
@@ -111,9 +115,8 @@ class PdfManager
         return $fileName . $extension;
     }
 
-    private function prepareOutputDir(string $rootPath=""): string|false
+    private function prepareOutputDir(): string|false
     {
-        $this->tmp_dir = $rootPath . $this->tmp_dir;
         $this->createTempDirIfNotExists();
 
         $outputDirectoryPath = $this->getOutputDirPath();
@@ -219,10 +222,9 @@ class PdfManager
         Etalonnage $etalonnage,
         array      $scores,
         array      $profils,
-        Graphique  $graphique,
-        string     $rootPath): BinaryFileResponse|false
+        Graphique  $graphique): BinaryFileResponse|false
     {
-        if ($outputDirectoryPath = $this->prepareOutputDir($rootPath . "\\")) {
+        if ($outputDirectoryPath = $this->prepareOutputDir()) {
 
             $zipFilePath = $this->getTempZipFilePath($outputDirectoryPath);
 
