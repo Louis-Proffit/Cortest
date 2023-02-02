@@ -22,9 +22,6 @@
         <div class="mb-3">
             <h5>{{ echelleGraphique.vars.value.echelle.nom }}</h5>
             <div class="row row-cols-auto">
-                <div class="col">
-                    {{ form_row(echelleGraphique.type) }}
-                </div>
                 {% for option in echelleGraphique.options %}
                     <div class="col">
                         {{ form_row(option) }}

@@ -13,17 +13,11 @@ class EchelleGraphique
 {
     const OPTION_NOM_AFFICHAGE = "Nom affiché";
     const OPTION_NOM_AFFICHAGE_PHP = "nom_affichage";
-    const TYPE_ECHELLE_SIMPLE = 1;
-    const TYPE_ECHELLE_OPTIONS = array(self::TYPE_ECHELLE_SIMPLE);
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public int $id;
-
-    #[NotBlank]
-    #[ORM\Column]
-    public int $type;
 
     #[IsGraphiqueEchelleOptions]
     #[ORM\Column]
