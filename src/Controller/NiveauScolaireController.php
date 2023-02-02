@@ -24,7 +24,7 @@ class NiveauScolaireController extends AbstractCrudController
     protected function produce(): NiveauScolaire
     {
         return new NiveauScolaire(
-            id: 0, nom: ""
+            id: 0, indice: 0, nom: ""
         );
     }
 
