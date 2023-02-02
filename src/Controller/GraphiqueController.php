@@ -82,7 +82,6 @@ class GraphiqueController extends AbstractController
             foreach ($profil->echelles as $echelle) {
                 $echelleGraphique = new EchelleGraphique();
                 $echelleGraphique->echelle = $echelle;
-                $echelleGraphique->type = EchelleGraphique::TYPE_ECHELLE_SIMPLE;
                 $echelleGraphique->options = $renderer->initializeEchelleOption($echelleGraphique);
 
                 $echelles[] = $echelleGraphique;

@@ -4,6 +4,28 @@
 \usepackage{tabularx}
 \usepackage{textcomp}
 \usepackage{caption}
+\usepackage{pgfplots}
+\usepackage{longtable}
+
+\newcommand{\printChartResult}[3]{
+    \begin{tikzpicture}
+        \begin{axis}[%
+            xmin=0,
+            xmax=#3,
+            ymin=-0.5,
+            ymax=0.5,
+            width=13cm,
+            height=2cm,
+            ticks=none,
+        ]
+            \addplot+[xbar, fill=gray, draw=gray, mark=none, bar width=20] coordinates { (#2,0) };
+            \addplot+[xbar, draw=blue, fill=blue, mark=none, bar width=5] coordinates { (#1,0) };
+
+        \end{axis}
+    \end{tikzpicture}
+}
+
+{% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
 
 \begin{document}
 
@@ -30,5 +52,26 @@
     \end{center}
 
     \vspace{1em}
+
+    \noindent
+    \begin{longtable}{ | m{1.8in} m{0.2in} m{4.7in} | }
+        \hline
+
+        & & \\
+        \underline{NOTES COMPOSITES} & &
+        \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
+            \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        \end{tabularx}
+        \\
+
+        {% for key, value in echelleOptions %}
+        {{ value.nom_affichage|raw }} & \fbox{ {{ attribute(score, key) }} } & \printChartResult{ {{ attribute(profil, key) }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% endfor %}
+
+        \hline
+
+    \end{longtable}
+
+
 
 \end{document}

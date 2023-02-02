@@ -20,4 +20,21 @@ class EchelleRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Echelle::class);
     }
+
+    /**
+     * @param array $ids
+     * @return Echelle[] that do not contain any of the ids in parameter
+     */
+    public function findByIdDifferent(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb = $this->createQueryBuilder('e')
+            ->where('e.id NOT IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.nom_php', 'ASC');
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+    }
 }

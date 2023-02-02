@@ -8,6 +8,7 @@ use App\Entity\Correcteur;
 use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\ReponseCandidat;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Twig\Environment;
 
@@ -25,6 +26,8 @@ class RendererBatonnets implements Renderer
     /** @var RendererOption[] */
     private array $echelleOptions;
 
+    private array $etalonnageParameters;
+
     public function __construct()
     {
         $this->options = [
@@ -41,6 +44,12 @@ class RendererBatonnets implements Renderer
             new RendererOption(nom: EchelleGraphique::OPTION_NOM_AFFICHAGE,
                 nom_php: EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP, default: "", form_type: TextType::class)
         ];
+        $this->etalonnageParameters = [
+            new RendererOption(nom: "nombreClasses",
+                nom_php: "nombre_classes",
+                default: 10,
+                form_type: IntegerType::class)
+        ];
     }
 
     public function render(
@@ -50,6 +59,7 @@ class RendererBatonnets implements Renderer
         Etalonnage      $etalonnage,
         array           $options,
         array           $echelleOptions,
+        array           $etalonnageParameters,
         array           $score,
         array           $profil): string
     {
@@ -59,6 +69,7 @@ class RendererBatonnets implements Renderer
             "session" => $reponse->session,
             "options" => $options,
             "echelleOptions" => $echelleOptions,
+            "etalonnageParameters" => $etalonnageParameters,
             "score" => $score,
             "profil" => $profil
         ]);

@@ -6,6 +6,7 @@ use App\Core\Renderer\Renderer;
 use App\Entity\EchelleGraphique;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,12 +18,7 @@ class EchelleGraphiqueType extends AbstractType
         /** @var Renderer $renderer */
         $renderer = $options[GraphiqueType::OPTION_RENDERER];
 
-        $builder->add("type", ChoiceType::class, [
-                "choices" => array_combine(
-                    EchelleGraphique::TYPE_ECHELLE_OPTIONS,
-                    EchelleGraphique::TYPE_ECHELLE_OPTIONS
-                )]
-        )->add("options", EchelleGraphiqueOptionsType::class, [GraphiqueType::OPTION_RENDERER => $renderer]);
+        $builder->add("options", EchelleGraphiqueOptionsType::class, [GraphiqueType::OPTION_RENDERER => $renderer]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
