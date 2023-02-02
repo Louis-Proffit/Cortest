@@ -18,7 +18,7 @@
     <br>
     {% for echelleCorrecteur in form.echelles %}
         <div class="mb-3">
-            <div class="form-label">{{ echelleCorrecteur.vars.value.echelle.nom }}</div>
+            <div class="form-label">{{ echelleCorrecteur.vars.value.echelle.nom }} ( {{ echelleCorrecteur.vars.value.echelle.type }} ) </div>
             {{ form_widget(echelleCorrecteur.expression) }}
         </div>
     {% endfor %}
