@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Correcteur;
-use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Correcteur[]    findAll()
  * @method Correcteur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CorrecteurRepository extends LazyServiceEntityRepository
+class CorrecteurRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

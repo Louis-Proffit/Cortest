@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SgapRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 #[ORM\Entity]
@@ -16,16 +17,25 @@ class NiveauScolaire
     public int $id;
 
     #[NotBlank]
+    #[Positive]
+    #[ORM\Column(unique: true)]
+    public int $indice;
+
+    #[NotBlank]
     #[ORM\Column(unique: true)]
     public string $nom;
 
     /**
      * @param int $id
+     * @param int $indice
      * @param string $nom
      */
-    public function __construct(int $id, string $nom)
+    public function __construct(int $id, int $indice, string $nom)
     {
         $this->id = $id;
+        $this->indice = $indice;
         $this->nom = $nom;
     }
+
+
 }

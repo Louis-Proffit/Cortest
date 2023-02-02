@@ -13,6 +13,7 @@ use FilesystemIterator;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
@@ -22,13 +23,16 @@ class PdfManager
 {
 
     public function __construct(
+        ContainerBagInterface               $params,
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
-        private readonly string             $tmp_dir = "tmp"
+        private string                      $tmp_dir = "public\\tmp"
     )
     {
+        $this->tmp_dir = $params->get('kernel.project_dir') . "\\" . $this->tmp_dir;
+
     }
 
     private function fileName(ReponseCandidat $candidat_reponse): string
@@ -62,6 +66,10 @@ class PdfManager
 
         }
 
+        $etalonnageParameters = [];
+
+        $etalonnageParameters['nombreClasses'] = $etalonnage->nombre_classes;
+
         return $renderer->render(
             environment: $this->twig,
             reponse: $reponse,
@@ -69,6 +77,7 @@ class PdfManager
             etalonnage: $etalonnage,
             options: $graphique->options,
             echelleOptions: $echelleOptions,
+            etalonnageParameters: $etalonnageParameters,
             score: $score,
             profil: $profil
         );

@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\CortestUser;
-use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

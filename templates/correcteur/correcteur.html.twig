@@ -8,7 +8,11 @@
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}">Modifier</a>
+               href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}">Modifier Expressions</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("correcteur_ajoutEchelle", {"id":correcteur.id}) }}">Ajouter Echelles</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary"
@@ -31,6 +35,7 @@
     <table class="table">
         <thead>
         <tr>
+            <th scope="col">Type</th>
             <th scope="col">Nom</th>
             <th scope="col">Expression</th>
         </tr>
@@ -38,6 +43,7 @@
         <tbody>
         {% for echelleController in correcteur.echelles %}
             <tr>
+                <td>{{ echelleController.echelle.type }}</td>
                 <td>{{ echelleController.echelle.nom }}</td>
                 <td>{{ echelleController.expression }}</td>
             </tr>

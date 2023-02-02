@@ -75,9 +75,14 @@ class InitFixture extends Fixture
     private function niveau_scolaire(): array
     {
         return [
-            new NiveauScolaire(id: 0, nom: "Baccalauréat"),
-            new NiveauScolaire(id: 0, nom: "Brevet des collèges"),
-            new NiveauScolaire(id: 0, nom: "Sans diplôme"),
+            new NiveauScolaire(id: 0, indice: 1, nom: "CEP ou niveau CEP"),
+            new NiveauScolaire(id: 0, indice: 2, nom: "CAP - BEP - BEPC"),
+            new NiveauScolaire(id: 0, indice: 3, nom: "Niveau BAC (1e Terminale)"),
+            new NiveauScolaire(id: 0, indice: 4, nom: "BAC"),
+            new NiveauScolaire(id: 0, indice: 5, nom: "BAC + 1"),
+            new NiveauScolaire(id: 0, indice: 6, nom: "BAC + 2 (DEUG)"),
+            new NiveauScolaire(id: 0, indice: 7, nom: "Licence ou Maîtrise"),
+            new NiveauScolaire(id: 0, indice: 8, nom: "Ingénieur ou 3e cycle"),
         ];
     }
 

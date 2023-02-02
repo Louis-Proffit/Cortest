@@ -16,6 +16,7 @@
         <thead>
         <tr>
             <th>Nom</th>
+            <th>Indice</th>
             <th>Modifier</th>
         </tr>
         </thead>
@@ -23,6 +24,7 @@
         {% for niveau in items %}
             <tr>
                 <td>{{ niveau.nom }}</td>
+                <td>{{ niveau.indice }}</td>
                 <td>
                     <a class="btn btn-link fw-bold btn-rounded"
                        href="{{ path("niveau_scolaire_modifier", {"id":niveau.id}) }}">Modifier</a>

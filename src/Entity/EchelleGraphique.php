@@ -6,6 +6,7 @@ use App\Constraint\IsGraphiqueEchelleOptions;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
 class EchelleGraphique

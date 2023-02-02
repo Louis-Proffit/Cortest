@@ -50,15 +50,15 @@ class Correcteur
         $this->echelles = $echelles;
     }
 
-    public function get_echelles_mapped_noms(): array
+    public function get_echelles_ids(): array
     {
-        $echelles_noms = array();
+        $echelles_ids = array();
         if (!$this->echelles->isEmpty()) {
             foreach ($this->echelles->getValues() as $echelle) {
-                $echelles_noms[$echelle->echelle->nom_php] = $echelle->expression;
+                $echelles_ids[] = $echelle->id;
             }
         }
-        return $echelles_noms;
+        return $echelles_ids;
     }
 
 
