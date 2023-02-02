@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\ReponseCandidat;
-use Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ReponseCandidat[]    findAll()
  * @method ReponseCandidat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ReponseCandidatRepository extends LazyServiceEntityRepository
+class ReponseCandidatRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

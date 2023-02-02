@@ -16,6 +16,8 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            logout:
+                path: logout
             form_login:
                 login_path: login
                 check_path: login

@@ -81,7 +81,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center">
-                    {% block actions %}{% endblock %}
+                    {% block actions %}
+                    <a class="btn" href="{{ path("logout") }}">Se deconnecter</a>
+                    {% endblock %}
                 </div>
             </div>
         </nav>
