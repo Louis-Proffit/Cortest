@@ -20,8 +20,8 @@ class Echelle
     const TYPE_ECHELLE_HIERARCHY = [
         self::TYPE_ECHELLE_SIMPLE => 0,
         self::TYPE_ECHELLE_COMPOSITE => 1,
-        self::TYPE_SUBTEST => 1,
-        self::TYPE_EPREUVE => 2
+        self::TYPE_SUBTEST => 2,
+        self::TYPE_EPREUVE => 3
     ];
 
     const TYPE_ECHELLE_OPTIONS = [

@@ -32,7 +32,6 @@ class PdfManager
     )
     {
         $this->tmp_dir = $params->get('kernel.project_dir') . "\\" . $this->tmp_dir;
-
     }
 
     private function fileName(ReponseCandidat $candidat_reponse): string
