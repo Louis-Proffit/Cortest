@@ -4,7 +4,8 @@ namespace App\Controller;
 
 
 use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Files\CsvManager;
+use App\Core\Files\Csv\CsvManager;
+use App\Core\Files\Csv\CsvScoreManager;
 use App\Entity\Session;
 use App\Form\CorrecteurChoiceType;
 use App\Form\Data\CorrecteurChoice;
@@ -76,7 +77,7 @@ class SessionScoreController extends AbstractController
         SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
         CorrecteurManager    $correcteur_manager,
-        CsvManager           $csv_manager,
+        CsvScoreManager           $csv_score_manager,
         int                  $session_id,
         int                  $correcteur_id
     ): Response
@@ -88,6 +89,6 @@ class SessionScoreController extends AbstractController
 
         $scores = $correcteur_manager->corriger($correcteur, $reponses);
 
-        return $csv_manager->exportScores($session, $correcteur->profil, $scores);
+        return $csv_score_manager->export($session, $correcteur->profil, $scores);
     }
 }

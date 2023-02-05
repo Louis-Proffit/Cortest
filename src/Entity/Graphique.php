@@ -3,10 +3,11 @@
 namespace App\Entity;
 
 use App\Constraint\IsGraphiqueOptions;
-use App\Constraint\RendererIndex;
+use App\Core\Renderer\RendererRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
@@ -31,7 +32,7 @@ class Graphique
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    #[RendererIndex]
+    #[Choice(choices: RendererRepository::INDEX)]
     #[ORM\Column]
     public int $renderer_index;
 
