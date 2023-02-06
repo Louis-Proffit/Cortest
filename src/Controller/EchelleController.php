@@ -32,32 +32,6 @@ class EchelleController extends AbstractCrudController
         );
     }
 
-    #[Route("/creation/{id}", name: "creation")]
-    public function creation(Request $request,
-                             EntityManagerInterface $entityManager,
-                             int $id,
-    ): Response
-    {
-        $echelle = $this->produce();
-
-        $form = $this->createForm(EchelleType::class, $echelle);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() and $form->isValid()) {
-
-            $echelle = $form->getData();
-            $entityManager->persist($echelle);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('correcteur_ajoutEchelle', ['id' => $id]);
-        }
-
-        return $this->render('echelle/creer.html.twig', [
-            'form' => $form,
-        ]);
-
-    }
-
     protected function renderIndex(array $items): Response
     {
         return $this->render("crud/index_echelle.html.twig", ["items" => $items]);
