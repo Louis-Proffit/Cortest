@@ -54,5 +54,14 @@ class Graphique
         $this->renderer_index = $renderer_index;
     }
 
+    public function getTypeEchelle() : array
+    {
+        $typeEchelle = array();
+        foreach ($this->echelles as $echelle){
+            $typeEchelle[$echelle->echelle->nom_php] = $echelle->echelle->type;
+        }
+        return $typeEchelle;
+    }
+
 
 }
