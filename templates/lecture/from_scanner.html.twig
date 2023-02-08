@@ -12,14 +12,6 @@
 
     <script>
 
-        var debile = function () {};
-        var forms = [
-            formInput('test', 'Joli texte', 'blabla', 'text', debile, debile, debile),
-            formInput('ka', 'Joli date', '', 'date', debile, debile, debile),
-            formInput('chiffre', 'Joli chiffre', '12', 'number', debile, debile, debile),
-            formSelect('sel', 'Joli select', GrilleManager.contentFID.niveau_scolaire.choice, debile, debile, debile),
-            formConfirm('conf', 'Joli confirm', '36', '67', debile, debile)
-        ];
 
         const request = {
             code_barre: {asked: true, expected: false, print: true},
@@ -41,24 +33,6 @@
 
         const questions = 5;
 
-        var fid = {
-            code_barre: "12345678",
-            nom: "COLLA RD",
-            prenom: "JULIEN",
-            nom_jeune_fille: "",
-            niveau_scolaire: "2",
-            date_naissance: "10122001",
-            sexe: "1",
-            concours: "E",
-            SGAP: "1j",
-            date_examen: "25012023",
-            type_concours: "11",
-            batterie: "587",
-            reserve: "",
-            option_1: "",
-            option_2: "",
-        };
-
         var gm = new GrilleManager(request, questions);
 
         var agOptions = gm.getGridConfig();
@@ -67,15 +41,6 @@
             const gridDiv = document.querySelector('#myGrid');
             ag = new agGrid.Grid(gridDiv, agOptions);
         });
-
-        async function test() {
-            //gm.readFID("18500431COLLAR?        JULIEN                 81012011E1320012354321               ");
-            //var brut = "18500110AABABABABBABBAAAABAABABBBABABAABBAABBBAABABBBAAABBAB@@@@@@@@@PHPPADPPADBABPAHABAHPHDAHDHBAHDHBBPDHBPBBBPBHPPBPDDABDDBBAHBPDDDPPAHDDHPBBDPPPBHAHBABADAAHBHB@ADDDHBHBAHHDPHHPPBAADPHPDPHPPABHBDBABBAAABBBABABBAABBAABBBAABBBBAABBBBBBAABBBBBABABABABBAABBBAABBBBABBABBBAABABBAABBBABBAABABBBAABBBABAABAABBABBBAAABBABABABABBBABBBA@BAABBABBBBAABAAABBBAABBBBBBABBABBBAAABAAABBBABBABAABBBBAABBBBBBBBABAAAPPPPPHBBPPPPPHAPPPDBPAHHHPPBDDPPDPAPPPABPPBPPHHDDBPPHPPBDPHPPHBDPPPBPA@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
-            //gm.readQCM(brut);
-            //gm.readFIDs();
-            //gm.readQCM("12345678ABC@H");
-            askManualLink(4, [{code_barre : 12453, nom: "COLLARD"}, {code_barre : 12983, nom: "TEST"}], [{code_barre : "dfgdgf"}, {code_barre :"qQDCE"}], function (rep) {console.log(rep);}, function () {});
-        }
 
         $(document).ready(function () {
             $("#spinner-fid").hide();
