@@ -2,14 +2,18 @@
 
 namespace App\Entity;
 
+use App\Constraint\UniqueDTO;
 use App\Repository\EtalonnageRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
 
 #[ORM\Entity(repositoryClass: EtalonnageRepository::class)]
+#[UniqueEntity('nom')]
 class Etalonnage
 {
     #[ORM\Id]
@@ -21,7 +25,7 @@ class Etalonnage
     public Profil $profil;
 
     #[NotBlank]
-    #[ORM\Column(unique: true)]
+    #[ORM\Column(name:'nom', unique: true)]
     public string $nom;
 
     #[Positive]
