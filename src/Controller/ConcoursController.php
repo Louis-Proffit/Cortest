@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Concours;
 use App\Entity\Echelle;
+use App\Form\ConcoursType;
 use App\Form\EchelleType;
 use App\Repository\ConcoursRepository;
 use App\Repository\EchelleRepository;

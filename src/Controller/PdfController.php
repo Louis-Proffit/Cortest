@@ -129,7 +129,7 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("pdf_download", [
                 "candidat_reponse_id" => $candidat_reponse_id,
                 "etalonnage_id" => $etalonnage_id,
-                "graphique_id" => $graphique_choice->graphique,
+                "graphique_id" => $graphique_choice->graphique->id,
                 "correcteur_id" => $correcteur_id]);
 
         }

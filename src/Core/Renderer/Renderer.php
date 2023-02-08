@@ -20,7 +20,8 @@ interface Renderer
         array           $echelleOptions,
         array           $etalonnageParameters,
         array           $score,
-        array           $profil
+        array           $profil,
+        array           $typeEchelle
     ): string;
 
     /**

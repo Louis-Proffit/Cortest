@@ -12,6 +12,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ClassNameValidator extends ConstraintValidator
 {
+    const VIOLATION_MESSAGE = "Ce devrait être un nom de classe";
 
     /**
      * @param string $value
@@ -24,8 +25,12 @@ class ClassNameValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, ClassName::class);
         }
 
-        if(!class_exists($value)) {
-            $this->context->addViolation("Ce devrait être un nom de classe");
+        if (!is_string($value)) {
+            throw new UnexpectedTypeException($value, "string");
+        }
+
+        if (!class_exists($value)) {
+            $this->context->addViolation(self::VIOLATION_MESSAGE);
         }
     }
 }

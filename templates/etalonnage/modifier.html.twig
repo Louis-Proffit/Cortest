@@ -9,7 +9,7 @@
     {{ form_row(form.nom) }}
     {% for echelleEtalonnage in form.echelles %}
         <div class="mb-3">
-            <div class="form-label">{{ echelleEtalonnage.echelle.nom }}</div>
+            <div class="form-label">{{ echelleEtalonnage.vars.value.echelle.nom }}</div>
             <div class="input-group">
                 {% for bound in echelleEtalonnage.bounds %}
                     <div class="input-group-text">Classe {{ loop.index }}</div>

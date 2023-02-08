@@ -38,7 +38,7 @@ class SessionRepository extends ServiceEntityRepository
         if (empty($numeros)) {
             return 0;
         } else {
-            return max($numeros);
+            return max($numeros[0]);
         }
     }
 

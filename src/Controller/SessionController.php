@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Core\Files\CsvManager;
+use App\Core\Files\Csv\CsvManager;
+use App\Core\Files\Csv\CsvReponseManager;
 use App\Core\Grille\GrilleRepository;
 use App\Core\Grille\Values\GrilleOctobre2019;
 use App\Entity\Session;
@@ -121,7 +122,7 @@ class SessionController extends AbstractController
 
     #[Route("/csv/{id}", name: "csv")]
     public function csv(
-        CsvManager        $csv_manager,
+        CsvReponseManager $csv_reponse_manager,
         SessionRepository $session_repository,
         int               $id
     ): BinaryFileResponse
@@ -130,13 +131,13 @@ class SessionController extends AbstractController
 
         $file_name = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
 
-        return $csv_manager->exportReponses($session->reponses_candidats->toArray(), $file_name);
+        return $csv_reponse_manager->export($session->reponses_candidats->toArray(), $file_name);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry   $doctrine,
+    public function supprimer(ManagerRegistry $doctrine,
                               SessionRepository $session_repository,
-                              int               $id): Response
+                              int $id): Response
     {
 
         $session = $session_repository->find($id);

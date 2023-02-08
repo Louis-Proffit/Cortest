@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
-use App\Core\Files\CsvManager;
+use App\Core\Files\Csv\CsvManager;
+use App\Core\Files\Csv\CsvReponseManager;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ReponsesCandidatChecked;
 use App\Form\Data\ReponsesCandidatCheckedListe;
 use App\Form\ReponsesCandidatCheckedListeType;
-use App\Form\ReponsesCandidatCheckedType;
 use App\Repository\ReponseCandidatRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -25,7 +24,7 @@ class RechercheController extends AbstractController
     public function index(
         SessionInterface          $session,
         Request                   $request,
-        CsvManager                $csv_manager,
+        CsvReponseManager $csv_reponse_manager,
         ReponseCandidatRepository $reponse_candidat_repository
     )
     {
@@ -79,7 +78,7 @@ class RechercheController extends AbstractController
 
             if ($exporter_reponses_csv->isClicked()) {
 
-                return $csv_manager->exportReponses($selected, "export_recherche_reponses.csv");
+                return $csv_reponse_manager->export($selected, "export_recherche_reponses.csv");
 
             }
 

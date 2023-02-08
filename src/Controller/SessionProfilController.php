@@ -4,7 +4,8 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\CsvManager;
+use App\Core\Files\Csv\CsvManager;
+use App\Core\Files\Csv\CsvProfilManager;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
@@ -157,7 +158,7 @@ class SessionProfilController extends AbstractController
         SessionRepository    $session_repository,
         EtalonnageRepository $etalonnage_repository,
         CorrecteurRepository $correcteur_repository,
-        CsvManager           $csv_manager,
+        CsvProfilManager     $csv_profil_manager,
         int                  $session_id,
         int                  $correcteur_id,
         int                  $etalonnage_id
@@ -189,7 +190,7 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        return $csv_manager->exportProfils(
+        return $csv_profil_manager->export(
             session: $session,
             profil: $correcteur->profil,
             profils: $profils

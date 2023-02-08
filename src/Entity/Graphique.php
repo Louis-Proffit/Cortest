@@ -3,13 +3,21 @@
 namespace App\Entity;
 
 use App\Constraint\IsGraphiqueOptions;
-use App\Constraint\RendererIndex;
+use App\Core\Renderer\RendererRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Validation;
+use App\Constraint\UniqueDTO;
+use function PHPUnit\Framework\throwException;
 
-#[Entity]
+
+#[ORM\Entity]
+#[UniqueEntity('nom')]
 class Graphique
 {
     #[ORM\Id]
@@ -31,7 +39,7 @@ class Graphique
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    #[RendererIndex]
+    #[Choice(choices: RendererRepository::INDEX)]
     #[ORM\Column]
     public int $renderer_index;
 
@@ -51,6 +59,15 @@ class Graphique
         $this->echelles = $echelles;
         $this->nom = $nom;
         $this->renderer_index = $renderer_index;
+    }
+
+    public function getTypeEchelle() : array
+    {
+        $typeEchelle = array();
+        foreach ($this->echelles as $echelle){
+            $typeEchelle[$echelle->echelle->nom_php] = $echelle->echelle->type;
+        }
+        return $typeEchelle;
     }
 
 

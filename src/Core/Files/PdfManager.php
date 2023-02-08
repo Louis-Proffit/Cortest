@@ -22,17 +22,19 @@ use ZipArchive;
 class PdfManager
 {
 
+    private string $tmp_dir;
+
     public function __construct(
-        ContainerBagInterface               $params,
+        // ContainerBagInterface               $params,
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
-        private string                      $tmp_dir = "public\\tmp"
+        string                              $tmp_dir = "tmp"
     )
     {
-        $this->tmp_dir = $params->get('kernel.project_dir') . "\\" . $this->tmp_dir;
-
+        $this->tmp_dir = getcwd() . "\\" . $tmp_dir;
+        $this->logger->debug("Tmp dir : " . $this->tmp_dir);
     }
 
     private function fileName(ReponseCandidat $candidat_reponse): string
@@ -70,6 +72,8 @@ class PdfManager
 
         $etalonnageParameters['nombreClasses'] = $etalonnage->nombre_classes;
 
+        $typeEchelle = $graphique->getTypeEchelle();
+
         return $renderer->render(
             environment: $this->twig,
             reponse: $reponse,
@@ -79,7 +83,8 @@ class PdfManager
             echelleOptions: $echelleOptions,
             etalonnageParameters: $etalonnageParameters,
             score: $score,
-            profil: $profil
+            profil: $profil,
+            typeEchelle: $typeEchelle
         );
     }
 
@@ -133,13 +138,15 @@ class PdfManager
             return $outputDirectoryPath;
 
         } else {
+
             return false;
+
         }
     }
 
     private function buildCommand(string $outputDirectory, string $texFileName): string
     {
-        return $this->latexCompilerExecutable . " --output-directory=" . $outputDirectory . " " . $texFileName;
+        return $this->latexCompilerExecutable . " --output-directory=\"" . $outputDirectory . "\" \"" . $texFileName . "\"";
     }
 
 
@@ -168,6 +175,8 @@ class PdfManager
         $file = fopen($texFilePath, 'w');
         fwrite($file, $content);
         fclose($file);
+
+        $this->logger->debug("Wrote to file " . $texFilePath);
 
         $command = $this->buildCommand($outputDirectoryPath, $texFilePath);
         $this->logger->debug("Executing command : " . $command);

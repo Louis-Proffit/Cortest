@@ -10,7 +10,6 @@ use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
 use App\Form\Data\CorrecteurCreer;
 use App\Repository\CorrecteurRepository;
-use App\Repository\EchelleRepository;
 use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function PHPUnit\Framework\isNull;
 
 #[Route("/correcteur", name: "correcteur_")]
 class CorrecteurController extends AbstractController
@@ -139,33 +137,6 @@ class CorrecteurController extends AbstractController
 
         return $this->render("correcteur/modifier.html.twig",
             ["form" => $form->createView(), "fonctions" => $fonctions]);
-    }
-
-    #[Route("/ajoutEchelle/{id}/{idEchelle}", name: "ajoutEchelle")]
-    public function ajoutEchelle(
-        ManagerRegistry           $doctrine,
-        CorrecteurRepository      $correcteur_repository,
-        EchelleRepository         $echelleRepository,
-        Request                   $request,
-        int                       $id,
-        int                       $idEchelle=Null,
-    ): Response
-    {
-
-        $correcteur = $correcteur_repository->find($id);
-        if (!is_null($idEchelle)){
-            $echelle = $echelleRepository->find($idEchelle);
-            $echelleCorrecteur = new EchelleCorrecteur(
-                id: 0, expression: "0", echelle: $echelle, correcteur: $correcteur
-            );
-            $correcteur->echelles[] = $echelleCorrecteur;
-            $doctrine->getManager()->flush();
-        }
-
-        $echelles = $echelleRepository->findByIdDifferent($correcteur->get_echelles_ids());
-
-        return $this->render("correcteur/ajoutEchelle.html.twig",
-            ["echellesDisponibles" => $echelles, "id" => $correcteur->id]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

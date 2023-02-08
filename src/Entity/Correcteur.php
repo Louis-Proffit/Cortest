@@ -6,12 +6,14 @@ use App\Constraint\ClassName;
 use App\Repository\CorrecteurRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
+#[UniqueEntity('nom')]
 class Correcteur
 {
     #[ORM\Id]
@@ -48,6 +50,22 @@ class Correcteur
         $this->profil = $profil;
         $this->nom = $nom;
         $this->echelles = $echelles;
+    }
+
+    /**
+     * Associe le nom des echelles php à leur type
+     * @return string[]
+     */
+    public function get_echelle_types(): array
+    {
+        $result = [];
+
+        /** @var EchelleCorrecteur $echelle */
+        foreach ($this->echelles as $echelle) {
+            $result[$echelle->echelle->nom_php] = $echelle->echelle->type;
+        }
+
+        return $result;
     }
 
     public function get_echelles_ids(): array

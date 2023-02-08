@@ -55,7 +55,6 @@ abstract class AbstractCrudController extends AbstractController
         }
 
         return $this->renderCreer($form);
-
     }
 
     #[Route("/modifier/{id}", name: "modifier")]

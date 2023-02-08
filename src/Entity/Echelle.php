@@ -5,10 +5,13 @@ namespace App\Entity;
 use App\Constraint\PhpIdentifier;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
+#[UniqueEntity('nom')]
+#[UniqueEntity('nom_php')]
 class Echelle
 {
 
@@ -20,8 +23,8 @@ class Echelle
     const TYPE_ECHELLE_HIERARCHY = [
         self::TYPE_ECHELLE_SIMPLE => 0,
         self::TYPE_ECHELLE_COMPOSITE => 1,
-        self::TYPE_SUBTEST => 1,
-        self::TYPE_EPREUVE => 2
+        self::TYPE_SUBTEST => 2,
+        self::TYPE_EPREUVE => 3
     ];
 
     const TYPE_ECHELLE_OPTIONS = [
