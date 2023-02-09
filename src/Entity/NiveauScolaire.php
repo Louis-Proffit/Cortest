@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use App\Repository\SgapRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 #[ORM\Entity]
+#[UniqueEntity('nom')]
+#[UniqueEntity('indice')]
 class NiveauScolaire
 {
     #[ORM\Id]

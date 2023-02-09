@@ -5,10 +5,13 @@ namespace App\Entity;
 use App\Constraint\PhpIdentifier;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
+#[UniqueEntity('nom')]
+#[UniqueEntity('nom_php')]
 class Echelle
 {
 

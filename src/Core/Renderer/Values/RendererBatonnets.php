@@ -61,7 +61,8 @@ class RendererBatonnets implements Renderer
         array           $echelleOptions,
         array           $etalonnageParameters,
         array           $score,
-        array           $profil): string
+        array           $profil,
+        array           $typeEchelle): string
     {
 
         return $environment->render("renderer/batonnet_cahier_des_charges.tex.twig", [
@@ -71,7 +72,8 @@ class RendererBatonnets implements Renderer
             "echelleOptions" => $echelleOptions,
             "etalonnageParameters" => $etalonnageParameters,
             "score" => $score,
-            "profil" => $profil
+            "profil" => $profil,
+            "typeEchelle" => $typeEchelle,
         ]);
     }
 

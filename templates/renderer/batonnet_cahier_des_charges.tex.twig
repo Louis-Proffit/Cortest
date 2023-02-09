@@ -65,7 +65,32 @@
         \\
 
         {% for key, value in echelleOptions %}
+        {% if attribute(typeEchelle, key) == "Echelle composite" %}
         {{ value.nom_affichage|raw }} & \fbox{ {{ attribute(score, key) }} } & \printChartResult{ {{ attribute(profil, key) }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% endif %}
+        {% endfor %}
+
+        \hline
+
+    \end{longtable}
+
+    \vspace{1em}
+
+    \noindent
+    \begin{longtable}{ | m{1.8in} m{0.2in} m{4.7in} | }
+        \hline
+
+        & & \\
+        \underline{NOTES SIMPLES} & &
+        \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
+            \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        \end{tabularx}
+        \\
+
+        {% for key, value in echelleOptions %}
+        {% if attribute(typeEchelle, key) == "Echelle simple" %}
+        {{ value.nom_affichage|raw }} & \fbox{ {{ attribute(score, key) }} } & \printChartResult{ {{ attribute(profil, key) }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% endif %}
         {% endfor %}
 
         \hline

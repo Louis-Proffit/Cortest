@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use App\Constraint\UniqueDTO;
+use App\Repository\EtalonnageRepository;
 use App\Repository\ProfilRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,6 +17,7 @@ class EtalonnageCreerType extends AbstractType
 
     public function __construct(
         private readonly ProfilRepository $profil_repository,
+        private readonly EtalonnageRepository $etalonnageRepository
     )
     {
     }
@@ -38,7 +41,7 @@ class EtalonnageCreerType extends AbstractType
             ->add("profil", ChoiceType::class, [
                 "choices" => $this->profilChoices()
             ])
-            ->add("nom", TextType::class)
+            ->add("nom", TextType::class, ['constraints' => new UniqueDTO(field:'nom', message: 'Ce nom existe deja', repository: $this->etalonnageRepository)])
             ->add("nombre_classes", IntegerType::class, ["label" => "Nombre de classes"])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
