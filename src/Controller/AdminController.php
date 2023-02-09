@@ -6,52 +6,102 @@ use App\Entity\CortestUser;
 use App\Form\CortestUserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/admin", name: "admin_")]
-class AdminController extends AbstractCrudController
+class AdminController extends AbstractController
 {
 
-    public function __construct(
-        UserRepository $repository,
-    )
+    #[Route("/index", name: "index")]
+    public function index(
+        UserRepository $user_repository,
+    ): Response
     {
-        parent::__construct(repository: $repository, formClass: CortestUserType::class, indexRoute: "admin_index");
-    }
+        $items = $user_repository->findAll();
 
-    protected function produce(): CortestUser
-    {
-        return new CortestUser(
-            id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR
-        );
-    }
-
-    protected function renderIndex(array $items): Response
-    {
         return $this->render("crud/index_user.html.twig", ["users" => $items]);
     }
 
-    /**
-     * @param EntityManagerInterface $entity_manager
-     * @param FormInterface $form
-     * @param CortestUser $item
-     * @return bool
-     */
-    protected function postValidate(EntityManagerInterface $entity_manager, FormInterface $form, $item): bool
+    #[Route("/creer", name: "creer")]
+    public function creer(
+        EntityManagerInterface      $entity_manager,
+        UserPasswordHasherInterface $user_password_hasher,
+        Request                     $request
+    ): RedirectResponse|Response
     {
-        if ($item->role !== CortestUser::ROLE_ADMINISTRATEUR) {
-            /** @var CortestUser[] $administrateurs */
-            $administrateurs = $this->repository->findBy(["role" => CortestUser::ROLE_ADMINISTRATEUR]);
+        $user = new CortestUser(
+            id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR
+        );
 
-            if (count($administrateurs) <= 1) {
+        $form = $this->createForm(CortestUserType::class, $user);
 
-                $form->get("role")->addError(new FormError("Impossible de supprimer le dernier administrateur"));
-                return false;
+        $form->handleRequest($request);
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $user->password = $user_password_hasher->hashPassword(
+                $user,
+                $user->password
+            );
+
+            $entity_manager->persist($user);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("admin_index");
+
+        }
+
+        return $this->render("crud/form.html.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/modifier/{id}", name: "modifier")]
+    public function modifier(
+        UserRepository         $user_repository,
+        EntityManagerInterface $entity_manager,
+        Request                $request,
+        int                    $id
+    ): Response
+    {
+        $item = $user_repository->find($id);
+
+        $form = $this->createForm(CortestUserType::class, $item);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            if ($item->role !== CortestUser::ROLE_ADMINISTRATEUR) {
+
+                $administrateurs = $user_repository->findBy(["role" => CortestUser::ROLE_ADMINISTRATEUR]);
+
+                if (count($administrateurs) > 1) {
+
+                    $entity_manager->flush();
+
+                    return $this->redirectToRoute("admin_index");
+                }
             }
         }
-        return true;
+
+        return $this->render("crud/form.html.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/supprimer/{id}", name: "supprimer")]
+    public function supprimer(
+        UserRepository         $user_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id): RedirectResponse
+    {
+        $item = $user_repository->find($id);
+        // TODO don't remove last
+
+        $entity_manager->remove($item);
+        $entity_manager->flush();
+
+        return $this->redirectToRoute("admin_index");
     }
 }
