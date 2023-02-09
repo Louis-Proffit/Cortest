@@ -11,17 +11,22 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class CortestUserType extends AbstractType
+class CreerCortestUserType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("username", TextType::class, ["label" => "Nom d'utilisateur"])
-            ->add("role", ChoiceType::class, [
-                "choices" => array_combine(CortestUser::ROLES, CortestUser::ROLES),
-                "label" => "Droits"
-            ])
-            ->add("submit", SubmitType::class, ["label" => "Valider"]);
+        $builder
+            ->add("password", RepeatedType::class, [
+                "type" => PasswordType::class,
+                'first_options' => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Confirmer le mot de passe'],
+            ]);
+    }
+
+    public function getParent(): string
+    {
+        return CortestUserType::class;
     }
 
 }

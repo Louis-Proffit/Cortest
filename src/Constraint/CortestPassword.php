@@ -14,11 +14,17 @@ use Symfony\Component\Validator\Constraints\Type;
 class CortestPassword extends Compound
 {
 
+    #[HasNamedArguments]
+    public function __construct(private readonly int $min, mixed $options = null)
+    {
+        parent::__construct($options);
+    }
+
     protected function getConstraints(array $options): array
     {
         return [
             new NotBlank(),
-            new Length(min: 12),
+            new Length(min: $this->min, minMessage: "Le mot de passe doit faire plus de " . $this->min . " caractères"),
             new Type("string")
         ];
     }

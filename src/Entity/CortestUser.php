@@ -32,7 +32,7 @@ class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, unique: true)]
     public string $username;
 
-    #[CortestPassword]
+    #[CortestPassword(min:5)]
     #[ORM\Column]
     public string $password;
 

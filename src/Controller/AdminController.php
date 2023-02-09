@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\CortestUser;
 use App\Form\CortestUserType;
+use App\Form\CreerCortestUserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +25,7 @@ class AdminController extends AbstractController
     {
         $items = $user_repository->findAll();
 
-        return $this->render("crud/index_user.html.twig", ["users" => $items]);
+        return $this->render("admin/index.html.twig", ["users" => $items]);
     }
 
     #[Route("/creer", name: "creer")]
@@ -38,7 +39,7 @@ class AdminController extends AbstractController
             id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR
         );
 
-        $form = $this->createForm(CortestUserType::class, $user);
+        $form = $this->createForm(CreerCortestUserType::class, $user);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
@@ -50,12 +51,13 @@ class AdminController extends AbstractController
 
             $entity_manager->persist($user);
             $entity_manager->flush();
+            $this->addFlash("notice", "Création enregistrée");
 
             return $this->redirectToRoute("admin_index");
 
         }
 
-        return $this->render("crud/form.html.twig", ["form" => $form->createView()]);
+        return $this->render("admin/creer.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
@@ -78,7 +80,7 @@ class AdminController extends AbstractController
 
                 $administrateurs = $user_repository->findBy(["role" => CortestUser::ROLE_ADMINISTRATEUR]);
 
-                if (count($administrateurs) > 1) {
+                if (count($administrateurs) >= 1) {
 
                     $entity_manager->flush();
 
@@ -87,7 +89,7 @@ class AdminController extends AbstractController
             }
         }
 
-        return $this->render("crud/form.html.twig", ["form" => $form->createView()]);
+        return $this->render("admin/modifier.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
@@ -101,6 +103,8 @@ class AdminController extends AbstractController
 
         $entity_manager->remove($item);
         $entity_manager->flush();
+
+        $this->addFlash("notice", "Suppression enregistrée");
 
         return $this->redirectToRoute("admin_index");
     }

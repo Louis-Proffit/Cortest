@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Créer un utilisateur</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.username) }}
+    {{ form_row(form.role) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.submit) }}
+    {{ form_end(form) }}
+
+{% endblock %}
+

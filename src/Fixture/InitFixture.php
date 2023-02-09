@@ -11,9 +11,18 @@ use App\Entity\Sgap;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class InitFixture extends Fixture
 {
+
+    public function __construct(
+        private readonly UserPasswordHasherInterface $password_hasher
+    )
+    {
+    }
 
     public function load(ObjectManager $manager)
     {
@@ -42,34 +51,42 @@ class InitFixture extends Fixture
                 graphiques: new ArrayCollection())
         );
 
-        $manager->persist(
-            new CortestUser(
-                id: 0,
-                username: "admin",
-                password: "admin",
-                role: CortestUser::ROLE_ADMINISTRATEUR
-            ),
-        );
-
-        $manager->persist(
-            new CortestUser(
-                id: 0,
-                username: "psycologue",
-                password: "psycologue",
-                role: CortestUser::ROLE_PSYCOLOGUE
-            ),
-        );
-
-        $manager->persist(
-            new CortestUser(
-                id: 0,
-                username: "correcteur",
-                password: "correcteur",
-                role: CortestUser::ROLE_CORRECTEUR
-            ),
-        );
+        foreach ($this->users() as $user) {
+            $manager->persist($user);
+        }
 
         $manager->flush();
+    }
+
+    private function users(): array
+    {
+
+        $admin = new CortestUser(
+            id: 0,
+            username: "admin",
+            password: "admin",
+            role: CortestUser::ROLE_ADMINISTRATEUR
+        );
+
+        $psycologue = new CortestUser(
+            id: 0,
+            username: "psycologue",
+            password: "psycologue",
+            role: CortestUser::ROLE_PSYCOLOGUE
+        );
+
+        $correcteur = new CortestUser(
+            id: 0,
+            username: "correcteur",
+            password: "correcteur",
+            role: CortestUser::ROLE_CORRECTEUR
+        );
+
+        $admin->password = $this->password_hasher->hashPassword($admin, $admin->password);
+        $psycologue->password = $this->password_hasher->hashPassword($psycologue, $psycologue->password);
+        $correcteur->password = $this->password_hasher->hashPassword($correcteur, $correcteur->password);
+
+        return [$admin, $psycologue, $correcteur];
     }
 
     private function niveau_scolaire(): array
