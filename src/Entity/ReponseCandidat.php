@@ -86,7 +86,7 @@ class ReponseCandidat
      * @param string $autre_1
      * @param string $autre_2
      * @param int $code_barre
-     * @param ?array $raw
+     * @param array|null $raw
      */
     public function __construct(int $id, Session $session, array $reponses, string $nom, string $prenom, string $nom_jeune_fille, NiveauScolaire $niveau_scolaire, DateTime $date_de_naissance, int $sexe, string $reserve, string $autre_1, string $autre_2, int $code_barre, ?array $raw)
     {

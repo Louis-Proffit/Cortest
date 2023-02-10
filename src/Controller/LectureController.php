@@ -18,40 +18,52 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/lecture", name: "lecture_")]
-
-class LectureController extends AbstractController {
-#[Route("/index", name: "index")]
-
-    public function lectureHome(): Response {
+class LectureController extends AbstractController
+{
+    #[Route("/index", name: "index")]
+    public function lectureHome(): Response
+    {
         return $this->render("lecture/index.html.twig");
     }
 
-#[Route("/form", name: "form")]
-
+    #[Route("/form", name: "form")]
     public function form(
-            SessionRepository $session_repository,
-            NiveauScolaireRepository $niveau_scolaire_repository,
-            Request $request,
-            EntityManagerInterface $entity_manager
-    ): Response {
+        SessionRepository        $session_repository,
+        NiveauScolaireRepository $niveau_scolaire_repository,
+        Request                  $request,
+        EntityManagerInterface   $entity_manager
+    ): Response
+    {
+
+        $session = $session_repository->findOneBy([]);
+
+        if ($session == null) {
+            $this->addFlash("warning", "Pas de séance, en créer une");
+            return $this->redirectToRoute("session_creer");
+        }
+
+        $niveau_scolaire = $niveau_scolaire_repository->findOneBy([]);
+        if ($niveau_scolaire == null) {
+            $this->addFlash("warning", "Pas de niveau scolaire, en créer un");
+            return $this->redirectToRoute("niveau_scolaire_creer");
+        }
 
         $reponse = new ReponseCandidat(
-                0,
-                $session_repository->findOneBy([]),
-                array(),
-                "",
-                "",
-                "",
-                $niveau_scolaire_repository->findOneBy([]),
-                new DateTime("now"),
-                1,
-                "",
-                "",
-                "",
-                0,
-                null
+            0,
+            $session,
+            array(),
+            "",
+            "",
+            "",
+            $niveau_scolaire,
+            new DateTime("now"),
+            1,
+            "",
+            "",
+            "",
+            0,
+            null
         );
-
 
 
         $form = $this->createForm(ReponseCandidatType::class, $reponse);
@@ -69,12 +81,12 @@ class LectureController extends AbstractController {
         return $this->render("lecture/from_form.html.twig", ["form" => $form]);
     }
 
-#[Route("/fichier", name: 'fichier')]
-
-    public function fichier(ManagerRegistry $doctrine,
-            NiveauScolaireRepository $niveau_scolaire_repository,
-            Request $request,
-            LoggerInterface $logger): Response {
+    #[Route("/fichier", name: 'fichier')]
+    public function fichier(ManagerRegistry          $doctrine,
+                            NiveauScolaireRepository $niveau_scolaire_repository,
+                            Request                  $request,
+                            LoggerInterface          $logger): Response
+    {
         $manager = $doctrine->getManager();
 
         $uploadSessionBase = new ParametresLectureJSON();
@@ -98,20 +110,20 @@ class LectureController extends AbstractController {
                 dump($reponse_array);
 
                 $reponse_candidat = new ReponseCandidat(
-                        0,
-                        $uploadSessionBase->session,
-                        $reponse_array,
-                        $reponses_candidat_json["nom"],
-                        $reponses_candidat_json["prenom"],
-                        $reponses_candidat_json["nom_jeune_fille"],
-                        $niveau_scolaire_repository->findOneBy([]),
-                        new DateTime("now"),
-                        $reponses_candidat_json["sexe"],
-                        $reponses_candidat_json["reserve"],
-                        $reponses_candidat_json["autre_1"],
-                        $reponses_candidat_json["autre_2"],
-                        $reponses_candidat_json["code_barre"],
-                        $reponses_candidat_json
+                    0,
+                    $uploadSessionBase->session,
+                    $reponse_array,
+                    $reponses_candidat_json["nom"],
+                    $reponses_candidat_json["prenom"],
+                    $reponses_candidat_json["nom_jeune_fille"],
+                    $niveau_scolaire_repository->findOneBy([]),
+                    new DateTime("now"),
+                    $reponses_candidat_json["sexe"],
+                    $reponses_candidat_json["reserve"],
+                    $reponses_candidat_json["autre_1"],
+                    $reponses_candidat_json["autre_2"],
+                    $reponses_candidat_json["code_barre"],
+                    $reponses_candidat_json
                 );
                 $manager->persist($reponse_candidat);
             }
@@ -122,13 +134,13 @@ class LectureController extends AbstractController {
         }
 
         return $this->render('lecture/from_file.html.twig', [
-                    'form' => $form->createView(),
+            'form' => $form->createView(),
         ]);
     }
 
-#[Route("/scanner", name: "scanner")]
-
-    public function scanner(): Response {
+    #[Route("/scanner", name: "scanner")]
+    public function scanner(): Response
+    {
         //si pas de session spécifiée, la demander !
         //si la session est renseignée : ($session disponible)
         //ancienne vue

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CortestUser;
 use App\Form\CortestUserType;
 use App\Form\CreerCortestUserType;
+use App\Form\MotDePasseCortestUserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,6 +59,36 @@ class AdminController extends AbstractController
         }
 
         return $this->render("admin/creer.html.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/modifier-mdp/{id}", name: "modifier_mdp")]
+    public function modifierMotDePasse(
+        UserRepository              $user_repository,
+        EntityManagerInterface      $entity_manager,
+        UserPasswordHasherInterface $user_password_hasher,
+        Request                     $request,
+        int                         $id
+    ): Response
+    {
+        $item = $user_repository->find($id);
+
+        $form = $this->createForm(MotDePasseCortestUserType::class, $item);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $item->password = $user_password_hasher->hashPassword(
+                $item,
+                $item->password
+            );
+
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("admin_index");
+        }
+
+        return $this->render("admin/modifier_mdp.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]

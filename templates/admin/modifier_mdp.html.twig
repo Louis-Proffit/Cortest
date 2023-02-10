@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Modifier le mot de passe</h1>
+    <br>
+    <p>Pour l'utilisateur {{ form.vars.value.username }}</p>
+    <br>
+    {{ form(form) }}
+
+{% endblock %}
+
