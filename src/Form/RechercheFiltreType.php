@@ -12,16 +12,16 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class RechercheReponsesCandidatType extends AbstractType
+class RechercheFiltreType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                "reponses_candidat",
-                CollectionType::class,
-                ["entry_type" => ReponsesCandidatCheckedType::class]
-            )->add("submit", SubmitType::class, ["label" => "Enregistrer"]);
+            ->add("filtre_prenom", TextType::class, ["empty_data" => "", "required" => false])
+            ->add("filtre_nom", TextType::class, ["empty_data" => "", "required" => false])
+            ->add("filtre_date_de_naissance_min", DateType::class)
+            ->add("filtre_date_de_naissance_max", DateType::class)
+            ->add("submit", SubmitType::class, ["label" => "Filtrer"]);
     }
 }

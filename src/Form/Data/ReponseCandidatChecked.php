@@ -9,7 +9,6 @@ class ReponseCandidatChecked
 
     public ReponseCandidat $reponse_candidat;
     public bool $checked;
-
     /**
      * @param ReponseCandidat $reponse_candidat
      * @param bool $checked

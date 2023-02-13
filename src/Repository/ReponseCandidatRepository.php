@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ReponseCandidat;
+use App\Form\Data\RechercheFiltre;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,28 +24,21 @@ class ReponseCandidatRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param string $nom_filter
-     * @param string $prenom_filter
-     * @param DateTime $date_naissance_min
-     * @param DateTime $date_de_naissance_max
+     * @param RechercheFiltre $recherche_filtre
      * @return ReponseCandidat[]
      */
-    public function filter(string   $nom_filter,
-                           string   $prenom_filter,
-                           DateTime $date_naissance_min,
-                           DateTime $date_de_naissance_max
+    public function filtrer(RechercheFiltre $recherche_filtre
     ): array
     {
         $query_builder = $this->createQueryBuilder("r");
         return $query_builder
-            ->where("r.nom LIKE (:nom)")
-            ->andWhere("r.prenom LIKE (:prenom)")
-            ->andWhere("r.date_de_naissance BEFORE (:date_de_naissance_max)")
-            ->andWhere("r.date_de_naissance AFTER (:date_de_naissance_min)")
-            ->setParameter("nom", $nom_filter)
-            ->setParameter("prenom", $prenom_filter)
-            ->setParameter("date_de_naissance_min", $date_naissance_min)
-            ->setParameter("date_de_naissance_max", $date_de_naissance_max)
+            ->where("r.nom LIKE :nom")
+            ->andWhere("r.prenom LIKE :prenom")
+            ->andWhere("r.date_de_naissance BETWEEN :date_de_naissance_min AND :date_de_naissance_max")
+            ->setParameter("nom", "%".$recherche_filtre->filtre_nom."%")
+            ->setParameter("prenom", "%".$recherche_filtre->filtre_prenom."%")
+            ->setParameter("date_de_naissance_min", $recherche_filtre->filtre_date_de_naissance_min)
+            ->setParameter("date_de_naissance_max", $recherche_filtre->filtre_date_de_naissance_max)
             ->getQuery()
             ->execute();
     }

@@ -45,17 +45,13 @@
     <br>
     <hr class="hr hr-blurry">
     <br>
-    {{ form_start(form) }}
     <h3>Filtres</h3>
     <br>
-    {{ form_row(form.filtre_nom) }}
-    {{ form_row(form.filtre_prenom) }}
-    {{ form_row(form.filtre_date_de_naissance_min) }}
-    {{ form_row(form.filtre_date_de_naissance_max) }}
-    {{ form_row(form.filter) }}
+    {{ form(form_filtre) }}
     <br>
     <h3>Candidats</h3>
     <br>
+    {{ form_start(form_reponses) }}
     <table class="table">
         <thead>
         <tr>
@@ -68,9 +64,9 @@
         </tr>
         </thead>
         <tbody>
-        {% for reponse_candidat in form.reponses_candidat %}
+        {% for reponse_candidat in form_reponses.reponses_candidat %}
             <tr>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
+                <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
                 <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
                 <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
                 <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
@@ -80,8 +76,8 @@
         {% endfor %}
         </tbody>
     </table>
-    {{ form_row(form.save) }}
-    {{ form_end(form) }}
+    {{ form_row(form_reponses.submit) }}
+    {{ form_end(form_reponses) }}
     <br>
 {% endblock %}
 
