@@ -22,6 +22,16 @@
         </div>
     {% endfor %}
 
+    <div class="row row-cols-auto">
+        <div class="col">
+            {{ form_row(form.submit) }}
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("etalonnage_consulter", {"id":form.vars.value.id}) }}">Annuler</a>
+        </div>
+    </div>
+
     {{ form_end(form) }}
 
 {% endblock %}

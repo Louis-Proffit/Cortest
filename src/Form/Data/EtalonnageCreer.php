@@ -3,6 +3,7 @@
 namespace App\Form\Data;
 
 use App\Entity\Profil;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
@@ -11,7 +12,7 @@ class EtalonnageCreer
 
     public Profil $profil;
 
-    #[Positive]
+    #[GreaterThanOrEqual(2, message: "Le nombre de classes doit être supérieur à deux")]
     public int $nombre_classes;
 
     #[NotBlank]

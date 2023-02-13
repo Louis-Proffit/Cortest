@@ -26,49 +26,21 @@ class SessionType extends AbstractType
     {
     }
 
-    private function concoursChoices(): array
-    {
-        $items = $this->concours_repository->findAll();
-
-        $result = [];
-
-        foreach ($items as $concours) {
-            $result[$concours->nom] = $concours;
-        }
-
-        return $result;
-    }
-
-    private function sgapChoices(): array
-    {
-        $items = $this->sgap_repository->findAll();
-
-        $result = [];
-
-        foreach ($items as $sgap) {
-            $result[$sgap->nom] = $sgap;
-        }
-
-        return $result;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("sgap", ChoiceType::class, [
-            "choices" => $this->sgapChoices()
-        ])
+        $builder
             ->add("date", DateType::class)
             ->add("grille_class", ChoiceType::class, [
                 "choices" => $this->grille_repository->nomToClassName()
             ])
             ->add("concours", ChoiceType::class, [
-                "choices" => $this->concoursChoices()
+                "choices" => $this->concours_repository->choices()
             ])
             ->add("type_concours", IntegerType::class)
             ->add("version_batterie", IntegerType::class)
             ->add("date", DateType::class)
             ->add("sgap", ChoiceType::class, [
-                "choices" => $this->sgapChoices()
+                "choices" => $this->sgap_repository->choices()
             ])
             ->add("observations", TextareaType::class)
             ->add("submit", SubmitType::class, ["label" => "Valider"]);

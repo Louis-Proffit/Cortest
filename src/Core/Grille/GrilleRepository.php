@@ -8,28 +8,15 @@ use App\Core\Grille\Values\GrilleOctobre2019;
 class GrilleRepository
 {
 
-    private array $classes;
+    const CLASSES =  [
+        GrilleOctobre2019::class,
+        GrilleBrigadierDePolice::class
+    ];
 
-    public function __construct()
-    {
-        $this->classes = [
-            GrilleOctobre2019::class,
-            GrilleBrigadierDePolice::class
-        ];
-    }
-
-    public function sampleClass(): string
-    {
-        return $this->classes[0];
-    }
 
     public function instanceOfAll(): array
     {
-        return array_map(fn($clazz) => new $clazz(), $this->classes);
-    }
-
-    public function classNames():array {
-        return $this->classes;
+        return array_map(fn($clazz) => new $clazz(), self::CLASSES);
     }
 
 
@@ -37,7 +24,7 @@ class GrilleRepository
     {
         $result = [];
 
-        foreach ($this->classes as $clazz) {
+        foreach (self::CLASSES as $clazz) {
             /** @var Grille $instance */
             $instance = new $clazz();
             $result[$clazz] = $instance->getNom();
@@ -49,7 +36,7 @@ class GrilleRepository
     {
         $result = [];
 
-        foreach ($this->classes as $clazz) {
+        foreach (self::CLASSES as $clazz) {
             /** @var Grille $instance */
             $instance = new $clazz();
             $result[$instance->getNom()] = $clazz;

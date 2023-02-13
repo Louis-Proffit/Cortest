@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @extends AbstractItemStorage<RechercheFiltre>
  *
  * @method RechercheFiltre get()
- * @method RechercheFiltre getOrDefault(RechercheFiltre $default)
+ * @method RechercheFiltre getOrSetDefault(RechercheFiltre $default)
  * @method set(RechercheFiltre $item)
  */
 class FiltreSessionStorage extends AbstractItemStorage

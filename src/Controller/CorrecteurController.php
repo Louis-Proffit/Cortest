@@ -55,12 +55,11 @@ class CorrecteurController extends AbstractController
     public function creer(
         EntityManagerInterface $entity_manager,
         ProfilRepository       $profil_repository,
-        GrilleRepository       $grille_repository,
         Request                $request
     ): Response
     {
         $profils = $profil_repository->findAll();
-        $grilles = $grille_repository->classNames();
+        $grilles = GrilleRepository::CLASSES;
 
         if (empty($profils)) {
             $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un");

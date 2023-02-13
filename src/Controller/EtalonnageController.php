@@ -43,7 +43,14 @@ class EtalonnageController extends AbstractController
     }
 
     #[Route("/creer", name: "creer")]
-    public function creer(
+    public function creer(): Response
+    {
+        return $this->render("etalonnage/index_creer.html.twig");
+    }
+
+
+    #[Route("/creer/simple", name: "creer_simple")]
+    public function creerSimple(
         EntityManagerInterface $entity_manager,
         ProfilRepository       $profil_repository,
         Request                $request
@@ -102,7 +109,14 @@ class EtalonnageController extends AbstractController
             return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
         }
 
-        return $this->render("etalonnage/modifier.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/creer_simple.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/creer/gaussien", name: "creer_gaussien")]
+    public function creerGaussien(): Response
+    {
+        $this->addFlash("warning", "En cours d'implémentation");
+        return $this->redirectToRoute("etalonnage_creer");
     }
 
     #[Route("/modifier/{id}", name: "modifier")]

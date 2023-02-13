@@ -36,7 +36,7 @@ class AbstractItemStorage
     /**
      * @return T
      */
-    public function getOrDefault($default): mixed
+    public function getOrSetDefault($default): mixed
     {
         if ($this->has()) {
             return $this->get();

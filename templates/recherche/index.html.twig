@@ -5,7 +5,7 @@
     <h1>Recherche de candidats</h1>
     <br>
     {% if selectionnes is empty %}
-        <p>Pas encore de réponses sélectionnées. Veuillez en choisir parmi celles ci-dessous en vous aidant des filtres
+        <p>Pas encore de candidaté sélectionnés. Veuillez en choisir parmi ceux ci-dessous en vous aidant des filtres
             de recherche.</p>
     {% else %}
         <div class="row row-cols-auto">
@@ -13,7 +13,10 @@
                 <a class="btn btn-primary" href="{{ path("recherche_download_reponses") }}">Exporter les réponses</a>
             </div>
             <div class="col">
-                <a class="btn btn-primary" href="{{ path("recherche_calculer_scores") }}">Calculer les scores</a>
+                <a class="btn btn-secondary" href="{{ path("recherche_calculer_scores") }}">Calculer les scores</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-secondary" href="{{ path("recherche_vider") }}">Vider</a>
             </div>
         </div>
         <br>
@@ -36,7 +39,8 @@
                     <td>{{ candidat.date_de_naissance|date("d/m/Y") }}</td>
                     <td>{{ candidat.session.date|date("d/m/Y") }}</td>
                     <td>{{ candidat.session.sgap.nom }}</td>
-                    <td><a class="btn btn-primary" href="{{ path("recherche_enlever_reponse", {"id":candidat.id}) }}">Retirer</a></td>
+                    <td><a class="btn btn-primary" href="{{ path("recherche_enlever_reponse", {"id":candidat.id}) }}">Retirer</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @extends AbstractItemStorage<ReponseCandidat[]>
  *
  * @method int[] get()
- * @method int[] getOrDefault(int[] $default)
+ * @method int[] getOrSetDefault(int[] $default)
  * @method set(int[] $item)
  */
 class ReponsesCandidatSessionStorage extends AbstractItemStorage

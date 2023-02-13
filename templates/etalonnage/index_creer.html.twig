@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Type d'initialisation d'étalonnage</h1>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="card col">
+            <div class="card-body">
+                <h5 class="card-title">Simple</h5>
+                <p class="card-text">
+                <ul>
+                    <li>Saisie du nombre de classes</li>
+                    <li>Saisie des bornes de chacune des classes pour chacune des échelles</li>
+                </ul>
+                </p>
+                <a type="button" class="btn btn-primary" href="{{ path("etalonnage_creer_simple") }}">Choisir</a>
+            </div>
+        </div>
+        <div class="card col ms-3">
+            <div class="card-body">
+                <h5 class="card-title">Gaussien</h5>
+                <p class="card-text">
+                <ul>
+                    <li>Saisie du nombre de classes</li>
+                    <li>Saisie de la valeur moyenne et de l'écart type pour chacune des échelles</li>
+                    <li>Possibilité de modifier les bornes manuellement, comme pour l'étalonnage simple</li>
+                </ul>
+                </p>
+                <a type="button" class="btn btn-primary" href="{{ path("etalonnage_creer_gaussien") }}">Choisir</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

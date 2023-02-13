@@ -3,7 +3,11 @@
 {% block content %}
 
     <br>
-    <h1>Saisir des notes</h1>
+    <h1>Lecture</h1>
+    <br>
+    <p class="lead">Lire des réponses de candidats. Plusieurs formats de lecture sont possibles. Pour lire une réponse
+        de candidat, il faut l'associer à la session correspondante, et éventuellement la créer si elle n'existe pas
+        encore.</p>
     <br>
     <div class="row row-cols-auto">
         <div class="card col">
@@ -15,16 +19,16 @@
         </div>
         <div class="card col ms-3">
             <div class="card-body">
-                <h5 class="card-title">.JSON</h5>
-                <p class="card-text">Lecture d'un fichier de notes au format .json</p>
-                <a type="button" class="btn btn-primary" href="{{ path("lecture_fichier") }}">Choisir</a>
+                <h5 class="card-title">Manuel</h5>
+                <p class="card-text">Saisir manuellement les réponses d'un candidat.</p>
+                <a type="button" class="btn btn-primary" href="{{ path("lecture_form") }}">Choisir</a>
             </div>
         </div>
         <div class="card col ms-3">
             <div class="card-body">
-                <h5 class="card-title">Manuel</h5>
-                <p class="card-text">Saisir manuellement les réponses d'un candidat.</p>
-                <a type="button" class="btn btn-primary" href="{{ path("lecture_form") }}">Choisir</a>
+                <h5 class="card-title">.JSON</h5>
+                <p class="card-text">Lecture d'un fichier de notes au format .json</p>
+                <a type="button" class="btn btn-primary" href="{{ path("lecture_fichier") }}">Choisir</a>
             </div>
         </div>
     </div>

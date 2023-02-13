@@ -42,6 +42,13 @@ class SessionRepository extends ServiceEntityRepository
         }
     }
 
+    public function nullable_choices(): array
+    {
+        $choices = $this->choices();
+        $choices["Vide"] = null;
+        return $choices;
+    }
+
     public function choices(): array
     {
 

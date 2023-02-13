@@ -20,4 +20,24 @@ class ConcoursRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Concours::class);
     }
+
+    public function nullable_choices(): array
+    {
+        $choices = $this->choices();
+        $choices["Vide"] = null;
+        return $choices;
+    }
+
+    public function choices(): array
+    {
+
+        $all_concours = $this->findAll();
+
+        $result = [];
+        foreach ($all_concours as $concours) {
+            $result[$concours->nom] = $concours;
+        }
+
+        return $result;
+    }
 }

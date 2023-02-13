@@ -17,7 +17,6 @@
         <tr>
             <th>Nom</th>
             <th>Propriétes</th>
-            <th>Modifier</th>
         </tr>
         </thead>
         <tbody>
@@ -29,9 +28,6 @@
                         {{ echelle.nom }} ({{ echelle.nom_php }})
                         {{ not loop.last ? ' - ' : '' }}
                     {% endfor %}
-                </td>
-                <td>
-                    <a class="btn btn-primary" href="{{ path("profil_modifier", {"id":profil.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% endfor %}

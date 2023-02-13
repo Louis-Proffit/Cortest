@@ -52,7 +52,7 @@ class AdminController extends AbstractController
 
             $entity_manager->persist($user);
             $entity_manager->flush();
-            $this->addFlash("notice", "Création enregistrée");
+            $this->addFlash("info", "Création enregistrée");
 
             return $this->redirectToRoute("admin_index");
 
@@ -135,7 +135,7 @@ class AdminController extends AbstractController
         $entity_manager->remove($item);
         $entity_manager->flush();
 
-        $this->addFlash("notice", "Suppression enregistrée");
+        $this->addFlash("info", "Suppression enregistrée");
 
         return $this->redirectToRoute("admin_index");
     }

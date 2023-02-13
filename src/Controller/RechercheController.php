@@ -36,6 +36,16 @@ class RechercheController extends AbstractController
         return $csv_reponse_manager->export($cached_reponses, "export_recherche_reponses.csv");
     }
 
+    #[Route("/vider", name: "vider")]
+    public function vider(
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage
+    ): Response
+    {
+        $reponses_candidat_session_storage->set(array());
+        $this->addFlash("success", "Les candidats ont été retirés, vous pouvez en sélectionner de nouveaux.");
+        return $this->redirectToRoute("recherche_index");
+    }
+
     #[Route("/calculer/scores", name: "calculer_scores")]
     public function calculerScores(): Response
     {
@@ -48,6 +58,7 @@ class RechercheController extends AbstractController
     {
         $cached_reposes = $reponses_candidat_session_storage->get();
         $reponses_candidat_session_storage->set(array_diff($cached_reposes, [$id]));
+        $this->addFlash("success", "Le candidat a été retiré.");
         return $this->redirectToRoute("recherche_index");
     }
 
@@ -59,12 +70,15 @@ class RechercheController extends AbstractController
         ReponseCandidatRepository      $reponse_candidat_repository
     ): BinaryFileResponse|RedirectResponse|Response
     {
-        $filtre = $filtre_session_storage->getOrDefault(new RechercheFiltre(filtre_prenom: "",
+        $filtre = $filtre_session_storage->getOrSetDefault(new RechercheFiltre(filtre_prenom: "",
             filtre_nom: "",
             filtre_date_de_naissance_min: new DateTime("@1344988800"),
-            filtre_date_de_naissance_max: new DateTime("now")));
+            filtre_date_de_naissance_max: new DateTime("now"),
+            niveau_scolaire: null,
+            session: null
+        ));
 
-        $cached_reponses_ids = $reponses_candidat_session_storage->getOrDefault(array());
+        $cached_reponses_ids = $reponses_candidat_session_storage->getOrSetDefault(array());
         $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
 
         $reponse_candidats_checked = array_map(

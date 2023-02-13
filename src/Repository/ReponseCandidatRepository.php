@@ -31,14 +31,26 @@ class ReponseCandidatRepository extends ServiceEntityRepository
     ): array
     {
         $query_builder = $this->createQueryBuilder("r");
-        return $query_builder
+        $query = $query_builder
             ->where("r.nom LIKE :nom")
             ->andWhere("r.prenom LIKE :prenom")
             ->andWhere("r.date_de_naissance BETWEEN :date_de_naissance_min AND :date_de_naissance_max")
-            ->setParameter("nom", "%".$recherche_filtre->filtre_nom."%")
-            ->setParameter("prenom", "%".$recherche_filtre->filtre_prenom."%")
+            ->setParameter("nom", "%" . $recherche_filtre->filtre_nom . "%")
+            ->setParameter("prenom", "%" . $recherche_filtre->filtre_prenom . "%")
             ->setParameter("date_de_naissance_min", $recherche_filtre->filtre_date_de_naissance_min)
-            ->setParameter("date_de_naissance_max", $recherche_filtre->filtre_date_de_naissance_max)
+            ->setParameter("date_de_naissance_max", $recherche_filtre->filtre_date_de_naissance_max);
+
+        if ($recherche_filtre->session != null) {
+            $query_builder->andWhere("r.session = :session")
+                ->setParameter("session", $recherche_filtre->session);
+        }
+
+        if ($recherche_filtre->niveau_scolaire != null) {
+            $query_builder->andWhere("r.niveau_scolaire = :niveau_scolaire")
+                ->setParameter("niveau_scolaire", $recherche_filtre->niveau_scolaire);
+        }
+
+        return $query
             ->getQuery()
             ->execute();
     }
