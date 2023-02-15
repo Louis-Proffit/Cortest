@@ -4,84 +4,108 @@
     <br>
     <h1>Recherche de candidats</h1>
     <br>
-    {% if selectionnes is empty %}
-        <p>Pas encore de candidaté sélectionnés. Veuillez en choisir parmi ceux ci-dessous en vous aidant des filtres
-            de recherche.</p>
-    {% else %}
-        <div class="row row-cols-auto">
-            <div class="col">
-                <a class="btn btn-primary" href="{{ path("recherche_download_reponses") }}">Exporter les réponses</a>
-            </div>
-            <div class="col">
-                <a class="btn btn-secondary" href="{{ path("recherche_calculer_scores") }}">Calculer les scores</a>
-            </div>
-            <div class="col">
-                <a class="btn btn-secondary" href="{{ path("recherche_vider") }}">Vider</a>
-            </div>
-        </div>
-        <br>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Date de naissance</th>
-                <th>Date de la session</th>
-                <th>SGAP</th>
-                <th>Retirer</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for candidat in selectionnes %}
-                <tr>
-                    <td>{{ candidat.nom }}</td>
-                    <td>{{ candidat.prenom }}</td>
-                    <td>{{ candidat.date_de_naissance|date("d/m/Y") }}</td>
-                    <td>{{ candidat.session.date|date("d/m/Y") }}</td>
-                    <td>{{ candidat.session.sgap.nom }}</td>
-                    <td><a class="btn btn-primary" href="{{ path("recherche_enlever_reponse", {"id":candidat.id}) }}">Retirer</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-    <br>
     <hr class="hr hr-blurry">
     <br>
-    <h3>Filtres</h3>
-    <br>
-    {{ form(form_filtre) }}
-    <br>
-    <h3>Candidats</h3>
-    <br>
-    {{ form_start(form_reponses) }}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Date de naissance</th>
-            <th>Date d'examen</th>
-            <th>SGAP</th>
-            <th>Sélectionné</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for reponse_candidat in form_reponses.reponses_candidat %}
-            <tr>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
-                <td>{{ reponse_candidat.vars.value.reponse_candidat.session.sgap.nom }}</td>
-                <td>{{ form_widget(reponse_candidat.checked) }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {{ form_row(form_reponses.submit) }}
-    {{ form_end(form_reponses) }}
-    <br>
+    <div class="row row-cols-auto">
+        <div class="col-6 border-end">
+            {% if selectionnes is empty %}
+                <div class="text-center">
+                    <i class="fas fa-ban fa-10x mb-6"></i>
+                </div>
+                <p>Pas encore de candidaté sélectionnés. Veuillez en choisir parmi ceux ci-dessous en vous aidant des
+                    filtres
+                    de recherche.</p>
+            {% else %}
+                <h3>Candidats sélectionnés</h3>
+                <br>
+                <div class="row row-cols-auto">
+                    <div class="col">
+                        <a class="btn btn-primary" href="{{ path("recherche_download_reponses") }}">Exporter les
+                            réponses</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-secondary" href="{{ path("recherche_calculer_scores") }}">Calculer les
+                            scores</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-secondary" href="{{ path("recherche_vider") }}">Vider</a>
+                    </div>
+                </div>
+                <br>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Date de naissance</th>
+                            <th>Date de la session</th>
+                            <th>SGAP</th>
+                            <th>Retirer</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for candidat in selectionnes %}
+                            <tr>
+                                <td>{{ candidat.nom }}</td>
+                                <td>{{ candidat.prenom }}</td>
+                                <td>{{ candidat.date_de_naissance|date("d/m/Y") }}</td>
+                                <td>{{ candidat.session.date|date("d/m/Y") }}</td>
+                                <td>{{ candidat.session.sgap.nom }}</td>
+                                <td><a class="btn btn-primary"
+                                       href="{{ path("recherche_enlever_reponse", {"id":candidat.id}) }}">Retirer</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-6">
+            <h3>Candidats</h3>
+            <br>
+            {{ form_start(form_reponses) }}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Date de naissance</th>
+                    <th>Date d'examen</th>
+                    <th>SGAP</th>
+                    <th>Sélectionné</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reponse_candidat in form_reponses.reponses_candidat %}
+                    <tr>
+                        <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
+                        <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
+                        <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
+                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
+                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.sgap.nom }}</td>
+                        <td>{{ form_widget(reponse_candidat.checked) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {{ form_row(form_reponses.submit) }}
+            {{ form_end(form_reponses) }}
+            <br>
+            <hr class="hr hr-blurry">
+            <br>
+            <h3>Filtres</h3>
+            <br>
+            {{ form_start(form_filtre) }}
+            <div class="mb-3 input-group">
+                <div class="input-group-text">Prénom</div>
+                {{ form_widget(form_filtre.filtre_prenom) }}
+                <div class="input-group-text">Nom</div>
+                {{ form_widget(form_filtre.filtre_nom) }}
+            </div>
+            {{ form_end(form_filtre) }}
+        </div>
+    </div>
 {% endblock %}
 

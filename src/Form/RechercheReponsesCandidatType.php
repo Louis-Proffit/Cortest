@@ -22,6 +22,6 @@ class RechercheReponsesCandidatType extends AbstractType
                 "reponses_candidat",
                 CollectionType::class,
                 ["entry_type" => ReponsesCandidatCheckedType::class]
-            )->add("submit", SubmitType::class, ["label" => "Enregistrer"]);
+            )->add("submit", SubmitType::class, ["label" => "Sélectionner"]);
     }
 }

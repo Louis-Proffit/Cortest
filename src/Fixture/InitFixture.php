@@ -183,21 +183,21 @@ class InitFixture extends Fixture
         $admin = new CortestUser(
             id: 0,
             username: "admin",
-            password: "admin",
+            password: "svUTr7FL87zm64",
             role: CortestUser::ROLE_ADMINISTRATEUR
         );
 
         $psycologue = new CortestUser(
             id: 0,
             username: "psycologue",
-            password: "psycologue",
+            password: "UvsTr8L7Fz76m4",
             role: CortestUser::ROLE_PSYCOLOGUE
         );
 
         $correcteur = new CortestUser(
             id: 0,
             username: "correcteur",
-            password: "correcteur",
+            password: "rvsUTF8L776zm4",
             role: CortestUser::ROLE_CORRECTEUR
         );
 

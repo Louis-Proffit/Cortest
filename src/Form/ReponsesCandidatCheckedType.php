@@ -18,7 +18,7 @@ class ReponsesCandidatCheckedType extends AbstractType
             CheckboxType::class,
             [
                 "required" => false,
-                "label" => ""
+                "label" => " "
             ]
         );
     }
