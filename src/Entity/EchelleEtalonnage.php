@@ -23,11 +23,25 @@ class EchelleEtalonnage
     #[ORM\Column]
     public array $bounds;
 
-    #[ORM\ManyToOne(targetEntity: Echelle::class)]
+    #[ORM\ManyToOne(targetEntity: Echelle::class, inversedBy: "echelles_etalonnage")]
     public Echelle $echelle;
 
     #[ORM\ManyToOne(targetEntity: Etalonnage::class, inversedBy: "echelles")]
     public Etalonnage $etalonnage;
+
+    /**
+     * @param int $id
+     * @param array $bounds
+     * @param Echelle $echelle
+     * @param Etalonnage $etalonnage
+     */
+    public function __construct(int $id, array $bounds, Echelle $echelle, Etalonnage $etalonnage)
+    {
+        $this->id = $id;
+        $this->bounds = $bounds;
+        $this->echelle = $echelle;
+        $this->etalonnage = $etalonnage;
+    }
 
 
 }

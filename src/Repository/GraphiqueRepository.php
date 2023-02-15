@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<DefinitionProfilComputer>
+ * @extends ServiceEntityRepository<Graphique>
  *
  * @method Graphique|null find($id, $lockMode = null, $lockVersion = null)
  * @method Graphique|null findOneBy(array $criteria, array $orderBy = null)

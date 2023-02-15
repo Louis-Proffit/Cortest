@@ -10,19 +10,14 @@
         <thead>
         <tr>
             <th>Nom</th>
-            <th>Propriétes</th>
+            <th>Nombre de questions</th>
         </tr>
         </thead>
         <tbody>
         {% for grille in grilles %}
             <tr>
                 <td>{{ grille.nom }}</td>
-                <td>
-                    {% for property in grille.properties %}
-                        {{ property.nom }}
-                        {{ not loop.last ? ' - ' : '' }}
-                    {% endfor %}
-                </td>
+                <td>{{ grille.nombre_questions }}</td>
             </tr>
         {% endfor %}
         </tbody>

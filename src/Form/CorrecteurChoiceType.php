@@ -23,7 +23,7 @@ class CorrecteurChoiceType extends AbstractType
 
     private function definitionCorrecteurChoice(Session $session): array
     {
-        $correcteurs = $this->repository->findBy(["grille_class" => $session->grille_class]);
+        $correcteurs = $this->repository->findBy(["concours" => $session->concours]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {

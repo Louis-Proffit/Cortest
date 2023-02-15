@@ -35,6 +35,12 @@
         <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
         <dt class="col-md-3">SGAP</dt>
         <dd class="col-md-9">{{ session.sgap.nom }}</dd>
+        <dt class="col-md-3">Concours</dt>
+        <dd class="col-md-9">{{ session.concours.nom }}</dd>
+        <dt class="col-md-3">Version batterie</dt>
+        <dd class="col-md-9">{{ session.concours.version_batterie }}</dd>
+        <dt class="col-md-3">Type de concours</dt>
+        <dd class="col-md-9">{{ session.concours.type_concours }}</dd>
     </dl>
     <br>
     <hr class="hr hr-blurry">

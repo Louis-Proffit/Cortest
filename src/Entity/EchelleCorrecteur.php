@@ -19,7 +19,7 @@ class EchelleCorrecteur
     #[ORM\Column]
     public string $expression;
 
-    #[ORM\ManyToOne(targetEntity: Echelle::class)]
+    #[ORM\ManyToOne(targetEntity: Echelle::class, inversedBy: "echelles_correcteur")]
     public Echelle $echelle;
 
     #[ORM\ManyToOne(targetEntity: Correcteur::class)]

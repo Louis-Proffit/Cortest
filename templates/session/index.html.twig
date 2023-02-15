@@ -30,13 +30,14 @@
         {% for session in sessions %}
             <tr>
                 <td>{{ session.date|date('d-m-Y') }}</td>
-                <td>{{ grilles[session.grille_class] }}</td>
+                <td>{{ grilles[session.concours.index_grille].nom }}</td>
                 <td>{{ session.sgap.nom }}</td>
-                <td>{{ session.type_concours }}-{{ session.date|date("Y") }}-{{ session.numero_ordre }}</td>
+                <td>{{ session.concours.type_concours }}-{{ session.date|date("Y") }}-{{ session.numero_ordre }}</td>
                 <td>{{ session.concours.nom }}</td>
-                <td>{{ session.type_concours }}</td>
-                <td>{{ session.version_batterie }}</td>
-                <td><a class="btn btn-link btn-sm" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a></td>
+                <td>{{ session.concours.type_concours }}</td>
+                <td>{{ session.concours.version_batterie }}</td>
+                <td><a class="btn btn-link btn-sm" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

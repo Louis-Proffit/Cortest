@@ -7,7 +7,8 @@ use App\Core\Renderer\Values\RendererBatonnets;
 class RendererRepository
 {
 
-    const INDEX = [0];
+    const INDEX_BATONNETS = 0;
+    const INDEX = [self::INDEX_BATONNETS];
     private array $values;
 
     public function __construct(
@@ -21,12 +22,7 @@ class RendererRepository
 
     public function sampleIndex(): int
     {
-        return 0;
-    }
-
-    public function indexExists(int $index): bool
-    {
-        return in_array($index, array_keys($this->values));
+        return self::INDEX_BATONNETS;
     }
 
     public function fromIndex(int $index): Renderer

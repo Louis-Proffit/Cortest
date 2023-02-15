@@ -2,13 +2,8 @@
 
 namespace App\Core\Files\Csv;
 
-use App\Entity\Echelle;
-use App\Entity\Profil;
 use App\Entity\ReponseCandidat;
-use App\Entity\Session;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 class CsvReponseManager
 {

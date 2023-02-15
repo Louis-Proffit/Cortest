@@ -2,31 +2,45 @@
 
 namespace App\Fixture;
 
+use App\Core\Renderer\Renderer;
+use App\Core\Renderer\RendererRepository;
 use App\Entity\Concours;
+use App\Entity\Correcteur;
 use App\Entity\CortestUser;
 use App\Entity\Echelle;
+use App\Entity\EchelleCorrecteur;
+use App\Entity\EchelleEtalonnage;
+use App\Entity\Etalonnage;
+use App\Entity\Graphique;
 use App\Entity\NiveauScolaire;
 use App\Entity\Profil;
+use App\Entity\QuestionConcours;
+use App\Entity\ReponseCandidat;
+use App\Entity\Session;
 use App\Entity\Sgap;
+use App\Repository\GrilleRepository;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class InitFixture extends Fixture
 {
 
     public function __construct(
-        private readonly UserPasswordHasherInterface $password_hasher
+        private readonly UserPasswordHasherInterface $password_hasher,
+        private readonly GrilleRepository            $grille_repository,
+        private readonly RendererRepository          $renderer_repository
     )
     {
     }
 
-    public function load(ObjectManager $manager)
+    public
+    function load(ObjectManager $manager)
     {
-        foreach ($this->sgaps() as $sgap) {
+        $sgaps = $this->sgaps();
+        foreach ($sgaps as $sgap) {
             $manager->persist($sgap);
         }
 
@@ -35,30 +49,135 @@ class InitFixture extends Fixture
             $manager->persist($echelle);
         }
 
-        foreach ($this->concours() as $concours) {
+        $all_concours = $this->concours();
+        foreach ($all_concours as $concours) {
             $manager->persist($concours);
         }
 
-        foreach ($this->niveau_scolaire() as $niveau_scolaire) {
+        $niveaux_scolaire = $this->niveau_scolaire();
+        foreach ($niveaux_scolaire as $niveau_scolaire) {
             $manager->persist($niveau_scolaire);
         }
 
-        $manager->persist(
-            new Profil(id: 0,
-                nom: "Profil cahier des charges",
-                echelles: new ArrayCollection($echelles),
-                etalonnages: new ArrayCollection(),
-                graphiques: new ArrayCollection())
-        );
+        $profil = new Profil(id: 0,
+            nom: "Profil cahier des charges",
+            echelles: new ArrayCollection($echelles),
+            etalonnages: new ArrayCollection(),
+            graphiques: new ArrayCollection());
+
+        $manager->persist($profil);
+
+        $correcteur = $this->correcteur($profil, $all_concours[0]);
+        $manager->persist($correcteur);
+
+        $etalonnage = $this->etalonnage($profil, 9);
+        $manager->persist($etalonnage);
 
         foreach ($this->users() as $user) {
             $manager->persist($user);
         }
 
+        $session = $this->session($all_concours[0], $sgaps[0]);
+        $manager->persist($session);
+
+        $reponseCandidat = $this->reponseCandidat($session, $niveaux_scolaire[0]);
+        $manager->persist($reponseCandidat);
+
+        $graphique = $this->graphique($profil, RendererRepository::INDEX_BATONNETS);
+        $manager->persist($graphique);
+
         $manager->flush();
     }
 
-    private function users(): array
+    public
+    function reponseCandidat(Session $session, NiveauScolaire $niveau_scolaire): ReponseCandidat
+    {
+        return new ReponseCandidat(
+            id: 0,
+            session: $session,
+            reponses: array(0, 1, 2, 3, 4, 5, 3, 1, 2, 3, 5, 4, 0, 1, 2, 3, 5, 4, 1, 2, 0, 2, 3, 4),
+            // TODO adapt to grille
+            nom: "Nom d'exemple",
+            prenom: "Prénom d'exemple",
+            nom_jeune_fille: "Nom d'exemple",
+            niveau_scolaire: $niveau_scolaire,
+            date_de_naissance: new DateTime("now"),
+            sexe: ReponseCandidat::INDEX_HOMME,
+            reserve: "",
+            autre_1: "",
+            autre_2: "",
+            code_barre: 0,
+            raw: null);
+    }
+
+    public
+    function session(Concours $concours, Sgap $sgap): Session
+    {
+        return new Session(
+            id: 0,
+            date: new DateTime("now"),
+            numero_ordre: 0,
+            observations: "Session d'exemple",
+            concours: $concours,
+            sgap: $sgap,
+            reponses_candidats: new ArrayCollection()
+        );
+    }
+
+    private
+    function etalonnage(Profil $profil, int $num_echelles): Etalonnage
+    {
+
+        $etalonnage = new Etalonnage(
+            id: 0,
+            profil: $profil,
+            nom: "Etalonnage d'exemple",
+            nombre_classes: $num_echelles,
+            echelles: new ArrayCollection()
+        );
+
+        /** @var Echelle $echelle */
+        foreach ($profil->echelles as $echelle) {
+            $bounds = [];
+
+            for ($bound = 0; $bound < $num_echelles; $bound++) {
+                $bounds[$bound] = $bound;
+            }
+            $etalonnage->echelles->add(
+                new EchelleEtalonnage(
+                    id: 0, bounds: $bounds, echelle: $echelle, etalonnage: $etalonnage
+                )
+            );
+        }
+
+        return $etalonnage;
+    }
+
+    private
+    function correcteur(Profil $profil, Concours $concours): Correcteur
+    {
+        $correcteur = new Correcteur(
+            id: 0,
+            concours: $concours,
+            profil: $profil,
+            nom: "Correcteur exemple",
+            echelles: new ArrayCollection()
+        );
+
+        /** @var Echelle $echelle */
+        foreach ($profil->echelles as $echelle) {
+            $correcteur->echelles->add(
+                new EchelleCorrecteur(
+                    id: 0, expression: "0", echelle: $echelle, correcteur: $correcteur
+                )
+            );
+        }
+
+        return $correcteur;
+    }
+
+    private
+    function users(): array
     {
 
         $admin = new CortestUser(
@@ -89,7 +208,8 @@ class InitFixture extends Fixture
         return [$admin, $psycologue, $correcteur];
     }
 
-    private function niveau_scolaire(): array
+    private
+    function niveau_scolaire(): array
     {
         return [
             new NiveauScolaire(id: 0, indice: 1, nom: "CEP ou niveau CEP"),
@@ -103,22 +223,97 @@ class InitFixture extends Fixture
         ];
     }
 
-    private function concours(): array
+    private
+    function concours(): array
     {
-        return [
-            new Concours(id: 0, nom: "Comissaire de police"),
-            new Concours(id: 0, nom: "Officier (lieutenant de police)"),
-            new Concours(id: 0, nom: "Sélection spécialisée - Motard - Garde de sécurité ambassade"),
-            new Concours(id: 0, nom: "Gardien de la paix"),
-            new Concours(id: 0, nom: "BAC - sélection spécialisée"),
-            new Concours(id: 0, nom: "Tests brigadier (Entrée en formation)"),
-            new Concours(id: 0, nom: "Tests brigadier (EXAPRO BIER)"),
-            new Concours(id: 0, nom: "Cadet de la république"),
-            new Concours(id: 0, nom: "Adjoint de sécurité"),
+        $result = [
+            new Concours(id: 0,
+                nom: "Comissaire de police",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Officier (lieutenant de police)",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Sélection spécialisée - Motard - Garde de sécurité ambassade",
+
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0,
+                version_batterie: 0,
+                questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Gardien de la paix",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "BAC - sélection spécialisée",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Tests brigadier (Entrée en formation)",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Tests brigadier (EXAPRO BIER)",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Cadet de la république",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
+            new Concours(id: 0,
+                nom: "Adjoint de sécurité",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
         ];
+
+        foreach ($result as $concours) {
+            QuestionConcours::initQuestions($this->grille_repository, $concours);
+        }
+
+        return $result;
     }
 
-    private function sgaps(): array
+    private
+    function graphique(Profil $profil, int $render_index): Graphique
+    {
+        $renderer = $this->renderer_repository->fromIndex($render_index);
+
+        $graphique = new Graphique(
+            id: 0,
+            options: $renderer->initializeOptions(),
+            profil: $profil,
+            echelles: new ArrayCollection(),
+            nom: "Graphique d'exemple",
+            renderer_index: $render_index
+        );
+
+        Graphique::initializeEchelles($graphique, $renderer);
+
+        return $graphique;
+    }
+
+    private
+    function sgaps(): array
     {
         return [
             new Sgap(id: 0, indice: 1, nom: "Bordeaux"),
@@ -144,7 +339,8 @@ class InitFixture extends Fixture
         ];
     }
 
-    private function echelles(): array
+    private
+    function echelles(): array
     {
         return [
             new Echelle(id: 0, nom: "Collationnement", nom_php: "collationnement", type: Echelle::TYPE_ECHELLE_SIMPLE),

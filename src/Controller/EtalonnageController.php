@@ -78,28 +78,20 @@ class EtalonnageController extends AbstractController
             $nombreClasses = $etalonnageCreer->nombre_classes;
             $profil = $etalonnageCreer->profil;
 
-            /** @var EchelleEtalonnage[] $echelles */
-            $echelles = [];
-
-            foreach ($profil->echelles as $echelle) {
-                $echelleEtalonnage = new EchelleEtalonnage();
-                $echelleEtalonnage->echelle = $echelle;
-                $echelleEtalonnage->bounds = range(1, $nombreClasses - 1);
-                $echelleEtalonnage->id = 0;
-                $echelles[] = $echelleEtalonnage;
-            }
-
             $etalonnage = new Etalonnage(
                 id: 0,
                 profil: $profil,
                 nom: $etalonnageCreer->nom,
                 nombre_classes: $nombreClasses,
-                echelles: new ArrayCollection($echelles)
+                echelles: new ArrayCollection()
             );
 
-            foreach ($echelles as $echelle) {
-                $echelle->etalonnage = $etalonnage;
-                $entity_manager->persist($echelle);
+            foreach ($profil->echelles as $echelle) {
+                $etalonnage->echelles->add(
+                    new EchelleEtalonnage(
+                        id: 0, bounds: range(1, $nombreClasses - 1), echelle: $echelle, etalonnage: $etalonnage
+                    )
+                );
             }
 
             $entity_manager->persist($etalonnage);

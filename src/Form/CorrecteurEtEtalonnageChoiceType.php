@@ -6,7 +6,6 @@ use App\Entity\Etalonnage;
 use App\Entity\Session;
 use App\Form\Data\CorrecteurEtEtalonnagePair;
 use App\Repository\CorrecteurRepository;
-use App\Repository\EtalonnageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -25,7 +24,7 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
 
     private function correcteurAndEtalonnageChoices(Session $session): array
     {
-        $correcteurs = $this->correcteur_repository->findBy(["grille_class" => $session->grille_class]);
+        $correcteurs = $this->correcteur_repository->findBy(["concours" => $session->concours]);
 
         $result = [];
         foreach ($correcteurs as $correcteur) {

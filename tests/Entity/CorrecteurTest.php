@@ -3,8 +3,10 @@
 namespace App\Tests\Entity;
 
 use App\Core\Grille\Values\GrilleOctobre2019;
+use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Profil;
+use App\Repository\GrilleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +33,12 @@ class CorrecteurTest extends KernelTestCase
 
         $correcteur = new Correcteur(
             id: 0,
-            grille_class: GrilleOctobre2019::class,
+            concours: new Concours(id: 0,
+                nom: "Concours",
+                correcteurs: new ArrayCollection(),
+                sessions: new ArrayCollection(),
+                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
+                type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
             profil: new Profil(
                 id: 0,
                 nom: "Profil",
@@ -43,7 +50,6 @@ class CorrecteurTest extends KernelTestCase
             echelles: new ArrayCollection()
         );
 
-        self::assertEmpty($validator->validateProperty($correcteur, "nom"));
-        self::assertEmpty($validator->validateProperty($correcteur, "grille_class"));
+        self::assertEmpty($validator->validate($correcteur));
     }
 }

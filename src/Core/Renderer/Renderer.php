@@ -3,6 +3,7 @@
 namespace App\Core\Renderer;
 
 use App\Entity\Correcteur;
+use App\Entity\Echelle;
 use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\ReponseCandidat;
@@ -34,7 +35,7 @@ interface Renderer
      */
     public function getEchelleOptions(): array;
 
-    public function initializeEchelleOption(EchelleGraphique $echelle_graphique): array;
+    public function initializeEchelleOption(Echelle $echelle): array;
 
     public function initializeOptions(): array;
 

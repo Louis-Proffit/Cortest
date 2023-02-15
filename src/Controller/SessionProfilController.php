@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\Csv\CsvManager;
 use App\Core\Files\Csv\CsvProfilManager;
+use App\Entity\Correcteur;
+use App\Entity\Etalonnage;
+use App\Entity\Session;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
@@ -16,7 +18,6 @@ use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/calcul/profil", name: "calcul_profil_")]
@@ -73,9 +74,8 @@ class SessionProfilController extends AbstractController
         $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if ($session->grille_class != $correcteur->grille_class) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST,
-                "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
+        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
+            return $response;
         }
 
         $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $etalonnage_repository->findOneBy([]));
@@ -121,14 +121,12 @@ class SessionProfilController extends AbstractController
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if ($session->grille_class !== $correcteur->grille_class) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST,
-                "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
+        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
+            return $response;
         }
 
-        if ($correcteur->profil->id !== $etalonnage->profil->id) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST,
-                "L'étalonnage ne s'applique pas au profil calculé",);
+        if (($response = $this->declineInvalidProfil($correcteur, $etalonnage)) != null) {
+            return $response;
         }
 
         $reponses = $session->reponses_candidats->toArray();
@@ -168,14 +166,12 @@ class SessionProfilController extends AbstractController
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if ($session->grille_class !== $correcteur->grille_class) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST,
-                "Le calculateur de score ne s'applique pas à la grille de la session considérée",);
+        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
+            return $response;
         }
 
-        if ($correcteur->profil->id !== $etalonnage->profil->id) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST,
-                "L'étalonnage ne s'applique pas au profil calculé",);
+        if (($response = $this->declineInvalidProfil($correcteur, $etalonnage)) != null) {
+            return $response;
         }
 
         $reponses = $session->reponses_candidats->toArray();
@@ -195,5 +191,26 @@ class SessionProfilController extends AbstractController
             profil: $correcteur->profil,
             profils: $profils
         );
+    }
+
+
+    private function declineInvalidProfil(Correcteur $correcteur, Etalonnage $etalonnage): ?Response
+    {
+        if ($correcteur->profil->id !== $etalonnage->profil->id) {
+            $this->addFlash("warning",
+                "Le correcteur et l'étalonnage sélectionnés ne correspondent pas au même profil.");
+            return new Response("");
+        }
+
+        return null;
+    }
+
+    private function declineInvalidConcours(Session $session, Correcteur $correcteur): ?Response
+    {
+        if ($session->concours->id !== $correcteur->concours->id) {
+            $this->addFlash("warning", "La session correspond à un concours que le correcteur ne support pas.");
+            return new Response("");
+        }
+        return null;
     }
 }

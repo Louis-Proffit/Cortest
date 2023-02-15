@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
-use App\Form\Mapper\CollectionToArrayMapper;
+use App\Form\Mapper\CollectionToArrayTransformer;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EchelleRepository;
 use Symfony\Component\Form\AbstractType;
@@ -20,7 +20,7 @@ class ProfilType extends AbstractType
 
     public function __construct(
         private readonly EchelleRepository       $echelle_repository,
-        private readonly CollectionToArrayMapper $collection_to_array_mapper
+        private readonly CollectionToArrayTransformer $collection_to_array_mapper
     )
     {
     }

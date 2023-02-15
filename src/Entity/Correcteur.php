@@ -21,11 +21,10 @@ class Correcteur
     #[ORM\Column]
     public int $id;
 
-    #[ClassName]
-    #[ORM\Column]
-    public string $grille_class;
+    #[ORM\ManyToOne(targetEntity: Concours::class, inversedBy: "correcteurs")]
+    public Concours $concours;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class)]
+    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "correcteurs")]
     public Profil $profil;
 
     #[NotBlank]
@@ -38,19 +37,20 @@ class Correcteur
 
     /**
      * @param int $id
-     * @param string $grille_class
+     * @param Concours $concours
      * @param Profil $profil
      * @param string $nom
      * @param Collection $echelles
      */
-    public function __construct(int $id, string $grille_class, Profil $profil, string $nom, Collection $echelles)
+    public function __construct(int $id, Concours $concours, Profil $profil, string $nom, Collection $echelles)
     {
         $this->id = $id;
-        $this->grille_class = $grille_class;
+        $this->concours = $concours;
         $this->profil = $profil;
         $this->nom = $nom;
         $this->echelles = $echelles;
     }
+
 
     /**
      * Associe le nom des echelles php à leur type

@@ -20,4 +20,15 @@ class ProfilRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Profil::class);
     }
+
+    public function choices(): array
+    {
+        $result = [];
+
+        foreach ($this->findAll() as $profil) {
+            $result[$profil->nom] = $profil;
+        }
+
+        return $result;
+    }
 }

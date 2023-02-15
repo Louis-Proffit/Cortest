@@ -22,9 +22,9 @@ class SgapController extends AbstractController
         SgapRepository $sgap_repository,
     ): Response
     {
-        $items = $sgap_repository->findAll();
+        $sgaps = $sgap_repository->findAll();
 
-        return $this->render("sgap/index.html.twig", $items);
+        return $this->render("sgap/index.html.twig", ["sgaps" => $sgaps]);
     }
 
     #[Route("/creer", name: "creer")]
@@ -78,7 +78,7 @@ class SgapController extends AbstractController
         return $this->render("sgap/form.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/supprimer", name: "supprimer")]
+    #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         SgapRepository         $sgap_repository,
         EntityManagerInterface $entity_manager,
@@ -88,6 +88,8 @@ class SgapController extends AbstractController
 
         $entity_manager->remove($item);
         $entity_manager->flush();
+
+        $this->addFlash("success", "Suppression du SGAP enregistrée");
 
         return $this->redirectToRoute("sgap_index");
     }

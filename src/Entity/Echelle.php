@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Constraint\PhpIdentifier;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -52,17 +54,33 @@ class Echelle
     #[ORM\Column]
     public string $type;
 
+    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
+    public Collection $echelles_correcteur;
+
+
+    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
+    public Collection $echelles_etalonnage;
+
+    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleGraphique::class, cascade: ["remove", "persist"])]
+    public Collection $echelles_graphiques;
+
     /**
      * @param int $id
      * @param string $nom
      * @param string $nom_php
      * @param string $type
+     * @param Collection $echelles_correcteur
+     * @param Collection $echelles_etalonnage
      */
-    public function __construct(int $id, string $nom, string $nom_php, string $type)
+    public function __construct(int $id, string $nom, string $nom_php, string $type, Collection $echelles_correcteur = new ArrayCollection(), Collection $echelles_etalonnage = new ArrayCollection())
     {
         $this->id = $id;
         $this->nom = $nom;
         $this->nom_php = $nom_php;
         $this->type = $type;
+        $this->echelles_correcteur = $echelles_correcteur;
+        $this->echelles_etalonnage = $echelles_etalonnage;
     }
+
+
 }

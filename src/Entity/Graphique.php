@@ -3,17 +3,13 @@
 namespace App\Entity;
 
 use App\Constraint\IsGraphiqueOptions;
+use App\Core\Renderer\Renderer;
 use App\Core\Renderer\RendererRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Validation;
-use App\Constraint\UniqueDTO;
-use function PHPUnit\Framework\throwException;
 
 
 #[ORM\Entity]
@@ -32,7 +28,7 @@ class Graphique
     #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "graphiques")]
     public Profil $profil;
 
-    #[ORM\OneToMany(mappedBy: "graphique", targetEntity: EchelleGraphique::class)]
+    #[ORM\OneToMany(mappedBy: "graphique", targetEntity: EchelleGraphique::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
     #[NotBlank]
@@ -61,14 +57,21 @@ class Graphique
         $this->renderer_index = $renderer_index;
     }
 
-    public function getTypeEchelle() : array
+    public function getTypeEchelle(): array
     {
         $typeEchelle = array();
-        foreach ($this->echelles as $echelle){
+        foreach ($this->echelles as $echelle) {
             $typeEchelle[$echelle->echelle->nom_php] = $echelle->echelle->type;
         }
         return $typeEchelle;
     }
 
-
+    public static function initializeEchelles(Graphique $graphique, Renderer $renderer): void
+    {
+        foreach ($graphique->profil->echelles as $echelle) {
+            $graphique->echelles->add(new EchelleGraphique(
+                id: 0, options: $renderer->initializeEchelleOption($echelle), echelle: $echelle, graphique: $graphique
+            ));
+        }
+    }
 }

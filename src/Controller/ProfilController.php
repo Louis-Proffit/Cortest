@@ -56,7 +56,7 @@ class ProfilController extends AbstractController
         return $this->render("profil/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/supprimer", name: "supprimer")]
+    #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         ProfilRepository       $profil_repository,
         EntityManagerInterface $entity_manager,
@@ -66,6 +66,8 @@ class ProfilController extends AbstractController
 
         $entity_manager->remove($item);
         $entity_manager->flush();
+
+        $this->addFlash("success", "Suppression du profil enregistrée.");
 
         return $this->redirectToRoute("profil_index");
     }

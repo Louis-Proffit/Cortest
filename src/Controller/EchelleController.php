@@ -79,7 +79,7 @@ class EchelleController extends AbstractController
         return $this->render("echelle/form.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/supprimer", name: "supprimer")]
+    #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         EchelleRepository      $echelle_repository,
         EntityManagerInterface $entity_manager,

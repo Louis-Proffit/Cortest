@@ -3,26 +3,40 @@
 namespace App\Tests\Controller;
 
 use App\Controller\ProfilController;
+use App\Repository\ProfilRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProfilControllerTest extends WebTestCase
 {
-    use CrudTestTrait;
+    use LoginTestTrait;
+
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = self::createClient();
+        $this->login($this->client);
+    }
 
     public function testSupprimer()
     {
-        self::markTestSkipped("TODO");
+        $profil = self::getContainer()->get(ProfilRepository::class)->findOneBy([]);
+        $this->client->request(Request::METHOD_GET, "/profil/supprimer/".$profil->id);
+        self::assertResponseRedirects("/profil/index");
     }
 
     public function testCreer()
     {
-        self::markTestSkipped("TODO");
+        $this->client->request(Request::METHOD_GET, "/profil/creer");
+        self::assertResponseIsSuccessful();
     }
 
     public function testIndex()
     {
-        $this->traitTestIndex("/profil/index");
+        $this->client->request(Request::METHOD_GET, "/profil/index");
+        self::assertResponseIsSuccessful();
     }
 }

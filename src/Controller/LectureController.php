@@ -78,7 +78,7 @@ class LectureController extends AbstractController
             return $this->redirectToRoute("session_consulter", ["id" => $reponse->session->id]);
         }
 
-        return $this->render("lecture/from_form.html.twig", ["form" => $form]);
+        return $this->render("lecture/from_form.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/fichier", name: 'fichier')]
@@ -110,20 +110,20 @@ class LectureController extends AbstractController
                 dump($reponse_array);
 
                 $reponse_candidat = new ReponseCandidat(
-                    0,
-                    $uploadSessionBase->session,
-                    $reponse_array,
-                    $reponses_candidat_json["nom"],
-                    $reponses_candidat_json["prenom"],
-                    $reponses_candidat_json["nom_jeune_fille"],
-                    $niveau_scolaire_repository->findOneBy([]),
-                    new DateTime("now"),
-                    $reponses_candidat_json["sexe"],
-                    $reponses_candidat_json["reserve"],
-                    $reponses_candidat_json["autre_1"],
-                    $reponses_candidat_json["autre_2"],
-                    $reponses_candidat_json["code_barre"],
-                    $reponses_candidat_json
+                    id: 0,
+                    session: $uploadSessionBase->session,
+                    reponses: $reponse_array,
+                    nom: $reponses_candidat_json["nom"],
+                    prenom: $reponses_candidat_json["prenom"],
+                    nom_jeune_fille: $reponses_candidat_json["nom_jeune_fille"],
+                    niveau_scolaire: $niveau_scolaire_repository->findOneBy([]),
+                    date_de_naissance: new DateTime("now"),
+                    sexe: $reponses_candidat_json["sexe"],
+                    reserve: $reponses_candidat_json["reserve"],
+                    autre_1: $reponses_candidat_json["autre_1"],
+                    autre_2: $reponses_candidat_json["autre_2"],
+                    code_barre: $reponses_candidat_json["code_barre"],
+                    raw: $reponses_candidat_json
                 );
                 $manager->persist($reponse_candidat);
             }

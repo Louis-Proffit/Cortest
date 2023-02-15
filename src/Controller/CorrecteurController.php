@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Grille\GrilleRepository;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
 use App\Form\Data\CorrecteurCreer;
+use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
+use App\Repository\GrilleRepository;
 use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,16 +25,15 @@ class CorrecteurController extends AbstractController
 {
     #[Route("/index", name: 'index')]
     public function index(
-        CorrecteurRepository $correcteur_repository
+        CorrecteurRepository $correcteur_repository,
+        GrilleRepository     $grille_repository
     ): Response
     {
         $correcteurs = $correcteur_repository->findAll();
 
         $grilles = [];
 
-        foreach ($correcteurs as $correcteur) {
-            $grilles[$correcteur->id] = new ($correcteur->grille_class)();
-        }
+        $grilles = $grille_repository->indexToInstance();
 
         return $this->render('correcteur/index.html.twig',
             ["correcteurs" => $correcteurs, "grilles" => $grilles]);
@@ -42,11 +42,12 @@ class CorrecteurController extends AbstractController
     #[Route("/consulter/{id}", name: 'consulter')]
     public function consulter(
         CorrecteurRepository $correcteur_repository,
+        GrilleRepository     $grille_repository,
         int                  $id
     ): Response
     {
         $correcteur = $correcteur_repository->find($id);
-        $grille = new ($correcteur->grille_class)();
+        $grille = $grille_repository->getFromIndex($correcteur->concours->index_grille);
         return $this->render("correcteur/correcteur.html.twig",
             ["correcteur" => $correcteur, "grille" => $grille]);
     }
@@ -54,21 +55,28 @@ class CorrecteurController extends AbstractController
     #[Route("/creer", name: "creer")]
     public function creer(
         EntityManagerInterface $entity_manager,
+        ConcoursRepository     $concours_repository,
         ProfilRepository       $profil_repository,
         Request                $request
     ): Response
     {
         $profils = $profil_repository->findAll();
-        $grilles = GrilleRepository::CLASSES;
 
         if (empty($profils)) {
-            $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un");
+            $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un.");
             return $this->redirectToRoute("profil_index");
+        }
+
+        $all_concours = $concours_repository->findAll();
+
+        if (empty($all_concours)) {
+            $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
+            return $this->redirectToRoute("concours_index");
         }
 
         $correcteurCreer = new CorrecteurCreer(
             profil: $profils[0],
-            grille_class: $grilles[0],
+            concours: $all_concours[0],
             nom: ""
         );
         $form = $this->createForm(CorrecteurCreerType::class, $correcteurCreer);
@@ -78,10 +86,11 @@ class CorrecteurController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $profil = $correcteurCreer->profil;
+            $concours = $correcteurCreer->concours;
 
             $correcteur = new Correcteur(
                 id: 0,
-                grille_class: $correcteurCreer->grille_class,
+                concours: $concours,
                 profil: $profil,
                 nom: $correcteurCreer->nom,
                 echelles: new ArrayCollection()

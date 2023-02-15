@@ -2,9 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\SgapRepository;
+use App\Constraint\ClassName;
+use App\Repository\GrilleRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
@@ -21,13 +26,50 @@ class Concours
     #[ORM\Column(unique: true)]
     public string $nom;
 
+    #[ORM\OneToMany(mappedBy: "concours", targetEntity: Correcteur::class, cascade: ["remove", "persist"])]
+    public Collection $correcteurs;
+
+    #[ORM\OneToMany(mappedBy: "concours", targetEntity: Session::class, cascade: ["remove", "persist"])]
+    public Collection $sessions;
+
+    #[Choice(choices: GrilleRepository::INDEX)]
+    #[ORM\Column]
+    public int $index_grille;
+
+    #[LessThan(value: 100)]
+    #[PositiveOrZero]
+    #[ORM\Column]
+    public int $type_concours;
+
+    #[LessThan(value: 1000)]
+    #[PositiveOrZero]
+    #[ORM\Column]
+    public int $version_batterie;
+
+    #[ORM\OneToMany(mappedBy: "concours", targetEntity: QuestionConcours::class, cascade: ["persist", "remove"])]
+    public Collection $questions;
+
     /**
      * @param int $id
      * @param string $nom
+     * @param Collection $correcteurs
+     * @param Collection $sessions
+     * @param int $index_grille
+     * @param int $type_concours
+     * @param int $version_batterie
+     * @param Collection $questions
      */
-    public function __construct(int $id, string $nom)
+    public function __construct(int $id, string $nom, Collection $correcteurs, Collection $sessions, int $index_grille, int $type_concours, int $version_batterie, Collection $questions)
     {
         $this->id = $id;
         $this->nom = $nom;
+        $this->correcteurs = $correcteurs;
+        $this->sessions = $sessions;
+        $this->index_grille = $index_grille;
+        $this->type_concours = $type_concours;
+        $this->version_batterie = $version_batterie;
+        $this->questions = $questions;
     }
+
+
 }

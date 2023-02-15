@@ -5,12 +5,16 @@ namespace App\Core\Renderer\Values;
 use App\Core\Renderer\Renderer;
 use App\Core\Renderer\RendererOption;
 use App\Entity\Correcteur;
+use App\Entity\Echelle;
 use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\ReponseCandidat;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class RendererBatonnets implements Renderer
 {
@@ -52,6 +56,11 @@ class RendererBatonnets implements Renderer
         ];
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     public function render(
         Environment     $environment,
         ReponseCandidat $reponse,
@@ -103,7 +112,7 @@ class RendererBatonnets implements Renderer
         return $this->echelleOptions;
     }
 
-    public function initializeEchelleOption(EchelleGraphique $echelle_graphique): array
+    public function initializeEchelleOption(Echelle $echelle): array
     {
         $result = [];
 
@@ -112,7 +121,7 @@ class RendererBatonnets implements Renderer
         }
 
         // Pour le nom affiché, on fait un cas particulier : on initialise au nom de l'échelle
-        $result[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP] = $echelle_graphique->echelle->nom;
+        $result[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP] = $echelle->nom;
 
         return $result;
     }

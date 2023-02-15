@@ -16,16 +16,22 @@
         <thead>
         <tr>
             <th>Nom</th>
-            <th>Modifier</th>
+            <th>Grille</th>
+            <th>Version batterie</th>
+            <th>Type de concours</th>
+            <th>Consulter</th>
         </tr>
         </thead>
         <tbody>
         {% for concours in items %}
-            <tr>
+            <tr class="align-middle">
                 <td>{{ concours.nom }}</td>
+                <td>{{ grilles[concours.index_grille].nom }}</td>
+                <td>{{ concours.version_batterie }}</td>
+                <td>{{ concours.type_concours }}</td>
                 <td>
                     <a class="btn btn-link fw-bold btn-rounded"
-                       href="{{ path("concours_modifier", {"id":concours.id}) }}">Modifier</a>
+                       href="{{ path("concours_consulter", {"id":concours.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

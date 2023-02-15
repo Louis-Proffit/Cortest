@@ -2,32 +2,46 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\EchelleController;
-use PHPUnit\Framework\TestCase;
+use App\Repository\EchelleRepository;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class EchelleControllerTest extends WebTestCase
 {
-    use CrudTestTrait;
+    use LoginTestTrait;
+
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = self::createClient();
+        $this->login($this->client);
+    }
 
     public function testCreer()
     {
-        self::markTestSkipped("TODO");
+        $this->client->request(Request::METHOD_GET, "/echelle/creer");
+        self::assertResponseIsSuccessful();
     }
 
     public function testSupprimer()
     {
-        self::markTestSkipped("TODO");
+        $echelle = self::getContainer()->get(EchelleRepository::class)->findOneBy([]);
+        $this->client->request(Request::METHOD_GET, "/echelle/supprimer/" . $echelle->id);
+        self::assertResponseRedirects("/echelle/index");
     }
 
     public function testIndex()
     {
-        $this->traitTestIndex("/echelle/index");
+        $this->client->request(Request::METHOD_GET, "/echelle/index");
+        self::assertResponseIsSuccessful();
     }
 
     public function testModifier()
     {
-        self::markTestSkipped("TODO");
+        $echelle = self::getContainer()->get(EchelleRepository::class)->findOneBy([]);
+        $this->client->request(Request::METHOD_GET, "/echelle/modifier/" . $echelle->id);
+        self::assertResponseIsSuccessful();
     }
 }

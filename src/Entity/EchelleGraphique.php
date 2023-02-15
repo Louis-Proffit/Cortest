@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\Constraint\IsGraphiqueEchelleOptions;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
 class EchelleGraphique
@@ -23,10 +21,25 @@ class EchelleGraphique
     #[ORM\Column]
     public array $options;
 
-    #[ORM\ManyToOne(targetEntity: Echelle::class)]
+    #[ORM\ManyToOne(targetEntity: Echelle::class, inversedBy: "echelles_graphiques")]
     public Echelle $echelle;
 
     #[ORM\ManyToOne(targetEntity: Graphique::class, inversedBy: "echelles")]
     public Graphique $graphique;
+
+    /**
+     * @param int $id
+     * @param array $options
+     * @param Echelle $echelle
+     * @param Graphique $graphique
+     */
+    public function __construct(int $id, array $options, Echelle $echelle, Graphique $graphique)
+    {
+        $this->id = $id;
+        $this->options = $options;
+        $this->echelle = $echelle;
+        $this->graphique = $graphique;
+    }
+
 
 }

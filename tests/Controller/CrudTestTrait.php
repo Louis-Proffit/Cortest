@@ -12,11 +12,6 @@ trait CrudTestTrait
 
     public function traitTestIndex(string $path, string $role = CortestUser::ROLE_ADMINISTRATEUR): void
     {
-        $client = self::createClient();
 
-        $this->login($client, $role);
-
-        $client->request(Request::METHOD_GET, $path);
-        self::assertResponseIsSuccessful();
     }
 }

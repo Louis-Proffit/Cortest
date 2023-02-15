@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Créer un concours</h1>
+    <br>
+    {{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.index_grille) }}
+    <div class="mb-3">
+        <button class="btn btn-primary">Créer</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}
+

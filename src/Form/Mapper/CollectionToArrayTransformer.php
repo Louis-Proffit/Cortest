@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class CollectionToArrayMapper implements DataTransformerInterface
+class CollectionToArrayTransformer implements DataTransformerInterface
 {
 
     /**

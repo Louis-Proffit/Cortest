@@ -6,64 +6,19 @@ use App\Core\Property;
 use Exception;
 use ReflectionClass;
 
-abstract class Grille
+class Grille
 {
-    #[CortestProperty(nom: "Réponses")]
-    public array $reponses;
+    public string $nom;
+    public int $nombre_questions;
 
-    protected abstract function getClass(): string;
-
-    public function fill(array $raw): void
+    /**
+     * @param string $nom
+     * @param int $nombre_questions
+     */
+    public function __construct(string $nom, int $nombre_questions)
     {
-        $this->reponses = $raw["reponses"];
-    }
-
-    public function getNom(): string
-    {
-        $reflectiveClass = new ReflectionClass($this->getClass());
-
-        $attributes = $reflectiveClass->getAttributes(CortestGrille::class);
-        if (empty($attributes)) {
-            throw new Exception("Grille class misses " . CortestGrille::class . " annotation");
-        }
-
-        if (count($attributes) > 1) {
-            throw new Exception("Grille class has too many " . CortestGrille::class . " annotations");
-        }
-
-        $attribute = $attributes[0];
-
-        return $attribute->getArguments()["nom"];
-    }
-
-    public function getProperties(): array
-    {
-        $reflectiveClass = new ReflectionClass($this->getClass());
-
-        $result = [];
-
-        $properties = $reflectiveClass->getProperties();
-
-        foreach ($properties as $property) {
-
-            $attributes = $property->getAttributes(CortestProperty::class);
-
-            if (!empty($attributes)) {
-
-                if (count($attributes) > 1) {
-                    throw new Exception("Too many " . CortestProperty::class . " attributes");
-                }
-
-                $attribute = $attributes[0];
-
-                $result[] = new Property(
-                    nom: $attribute->getArguments()["nom"],
-                    nom_php: $property->getName()
-                );
-            }
-        }
-
-        return $result;
+        $this->nom = $nom;
+        $this->nombre_questions = $nombre_questions;
     }
 
 

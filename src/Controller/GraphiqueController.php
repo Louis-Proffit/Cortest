@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Core\Renderer\RendererRepository;
-use App\Entity\EchelleGraphique;
 use App\Entity\Graphique;
 use App\Form\CreerGraphiqueType;
 use App\Form\Data\GraphiqueCreer;
@@ -76,30 +75,16 @@ class GraphiqueController extends AbstractController
             $profil = $creer_graphique->profil;
             $renderer = $renderer_repository->fromIndex($creer_graphique->renderer_index);
 
-            /** @var EchelleGraphique[] $echelles */
-            $echelles = [];
-
-            foreach ($profil->echelles as $echelle) {
-                $echelleGraphique = new EchelleGraphique();
-                $echelleGraphique->echelle = $echelle;
-                $echelleGraphique->options = $renderer->initializeEchelleOption($echelleGraphique);
-
-                $echelles[] = $echelleGraphique;
-            }
-
             $graphique = new Graphique(
                 id: 0,
                 options: $renderer->initializeOptions(),
                 profil: $profil,
-                echelles: new ArrayCollection($echelles),
+                echelles: new ArrayCollection(),
                 nom: $creer_graphique->nom,
                 renderer_index: $creer_graphique->renderer_index
             );
 
-            foreach ($echelles as $echelle) {
-                $echelle->graphique = $graphique;
-                $entity_manager->persist($echelle);
-            }
+            Graphique::initializeEchelles($graphique, $renderer);
 
             $entity_manager->persist($graphique);
             $entity_manager->flush();
@@ -114,7 +99,7 @@ class GraphiqueController extends AbstractController
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
         GraphiqueRepository $graphique_repository,
-        RendererRepository $renderer_repository,
+        RendererRepository  $renderer_repository,
         ManagerRegistry     $doctrine,
         Request             $request,
         int                 $id,
@@ -148,11 +133,8 @@ class GraphiqueController extends AbstractController
 
         if ($graphique != null) {
             $entity_manager->remove($graphique);
-
-            foreach ($graphique->echelles as $echelle) {
-                $entity_manager->remove($echelle);
-            }
             $entity_manager->flush();
+            $this->addFlash("success", "Le graphique a bien été supprimé");
         }
 
         return $this->redirectToRoute("graphique_index");

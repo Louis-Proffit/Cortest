@@ -17,7 +17,7 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Nom de la grille</th>
+            <th scope="col">Concours</th>
             <th scope="col">Nom du profil</th>
             <th scope="col">Consulter</th>
         </tr>
@@ -26,7 +26,7 @@
         {% for correcteur in correcteurs %}
             <tr>
                 <td>{{ correcteur.nom }}</td>
-                <td>{{ grilles[correcteur.id].nom }}</td>
+                <td>{{ correcteur.concours.nom }}</td>
                 <td>{{ correcteur.profil.nom }}</td>
                 <td>
                     <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link">

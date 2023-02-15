@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Core\Files\Csv\CsvManager;
 use App\Core\Files\Csv\CsvReponseManager;
-use App\Core\Grille\GrilleRepository;
-use App\Core\Grille\Values\GrilleOctobre2019;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\ConcoursRepository;
+use App\Repository\GrilleRepository;
 use App\Repository\SessionRepository;
 use App\Repository\SgapRepository;
 use DateTime;
@@ -33,7 +31,8 @@ class SessionController extends AbstractController
     {
         /** @var array $session */
         $sessions = $session_repository->findAll();
-        $grilles = $grille_repository->classNameToNom();
+
+        $grilles = $grille_repository->indexToInstance();
 
         return $this->render('session/index.html.twig', ["sessions" => $sessions, "grilles" => $grilles]);
     }
@@ -45,22 +44,26 @@ class SessionController extends AbstractController
         ConcoursRepository     $concours_repository,
         Request                $request): Response
     {
+        $concours = $concours_repository->findAll();
         $sgaps = $sgap_repository->findAll();
 
+
         if (empty($sgaps)) {
-            $this->addFlash("warning", "Pas de sgap disponible, veuillez en créer un.");
+            $this->addFlash("warning", "Pas de SGAP disponible, veuillez en créer un.");
             return $this->redirectToRoute("sgap_index");
+        }
+
+        if (empty($concours)) {
+            $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
+            return $this->redirectToRoute("concours_index");
         }
 
         $session = new Session(
             id: 0,
             date: new DateTime("now"),
-            grille_class: GrilleOctobre2019::class,
             numero_ordre: 0,
             observations: "",
-            concours: $concours_repository->findOneBy([]),
-            type_concours: 0,
-            version_batterie: 0,
+            concours: $concours[0],
             sgap: $sgaps[0],
             reponses_candidats: new ArrayCollection()
         );
@@ -79,7 +82,7 @@ class SessionController extends AbstractController
 
         return $this->render(
             'session/modifier.html.twig',
-            ["form" => $form]
+            ["form" => $form->createView()]
         );
     }
 
@@ -105,7 +108,7 @@ class SessionController extends AbstractController
 
         return $this->render(
             'session/modifier.html.twig',
-            ["form" => $form]
+            ["form" => $form->createView()]
         );
     }
 

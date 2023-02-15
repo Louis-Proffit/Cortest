@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Concours</h1>
+    <br>
+    <p class="lead">Propriétés du concours {{ concours.nom }}</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("concours_modifier", {"id":concours.id}) }}">Modifier</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("concours_supprimer", {"id":concours.id}) }}">Supprimer</a>
+        </div>
+    </div>
+    <br>
+    <dl class="row">
+        <dt class="col-md-3">Nom</dt>
+        <dd class="col-md-9">{{ concours.nom }}</dd>
+        <dt class="col-md-3">Version batterie</dt>
+        <dd class="col-md-9">{{ concours.version_batterie }}</dd>
+        <dt class="col-md-3">Type de concours</dt>
+        <dd class="col-md-9">{{ concours.version_batterie }}</dd>
+        <dt class="col-md-3">Grille</dt>
+        <dd class="col-md-9">{{ grille.nom }}</dd>
+        <dt class="col-md-3">Nombre de questions</dt>
+        <dd class="col-md-9">{{ grille.nombre_questions }}</dd>
+    </dl>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th>Indice</th>
+            <th>Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for question in concours.questions %}
+            <tr>
+                <td>{{ question.indice }}</td>
+                <td>{{ question.type }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

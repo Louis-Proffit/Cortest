@@ -2,12 +2,8 @@
 
 namespace App\Constraint;
 
-use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Grille\GrilleRepository;
 use App\Core\Renderer\RendererRepository;
-use App\Entity\Correcteur;
 use App\Entity\EchelleGraphique;
-use Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
