@@ -9,9 +9,9 @@
     <body>
         <h1>Choix de l'échelle</h1>
         <ul>
-            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 0 }) }}> Échelle simple </a> </li>
-            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 1 }) }}> Échelle composite </a> </li>
-            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.version, 'typeEchelle': 0 }) }}> Subtest </a> </li>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.codeVersion, 'typeEchelle': 0 }) }}> Échelle simple </a> </li>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.codeVersion, 'typeEchelle': 1 }) }}> Échelle composite </a> </li>
+            <li> <a href =  {{  path(pathNextPage, { 'idEpreuve': version.epreuve.code, 'idVersion': version.codeVersion, 'typeEchelle': 2 }) }}> Subtest </a> </li>
         </ul>
 
         
