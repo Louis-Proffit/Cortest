@@ -143,7 +143,7 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        return $this->render("profil/index.html.twig",
+        return $this->render("profil/index_calcul.html.twig",
             ["profils" => $profils,
                 "scores" => $scores,
                 "session" => $session,

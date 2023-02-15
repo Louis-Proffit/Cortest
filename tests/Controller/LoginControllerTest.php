@@ -34,14 +34,14 @@ class LoginControllerTest extends WebTestCase
     {
         $client = self::createClient();
 
-        $client->loginUser($this->loadUser($role));
+        $this->login($client, $role);
 
         $client->request(Request::METHOD_GET, $path);
 
         if ($authorized) {
             self::assertResponseIsSuccessful();
         } else {
-            self::assertResponseStatusCodeSame(403);
+            self::assertResponseRedirects("/login");
         }
     }
 

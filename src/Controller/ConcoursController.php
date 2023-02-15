@@ -3,37 +3,90 @@
 namespace App\Controller;
 
 use App\Entity\Concours;
-use App\Entity\Echelle;
 use App\Form\ConcoursType;
-use App\Form\EchelleType;
 use App\Repository\ConcoursRepository;
-use App\Repository\EchelleRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(self::BASE_PATH, name: self::BASE_ROUTE)]
-class ConcoursController extends AbstractCrudController
+#[Route("/concours", name: "concours_")]
+class ConcoursController extends AbstractController
 {
 
-    const BASE_ROUTE = "concours_";
-    const BASE_PATH = "/concours";
-
-    public function __construct(ConcoursRepository $concours_repository)
+    #[Route("/index", name: "index")]
+    public function index(
+        ConcoursRepository $concours_repository
+    ): Response
     {
-        parent::__construct($concours_repository, ConcoursType::class, self::BASE_ROUTE . "index");
+        $items = $concours_repository->findAll();
+
+        return $this->render("concours/index.html.twig", ["items" => $items]);
     }
 
-
-    protected function produce(): Concours
+    #[Route("/creer", name: "creer")]
+    public function creer(
+        EntityManagerInterface $entity_manager,
+        Request                $request
+    ): RedirectResponse|Response
     {
-        return new Concours(
+        $item = new Concours(
             id: 0,
             nom: "",
         );
+
+        $form = $this->createForm(ConcoursType::class, $item);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $entity_manager->persist($item);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("concours_index");
+
+        }
+
+        return $this->render("concours/form.html.twig", ["form" => $form->createView()]);
     }
 
-    protected function renderIndex(array $items): Response
+    #[Route("/modifier/{id}", name: "modifier")]
+    public function modifier(
+        ConcoursRepository     $concours_repository,
+        EntityManagerInterface $entity_manager,
+        Request                $request,
+        int                    $id
+    ): Response
     {
-        return $this->render("crud/index_concours.html.twig", ["items" => $items]);
+        $item = $concours_repository->find($id);
+
+        $form = $this->createForm(ConcoursRepository::class, $item);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("concours_index");
+        }
+
+        return $this->render("concours/form.html.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/supprimer", name: "supprimer")]
+    public function supprimer(
+        ConcoursRepository     $concours_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id)
+    {
+        $item = $concours_repository->find($id);
+
+        $entity_manager->remove($item);
+        $entity_manager->flush();
+
+        return $this->redirectToRoute("concours_index");
     }
 }
