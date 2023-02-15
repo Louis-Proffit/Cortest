@@ -21,17 +21,17 @@
             niveau_scolaire: {asked: true, expected: false, print: true},
             date_naissance: {asked: true, expected: false, print: true},
             sexe: {asked: true, expected: false, print: true},
-            concours: {asked: true, expected: 'I', print: true},
-            SGAP: {asked: true, expected: "12", print: true},
+            concours: {asked: true, expected: false, print: true},
+            SGAP: {asked: true, expected: false, print: true},
             date_examen: {asked: true, expected: false, print: true},
-            type_concours: {asked: true, expected: "31", print: true},
-            batterie: {asked: true, expected: "003", print: true},
+            type_concours: {asked: true, expected: false, print: true},
+            batterie: {asked: true, expected: false, print: true},
             reserve: {asked: false, expected: false, print: true},
             option_1: {asked: false, expected: false, print: true},
             option_2: {asked: false, expected: false, print: true},
         };
 
-        const questions = 5;
+        var questions = 5;
 
         var gm = new GrilleManager(request, questions);
 
@@ -153,7 +153,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">5. Enregistrer</h5>
-            <p class="card-text">Si le nombre de pages appairées correspond à la valeur attendu, vous pouvez enregistrer cette correction</p>
+            <p class="card-text">Si le nombre de pages appairées correspond à la valeur attendue, vous pouvez enregistrer cette correction</p>
             <div class='row'>
                 <div class='col-2'>
                     <button class="btn btn-success" onclick="gm.save()">
