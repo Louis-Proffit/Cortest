@@ -14,70 +14,70 @@
 
 
         const request = {
-        code_barre: {asked: true, expected: false, print: true},
-                nom: {asked: true, expected: false, print: true},
-                prenom: {asked: true, expected: false, print: true},
-                nom_jeune_fille: {asked: true, expected: false, print: true},
-                niveau_scolaire: {asked: true, expected: false, print: true},
-                date_naissance: {asked: true, expected: false, print: true},
-                sexe: {asked: true, expected: false, print: true},
-                concours: {asked: true, expected: false, print: true},
-                SGAP: {asked: true, expected:{{session.sgap.indice}}, print: true},
-                date_examen: {asked: true, expected: false, print: true},
-                type_concours: {asked: true, expected:{{session.type_concours }}, print: true},
-                batterie: {asked: true, expected:{{session.version_batterie}}, print: true},
-                reserve: {asked: false, expected: false, print: true},
-                option_1: {asked: false, expected: false, print: true},
-                option_2: {asked: false, expected: false, print: true},
+            code_barre: {asked: true, expected: false, print: true},
+            nom: {asked: true, expected: false, print: true},
+            prenom: {asked: true, expected: false, print: true},
+            nom_jeune_fille: {asked: true, expected: false, print: true},
+            niveau_scolaire: {asked: true, expected: false, print: true},
+            date_naissance: {asked: true, expected: false, print: true},
+            sexe: {asked: true, expected: false, print: true},
+            concours: {asked: true, expected: false, print: true},
+            SGAP: {asked: true, expected:{{ session.sgap.indice }}, print: true},
+            date_examen: {asked: true, expected: false, print: true},
+            type_concours: {asked: true, expected:{{ session.type_concours }}, print: true},
+            batterie: {asked: true, expected:{{ session.version_batterie }}, print: true},
+            reserve: {asked: false, expected: false, print: true},
+            option_1: {asked: false, expected: false, print: true},
+            option_2: {asked: false, expected: false, print: true},
         };
-        var questions = {{questions }};
+        var questions = {{ questions }};
         var gm = new GrilleManager(request, questions);
         var agOptions = gm.getGridConfig();
         // setup the grid after the page has finished loading
         document.addEventListener('DOMContentLoaded', () => {
-        const gridDiv = document.querySelector('#myGrid');
-        ag = new agGrid.Grid(gridDiv, agOptions);
+            const gridDiv = document.querySelector('#myGrid');
+            ag = new agGrid.Grid(gridDiv, agOptions);
         });
         $(document).ready(function () {
-        $("#spinner-fid").hide();
-        $("#spinner-qcm").hide();
+            $("#spinner-fid").hide();
+            $("#spinner-qcm").hide();
         });
     </script>
 {% endblock %}
 
 {% block content %}
     <br>
-    <h1>Lecture de feuilles par lecteur optique</h1>
+    <h1>Correction de grilles QCM par lecture optique</h1>
     <br>
 
     <p class="lead">Session : </p>
     <table class="table">
 
         <tbody>
-            <tr>
-                <td>Date</th>
-                <td><em>{{session.date |date("m/d/Y") }}</em></td>
-            </tr>
-            <tr>
-                <td>Concours</th>
-                <td><em>{{session.concours.nom}}</em></td>
-            </tr>
-            <tr>
-                <td>Type concours</th>
-                <td><em>{{session.type_concours }}</em></td>
-            </tr>
-            <tr>
-                <td>Batterie</th>
-                <td><em>{{session.version_batterie}}</em></td>
-            </tr>
-            <tr>
-                <td>SGAP</th>
-                <td><em>{{session.sgap.nom}}</em></td>
-            </tr>
-            <tr>
-                <td>Nombre de questions</th>
-                <td> <em>{{questions }}</em></td>
-            </tr>
+        <tr>
+            <td>Date
+            <td><em>{{ session.date |date("m/d/Y") }}</em></td>
+        </tr>
+        <tr>
+            <td>Concours
+            <td><em>{{ session.concours.nom }}</em></td>
+        </tr>
+        <tr>
+            <td>Type concours
+            <td><em>{{ session.concours.type_concours }}</em></td>
+        </tr>
+        <tr>
+            <td>Batterie
+            <td><em>{{ session.concours.version_batterie }}</em></td>
+        </tr>
+        <tr>
+            <td>SGAP
+            <td><em>{{ session.sgap.nom }}</em></td>
+        </tr>
+        <tr>
+            <td>Nombre de questions
+            <td><em>{{ questions }}</em></td>
+        </tr>
         </tbody>
     </table>
 
@@ -86,7 +86,7 @@
             <h5 class="card-title">1. Connection à l'appareil</h5>
             <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
             <button class="btn btn-primary" onclick="connect()">
-                Connecter le lecteur optique 
+                Connecter le lecteur optique
             </button>
         </div>
     </div>
@@ -98,7 +98,7 @@
             <div class='row'>
                 <div class='col-2'>
                     <button class="btn btn-primary" onclick="gm.readFIDs()">
-                        Lire les FID 
+                        Lire les FID
                     </button>
                 </div>
                 <div class='col-1'>
@@ -110,7 +110,8 @@
                     <p class="card-text">Pages lues : <strong id='nb-fid-lues'>0</strong></p>
                 </div>
                 <div class='col-4'>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                         Voir le détail
                     </button>
                 </div>
@@ -151,7 +152,8 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">4. Appairer</h5>
-            <p class="card-text">Si le nombres de pages lues et appairées ne correspond pas, veuillez procéder à un appairage manuel.</p>
+            <p class="card-text">Si le nombres de pages lues et appairées ne correspond pas, veuillez procéder à un
+                appairage manuel.</p>
             <div class='row'>
                 <div class='col-3'>
                     <button class="btn btn-primary" onclick="gm.manualLink()">
@@ -171,7 +173,8 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">5. Enregistrer</h5>
-            <p class="card-text">Si le nombre de pages appairées correspond à la valeur attendue, vous pouvez enregistrer cette correction</p>
+            <p class="card-text">Si le nombre de pages appairées correspond à la valeur attendue, vous pouvez
+                enregistrer cette correction</p>
             <div class='row'>
                 <div class='col-2'>
                     <button class="btn btn-success" onclick="gm.save()">
@@ -184,11 +187,13 @@
 
 
     <!--- Modal --->
-    <div class="modal modal-xl" id="manual-FID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal modal-xl" id="manual-FID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong class='code-barre'></strong></h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -196,13 +201,15 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Supprimer cette page</button>
+                    <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Supprimer cette page
+                    </button>
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Valider</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal modal-xl" id="manual-already" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-xl" id="manual-already" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -213,16 +220,20 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">La recorriger</button>
-                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ignorer cette page et continuer</button>
+                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ignorer cette page et
+                        continuer
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal modal-xl" id="manual-QCM" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal modal-xl" id="manual-QCM" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle du QCM : <strong class='code-barre'></strong></h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle du QCM : <strong
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -230,13 +241,15 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Supprimer cette page</button>
+                    <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Supprimer cette page
+                    </button>
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Valider</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal modal-lg" id="manual-fatal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-fatal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -246,12 +259,15 @@
                     <p><strong class='message'></strong></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary ignorer button" data-bs-dismiss="modal">Ignorer cette page et continuer</button>
+                    <button type="button" class="btn btn-primary ignorer button" data-bs-dismiss="modal">Ignorer cette
+                        page et continuer
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal modal-lg" id="manual-code-barre" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-code-barre" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -259,7 +275,8 @@
                 </div>
                 <div class="modal-body">
                     <p>Une erreur est survenue à la lecture du <strong>code barre</strong></p>
-                    <p><em>Vous pouvez essayez de cliquer sur la zone de saisie puis de scanner le code barre avec la scanette. Si cela fonctionne, cliquer ensuite sur "Corriger".</em></p>
+                    <p><em>Vous pouvez essayez de cliquer sur la zone de saisie puis de scanner le code barre avec la
+                            scanette. Si cela fonctionne, cliquer ensuite sur "Corriger".</em></p>
                     <form>
                         <div class="row mb-3">
                             <div class="col-12">
@@ -267,27 +284,33 @@
                             </div>
                         </div>
                     </form>
-                    <p><em>Si le code barre est absent ou que sa lecture à la scanette ne donne rien, vous pouvez noter sur la page la référence proposée ci-dessous et cliquer sur "Appairage manuel". 
+                    <p><em>Si le code barre est absent ou que sa lecture à la scanette ne donne rien, vous pouvez noter
+                            sur la page la référence proposée ci-dessous et cliquer sur "Appairage manuel".
                             Cet appairage vous sera demandé après lecture de toutes les autres pages.</em></p>
-                    <p  class='text-center'><strong class='propal'></strong></p>
-                    <p><em>Si vous souhaitez finalement ne pas corriger cette page, cliquez sur "Ne pas corriger", elle sera alors ignorée.</em></p>
+                    <p class='text-center'><strong class='propal'></strong></p>
+                    <p><em>Si vous souhaitez finalement ne pas corriger cette page, cliquez sur "Ne pas corriger", elle
+                            sera alors ignorée.</em></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ne pas corriger</button>
-                    <button type="button" class="btn btn-primary manuel" data-bs-dismiss="modal">Appairage manuel</button>
+                    <button type="button" class="btn btn-warning ignorer" data-bs-dismiss="modal">Ne pas corriger
+                    </button>
+                    <button type="button" class="btn btn-primary manuel" data-bs-dismiss="modal">Appairage manuel
+                    </button>
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Corriger</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal modal-lg" id="manual-link" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal modal-lg" id="manual-link" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Appairage manuel</h1>
                 </div>
                 <div class="modal-body">
-                    <p>Vous avez <strong class='nb-a-appaires'></strong> pages à appairer manuellement. Veuillez faire les associations puis valider.</p>
+                    <p>Vous avez <strong class='nb-a-appaires'></strong> pages à appairer manuellement. Veuillez faire
+                        les associations puis valider.</p>
 
                     <form>
                         <div class="row mb-1">

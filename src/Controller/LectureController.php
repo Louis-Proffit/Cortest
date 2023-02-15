@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ReponseCandidat;
+use App\Entity\Session;
 use App\Form\Data\ParametresLectureJSON;
 use App\Form\Data\ParametresLectureOptique;
 use App\Form\ParametresLectureFichierType;
@@ -141,26 +142,25 @@ class LectureController extends AbstractController
     }
 
     #[Route("/scanner", name: "scanner")]
-    public function scanner(ManagerRegistry          $doctrine,
-                            NiveauScolaireRepository $niveau_scolaire_repository,
-                            Request                  $request,
-                            LoggerInterface          $logger): Response
+    public function scanner(ManagerRegistry $doctrine,
+                            Request         $request): Response
     {
-        
+
         $manager = $doctrine->getManager();
 
         $uploadSessionBase = new ParametresLectureOptique();
         $form = $this->createForm(ParametresLectureOptiqueType::class, $uploadSessionBase);
 
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getdata();
-            $session = $data->session;
-            $questions = $data->questions;
-            return $this->render("lecture/from_scanner.html.twig", ["form" => null, "session" => $session, "questions" => $questions]);
+
+            $session = $uploadSessionBase->session;
+            $questions = $uploadSessionBase->questions;
+            return $this->render("lecture/from_scanner.html.twig",
+                ["form" => null, "session" => $session, "questions" => $questions]);
         }
-        
+
         return $this->render('lecture/from_scanner_parameters.html.twig', [
             'form' => $form
         ]);
