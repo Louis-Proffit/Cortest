@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Correction par lecture optique</h1>
+    <br>
+    {{ form_start(form) }}
+    <div class="row align-items-center">
+        <div class="col-md-auto">
+            <a class="btn btn-primary" href="{{ path("session_creer") }}">Créer</a>
+        </div>
+        <div class="col">
+            {{ form_row(form.session) }}
+        </div>
+    </div>
+    {{ form_row(form.questions) }}
+    {{ form_end(form) }}
+    <br>
+{% endblock %}
+
