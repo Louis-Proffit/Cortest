@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ParametresLectureJSON;
+use App\Form\Data\ParametresLectureOptique;
 use App\Form\ParametresLectureFichierType;
+use App\Form\ParametresLectureOptiqueType;
 use App\Form\ReponseCandidatType;
 use App\Repository\NiveauScolaireRepository;
 use App\Repository\SessionRepository;
@@ -139,14 +141,29 @@ class LectureController extends AbstractController
     }
 
     #[Route("/scanner", name: "scanner")]
-    public function scanner(): Response
+    public function scanner(ManagerRegistry          $doctrine,
+                            NiveauScolaireRepository $niveau_scolaire_repository,
+                            Request                  $request,
+                            LoggerInterface          $logger): Response
     {
-        //si pas de session spécifiée, la demander !
-        //si la session est renseignée : ($session disponible)
-        //ancienne vue
-        return $this->render("lecture/from_scanner.html.twig", ["form" => null]);
-        //nouvelle vue
-        //return $this->render("lecture/lecteur_optique.html.twig", ["form" => null]);
+        
+        $manager = $doctrine->getManager();
+
+        $uploadSessionBase = new ParametresLectureOptique();
+        $form = $this->createForm(ParametresLectureOptiqueType::class, $uploadSessionBase);
+
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getdata();
+            $session = $data->session;
+            $questions = $data->questions;
+            return $this->render("lecture/from_scanner.html.twig", ["form" => null, "session" => $session, "questions" => $questions]);
+        }
+        
+        return $this->render('lecture/from_scanner_parameters.html.twig', [
+            'form' => $form
+        ]);
     }
 
 }
