@@ -155,7 +155,10 @@ class LectureController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->render("lecture/from_scanner.html.twig", ["form" => null]);
+            $data = $form->getdata();
+            $session = $data->session;
+            $questions = $data->questions;
+            return $this->render("lecture/from_scanner.html.twig", ["form" => null, "session" => $session, "questions" => $questions]);
         }
         
         return $this->render('lecture/from_scanner_parameters.html.twig', [
