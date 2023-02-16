@@ -14,33 +14,38 @@
 
 
         const request = {
-            code_barre: {asked: true, expected: false, print: true},
-            nom: {asked: true, expected: false, print: true},
-            prenom: {asked: true, expected: false, print: true},
-            nom_jeune_fille: {asked: true, expected: false, print: true},
-            niveau_scolaire: {asked: true, expected: false, print: true},
-            date_naissance: {asked: true, expected: false, print: true},
-            sexe: {asked: true, expected: false, print: true},
-            concours: {asked: true, expected: false, print: true},
-            SGAP: {asked: true, expected:{{ session.sgap.indice }}, print: true},
-            date_examen: {asked: true, expected: false, print: true},
-            type_concours: {asked: true, expected:{{ session.type_concours }}, print: true},
-            batterie: {asked: true, expected:{{ session.version_batterie }}, print: true},
-            reserve: {asked: false, expected: false, print: true},
-            option_1: {asked: false, expected: false, print: true},
-            option_2: {asked: false, expected: false, print: true},
+        code_barre: {asked: true, expected: false, print: true},
+                nom: {asked: true, expected: false, print: true},
+                prenom: {asked: true, expected: false, print: true},
+                nom_jeune_fille: {asked: true, expected: false, print: true},
+                niveau_scolaire: {asked: true, expected: false, print: true},
+                date_naissance: {asked: true, expected: false, print: true},
+                sexe: {asked: true, expected: false, print: true},
+                concours: {asked: true, expected: false, print: true},
+                SGAP: {asked: true, expected:'{{ session.SGAP }}', print: true},
+                date_examen: {asked: true, expected: false, print: true},
+                type_concours: {asked: true, expected:'{{ session.concours.type_concours }}', print: true},
+                batterie: {asked: true, expected:'{{ session.concours.version_batterie }}', print: true},
+                reserve: {asked: false, expected: false, print: true},
+                option_1: {asked: false, expected: false, print: true},
+                option_2: {asked: false, expected: false, print: true},
         };
-        var questions = {{ questions }};
+        var questions = {};
+        {% for questionInfos in session.concours.questions %}
+            questions['{{questionInfos.indice}}'] = '{{questionInfos.type}}';
+        {% endfor %}
+        
+       
         var gm = new GrilleManager(request, questions);
         var agOptions = gm.getGridConfig();
         // setup the grid after the page has finished loading
         document.addEventListener('DOMContentLoaded', () => {
-            const gridDiv = document.querySelector('#myGrid');
-            ag = new agGrid.Grid(gridDiv, agOptions);
+        const gridDiv = document.querySelector('#myGrid');
+        ag = new agGrid.Grid(gridDiv, agOptions);
         });
         $(document).ready(function () {
-            $("#spinner-fid").hide();
-            $("#spinner-qcm").hide();
+        $("#spinner-fid").hide();
+        $("#spinner-qcm").hide();
         });
     </script>
 {% endblock %}
@@ -54,30 +59,26 @@
     <table class="table">
 
         <tbody>
-        <tr>
-            <td>Date
-            <td><em>{{ session.date |date("m/d/Y") }}</em></td>
-        </tr>
-        <tr>
-            <td>Concours
-            <td><em>{{ session.concours.nom }}</em></td>
-        </tr>
-        <tr>
-            <td>Type concours
-            <td><em>{{ session.concours.type_concours }}</em></td>
-        </tr>
-        <tr>
-            <td>Batterie
-            <td><em>{{ session.concours.version_batterie }}</em></td>
-        </tr>
-        <tr>
-            <td>SGAP
-            <td><em>{{ session.sgap.nom }}</em></td>
-        </tr>
-        <tr>
-            <td>Nombre de questions
-            <td><em>{{ questions }}</em></td>
-        </tr>
+            <tr>
+                <td>Date
+                <td><em>{{ session.date |date("m/d/Y") }}</em></td>
+            </tr>
+            <tr>
+                <td>Concours
+                <td><em>{{ session.concours.nom }}</em></td>
+            </tr>
+            <tr>
+                <td>Type concours
+                <td><em>{{ session.concours.type_concours }}</em></td>
+            </tr>
+            <tr>
+                <td>Batterie
+                <td><em>{{ session.concours.version_batterie }}</em></td>
+            </tr>
+            <tr>
+                <td>SGAP
+                <td><em>{{ session.sgap.nom }}</em></td>
+            </tr>
         </tbody>
     </table>
 
@@ -193,7 +194,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong
-                                class='code-barre'></strong></h1>
+                            class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -233,7 +234,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle du QCM : <strong
-                                class='code-barre'></strong></h1>
+                            class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>

@@ -26,7 +26,7 @@ class ParametresLectureOptiqueType extends AbstractType
     private function sessionDisplay(Session $session): string
     {
         return "Session : "
-            . $session->date->format('Y-m-d')
+            . $session->date->format('d-m-Y')
             . " | "
             . $session->sgap->nom;
     }
@@ -54,11 +54,6 @@ class ParametresLectureOptiqueType extends AbstractType
                     'choices' => $this->sessionChoices()
                 ]
             )
-            ->add("questions",
-                    IntegerType::class,
-                [
-                    'label' => "Nombre de questions à corriger"
-                ])
             ->add("Corriger", SubmitType::class);
     }
         

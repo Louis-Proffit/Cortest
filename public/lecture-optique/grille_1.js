@@ -40,7 +40,7 @@ class GrilleManager {
         option_2: {name: 'Option 2', type: 'number', length: 6, regex: /^[0-9]{6}$/},
     };
 
-    constructor(request, nbQuestions) {
+    constructor(request, questions) {
 
         /* request décrit ce qui est attendu pour cette session
          * elle doit être de la forme
@@ -55,7 +55,8 @@ class GrilleManager {
         this.request = request;
         this.FIDs = [];
         this.QCMs = [];
-        this.nbQuestions = nbQuestions;
+        this.nbQuestions = 640;
+        this.questions = questions;
         this.noCodeBarreFID = 1;
         this.noCodeBarreQCM = 1;
         this.codesAppaires = [];
@@ -121,7 +122,7 @@ class GrilleManager {
 //vérifie si une fid a été traitée
         return this.FIDs.findIndex((e) => e.code_barre === code_barre) !== -1;
     }
-    
+
     getFID(code_barre) {
         return this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code_barre)];
     }
@@ -136,7 +137,7 @@ class GrilleManager {
 //vérifie si un qcm a été traité
         return this.QCMs.findIndex((e) => e.code_barre === code_barre) !== -1;
     }
-    
+
     getQCM(code_barre) {
         return this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code_barre)];
     }
@@ -266,17 +267,22 @@ class GrilleManager {
     async correctQCM(code_barre, qcm) {
         const blanck = '_';
         const unknown = '?';
+        const notasked = '*';
         const corresp = {'A': 'A', 'B': 'B', 'D': 'C', 'H': 'D', 'P': 'E'};
         var toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
-            if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
-                qcm[i] = corresp[qcm[i]];
-            } else {
-                if (qcm[i] === '@') {
-                    toCorrect.push({numero: i, blanck: true, unknown: false});
+            if (this.questions[i.toString()] !== 'Inutilisé') {
+                if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
+                    qcm[i] = corresp[qcm[i]];
                 } else {
-                    toCorrect.push({numero: i, blanck: false, unknown: true});
+                    if (qcm[i] === '@') {
+                        toCorrect.push({numero: i, blanck: true, unknown: false});
+                    } else {
+                        toCorrect.push({numero: i, blanck: false, unknown: true});
+                    }
                 }
+            } else {
+                qcm[i] = notasked;
             }
         }
         if (toCorrect.length > 0) {
@@ -290,7 +296,7 @@ class GrilleManager {
                 my.readQCMs();
             }, function () {
                 my.readQCMs();
-            }, '_', '?');
+            }, blanck, unknown);
         } else {
             tell('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
@@ -472,7 +478,7 @@ class GrilleManager {
                 var my = this;
                 askManualLink(nbPagesAAppairer, FIDsDispo, QCMsDispo, function (rep) {
                     for (var i in rep) {
-                        if(!(my.codesAppaires.includes(rep[i].fid) || my.codesAppaires.includes(rep[i].qcm))) {
+                        if (!(my.codesAppaires.includes(rep[i].fid) || my.codesAppaires.includes(rep[i].qcm))) {
                             my.getQCM(rep[i].qcm).code_barre = rep[i].fid;
                             my.codesAppaires.push(rep[i].fid);
                             $("#nb-appaires").text(parseInt($("#nb-appaires").text()) + 2);

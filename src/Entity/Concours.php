@@ -36,15 +36,13 @@ class Concours
     #[ORM\Column]
     public int $index_grille;
 
-    #[LessThan(value: 100)]
-    #[PositiveOrZero]
+    #[NotBlank]
     #[ORM\Column]
-    public int $type_concours;
+    public string $type_concours;
 
-    #[LessThan(value: 1000)]
-    #[PositiveOrZero]
+    #[NotBlank]
     #[ORM\Column]
-    public int $version_batterie;
+    public string $version_batterie;
 
     #[ORM\OneToMany(mappedBy: "concours", targetEntity: QuestionConcours::class, cascade: ["persist", "remove"])]
     public Collection $questions;
@@ -55,11 +53,11 @@ class Concours
      * @param Collection $correcteurs
      * @param Collection $sessions
      * @param int $index_grille
-     * @param int $type_concours
-     * @param int $version_batterie
+     * @param string $type_concours
+     * @param string $version_batterie
      * @param Collection $questions
      */
-    public function __construct(int $id, string $nom, Collection $correcteurs, Collection $sessions, int $index_grille, int $type_concours, int $version_batterie, Collection $questions)
+    public function __construct(int $id, string $nom, Collection $correcteurs, Collection $sessions, int $index_grille, string $type_concours, string $version_batterie, Collection $questions)
     {
         $this->id = $id;
         $this->nom = $nom;
