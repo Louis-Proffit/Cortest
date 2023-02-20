@@ -14,39 +14,48 @@
 
 
         const request = {
-        code_barre: {asked: true, expected: false, print: true},
-                nom: {asked: true, expected: false, print: true},
-                prenom: {asked: true, expected: false, print: true},
-                nom_jeune_fille: {asked: true, expected: false, print: true},
-                niveau_scolaire: {asked: true, expected: false, print: true},
-                date_naissance: {asked: true, expected: false, print: true},
-                sexe: {asked: true, expected: false, print: true},
-                concours: {asked: true, expected: false, print: true},
-                SGAP: {asked: true, expected:'{{ session.SGAP }}', print: true},
-                date_examen: {asked: true, expected: false, print: true},
-                type_concours: {asked: true, expected:'{{ session.concours.type_concours }}', print: true},
-                batterie: {asked: true, expected:'{{ session.concours.version_batterie }}', print: true},
-                reserve: {asked: false, expected: false, print: true},
-                option_1: {asked: false, expected: false, print: true},
-                option_2: {asked: false, expected: false, print: true},
+            code_barre: {asked: true, expected: false, print: true},
+            nom: {asked: true, expected: false, print: true},
+            prenom: {asked: true, expected: false, print: true},
+            nom_jeune_fille: {asked: true, expected: false, print: true},
+            niveau_scolaire: {asked: true, expected: false, print: true},
+            date_naissance: {asked: true, expected: false, print: true},
+            sexe: {asked: true, expected: false, print: true},
+            concours: {asked: true, expected: false, print: true},
+            SGAP: {asked: true, expected: '{{ session.SGAP }}', print: true},
+            date_examen: {asked: true, expected: false, print: true},
+            type_concours: {asked: true, expected: '{{ session.concours.type_concours }}', print: true},
+            batterie: {asked: true, expected: '{{ session.concours.version_batterie }}', print: true},
+            reserve: {asked: false, expected: false, print: true},
+            option_1: {asked: false, expected: false, print: true},
+            option_2: {asked: false, expected: false, print: true},
         };
         var questions = {};
         {% for questionInfos in session.concours.questions %}
             questions['{{questionInfos.indice}}'] = '{{questionInfos.type}}';
         {% endfor %}
-        
-       
-        var gm = new GrilleManager(request, questions);
-        var agOptions = gm.getGridConfig();
-        // setup the grid after the page has finished loading
-        document.addEventListener('DOMContentLoaded', () => {
-        const gridDiv = document.querySelector('#myGrid');
-        ag = new agGrid.Grid(gridDiv, agOptions);
-        });
-        $(document).ready(function () {
-        $("#spinner-fid").hide();
-        $("#spinner-qcm").hide();
-        });
+
+
+            var gm = new GrilleManager(request, questions);
+            var agOptions = gm.getGridConfig();
+            // setup the grid after the page has finished loading
+            document.addEventListener('DOMContentLoaded', () => {
+                const gridDiv = document.querySelector('#myGrid');
+                ag = new agGrid.Grid(gridDiv, agOptions);
+            });
+            
+            var lunch = function () {
+                $("#btn-fid").removeAttr("disabled");
+                $("#btn-qcm").removeAttr("disabled");
+            };
+            
+            $(document).ready(function () {
+                $("#btn-fid").attr("disabled", true);
+                $("#btn-qcm").attr("disabled", true);
+                $("#btn-test-connexion").attr("disabled", true);
+                $("#spinner-fid").hide();
+                $("#spinner-qcm").hide();
+            });
     </script>
 {% endblock %}
 
@@ -86,8 +95,11 @@
         <div class="card-body">
             <h5 class="card-title">1. Connection à l'appareil</h5>
             <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
-            <button class="btn btn-primary" onclick="connect()">
-                Connecter le lecteur optique
+            <button class="btn btn-primary" onclick="connect(function () {$('#btn-test-connexion').removeAttr('disabled');})">
+                Sélectionner le lecteur optique
+            </button>
+            <button id='btn-test-connexion' class="btn btn-primary" onclick="tryConnexion(lunch)">
+                Vérifier la connexion
             </button>
         </div>
     </div>
@@ -98,7 +110,7 @@
             <p class="card-text">Placez les pages d'identification et lancez la procédure</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button class="btn btn-primary" onclick="gm.readFIDs()">
+                    <button id='btn-fid' class="btn btn-primary" onclick="gm.readFIDs()" disabled>
                         Lire les FID
                     </button>
                 </div>
@@ -134,7 +146,7 @@
             <p class="card-text">Placez les pages de réponse au QCM et lancez la procédure</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button class="btn btn-primary" onclick="gm.readQCMs()">
+                    <button id='btn-qcm' class="btn btn-primary" onclick="gm.readQCMs()" disabled>
                         Lire les QCMs
                     </button>
                 </div>

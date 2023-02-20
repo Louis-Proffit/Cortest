@@ -22,8 +22,8 @@ class ConcoursType extends AbstractType
     {
         $builder
             ->add("nom", TextType::class, ["label" => "Nom du concours"])
-            ->add("type_concours", IntegerType::class, ["label" => "Type de concours"])
-            ->add("version_batterie", IntegerType::class, ["label" => "Version batterie"])
+            ->add("type_concours", TextType::class, ["label" => "Type de concours"])
+            ->add("version_batterie", TextType::class, ["label" => "Version batterie"])
             ->add("questions", CollectionType::class, [
                 "entry_type" => QuestionConcoursType::class,
                 "label" => false

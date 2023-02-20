@@ -4,10 +4,20 @@
 
 var port = null;
 
-async function connect() {
+async function connect(callback) {
     port = await navigator.serial.requestPort();
     await port.open({baudRate: 19200});
     read();
+    callback();
+    
+    
+}
+
+async function tryConnexion(toDo) {
+    var test = await get('V');
+    if(test.match(/\x01\x02.*\r\n\x03\x04/)) {
+        toDO();
+    }
 }
 
 //stocke les réponses du lecteur
