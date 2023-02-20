@@ -15,8 +15,8 @@ async function connect(callback) {
 
 async function tryConnexion(toDo) {
     var test = await get('V');
-    if(test.match(/\x01\x02.*\r\n\x03\x04/)) {
-        toDO();
+    if(test.match(/\x01\x02.*r\n\x03\x04/) !== null) {
+        toDo();
     }
 }
 
