@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route("/lecture", name: "lecture_")]
 class LectureController extends AbstractController
@@ -143,6 +144,7 @@ class LectureController extends AbstractController
 
     #[Route("/scanner", name: "scanner")]
     public function scanner(ManagerRegistry $doctrine,
+                            NiveauScolaireRepository $niveauScolaireRepository,
                             Request         $request): Response
     {
 
@@ -157,12 +159,46 @@ class LectureController extends AbstractController
 
             $session = $uploadSessionBase->session;
             return $this->render("lecture/from_scanner.html.twig",
-                ["form" => null, "session" => $session]);
+                ["form" => null, 
+                 "session" => $session,
+                 "niveaux" => $niveauScolaireRepository->findAll(),
+                    ]);
         }
 
         return $this->render('lecture/from_scanner_parameters.html.twig', [
             'form' => $form
         ]);
+    }
+    
+    #[Route("/scanner/save", name: 'saveFromScanner')]
+    public function saveFromScanner(Request $request, 
+            EntityManagerInterface  $entity_manager,
+            SessionRepository        $session_repository,
+            NiveauScolaireRepository $niveau_scolaire_repository
+            ) : Response {
+        
+        $data = json_decode($request->request->get("data"), true);
+        foreach ($data as $i => $ligne) {
+            $rep = new ReponseCandidat(
+                0,
+                $session_repository->find($request->request->get('session')),
+                $ligne['qcm'],
+                $ligne['nom'],
+                $ligne['prenom'],
+                $ligne['nom_jeune_fille'],
+                $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
+                new DateTime($ligne['date_naissance']),
+                $ligne['sexe'],
+                $ligne['reserve'],
+                $ligne['option_1'],
+                $ligne['option_2'],
+                $i,
+                null
+            );
+            $entity_manager->persist($rep);
+            $entity_manager->flush();
+        }
+        return new JsonResponse($data);
     }
 
 }

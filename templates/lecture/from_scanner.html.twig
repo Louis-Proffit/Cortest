@@ -35,27 +35,55 @@
             questions['{{questionInfos.indice}}'] = '{{questionInfos.type}}';
         {% endfor %}
 
+            var choice = [];
+        {% for niveau in niveaux %}
+            choice.push({read : '{{niveau.indice}}', print: '{{niveau.nom}}', store: {{niveau.id}} });
+        {% endfor %}
 
-            var gm = new GrilleManager(request, questions);
+
+            var gm = new GrilleManager(request, questions, choice);
             var agOptions = gm.getGridConfig();
             // setup the grid after the page has finished loading
             document.addEventListener('DOMContentLoaded', () => {
                 const gridDiv = document.querySelector('#myGrid');
                 ag = new agGrid.Grid(gridDiv, agOptions);
             });
-            
+
             var lunch = function () {
                 $("#btn-fid").removeAttr("disabled");
                 $("#btn-qcm").removeAttr("disabled");
             };
-            
+
             $(document).ready(function () {
                 $("#btn-fid").attr("disabled", true);
                 $("#btn-qcm").attr("disabled", true);
                 $("#btn-test-connexion").attr("disabled", true);
                 $("#spinner-fid").hide();
                 $("#spinner-qcm").hide();
+
+                gm.FIDs = [{
+                        code_barre: "125273",
+                        nom: "COLLARD",
+                        prenom: 'Julien',
+                        nom_jeune_fille: "",
+                        niveau_scolaire: 66,
+                        date_naissance: '10/12/2001',
+                        sexe: 1,
+                        concours: "E",
+                        SGAP: 12,
+                        date_examen: "22/02/2023",
+                        type_concours: 23,
+                        batterie: 344,
+                        reserve: "",
+                        option_1: "",
+                        option_2: "",
+                    }];
+                gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];
             });
+
+
+
+
     </script>
 {% endblock %}
 
@@ -95,7 +123,9 @@
         <div class="card-body">
             <h5 class="card-title">1. Connection à l'appareil</h5>
             <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
-            <button class="btn btn-primary" onclick="connect(function () {$('#btn-test-connexion').removeAttr('disabled');})">
+            <button class="btn btn-primary" onclick="connect(function () {
+                        $('#btn-test-connexion').removeAttr('disabled');
+                    })">
                 Sélectionner le lecteur optique
             </button>
             <button id='btn-test-connexion' class="btn btn-primary" onclick="tryConnexion(lunch)">
@@ -190,7 +220,7 @@
                 enregistrer cette correction</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button class="btn btn-success" onclick="gm.save()">
+                    <button class="btn btn-success" onclick="gm.save({{ session.id }})">
                         Enregistrer
                     </button>
                 </div>
@@ -357,6 +387,20 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning annuler" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-success valider" data-bs-dismiss="modal">Appairer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal modal-lg" id="manual-end" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Enregistrement avec succès</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Les tests corrigés ont bien été enregistrés !</p><a href="/lecture/index" class="btn btn-success valider" >Fin de la correction</a>
                 </div>
             </div>
         </div>

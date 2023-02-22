@@ -22,8 +22,8 @@ class GrilleManager {
             ]},
         date_naissance: {name: 'Date de naissance', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
         sexe: {name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
-                {read: '1', print: 'M', store: 'M'},
-                {read: '2', print: 'F', store: 'F'},
+                {read: '1', print: 'M', store: 1},
+                {read: '2', print: 'F', store: 2},
             ]},
         concours: {name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
                 {read: 'E', print: 'E', store: 'E'},
@@ -40,7 +40,7 @@ class GrilleManager {
         option_2: {name: 'Option 2', type: 'number', length: 6, regex: /^[0-9]{6}$/},
     };
 
-    constructor(request, questions) {
+    constructor(request, questions, niveauxScolaires) {
 
         /* request décrit ce qui est attendu pour cette session
          * elle doit être de la forme
@@ -51,6 +51,42 @@ class GrilleManager {
          ...
          }
          */
+
+        this.contentFID = {
+            code_barre: {name: 'Code barre', type: 'number', length: 8, regex: /^.{8}$/},
+            nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+[\s]*$/},
+            prenom: {name: 'Prénom', type: 'string', length: 11, regex: /^[A-Z]+[\s]*$/},
+            nom_jeune_fille: {name: 'Nom de jeune fille', type: 'string', length: 12, regex: /^[A-Z]*[\s]*$/},
+            niveau_scolaire: {name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
+                    {read: '1', print: 'CEP', store: 'CEP'},
+                    {read: '2', print: 'CAP-BEP-BEPC', store: 'CAP-BEP-BEPC'},
+                    {read: '3', print: 'niveau BAC', store: 'niveau BAC'},
+                    {read: '4', print: 'BAC', store: 'BAC'},
+                    {read: '5', print: 'BAC+1', store: 'BAC+1'},
+                    {read: '6', print: 'BAC+2', store: 'BAC+2'},
+                    {read: '7', print: 'license ou maitrise', store: 'license ou maitrise'},
+                    {read: '8', print: 'ingénieur ou troisème cycle', store: 'ingénieur ou troisème cycle'},
+                ]},
+            date_naissance: {name: 'Date de naissance', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
+            sexe: {name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
+                    {read: '1', print: 'M', store: 1},
+                    {read: '2', print: 'F', store: 2},
+                ]},
+            concours: {name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
+                    {read: 'E', print: 'E', store: 'E'},
+                    {read: 'I', print: 'I', store: 'I'},
+                    {read: 'R', print: 'R', store: 'R'},
+                    {read: 'S', print: 'S', store: 'S'},
+                ]},
+            SGAP: {name: 'SGAP', type: 'number', length: 2, regex: /^[0-9]{2}$/},
+            date_examen: {name: 'Date d\'examen', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
+            type_concours: {name: 'Type concours', type: 'number', length: 2, regex: /^[0-9]{2}$/},
+            batterie: {name: 'Batterie', type: 'number', length: 3, regex: /^[0-9]{3}$/},
+            reserve: {name: 'Reservé', type: 'number', length: 5, regex: /^[0-9]{5}$/},
+            option_1: {name: 'Option 1', type: 'number', length: 4, regex: /^[0-9]{4}$/},
+            option_2: {name: 'Option 2', type: 'number', length: 6, regex: /^[0-9]{6}$/},
+        };
+        this.contentFID.niveau_scolaire.choice = niveauxScolaires;
 
         this.request = request;
         this.FIDs = [];
@@ -65,8 +101,8 @@ class GrilleManager {
     getGridConfig() {
 //renvoie la configuration pour le tableau AG-GRID
         var columnDefs = [];
-        for (var field in GrilleManager.contentFID) {
-            var ligne = GrilleManager.contentFID[field];
+        for (var field in this.contentFID) {
+            var ligne = this.contentFID[field];
             if (this.request[field].print) {
                 switch (ligne.type) {
                     case 'date':
@@ -166,8 +202,8 @@ class GrilleManager {
         const not_asked = 'not_asked';
         const siecleCorrection = 20;
         const anneeCorrection = 23;
-        for (var field in GrilleManager.contentFID) {
-            var ligne = GrilleManager.contentFID[field];
+        for (var field in this.contentFID) {
+            var ligne = this.contentFID[field];
             var requestField = this.request[field];
             if (requestField.asked) {
                 //si le champs est demandé
@@ -309,8 +345,8 @@ class GrilleManager {
     readFID(text) {
         var fid = {};
         var cursor = 0;
-        for (var field in GrilleManager.contentFID) {
-            var ligne = GrilleManager.contentFID[field];
+        for (var field in this.contentFID) {
+            var ligne = this.contentFID[field];
             var step = ligne.length;
             fid[field] = text.slice(cursor, cursor + step);
             cursor += step;
@@ -456,7 +492,9 @@ class GrilleManager {
     }
 
     manualLink() {
+        console.log(this.QCMs.length);
         var nbPagesAAppairer = this.FIDs.length + this.QCMs.length - 2 * this.codesAppaires.length;
+        console.log(nbPagesAAppairer);
         if (nbPagesAAppairer % 2 === 1) {
             tellFatalError("Le nombre de pages à appairer n'est pas paire, veuillez poursuivre la correction", "Continuer", function () {});
         } else {
@@ -489,5 +527,19 @@ class GrilleManager {
 
         }
 
+    }
+
+    save(session) {
+        var rep = {};
+        for (var i in this.codesAppaires) {
+            var code = this.codesAppaires[i]
+            rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
+            rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].qcm;
+        }
+        console.log(rep);
+        console.log("session " + session)
+        $.post('/lecture/scanner/save', {data: JSON.stringify(rep), session: session}, function (rep) {
+            $("#manual-end").modal("show");
+        });
     }
 }
