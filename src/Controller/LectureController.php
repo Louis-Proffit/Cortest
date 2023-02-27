@@ -178,6 +178,8 @@ class LectureController extends AbstractController
             ) : Response {
         
         $data = json_decode($request->request->get("data"), true);
+        
+        /*
         foreach ($data as $i => $ligne) {
             $rep = new ReponseCandidat(
                 0,
@@ -198,6 +200,8 @@ class LectureController extends AbstractController
             $entity_manager->persist($rep);
             $entity_manager->flush();
         }
+        
+         */
             return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
     }
 
