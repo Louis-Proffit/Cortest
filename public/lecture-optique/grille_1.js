@@ -306,7 +306,7 @@ class GrilleManager {
         const corresp = {'A': 'A', 'B': 'B', 'D': 'C', 'H': 'D', 'P': 'E'};
         var toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
-            if (this.questions[i.toString()] !== 'Inutilisé') {
+            if (this.questions[(i+1).toString()] !== 'Inutilisé') {
                 if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
                     qcm[i] = corresp[qcm[i]];
                 } else {
@@ -321,7 +321,7 @@ class GrilleManager {
             }
         }
         if (toCorrect.length > 0) {
-            tell('S');
+            await tell('S');
             var my = this;
             askQCM(code_barre, toCorrect, function (rep) {
                 for (var j in rep) {
@@ -333,10 +333,9 @@ class GrilleManager {
                 my.readQCMs();
             }, blanck, unknown);
         } else {
-            tell('G');
+            await tell('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
             this.readQCMs();
-
         }
 
     }
@@ -444,7 +443,7 @@ class GrilleManager {
             return true;
         }
 
-        //si il y a effectivement un epage à lire
+        //si il y a effectivement une page à lire
         //var rep = "\x15  00003 Erreur type de feuille\x15  00003 Erreur type de feuille\r\n\x03\x01\x023250011018500110TEST TPPTLS    T PPTSA                70506942 150401??99003     1007      090\r\n\x03\x04";
         for (var i in GrilleManager.codesErreurs) {
             var erreur = GrilleManager.codesErreurs[i];
@@ -485,7 +484,7 @@ class GrilleManager {
         } else {
             await tell('G');
             var expl = match[1];
-            return this.readQCM(expl);
+            this.readQCM(expl);
         }
 
     }
@@ -531,7 +530,7 @@ class GrilleManager {
         for (var i in this.codesAppaires) {
             var code = this.codesAppaires[i]
             rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
-            rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].qcm;
+            rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].reponses;
         }
         console.log("Envoie de la requête :");
         console.log(JSON.stringify(rep));
