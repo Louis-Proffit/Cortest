@@ -369,9 +369,7 @@ class GrilleManager {
         $("#spinner-fid").show();
         var rep = await get('L');
         //var rep = "\x01\x0222????? ????????COLLARD        JULIEN                 81012011E1327012313021               090\r\n\x03\x04";
-
         const bac_vide = "\x1506\r\n\x03";
-
         if (rep.includes(bac_vide)) {
             //on n'a plus de page à lire
             //on revoie une commande L pour baisser le bac
@@ -389,7 +387,7 @@ class GrilleManager {
             var my = this;
             if (rep.includes(erreur.sequence)) {
                 await tell('S');
-                return tellFatalError(erreur.message, "Lire la page suivante", function () {
+                return tellFatalError(erreur.message, "Lire la page suivante", async function () {
                     return my.readFIDs();
                 });
             }
@@ -482,7 +480,6 @@ class GrilleManager {
                 });
             }
         } else {
-            await tell('G');
             var expl = match[1];
             this.readQCM(expl);
         }
