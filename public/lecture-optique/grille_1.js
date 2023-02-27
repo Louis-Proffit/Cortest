@@ -535,7 +535,7 @@ class GrilleManager {
             rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
             rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].qcm;
         }
-        console.log(rep);
+        console.log(JSON.stringify(rep));
         console.log("session " + session)
         $.post('/lecture/scanner/save', {data: JSON.stringify(rep), session: session}, function (rep) {
             console.log("réponse du serveur :");
