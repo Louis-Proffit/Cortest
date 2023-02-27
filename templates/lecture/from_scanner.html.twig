@@ -37,7 +37,7 @@
 
             var choice = [];
         {% for niveau in niveaux %}
-            choice.push({read : '{{niveau.indice}}', print: '{{niveau.nom}}', store: {{niveau.id}} });
+            choice.push({read: '{{niveau.indice}}', print: '{{niveau.nom}}', store:  {{niveau.id}} });
         {% endfor %}
 
 
@@ -60,26 +60,34 @@
                 $("#btn-test-connexion").attr("disabled", true);
                 $("#spinner-fid").hide();
                 $("#spinner-qcm").hide();
+                console.log('ready');
 
-                /*gm.FIDs = [{
-                        code_barre: "125273",
-                        nom: "COLLARD",
-                        prenom: 'Julien',
-                        nom_jeune_fille: "",
-                        niveau_scolaire: 66,
-                        date_naissance: '10/12/2001',
-                        sexe: 1,
-                        concours: "E",
-                        SGAP: 12,
-                        date_examen: "22/02/2023",
-                        type_concours: 23,
-                        batterie: 344,
-                        reserve: "",
-                        option_1: "",
-                        option_2: "",
-                    }];
-                gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];*/
+
+
+                /*gm.FIDs = [];
+                 gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];*/
             });
+
+            var testFID = {
+                code_barre: "125273",
+                nom: "COLLARD",
+                prenom: 'Julien',
+                nom_jeune_fille: "",
+                niveau_scolaire: 66,
+                date_naissance: '10/12/2001',
+                sexe: 1,
+                concours: "E",
+                SGAP: 12,
+                date_examen: "22/02/2023",
+                type_concours: 23,
+                batterie: 344,
+                reserve: "",
+                option_1: "",
+                option_2: "",
+            };
+
+
+            var testQCM = {code_barre: "37438", qcm: ['A','B','C']};
 
 
 
@@ -125,6 +133,8 @@
             <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
             <button class="btn btn-primary" onclick="connect(function () {
                         $('#btn-test-connexion').removeAttr('disabled');
+                        $('#btn-fid').removeAttr('disabled');
+                        $('#btn-qcm').removeAttr('disabled');
                     })">
                 Sélectionner le lecteur optique
             </button>
@@ -391,7 +401,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="modal modal-lg" id="manual-end" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">

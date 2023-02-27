@@ -146,11 +146,11 @@ class GrilleManager {
 //ajoute une fid à la liste des fid traités
         this.FIDs = this.FIDs.concat([fid])
         this.gridOptions.api.setRowData(this.FIDs);
-        if (hasQCM(fid.code_barre)) {
+        if (this.hasQCM(fid.code_barre)) {
             this.codesAppaires.push(fid.code_barre);
             $("#nb-appaires").text(parseInt($("#nb-appaires").text()) + 2);
         }
-        $("#nb-fid-lues").text(parseInt($("#nb-fid-lues").text()) + 1);
+        $("#nb-fid-lues").text(parseInt(this.FIDs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
     }
 
@@ -181,11 +181,11 @@ class GrilleManager {
     storeQCM(qcm) {
 //ajoute une fid à la liste des fid traités
         this.QCMs = this.QCMs.concat([qcm]);
-        if (hasFID(qcm.code_barre)) {
+        if (this.hasFID(qcm.code_barre)) {
             this.codesAppaires.push(qcm.code_barre);
             $("#nb-appaires").text(parseInt($("#nb-appaires").text()) + 2);
         }
-        $("#nb-qcm-lues").text(parseInt($("#nb-qcm-lues").text()) + 1);
+        $("#nb-qcm-lues").text(parseInt(this.QCMs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
     }
 
@@ -291,10 +291,9 @@ class GrilleManager {
                 my.readFIDs();
             });
         } else {
-            await tell('G');
+            tell('G');
             this.storeFID(fid);
-            console.log('tout est bon, suivant');
-            return this.readFIDs();
+            this.readFIDs();
         }
 
 
@@ -384,7 +383,7 @@ class GrilleManager {
             return true;
         }
 
-        //si il y a effectivement un epage à lire
+        //si il y a effectivement une page à lire
         //var rep = "\x15  00003 Erreur type de feuille\x15  00003 Erreur type de feuille\r\n\x03\x01\x023250011018500110TEST TPPTLS    T PPTSA                70506942 150401??99003     1007      090\r\n\x03\x04";
         for (var i in GrilleManager.codesErreurs) {
             var erreur = GrilleManager.codesErreurs[i];
@@ -539,6 +538,8 @@ class GrilleManager {
         console.log(rep);
         console.log("session " + session)
         $.post('/lecture/scanner/save', {data: JSON.stringify(rep), session: session}, function (rep) {
+            console.log("réponse du serveur :");
+            console.log(rep);
             $("#manual-end").modal("show");
         });
     }
