@@ -8,6 +8,8 @@ async function connect(callback) {
     port = await navigator.serial.requestPort();
     await port.open({baudRate: 19200});
     read();
+    $("#btn-fid").removeAttr("disabled");
+                $("#btn-qcm").removeAttr("disabled");
     callback();
     
     
