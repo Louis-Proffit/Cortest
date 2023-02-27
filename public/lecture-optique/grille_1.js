@@ -491,9 +491,7 @@ class GrilleManager {
     }
 
     manualLink() {
-        console.log(this.QCMs.length);
         var nbPagesAAppairer = this.FIDs.length + this.QCMs.length - 2 * this.codesAppaires.length;
-        console.log(nbPagesAAppairer);
         if (nbPagesAAppairer % 2 === 1) {
             tellFatalError("Le nombre de pages à appairer n'est pas paire, veuillez poursuivre la correction", "Continuer", function () {});
         } else {
@@ -535,8 +533,8 @@ class GrilleManager {
             rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
             rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].qcm;
         }
+        console.log("Envoie de la requête :");
         console.log(JSON.stringify(rep));
-        console.log("session " + session)
         $.post('/lecture/scanner/save', {data: JSON.stringify(rep), session: session}, function (rep) {
             console.log("réponse du serveur :");
             console.log(rep);
