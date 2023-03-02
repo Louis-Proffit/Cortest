@@ -261,7 +261,7 @@ class GrilleManager {
                             }));
                         } else {
                             if (ligne.type === 'date') {
-                                forms.push(formInput(field, ligne.name, fid[field], function (r) {
+                                forms.push(formDate(field, ligne.name, fid[field], function (r) {
                                     fid[field] = r;
                                 }));
                             } else {
