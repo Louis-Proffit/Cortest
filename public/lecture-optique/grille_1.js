@@ -187,6 +187,7 @@ class GrilleManager {
         }
         $("#nb-qcm-lues").text(parseInt(this.QCMs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
+        console.log('on a store');
     }
 
     removeQCM(code_barre) {
@@ -259,13 +260,19 @@ class GrilleManager {
                                 fid[field] = unknown;
                             }));
                         } else {
-                            forms.push(formInput(field, ligne.name, fid[field], ligne.type, function (r) {
-                                fid[field] = r;
-                            }, function () {
-                                fid[field] = blanck;
-                            }, function () {
-                                fid[field] = unknown;
-                            }));
+                            if (ligne.type === 'date') {
+                                forms.push(formInput(field, ligne.name, fid[field], function (r) {
+                                    fid[field] = r;
+                                }));
+                            } else {
+                                forms.push(formInput(field, ligne.name, fid[field], ligne.type, function (r) {
+                                    fid[field] = r;
+                                }, function () {
+                                    fid[field] = blanck;
+                                }, function () {
+                                    fid[field] = unknown;
+                                }));
+                            }
                         }
                     }
                 }
@@ -306,7 +313,7 @@ class GrilleManager {
         const corresp = {'A': 'A', 'B': 'B', 'D': 'C', 'H': 'D', 'P': 'E'};
         var toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
-            if (this.questions[(i+1).toString()] !== 'Inutilisé') {
+            if (this.questions[(i + 1).toString()] !== 'Inutilisé') {
                 if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
                     qcm[i] = corresp[qcm[i]];
                 } else {
@@ -330,7 +337,7 @@ class GrilleManager {
                     qcm[rep[j].question] = rep[j].response;
                 }
                 console.log('on save :');
-            console.log(qcm);
+                console.log(qcm);
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
                 my.readQCMs();
             }, function () {

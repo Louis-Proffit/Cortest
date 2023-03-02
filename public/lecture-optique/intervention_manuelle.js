@@ -82,6 +82,19 @@ function formInput(field, field_name, value, type, valid, left_void, unknown) {
     };
 }
 
+function formDate(field, field_name, value, valid) {
+    var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
+<div class='col-4'><input type='date' class='form-control res' value='" + value + "'></div>";
+    return {
+        html: html,
+        field: field,
+        action: function () {
+            var r = $(".ligne-" + field + " .res").val();
+            valid(r);
+        }
+    };
+}
+
 
 /*renvoie un {form} pour un cas ou on demande à l'utilisteur de corriger ou non un champs
  * par la valeur attendu (pour le numéro de batterie par exemple)
