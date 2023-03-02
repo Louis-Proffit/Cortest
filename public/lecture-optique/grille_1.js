@@ -152,6 +152,7 @@ class GrilleManager {
         }
         $("#nb-fid-lues").text(parseInt(this.FIDs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
+        console.log("on a enregistré");
     }
 
     hasFID(code_barre) {
@@ -187,7 +188,7 @@ class GrilleManager {
         }
         $("#nb-qcm-lues").text(parseInt(this.QCMs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
-        console.log('on a store');
+        console.log("on a enregistré");
     }
 
     removeQCM(code_barre) {
@@ -285,6 +286,7 @@ class GrilleManager {
         //la lecture est terminée, on demande les corrections nécessaires
         if (forms.length > 0) {
             tell('S');
+            console.log('erreurs détéctées');
             var my = this;
             askFID(fid.code_barre, forms, function () {
                 for (var i in forms) {
@@ -292,6 +294,7 @@ class GrilleManager {
                     field = line.field;
                     line.action();
                 }
+                console.log('on va enregistrer');
                 my.storeFID(fid);
                 my.readFIDs();
             }, function () {
@@ -299,6 +302,7 @@ class GrilleManager {
             });
         } else {
             tell('G');
+            console.log('on va enregistrer')
             this.storeFID(fid);
             this.readFIDs();
         }
@@ -336,7 +340,7 @@ class GrilleManager {
                 for (var j in rep) {
                     qcm[rep[j].question] = rep[j].response;
                 }
-                console.log('on save :');
+                console.log('on va enregistrer : ');
                 console.log(qcm);
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
                 my.readQCMs();
@@ -345,7 +349,7 @@ class GrilleManager {
             }, blanck, unknown);
         } else {
             console.log("pas de soucis");
-            console.log('on save :');
+            console.log('on va enregistrer :');
             console.log(qcm);
             await tell('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
@@ -383,6 +387,9 @@ class GrilleManager {
         $("#spinner-fid").show();
         await timeout(10);
         var rep = await get('L');
+        console.log('on commence une lecture dune FID');
+        console.log('on a reçu : ');
+        console.log(rep);
         //var rep = "\x01\x0222????? ????????COLLARD        JULIEN                 81012011E1327012313021               090\r\n\x03\x04";
         const bac_vide = "\x1506\r\n\x03";
         if (rep.includes(bac_vide)) {
@@ -429,12 +436,14 @@ class GrilleManager {
             } else {
                 var my = this;
                 await tell('S');
+                console.log("impossible de lire");
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readFIDs();
                 });
             }
 
         } else {
+            console.log("on lit la fid");
             var expl = match[1];
             return this.readFID(expl);
         }
@@ -444,7 +453,12 @@ class GrilleManager {
         $("#spinner-qcm").show();
         await timeout(10);
         console.log('on commence une lecture de QCM');
+        console.log('avant tout, gm.QCMs = ');
+        console.log(this.QCMs);
+        console.log("on demande L au lecteur");
         var rep = await get('L');
+        console.log('on a reçu : ');
+        console.log(rep);
 
         const bac_vide = "\x1506\r\n\x03";
 
@@ -542,6 +556,8 @@ class GrilleManager {
     }
 
     save(session) {
+        console.log("Etat du gm avant enregistrement :");
+        console.log(this);
         var rep = {};
         for (var i in this.codesAppaires) {
             var code = this.codesAppaires[i]
