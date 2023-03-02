@@ -381,6 +381,7 @@ class GrilleManager {
 
     async readFIDs() {
         $("#spinner-fid").show();
+        await timeout(10);
         var rep = await get('L');
         //var rep = "\x01\x0222????? ????????COLLARD        JULIEN                 81012011E1327012313021               090\r\n\x03\x04";
         const bac_vide = "\x1506\r\n\x03";
@@ -441,6 +442,8 @@ class GrilleManager {
 
     async readQCMs() {
         $("#spinner-qcm").show();
+        await timeout(10);
+        console.log('on commence une lecture de QCM');
         var rep = await get('L');
 
         const bac_vide = "\x1506\r\n\x03";
@@ -489,6 +492,7 @@ class GrilleManager {
             } else {
                 var my = this;
                 await tell('S');
+                console.log("impossible de lire");
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readQCMs();
                 });
