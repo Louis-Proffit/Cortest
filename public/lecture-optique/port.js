@@ -6,7 +6,7 @@ var port = null;
 
 async function connect(callback) {
 
-    if (begugPort) {
+    if (debugPort) {
         return  callback();
     } else {
 
@@ -46,7 +46,7 @@ async function read() {
 
 async function tell(commande) {
 
-    if (begugPort) {
+    if (debugPort) {
 
         console.log("tell = " + commande)
 
@@ -71,8 +71,8 @@ function timeout(ms) {
 async function get(commande) {
 
     //pour le debug :
-    //
-    if (begugPort) {
+    //debugPort
+    if (debugPort) {
         var cache = "";
         console.log('ask = ' + commande);
         var r = await window.prompt("Résultat du " + commande, "");

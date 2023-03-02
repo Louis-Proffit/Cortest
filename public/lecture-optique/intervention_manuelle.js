@@ -223,6 +223,7 @@ function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
 }
 
 function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
+    console.log(questions);
     $('#manual-QCM form').empty();
     $('#manual-QCM .code-barre').text(code_barre);
     for (var i in questions) {
@@ -237,7 +238,7 @@ function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
         var rep = [];
         for (var i in questions) {
             var question = questions[i];
-            var r = $('#manual-QCM .qcm-' + question + ' input:checked').val();
+            var r = $('#manual-QCM .qcm-' + question.numero + ' input:checked').val();
             rep.push({question: question, response: r});
         }
         valider(rep);

@@ -322,17 +322,24 @@ class GrilleManager {
         }
         if (toCorrect.length > 0) {
             await tell('S');
+            console.log('erreurs détectés :');
+            console.log(toCorrect);
             var my = this;
             askQCM(code_barre, toCorrect, function (rep) {
                 for (var j in rep) {
                     qcm[rep[j].question] = rep[j].response;
                 }
+                console.log('on save :');
+            console.log(qcm);
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
                 my.readQCMs();
             }, function () {
                 my.readQCMs();
             }, blanck, unknown);
         } else {
+            console.log("pas de soucis");
+            console.log('on save :');
+            console.log(qcm);
             await tell('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
             this.readQCMs();
@@ -480,6 +487,7 @@ class GrilleManager {
                 });
             }
         } else {
+            console.log("on lit le qcm");
             var expl = match[1];
             this.readQCM(expl);
         }
