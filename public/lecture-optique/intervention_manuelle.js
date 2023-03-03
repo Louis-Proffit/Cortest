@@ -205,23 +205,23 @@ function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
 <strong>" + (question + 1).toString() + "</strong>\n\
 </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='A' name='ligne-" + question + "'>\n\
+                                <input class='form-check-input' type='radio' value='1' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>A</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='B' name='ligne-" + question + "'>\n\
+                                <input class='form-check-input' type='radio' value='2' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>B</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='C' name='ligne-" + question + "'>\n\
+                                <input class='form-check-input' type='radio' value='3' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>C</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='D' name='ligne-" + question + "'>\n\
+                                <input class='form-check-input' type='radio' value='4' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>D</label>\n\
                             </div>\n\
                             <div class='form-check col-1'>\n\
-                                <input class='form-check-input' type='radio' value='E' name='ligne-" + question + "'>\n\
+                                <input class='form-check-input' type='radio' value='5' name='ligne-" + question + "'>\n\
                                 <label class='form-check-label'>E</label>\n\
                             </div>\n\
                             <div class='col-2 offset-1'>\n\
@@ -252,7 +252,7 @@ function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
         for (var i in questions) {
             var question = questions[i];
             var r = $('#manual-QCM .qcm-' + question.numero + ' input:checked').val();
-            rep.push({question: question, response: r});
+            rep.push({question: question.numero, response: parseInt(r)});
         }
         valider(rep);
     });

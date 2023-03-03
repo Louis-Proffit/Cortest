@@ -311,10 +311,10 @@ class GrilleManager {
     }
 
     async correctQCM(code_barre, qcm) {
-        const blanck = '_';
-        const unknown = '?';
-        const notasked = '*';
-        const corresp = {'A': 'A', 'B': 'B', 'D': 'C', 'H': 'D', 'P': 'E'};
+        const blanck = 0;
+        const unknown = 0;
+        const notasked = 0;
+        const corresp = {'A': 1, 'B': 2, 'D': 3, 'H': 4, 'P': 5};
         var toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
             if (this.questions[(i + 1).toString()] !== 'Inutilisé') {
@@ -340,6 +340,7 @@ class GrilleManager {
                 for (var j in rep) {
                     qcm[rep[j].question] = rep[j].response;
                 }
+                console.log(rep);
                 console.log('on va enregistrer : ');
                 console.log(qcm);
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
