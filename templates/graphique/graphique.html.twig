@@ -11,7 +11,10 @@
                href="{{ path("graphique_modifier", {"id":graphique.id}) }}">Modifier</a>
         </div>
         <div class="col">
-            <a class="btn btn-secondary"
+            <a class="btn btn-primary"
+               href="{{ path("graphique_ajouter_subtests", {"id":graphique.id}) }}">Modifier Subtests</a>
+        </div>
+        <div class="col"><a class="btn btn-secondary"
                href="{{ path("graphique_supprimer", {"id":graphique.id}) }}">Supprimer</a>
         </div>
         <div class="col">
@@ -57,6 +60,43 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <h5> Arborescence affichée dans les PDF : </h5>
+    {% for subIdx, subtest in graphique.subtests %}
+        <hr>
+        <strong> {{ subtest[0] }} ({{ arrayType[subtest[1]] }}) </strong>
+        <br>
+        {% if subtest[1] == 0 %}
+            <ul>
+                {% for echelle in subtest[2] %}
+                    <br>
+                    <li>{{ echelleNoms[echelle[0]] }} ( {{ echelleAffiche[echelle[0]] }} )</li>
+                    <ul>
+                        <li>{{ echelleNoms[echelle[1][0]] }}</li>
+                        <li>{{ echelleNoms[echelle[1][1]] }}</li>
+                    </ul>
+                {% endfor %}
+            </ul>
+        {% elseif subtest[1] == 1 %}
+            <ul>
+                {% for echelleComposite in subtest[2] %}
+                    <br>
+                    <li>{{ echelleNoms[echelleComposite[0]] }} ( {{ echelleAffiche[echelleComposite[0]] }} )</li>
+                    <ul>
+                        {% for echelleSimple in echelleComposite[1] %}
+                            <li>{{ echelleNoms[echelleSimple] }} ( {{ echelleAffiche[echelleSimple] }} )</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p> Echelles de bas de cadre: </p>
+        <ul>
+            {% for idFoot, footer in subtest[3] %}
+                <li> {{ echelleNoms[footer[0]] }} ( {{ echelleAffiche[footer[0]] }} ) ({{ footerType[footer[1]] }})</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
 
 {% endblock %}
 

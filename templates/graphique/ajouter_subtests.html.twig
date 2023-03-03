@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Modifier et ajouter les champs de {{ graphique.nom }}</h1>
+    <br>
+
+    {% for subIdx, subtest in graphique.subtests %}
+        <hr>
+        <a class="btn btn-outline-secondary"
+           href="{{ path("graphique_ajouter_composite", {"id":graphique.id, "idSub": subIdx}) }}">Modifier Subtest</a>
+        <a class="btn btn-secondary"
+           href="{{ path("graphique_supprimer_subtest", {"id":graphique.id, "idSub": subIdx}) }}">Supprimer Subtest</a>
+        <strong> {{ subtest[0] }} ({{ arrayType[subtest[1]] }}) </strong>
+        <br>
+        {% if subtest[1] == 0 %}
+            <ul>
+                {% for echelle in subtest[2] %}
+                    <br>
+                    <li>{{ echelleNoms[echelle[0]] }} ( {{ echelleAffiche[echelle[0]] }} )</li>
+                    <ul>
+                        <li>{{ echelleNoms[echelle[1][0]] }}</li>
+                        <li>{{ echelleNoms[echelle[1][1]] }}</li>
+                    </ul>
+                {% endfor %}
+            </ul>
+        {% elseif subtest[1] == 1 %}
+            <ul>
+                {% for echelleComposite in subtest[2] %}
+                    <br>
+                    <li>{{ echelleNoms[echelleComposite[0]] }} ( {{ echelleAffiche[echelleComposite[0]] }} )</li>
+                    <ul>
+                        {% for echelleSimple in echelleComposite[1] %}
+                            <li>{{ echelleNoms[echelleSimple] }} ( {{ echelleAffiche[echelleSimple] }} )</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p> Echelles de bas de cadre: </p>
+        <ul>
+            {% for idFoot, footer in subtest[3] %}
+                <li> {{ echelleNoms[footer[0]] }} ( {{ echelleAffiche[footer[0]] }} ) ({{ footerType[footer[1]] }})</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    {{ form(form) }}
+
+    <h5> Retour au graphique: </h5>
+    <a class="btn btn-secondary"
+       href="{{ path("graphique_consulter", {"id":graphique.id}) }}">Retour</a>
+
+{% endblock %}

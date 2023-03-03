@@ -1,11 +1,19 @@
 \documentclass[10pt, letterpaper, twoside]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[a4paper, total={7in, 8in}]{geometry}
+\usepackage[a4paper, total={19cm, 26cm}]{geometry}
 \usepackage{tabularx}
 \usepackage{textcomp}
 \usepackage{caption}
 \usepackage{pgfplots}
 \usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{xcolor}
+\setlength\headheight{70pt}
+\usepackage{multirow}
+
+\graphicspath{ {{ "\{" ~ imagesDirectory ~ "\}" }} }
 
 \newcommand{\printChartResult}[3]{
     \begin{tikzpicture}
@@ -17,9 +25,12 @@
             width=13cm,
             height=2cm,
             ticks=none,
+            grid style={line width=.1pt, draw=black!60},
+            grid=major,
+            ymajorgrids=false,
         ]
             \addplot+[xbar, fill=gray, draw=gray, mark=none, bar width=20] coordinates { (#2,0) };
-            \addplot+[xbar, draw=blue, fill=blue, mark=none, bar width=5] coordinates { (#1,0) };
+            \addplot+[xbar, draw=black, fill=black, mark=none, bar width=5] coordinates { (#1,0) };
 
         \end{axis}
     \end{tikzpicture}
@@ -27,76 +38,81 @@
 
 {% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
 
-\begin{document}
+\fancyhead[C]{\textbf{ {{ options.titre }} }}
+\rhead{\includegraphics[width=3cm]{logo.png}}
 
-    \begin{center}
-        \textbf{ {{ options.titre }} } \\
-        \textbf{ {{ options.sous_titre }} }
-    \end{center}
+\begin{document}
 
     \noindent\fbox{
         \begin{minipage}{\linewidth}
-            \begin{tabular}{m{1.2in} m{2.1in} m{1.2in} m{2.1in}}
-                \underline{Nom:}                                  & {{ reponse.nom }}                             & \underline{Prénom:}           & {{ reponse.prenom }}              \\
-                \underline{Nom de jeune Fille:}                   & {{ reponse.nom_jeune_fille }}                 & \underline{Sexe:}             & {{ reponse.sexe|sexe }}           \\
-                \underline{Date de naissance:}                    & {{ reponse.date_de_naissance|date('d/m/Y') }} & \underline{Niveau scolaire:} & {{ reponse.niveau_scolaire.nom }} \\
-                \underline{N\textdegree \space d'identification:} & XXX                                           & \underline{Type du concours:} & {{ session.type_concours }} \\
-                \underline{SGAP ou CS:}                           & {{ session.sgap.nom }}                        & \underline{Version Batterie:} & {{ session.version_batterie }}    \\
-                \underline{Date d'examen:}                        & {{ session.date|date('d/m/Y') }}              & \underline{Note Globale:} & XXX \\
+            \begin{tabular}{m{3.5cm} m{5.2cm} m{3.5cm} m{5.2cm}}
+                Nom de naissance:       & {{ reponse.nom|raw }}                             & Type du concours:         & {{ session.type_concours|raw }}       \\
+                Prénom:                 & {{ reponse.prenom|raw }}                          & Version Batterie:         & {{ session.version_batterie|raw }}    \\
+                Nom d'usage:            & {{ reponse.nom_jeune_fille|raw }}                 & Date d'examen:            & {{ session.date|date('d/m/Y') }}      \\
+                Sexe:                   & {{ reponse.sexe|sexe }}                           & SGAMI/SGAP:               & {{ session.sgap.nom|raw }}            \\
+                Date de naissance:      & {{ reponse.date_de_naissance|date('d/m/Y') }}     & Numéro d'identification   & xxx                                   \\
+                Niveau scolaire:        & {{ reponse.niveau_scolaire.nom|raw }}             \\
             \end{tabular}
         \end{minipage}
     }
 
-    \begin{center}
-        \textbf{PROFIL DU CANDIDAT} \\
-    \end{center}
+    \vspace{-1mm}
 
-    \vspace{1em}
-
+    {% for subtest in arborescence %}
     \noindent
-    \begin{longtable}{ | m{1.8in} m{0.2in} m{4.7in} | }
+    \begin{longtable}{ | wr{4cm} wc{0.7cm} wc{0.7cm} wc{12.25cm} | }
         \hline
 
-        & & \\
-        \underline{NOTES COMPOSITES} & &
+        {% if subtest[1] == 0 %}
+        \underline{\textbf{ {{ subtest[0]|raw }} }} & & & {% if subtest[2]|length > 0 %} \textit{classes} {% endif %} \\
+        {% if subtest[2]|length > 0 %} & BR & MR &
         \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
             \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
-
-        {% for key, value in echelleOptions %}
-        {% if attribute(typeEchelle, key) == "Echelle composite" %}
-        {{ value.nom_affichage|raw }} & \fbox{ {{ attribute(score, key) }} } & \printChartResult{ {{ attribute(profil, key) }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
         {% endif %}
+        {% for echelle in subtest[2] %}
+        {{ echelleOptions[echelle[0]].nom_affichage|raw }} & \fbox{ {{ score[echelle[1][0]] }} } & \fbox{ {{ score[echelle[1][0]] }} } &\printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
         {% endfor %}
-
-        \hline
-
-    \end{longtable}
-
-    \vspace{1em}
-
-    \noindent
-    \begin{longtable}{ | m{1.8in} m{0.2in} m{4.7in} | }
-        \hline
-
-        & & \\
-        \underline{NOTES SIMPLES} & &
+        {% else %}
+        \underline{\textbf{ {{ subtest[0]|raw }} }} & & {% if subtest[2]|length > 0 %} \textit{scores} &
         \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
             \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
-
-        {% for key, value in echelleOptions %}
-        {% if attribute(typeEchelle, key) == "Echelle simple" %}
-        {{ value.nom_affichage|raw }} & \fbox{ {{ attribute(score, key) }} } & \printChartResult{ {{ attribute(profil, key) }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% else %} & \\ {% endif %}
+        {% for echelle in subtest[2] %}
+        {% if echelle.1|length > 0 %}
+        \hline
+        \multirow{ {{ echelle.1|length }} }*{\textit{class} \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        {% for echelleSimple in echelle[1] %}
+        & {{ echelleOptions[echelleSimple].nom_affichage|raw }} & \fbox{ {{ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% endfor %}
+        {% else %}
+        \multirow{ 1 }*{\textit{class} \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        &  & \fbox{  } & Il faut au moins une échelle simple dans cette échelle composite! \\
         {% endif %}
         {% endfor %}
-
+        {% endif %}
+        {% if subtest[3]|length > 0 %}
+        {% if subtest[2] == 1 %} \hline {% endif %}
+        \multicolumn{4}{|c|}{
+            \begin{tabular}{ {% for echelle in subtest[3] %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }
+            {% for echelle in subtest[3] %}
+            {% if echelle[1] == 0 %}
+                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]] }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
+                {% else %}
+                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]] }} } &
+            {% endif %}
+            {% endfor %}
+            \end{tabular}
+        }
+        \\
+        {% endif %}
         \hline
-
     \end{longtable}
 
-
+    \vspace{-5mm}
+{% endfor %}
 
 \end{document}

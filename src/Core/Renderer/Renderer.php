@@ -22,7 +22,8 @@ interface Renderer
         array           $etalonnageParameters,
         array           $score,
         array           $profil,
-        array           $typeEchelle
+        array           $typeEchelle,
+        array           $arborescence,
     ): string;
 
     /**

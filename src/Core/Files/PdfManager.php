@@ -84,7 +84,8 @@ class PdfManager
             etalonnageParameters: $etalonnageParameters,
             score: $score,
             profil: $profil,
-            typeEchelle: $typeEchelle
+            typeEchelle: $typeEchelle,
+            arborescence: $graphique->subtests
         );
     }
 

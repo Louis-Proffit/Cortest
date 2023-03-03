@@ -30,6 +30,8 @@ class RendererBatonnets implements Renderer
     /** @var RendererOption[] */
     private array $echelleOptions;
 
+    private string $imagesDirectory;
+
     private array $etalonnageParameters;
 
     public function __construct()
@@ -54,6 +56,7 @@ class RendererBatonnets implements Renderer
                 default: 10,
                 form_type: IntegerType::class)
         ];
+        $this->imagesDirectory = str_replace("\\", "/", getCwd()) . "/../templates/renderer/images/";
     }
 
     /**
@@ -71,7 +74,9 @@ class RendererBatonnets implements Renderer
         array           $etalonnageParameters,
         array           $score,
         array           $profil,
-        array           $typeEchelle): string
+        array           $typeEchelle,
+        array           $arborescence,
+    ): string
     {
 
         return $environment->render("renderer/batonnet_cahier_des_charges.tex.twig", [
@@ -83,6 +88,8 @@ class RendererBatonnets implements Renderer
             "score" => $score,
             "profil" => $profil,
             "typeEchelle" => $typeEchelle,
+            "arborescence" => $arborescence,
+            "imagesDirectory" => $this->imagesDirectory,
         ]);
     }
 
