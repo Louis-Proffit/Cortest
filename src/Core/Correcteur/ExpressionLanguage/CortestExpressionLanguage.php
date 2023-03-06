@@ -5,9 +5,19 @@ namespace App\Core\Correcteur\ExpressionLanguage;
 use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
 use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Echelle;
+use App\Core\Correcteur\ExpressionLanguage\Functions\FauxA;
+use App\Core\Correcteur\ExpressionLanguage\Functions\FauxB;
+use App\Core\Correcteur\ExpressionLanguage\Functions\FauxC;
+use App\Core\Correcteur\ExpressionLanguage\Functions\FauxD;
+use App\Core\Correcteur\ExpressionLanguage\Functions\FauxE;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Score;
-use App\Core\Correcteur\ExpressionLanguage\Functions\Vrai1;
-use App\Core\Correcteur\ExpressionLanguage\Functions\Vrai2;
+use App\Core\Correcteur\ExpressionLanguage\Functions\Score01234;
+use App\Core\Correcteur\ExpressionLanguage\Functions\Score43210;
+use App\Core\Correcteur\ExpressionLanguage\Functions\VraiA;
+use App\Core\Correcteur\ExpressionLanguage\Functions\VraiB;
+use App\Core\Correcteur\ExpressionLanguage\Functions\VraiC;
+use App\Core\Correcteur\ExpressionLanguage\Functions\VraiD;
+use App\Core\Correcteur\ExpressionLanguage\Functions\VraiE;
 use App\Entity\EchelleCorrecteur;
 use BadMethodCallException;
 use JetBrains\PhpStorm\Deprecated;
@@ -23,9 +33,19 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
 
 
     public function __construct(
-        private readonly Vrai1   $vrai_1,
-        private readonly Vrai2   $vrai_2,
+        private readonly VraiA   $vrai_A,
+        private readonly VraiB   $vrai_B,
+        private readonly VraiC   $vrai_C,
+        private readonly VraiD   $vrai_D,
+        private readonly VraiE   $vrai_E,
+        private readonly FauxA   $faux_A,
+        private readonly FauxB   $faux_B,
+        private readonly FauxC   $faux_C,
+        private readonly FauxD   $faux_D,
+        private readonly FauxE   $faux_E,
         private readonly Score   $score,
+        private readonly Score43210   $score_43210,
+        private readonly Score01234   $score_01234,
         private readonly Echelle $echelle,
         CacheItemPoolInterface   $cache = null)
     {
@@ -38,8 +58,18 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
     public function getCortestFunctions(): array
     {
         return [
-            $this->vrai_1,
-            $this->vrai_2,
+            $this->vrai_A,
+            $this->vrai_B,
+            $this->vrai_C,
+            $this->vrai_D,
+            $this->vrai_E,
+            $this->faux_A,
+            $this->faux_B,
+            $this->faux_C,
+            $this->faux_D,
+            $this->faux_E,
+            $this->score_01234,
+            $this->score_43210,
             $this->score,
             $this->echelle
         ];

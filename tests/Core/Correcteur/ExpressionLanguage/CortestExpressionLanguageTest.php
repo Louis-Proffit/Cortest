@@ -30,13 +30,13 @@ class CortestExpressionLanguageTest extends KernelTestCase
     public function compilerProvider(): array
     {
         return [
-            [["x" => "vrai1(1)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
-            [["x" => "vrai2(2)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
-            [["x" => "vrai3(3)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
-            [["x" => "vrai4(4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
-            [["x" => "vrai5(5)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], SyntaxError::class],
-            [["x" => "vrai1()"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], TypeError::class],
-            [["x" => "vrai1(3,4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxA(1)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxB(2)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxC(3)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxD(4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxE(5)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
+            [["x" => "fauxA()"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], TypeError::class],
+            [["x" => "fauxA(3,4)"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE], null],
             [["x" => "1", "y" => "echelle(\"x\")"], ["x" => Echelle::TYPE_ECHELLE_SIMPLE, "y" => Echelle::TYPE_ECHELLE_COMPOSITE], null],
         ];
     }
@@ -44,7 +44,28 @@ class CortestExpressionLanguageTest extends KernelTestCase
     public function evaluerProvider(): array
     {
         return [
-            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vrai1(1)"], [1, 2, 3, 4, 1, 5, 6], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiA(1)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiB(2)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiC(3)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiD(4)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiE(5)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiA(6)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiB(6)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiC(6)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiD(6)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "vraiE(6)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxA(1)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxB(2)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxC(3)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxD(4)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxE(5)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxA(6)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxB(6)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxC(6)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxD(6)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "fauxE(6)"], [1, 2, 3, 4, 5, 0], ["x" => 1]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "score43210(1)"], [1, 2, 3, 4, 5, 0], ["x" => 4]],
+            [["x" => Echelle::TYPE_ECHELLE_SIMPLE], ["x" => "score01234(1)"], [1, 2, 3, 4, 5, 0], ["x" => 0]],
             [["x" => Echelle::TYPE_ECHELLE_SIMPLE, "y" => Echelle::TYPE_ECHELLE_COMPOSITE], ["x" => "1", "y" => "echelle(\"x\")"], [1, 2, 3, 4, 1, 5, 6], ["x" => 1, "y" => 1]],
         ];
     }

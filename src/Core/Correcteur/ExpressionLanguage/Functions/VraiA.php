@@ -4,20 +4,20 @@ namespace App\Core\Correcteur\ExpressionLanguage\Functions;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestFunction;
 
-class Vrai1 extends CortestFunction
+class VraiA extends CortestFunction
 {
 
 
     public function __construct()
     {
-        parent::__construct(nom_affiche: "vrai1(numéro_question)",
-            nom_php: "vrai1",
+        parent::__construct(nom_affiche: "vraiA(numéro_question)",
+            nom_php: "vraiA",
             description: '
-            <p>Renvoie 1 si le candidat a choisi l\\\'item 1 à la question d\\\'indice [indice], 0 sinon</p>
+            <p>Renvoie 1 si le candidat a choisi l\\\'item A à la question d\\\'indice [indice], 0 sinon</p>
             <ul>
-            <li>vrai1(3) : 1 point si le candidat a répondu 1 à la question 3, 0 sinon</li>
-            <li>vrai1() : Erreur de syntaxe</li>
-            <li>vrai1(3, 5) : Le 5 ne sera pas lu</li>
+            <li>vraiA(3) : 1 point si le candidat a répondu A à la question 3, 0 sinon</li>
+            <li>vraiA() : Erreur de syntaxe</li>
+            <li>vraiA(3, 5) : Le 5 ne sera pas lu</li>
            </ul>
             ',
             evaluator: $this->evaluer(...),
