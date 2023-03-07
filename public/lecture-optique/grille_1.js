@@ -166,8 +166,10 @@ class GrilleManager {
 
     removeFID(code_barre) {
 //supprime une fid de la liste des fids traités
+        console.log("on supprime : "+ code_barre);
         this.FIDs = this.FIDs.splice(this.FIDs.findIndex((e) => e.code_barre === code_barre), 1);
         $("#nb-fid-lues").text(parseInt($("#nb-fid-lues").text()) - 1);
+        this.gridOptions.api.setRowData(this.FIDs);
     }
 
     hasQCM(code_barre) {
@@ -193,6 +195,7 @@ class GrilleManager {
 
     removeQCM(code_barre) {
 //supprime une fid de la liste des fids traités
+        console.log("on supprime");
         this.QCMs = this.QCMs.splice(this.QCMs.findIndex((e) => e.code_barre === code_barre), 1);
         $("#nb-qcm-lues").text(parseInt($("#nb-qcm-lues").text()) - 1);
     }
@@ -369,12 +372,8 @@ class GrilleManager {
             cursor += step;
         }
         if(this.hasFID(fid.code_barre)) {
-            var my = this;
-            askAlready(fid.code_barre, function () {
-                my.correctFID(fid);
-            }, function () {
-                my.readFIDs();
-            });
+            tell('G');
+                this.readFIDs();
         } else {
             this.correctFID(fid);
         }
@@ -387,12 +386,8 @@ class GrilleManager {
             qcm[i] = text[8 + i];
         }
         if(this.hasQCM(text.slice(0, 8))) {
-            var my = this;
-            askAlready(text.slice(0, 8), function () {
-                this.correctQCM(text.slice(0, 8), qcm);
-            }, function () {
-                my.readQCMs();
-            });
+            tell('G');
+            this.readQCMs();
         } else {
             this.correctQCM(text.slice(0, 8), qcm);
         }
@@ -443,7 +438,7 @@ class GrilleManager {
             var match = rep.match(regex);
             if (match !== null) {
                 var suite = match[1];
-                var propal = "M-FID-0" + this.noCodeBarreFID.toString();
+                var propal = "1000000" + this.noCodeBarreFID.toString();
                 var my = this;
                 await tell('S');
                 askCodeBarre(propal, function (r) {
@@ -513,7 +508,7 @@ class GrilleManager {
             var match = rep.match(regex);
             if (match !== null) {
                 var suite = match[1];
-                var propal = "M-QCM-0" + this.noCodeBarreQCM.toString();
+                var propal = "2000000" + this.noCodeBarreQCM.toString();
                 var my = this;
                 await tell('S');
                 askCodeBarre(propal, function (r) {
