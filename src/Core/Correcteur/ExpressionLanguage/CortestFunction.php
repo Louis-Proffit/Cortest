@@ -31,30 +31,30 @@ class CortestFunction
         $this->compiler = $compiler;
     }
 
-    protected function innerEvaluer(array $arguments, int $index, float $si_0, float $si_1, float $si_2, float $si_3, float $si_4, float $si_5): float
+    protected function innerEvaluer(array $arguments, int $index, float $si_vide, float $si_a, float $si_b, float $si_c, float $si_d, float $si_e): float
     {
         return match ($arguments["reponses"][$index - 1]) {
-            0 => $si_0,
-            1 => $si_1,
-            2 => $si_2,
-            3 => $si_3,
-            4 => $si_4,
-            5 => $si_5,
+            0 => $si_vide,
+            1 => $si_a,
+            2 => $si_b,
+            3 => $si_c,
+            4 => $si_d,
+            5 => $si_e,
             default => 0
         };
     }
 
-    protected function innerCompiler(int $index, float $si_0, float $si_1, float $si_2, float $si_3, float $si_4, float $si_5): string
+    protected function innerCompiler(int $index, float $si_0, float $si_a, float $si_b, float $si_c, float $si_d, float $si_e): string
     {
         $true_index = $index - 1;
         return sprintf('(reponses[%1$d] == 0 ? %2$d : (reponses[%1$d] == 1 ? %3$d : (reponses[%1$d] == 2 ? %4$d : (reponses[%1$d] == 3 ? %5$d : (reponses[%1$d] == 4 ? %6$d : %7$d)))))',
             $true_index,
             $si_0,
-            $si_1,
-            $si_2,
-            $si_3,
-            $si_4,
-            $si_5);
+            $si_a,
+            $si_b,
+            $si_c,
+            $si_d,
+            $si_e);
     }
 
     public function to_expression_function(): ExpressionFunction

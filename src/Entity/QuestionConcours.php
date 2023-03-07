@@ -16,7 +16,8 @@ class QuestionConcours
     const TYPE_INUTILISE = "Inutilisé";
     const TYPE_VRAI_FAUX = "Vrai ou faux";
     const TYPE_SCORE = "Score";
-    const TYPES = [self::TYPE_INUTILISE, self::TYPE_SCORE, self::TYPE_VRAI_FAUX];
+    const TYPE_EXEMPLE = "Exemple";
+    const TYPES = [self::TYPE_INUTILISE, self::TYPE_SCORE, self::TYPE_VRAI_FAUX, self::TYPE_EXEMPLE];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

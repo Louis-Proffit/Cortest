@@ -16,13 +16,13 @@ class EchelleCorrecteur
     public int $id;
 
     #[Compilable]
-    #[ORM\Column]
+    #[ORM\Column(length: 10000)]
     public string $expression;
 
     #[ORM\ManyToOne(targetEntity: Echelle::class, inversedBy: "echelles_correcteur")]
     public Echelle $echelle;
 
-    #[ORM\ManyToOne(targetEntity: Correcteur::class)]
+    #[ORM\ManyToOne(targetEntity: Correcteur::class, inversedBy: "echelles")]
     public Correcteur $correcteur;
 
     /**

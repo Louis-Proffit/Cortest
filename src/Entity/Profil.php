@@ -22,7 +22,7 @@ class Profil
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    #[ORM\ManyToMany(targetEntity: Echelle::class)]
+    #[ORM\ManyToMany(targetEntity: Echelle::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
     #[ORM\OneToMany(mappedBy: "profil", targetEntity: Correcteur::class, cascade: ["remove", "persist"])]
