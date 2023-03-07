@@ -368,7 +368,17 @@ class GrilleManager {
             fid[field] = text.slice(cursor, cursor + step);
             cursor += step;
         }
-        this.correctFID(fid);
+        if(this.hasFID(fid.code_barre)) {
+            var my = this;
+            askAlready(fid.code_barre, function () {
+                my.correctFID(fid);
+            }, function () {
+                my.readFIDs();
+            });
+        } else {
+            this.correctFID(fid);
+        }
+        
     }
 
     readQCM(text) {
@@ -376,7 +386,17 @@ class GrilleManager {
         for (let i = 0; i < this.nbQuestions; i++) {
             qcm[i] = text[8 + i];
         }
-        this.correctQCM(text.slice(0, 8), qcm);
+        if(this.hasQCM(text.slice(0, 8))) {
+            var my = this;
+            askAlready(text.slice(0, 8), function () {
+                this.correctQCM(text.slice(0, 8), qcm);
+            }, function () {
+                my.readQCMs();
+            });
+        } else {
+            this.correctQCM(text.slice(0, 8), qcm);
+        }
+        
     }
 
     static codesErreurs = [
