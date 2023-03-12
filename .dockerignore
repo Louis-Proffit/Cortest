@@ -1,0 +1,7 @@
+node_modules
+doc
+assets
+migrations
+mysql
+composer.lock
+package-lock.json

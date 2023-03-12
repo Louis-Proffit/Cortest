@@ -102,11 +102,6 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         return $session;
     }
 
-    private function reponse_exemple(): ReponseCandidat
-    {
-
-    }
-
     private function questions(Concours $concours)
     {
         $concours->questions->add(new QuestionConcours(
