@@ -192,7 +192,7 @@ function askAlready(code_barre, valider, annuler) {
     $("#manual-already .valider").click(function () {
         valider();
     });
-    $("#manual-already .annuler").click(function () {
+    $("#manual-already .ignorer").click(function () {
         annuler();
     });
 }
