@@ -11,6 +11,7 @@ use App\Entity\ReponseCandidat;
 class CorrecteurManager
 {
 
+
     public function __construct(
         private readonly CortestExpressionLanguage $cortest_expression_language
     )

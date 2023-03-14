@@ -31,23 +31,22 @@ use TypeError;
 class CortestExpressionLanguage extends ExpressionLanguage implements ExpressionFunctionProviderInterface
 {
 
-
     public function __construct(
-        private readonly VraiA   $vrai_A,
-        private readonly VraiB   $vrai_B,
-        private readonly VraiC   $vrai_C,
-        private readonly VraiD   $vrai_D,
-        private readonly VraiE   $vrai_E,
-        private readonly FauxA   $faux_A,
-        private readonly FauxB   $faux_B,
-        private readonly FauxC   $faux_C,
-        private readonly FauxD   $faux_D,
-        private readonly FauxE   $faux_E,
-        private readonly Score   $score,
-        private readonly Score43210   $score_43210,
-        private readonly Score01234   $score_01234,
-        private readonly Echelle $echelle,
-        CacheItemPoolInterface   $cache = null)
+        private readonly VraiA      $vrai_A,
+        private readonly VraiB      $vrai_B,
+        private readonly VraiC      $vrai_C,
+        private readonly VraiD      $vrai_D,
+        private readonly VraiE      $vrai_E,
+        private readonly FauxA      $faux_A,
+        private readonly FauxB      $faux_B,
+        private readonly FauxC      $faux_C,
+        private readonly FauxD      $faux_D,
+        private readonly FauxE      $faux_E,
+        private readonly Score      $score,
+        private readonly Score43210 $score_43210,
+        private readonly Score01234 $score_01234,
+        private readonly Echelle    $echelle,
+        CacheItemPoolInterface      $cache = null)
     {
         parent::__construct($cache, [$this]);
     }
