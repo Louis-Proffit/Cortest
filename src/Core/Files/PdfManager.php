@@ -22,6 +22,8 @@ use ZipArchive;
 class PdfManager
 {
 
+    const SEPARATOR = "/";
+
     private string $tmp_dir;
 
     public function __construct(
@@ -33,7 +35,7 @@ class PdfManager
         string                              $tmp_dir = "tmp"
     )
     {
-        $this->tmp_dir = getcwd() . "\\" . $tmp_dir;
+        $this->tmp_dir = getcwd() . self::SEPARATOR . $tmp_dir;
         $this->logger->debug("Tmp dir : " . $this->tmp_dir);
     }
 
@@ -113,12 +115,12 @@ class PdfManager
 
     private function getOutputDirPath(): string
     {
-        return $this->tmp_dir . "\\" . time();
+        return $this->tmp_dir . self::SEPARATOR . time();
     }
 
     private function getTempZipFilePath(string $outputDirectoryPath): string
     {
-        return $outputDirectoryPath . "\\temp.zip";
+        return $outputDirectoryPath . self::SEPARATOR . "temp.zip";
     }
 
     private function addExtensionToFile(string $fileName, string $extension): string
@@ -169,7 +171,7 @@ class PdfManager
             profil: $profil
         );
 
-        $filePathWithoutExtension = $outputDirectoryPath . "\\" . $fileNameWithoutExtension;
+        $filePathWithoutExtension = $outputDirectoryPath . self::SEPARATOR . $fileNameWithoutExtension;
 
         $texFilePath = $this->addExtensionToFile($filePathWithoutExtension, ".tex");
 
