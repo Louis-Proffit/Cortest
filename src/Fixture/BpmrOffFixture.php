@@ -65,29 +65,17 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->sl($profil, $correcteur);
         $this->dic($profil, $correcteur);
         $this->as($profil, $correcteur);
+        $this->eg($profil, $correcteur);
+        $this->qr($profil, $correcteur);
 
-        $this->addEchelle(
-            $profil,
-            $correcteur,
-            "AT",
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            self::AT,
-            $this->expressionFromArraySimplePersonalite(self::AT_REPONSES)
-        );
-        $this->addEchelle(
-            $profil,
-            $correcteur,
-            "DS",
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            self::DS,
-            $this->expressionFromArraySimplePersonalite(self::DS_REPONSES)
-        );
-
+        $this->at($profil, $correcteur);
+        $this->ds($profil, $correcteur);
         $this->fp($profil, $correcteur);
         $this->me($profil, $correcteur);
         $this->cp($profil, $correcteur);
         $this->ar($profil, $correcteur);
         $this->pm($profil, $correcteur);
+        $this->rc($profil, $correcteur);
 
         $manager->persist($concours);
         $manager->persist($profil);
@@ -166,14 +154,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "VT bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "vt_br",
+            self::VT_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_VT_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "VT mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "vt_mr",
+            self::VT_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_VT_INDEX_TO_VRAI, "faux"));
     }
 
@@ -184,14 +172,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "SP bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "sp_br",
+            self::SP_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_SP_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "SP mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "sp_mr",
+            self::SP_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_SP_INDEX_TO_VRAI, "faux"));
     }
 
@@ -202,14 +190,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "Rais bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "rais_br",
+            self::RAIS_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_RAIS_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "Rais mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "rais_mr",
+            self::RAIS_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_RAIS_INDEX_TO_VRAI, "faux"));
     }
 
@@ -220,14 +208,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "CV bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "cv_br",
+            self::CV_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_CV_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "CV mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "cv_mr",
+            self::CV_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_CV_INDEX_TO_VRAI, "faux"));
     }
 
@@ -238,14 +226,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "SL bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "sl_br",
+            self::SL_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_SL_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "SL mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "sl_mr",
+            self::SL_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_SL_INDEX_TO_VRAI, "faux"));
     }
 
@@ -256,14 +244,14 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "DIC bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "dic_br",
+            self::DIC_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_DIC_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "DIC mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "dic_mr",
+            self::DIC_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_DIC_INDEX_TO_VRAI, "faux"));
     }
 
@@ -274,15 +262,78 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             $correcteur,
             "AS bonnes réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "as_br",
+            self::AS_BR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_AS_INDEX_TO_VRAI, "vrai"));
         $this->addEchelle(
             $profil,
             $correcteur,
             "AS mauvaises réponses",
             Echelle::TYPE_ECHELLE_SIMPLE,
-            "as_mr",
+            self::AS_MR,
             $this->expressionFromArrayAptitudeCognitive(self::REPONSES_AS_INDEX_TO_VRAI, "faux"));
+    }
+
+    private function eg(
+        Profil     $profil,
+        Correcteur $correcteur
+    )
+    {
+        $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")*(" . $this->nombreReponsesTraiteesCognitif() . ")) ** 0.5";
+
+        $this->addEchelle(
+            $profil,
+            $correcteur,
+            "EG",
+            Echelle::TYPE_ECHELLE_COMPOSITE,
+            self::EG,
+            $expression
+        );
+    }
+
+    private function qr(
+        Profil     $profil,
+        Correcteur $correcteur
+    )
+    {
+        $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")/(" . $this->nombreReponsesTraiteesCognitif() . ")) * 100";
+
+        $this->addEchelle(
+            $profil,
+            $correcteur,
+            "QR",
+            Echelle::TYPE_ECHELLE_COMPOSITE,
+            self::QR,
+            $expression
+        );
+    }
+
+    private function nombreReponsesTraiteesCognitif(): string
+    {
+        $nombre_reponses_traitees = "0";
+        foreach ((
+            self::REPONSES_VT_INDEX_TO_VRAI +
+            self::REPONSES_SP_INDEX_TO_VRAI +
+            self::REPONSES_RAIS_INDEX_TO_VRAI +
+            self::REPONSES_CV_INDEX_TO_VRAI +
+            self::REPONSES_SL_INDEX_TO_VRAI +
+            self::REPONSES_DIC_INDEX_TO_VRAI +
+            self::REPONSES_AS_INDEX_TO_VRAI
+        ) as $index => $vrai) {
+            $nombre_reponses_traitees = $nombre_reponses_traitees . "+repondu(" . $index . ")";
+        }
+
+        return $nombre_reponses_traitees;
+    }
+
+    private function nombreBonnesReponsesCognitif(): string
+    {
+        $nombre_bonnes_reponses = "0";
+
+        foreach ([self::VT_BR, self::SP_BR, self::RAIS_BR, self::CV_BR, self::SL_BR, self::DIC_BR, self::AS_BR] as $echelle) {
+            $nombre_bonnes_reponses = $nombre_bonnes_reponses . "+echelle(\"" . $echelle . "\")";
+        }
+
+        return $nombre_bonnes_reponses;
     }
 
     private function expressionFromArrayAptitudeCognitive(array $index_to_vrai, string $base): string
@@ -294,6 +345,34 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         }
 
         return $expression;
+    }
+
+    private function at(
+        Profil     $profil,
+        Correcteur $correcteur)
+    {
+        $this->addEchelle(
+            $profil,
+            $correcteur,
+            "AT",
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            self::AT,
+            $this->expressionFromArraySimplePersonalite(self::AT_REPONSES)
+        );
+    }
+
+    private function ds(
+        Profil     $profil,
+        Correcteur $correcteur)
+    {
+        $this->addEchelle(
+            $profil,
+            $correcteur,
+            "DS",
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            self::DS,
+            $this->expressionFromArraySimplePersonalite(self::DS_REPONSES)
+        );
     }
 
     private function fp(
@@ -313,7 +392,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->echelleCompositePersonalite($profil,
             $correcteur,
             "FP",
-            "fp",
+            self::FP,
             [self::FP_ANX, self::FP_INSTROS, self::FP_HDEP, self::FP_DEV, self::FP_GEN]);
     }
 
@@ -334,7 +413,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->echelleCompositePersonalite($profil,
             $correcteur,
             "ME",
-            "me",
+            self::ME,
             [self::ME_CE, self::ME_MODES, self::ME_COOPE, self::ME_AMB, self::ME_DROIT]);
     }
 
@@ -355,7 +434,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->echelleCompositePersonalite($profil,
             $correcteur,
             "CP",
-            "cp",
+            self::CP,
             [self::CP_FIAB, self::CP_AUTODISC, self::CP_REFL, self::CP_RIG, self::CP_SVA]);
     }
 
@@ -376,7 +455,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->echelleCompositePersonalite($profil,
             $correcteur,
             "AR",
-            "ar",
+            self::AR,
             [self::AR_CONF, self::AR_GREGA, self::AR_SPONT, self::AR_NOUV, self::AR_DYN]);
     }
 
@@ -401,8 +480,55 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->echelleCompositePersonalite($profil,
             $correcteur,
             "PM",
-            "pm",
+            self::PM,
             [self::PM_1, self::PM_AFFIRM, self::PM_EMP, self::PM_ING, self::PM_SINTEL]);
+    }
+
+    private function rc(
+        Profil     $profil,
+        Correcteur $correcteur
+    )
+    {
+        $expression = "0";
+        foreach ((
+            self::FP_ANX_REPONSES +
+            self::FP_INSTROS_REPONSES +
+            self::FP_HDEP_REPONSES +
+            self::FP_DEV_REPONSES +
+            self::FP_GEN_REPONSES +
+            self::ME_CE_REPONSES +
+            self::ME_MODES_REPONSES +
+            self::ME_COOPE_REPONSES +
+            self::ME_AMB_REPONSES +
+            self::ME_DROIT_REPONSES +
+            self::CP_FIAB_REPONSES +
+            self::CP_AUTODISC_REPONSES +
+            self::CP_REFL_REPONSES +
+            self::CP_RIG_REPONSES +
+            self::CP_SVA_REPONSES +
+            self::AR_CONF_REPONSES +
+            self::AR_GREGA_REPONSES +
+            self::AR_SPONT_REPONSES +
+            self::AR_NOUV_REPONSES +
+            self::AR_DYN_REPONSES +
+            self::PM_1_REPONSES +
+            self::PM_AFFIRM_REPONSES +
+            self::PM_EMP_REPONSES +
+            self::PM_ING_REPONSES +
+            self::PM_SINTEL_REPONSES
+        ) as $index => $type
+        ) {
+            $expression = $expression . "+vraiC(" . $index . ")";
+        }
+
+        $this->addEchelle(
+            $profil,
+            $correcteur,
+            "rc",
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            self::RC,
+            $expression
+        );
     }
 
     private function echelleSimplePersonalite(
@@ -504,6 +630,11 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
     const D = "D";
     const E = "E";
 
+    const EG = "eg";
+    const QR = "qr";
+
+    const VT_BR = "vt_br";
+    const VT_MR = "vt_mr";
     const REPONSES_VT_INDEX_TO_VRAI = [
         2 => self::B,
         3 => self::E,
@@ -558,6 +689,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
 
     ];
 
+    const SP_BR = "sp_br";
+    const SP_MR = "sp_mr";
     const REPONSES_SP_INDEX_TO_VRAI = [
         54 => self::B,
         55 => self::D,
@@ -582,6 +715,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
 
     ];
 
+    const RAIS_BR = "rais_br";
+    const RAIS_MR = "rais_mr";
     const REPONSES_RAIS_INDEX_TO_VRAI = [
         77 => self::D,
         78 => self::C,
@@ -600,6 +735,9 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         91 => self::C,
     ];
 
+
+    const CV_BR = "cv_br";
+    const CV_MR = "cv_mr";
     const REPONSES_CV_INDEX_TO_VRAI = [
         93 => self::B,
         94 => self::B,
@@ -623,6 +761,9 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         112 => self::B,
     ];
 
+
+    const SL_BR = "sl_br";
+    const SL_MR = "sl_mr";
     const REPONSES_SL_INDEX_TO_VRAI = [
         114 => self::B,
         115 => self::D,
@@ -641,6 +782,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         128 => self::B,
     ];
 
+    const DIC_BR = "dic_br";
+    const DIC_MR = "dic_mr";
     const REPONSES_DIC_INDEX_TO_VRAI = [
         130 => self::D,
         131 => self::D,
@@ -665,6 +808,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
 
     ];
 
+    const AS_BR = "as_br";
+    const AS_MR = "as_mr";
     const REPONSES_AS_INDEX_TO_VRAI = [
         151 => self::A,
         152 => self::A,
@@ -735,6 +880,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         425 => self::NORMAL,
         455 => self::NORMAL,
     ];
+
+    const FP = "fp";
 
     const FP_ANX = "fp1_anx";
     const FP_ANX_REPONSES = [
@@ -808,6 +955,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
     ];
 
 
+    const ME = "me";
+
     const ME_CE = "me1_ce";
     const ME_CE_REPONSES = [
         204 => self::INVERSE,
@@ -877,6 +1026,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         416 => self::INVERSE,
         442 => self::INVERSE,
     ];
+
+    const CP = "cp";
 
     const CP_FIAB = "cp1_fiab";
     const CP_FIAB_REPONSES = [
@@ -948,6 +1099,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         446 => self::INVERSE,
     ];
 
+    const AR = "ar";
+
     const AR_CONF = "ar1_conf";
     const AR_CONF_REPONSES = [
         211 => self::NORMAL,
@@ -1017,6 +1170,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         434 => self::INVERSE,
     ];
 
+    const PM = "pm";
+
     const PM_1 = "pm1";
     const PM_1_REPONSES = [
         207 => self::NORMAL,
@@ -1083,6 +1238,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         404 => self::NORMAL,
         430 => self::NORMAL,
     ];
+
+    const RC = "rc";
 }
 
 

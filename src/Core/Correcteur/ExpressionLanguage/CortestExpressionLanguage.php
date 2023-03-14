@@ -10,6 +10,7 @@ use App\Core\Correcteur\ExpressionLanguage\Functions\FauxB;
 use App\Core\Correcteur\ExpressionLanguage\Functions\FauxC;
 use App\Core\Correcteur\ExpressionLanguage\Functions\FauxD;
 use App\Core\Correcteur\ExpressionLanguage\Functions\FauxE;
+use App\Core\Correcteur\ExpressionLanguage\Functions\Repondu;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Score;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Score01234;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Score43210;
@@ -46,6 +47,7 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
         private readonly Score43210 $score_43210,
         private readonly Score01234 $score_01234,
         private readonly Echelle    $echelle,
+        private readonly Repondu    $repondu,
         CacheItemPoolInterface      $cache = null)
     {
         parent::__construct($cache, [$this]);
@@ -70,7 +72,8 @@ class CortestExpressionLanguage extends ExpressionLanguage implements Expression
             $this->score_01234,
             $this->score_43210,
             $this->score,
-            $this->echelle
+            $this->echelle,
+            $this->repondu
         ];
     }
 
