@@ -78,7 +78,13 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $etalonnage_repository->findOneBy([]));
+        if ($correcteur->profil->etalonnages->isEmpty()) {
+            $this->addFlash("warning", "Pas d'étalonnage disponible");
+            return $this->redirectToRoute("home");
+        }
+
+        $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $correcteur->profil->etalonnages[0]);
+
         $form = $this->createForm(
             EtalonnageChoiceType::class,
             $parametres_calcul_profil,

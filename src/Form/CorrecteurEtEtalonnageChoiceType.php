@@ -35,7 +35,8 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
 
             /** @var Etalonnage $etalonnage */
             foreach ($profil->etalonnages as $etalonnage) {
-                $sub_result[$etalonnage->nom] = new CorrecteurEtEtalonnagePair($correcteur, $etalonnage);
+                $sub_result[$correcteur->nom . " | " . $etalonnage->nom] = new CorrecteurEtEtalonnagePair($correcteur,
+                    $etalonnage);
             }
 
             $result[$correcteur->nom] = $sub_result;
@@ -47,7 +48,8 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add("both", ChoiceType::class, [
-            "choices" => $this->correcteurAndEtalonnageChoices($options[self::OPTION_SESSION])
+            "choices" => $this->correcteurAndEtalonnageChoices($options[self::OPTION_SESSION]),
+            "label" => "Correcteur et étalonnage"
         ])->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 

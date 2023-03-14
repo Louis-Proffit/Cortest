@@ -13,23 +13,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EtalonnageChoiceType extends AbstractType
 {
+
     const OPTION_PROFIL = "profil";
-
-    public function __construct(
-        private readonly EtalonnageRepository $repository
-    )
-    {
-    }
-
-    private function etalonnage(Etalonnage $definition_etalonnage_computer): string
-    {
-        return $definition_etalonnage_computer->nom;
-    }
 
     private function etalonnageChoices(Profil $profil): array
     {
 
         $result = [];
+        // dump($profil->etalonnages);
+
         /** @var Etalonnage $etalonnage */
         foreach ($profil->etalonnages as $etalonnage) {
             $result[$etalonnage->nom] = $etalonnage;

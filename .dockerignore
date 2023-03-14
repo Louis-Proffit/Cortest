@@ -7,3 +7,4 @@ vendor
 mysql
 composer.lock
 package-lock.json
+.env.local

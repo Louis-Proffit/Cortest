@@ -61,6 +61,41 @@ class PdfController extends AbstractController
 
     }
 
+    #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "download")]
+    public function download(
+        GraphiqueRepository       $graphique_repository,
+        ReponseCandidatRepository $candidat_reponse_repository,
+        CorrecteurRepository      $correcteur_repository,
+        EtalonnageRepository      $etalonnage_repository,
+        CorrecteurManager         $correcteur_manager,
+        EtalonnageManager         $etalonnage_manager,
+        PdfManager                $pdf_manager,
+        int                       $candidat_reponse_id,
+        int                       $correcteur_id,
+        int                       $etalonnage_id,
+        int                       $graphique_id
+    ): Response
+    {
+        $correcteur = $correcteur_repository->find($correcteur_id);
+        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+        $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
+
+        $graphique = $graphique_repository->find($graphique_id);
+
+        $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
+        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+
+
+        return $pdf_manager->createPdfFile(
+            graphique: $graphique,
+            candidat_reponse: $candidat_reponse,
+            correcteur: $correcteur,
+            etalonnage: $etalonnage,
+            score: $scores[$candidat_reponse_id],
+            profil: $profils[$candidat_reponse_id]
+        );
+    }
+
     #[Route("/session/form/{session_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "session_download")]
     public function form_session(
         SessionRepository    $session_repository,
@@ -109,7 +144,7 @@ class PdfController extends AbstractController
 
         $graphiques = $graphique_repository->findAll();
 
-        if (empty($graphiques)) {
+        if ($correcteur->profil->graphiques->isEmpty()) {
             $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
             return $this->redirectToRoute("graphique_index");
         }
@@ -135,40 +170,5 @@ class PdfController extends AbstractController
         }
 
         return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
-    }
-
-    #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "download")]
-    public function download(
-        GraphiqueRepository       $graphique_repository,
-        ReponseCandidatRepository $candidat_reponse_repository,
-        CorrecteurRepository      $correcteur_repository,
-        EtalonnageRepository      $etalonnage_repository,
-        CorrecteurManager         $correcteur_manager,
-        EtalonnageManager         $etalonnage_manager,
-        PdfManager                $pdf_manager,
-        int                       $candidat_reponse_id,
-        int                       $correcteur_id,
-        int                       $etalonnage_id,
-        int                       $graphique_id
-    ): Response
-    {
-        $correcteur = $correcteur_repository->find($correcteur_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
-        $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
-
-        $graphique = $graphique_repository->find($graphique_id);
-
-        $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
-        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
-
-
-        return $pdf_manager->createPdfFile(
-            graphique: $graphique,
-            candidat_reponse: $candidat_reponse,
-            correcteur: $correcteur,
-            etalonnage: $etalonnage,
-            score: $scores[$candidat_reponse_id],
-            profil: $profils[$candidat_reponse_id]
-        );
     }
 }

@@ -46,8 +46,8 @@
     \noindent\fbox{
         \begin{minipage}{\linewidth}
             \begin{tabular}{m{3.5cm} m{5.2cm} m{3.5cm} m{5.2cm}}
-                Nom de naissance:       & {{ reponse.nom|raw }}                             & Type du concours:         & {{ session.type_concours|raw }}       \\
-                Prénom:                 & {{ reponse.prenom|raw }}                          & Version Batterie:         & {{ session.version_batterie|raw }}    \\
+                Nom de naissance:       & {{ reponse.nom|raw }}                             & Type du concours:         & {{ session.concours.type_concours|raw }}       \\
+                Prénom:                 & {{ reponse.prenom|raw }}                          & Version Batterie:         & {{ session.concours.version_batterie|raw }}    \\
                 Nom d'usage:            & {{ reponse.nom_jeune_fille|raw }}                 & Date d'examen:            & {{ session.date|date('d/m/Y') }}      \\
                 Sexe:                   & {{ reponse.sexe|sexe }}                           & SGAMI/SGAP:               & {{ session.sgap.nom|raw }}            \\
                 Date de naissance:      & {{ reponse.date_de_naissance|date('d/m/Y') }}     & Numéro d'identification   & xxx                                   \\
@@ -100,9 +100,9 @@
             \begin{tabular}{ {% for echelle in subtest[3] %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }
             {% for echelle in subtest[3] %}
             {% if echelle[1] == 0 %}
-                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]] }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
+                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]]|number_format(2) }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
                 {% else %}
-                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]] }} } &
+                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]]|number_format(2) }} } &
             {% endif %}
             {% endfor %}
             \end{tabular}

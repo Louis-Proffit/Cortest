@@ -17,12 +17,6 @@ class GraphiqueChoiceType extends AbstractType
 {
     const OPTION_PROFIL = "profil";
 
-    public function __construct(
-        private readonly CorrecteurRepository $repository
-    )
-    {
-    }
-
     private function graphiqueChoices(Profil $profil): array
     {
         $graphiques = $profil->graphiques;

@@ -52,10 +52,8 @@
                     <td>
                         <a href="{{ path("pdf_form", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
                     </td>
-                    {% for score in scores[reponse.id] %}
-                        <td>
-                            {{ score }}
-                        </td>
+                    {% for echelle in correcteur.echelles %}
+                        <td>{{ profils[reponse.id][echelle.echelle.nom_php] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
