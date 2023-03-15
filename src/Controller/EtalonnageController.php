@@ -87,11 +87,11 @@ class EtalonnageController extends AbstractController
             );
 
             foreach ($profil->echelles as $echelle) {
-                $etalonnage->echelles->add(
-                    new EchelleEtalonnage(
-                        id: 0, bounds: range(1, $nombreClasses - 1), echelle: $echelle, etalonnage: $etalonnage
-                    )
-                );
+                $etalonnage->echelles->add(EchelleEtalonnage::rangeEchelle(
+                    $echelle,
+                    $etalonnage,
+                    $nombreClasses
+                ));
             }
 
             $entity_manager->persist($etalonnage);

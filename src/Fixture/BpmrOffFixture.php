@@ -6,6 +6,8 @@ use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
+use App\Entity\EchelleEtalonnage;
+use App\Entity\Etalonnage;
 use App\Entity\NiveauScolaire;
 use App\Entity\Profil;
 use App\Entity\QuestionConcours;
@@ -77,9 +79,13 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $this->pm($profil, $correcteur);
         $this->rc($profil, $correcteur);
 
+        $etalonnage = $this->etalonnage($profil);
+
         $manager->persist($concours);
         $manager->persist($profil);
         $manager->persist($correcteur);
+        $manager->persist($etalonnage);
+
 
         $session = $this->session_exemple(
             $concours,
@@ -90,6 +96,27 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $manager->persist($session);
 
         $manager->flush();
+    }
+
+    private function etalonnage(Profil $profil): Etalonnage
+    {
+        $nombre_classes = 9;
+
+        $echelles = new ArrayCollection();
+
+        $etalonnage = new Etalonnage(
+            0,
+            $profil,
+            "Etalonnage BMPR OFF test",
+            $nombre_classes,
+            $echelles
+        );
+
+        foreach ($profil->echelles as $echelle) {
+            $etalonnage->echelles->add(EchelleEtalonnage::rangeEchelle($echelle, $etalonnage, $nombre_classes));
+        }
+
+        return $etalonnage;
     }
 
     private function session_exemple(Concours $concours, Sgap $sgap, NiveauScolaire $niveau_scolaire): Session
@@ -137,14 +164,33 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             ));
         }
 
-        for ($i = 1; $i <= 51; $i++) {
+        foreach ((
+            self::REPONSES_VT_INDEX_TO_VRAI +
+            self::REPONSES_AS_INDEX_TO_VRAI +
+            self::REPONSES_DIC_INDEX_TO_VRAI +
+            self::REPONSES_SL_INDEX_TO_VRAI +
+            self::REPONSES_CV_INDEX_TO_VRAI +
+            self::REPONSES_RAIS_INDEX_TO_VRAI +
+            self::REPONSES_SP_INDEX_TO_VRAI
+        ) as $index => $vrai) {
             $concours->questions->add(new QuestionConcours(
                 0,
-                $i,
+                $index,
                 $concours,
                 QuestionConcours::TYPE_VRAI_FAUX
             ));
         }
+
+        foreach (self::ALL_PERSONNALITE as $index => $type
+        ) {
+            $concours->questions->add(new QuestionConcours(
+                0,
+                $index,
+                $concours,
+                QuestionConcours::TYPE_SCORE
+            ));
+        }
+
     }
 
     private function vt(Profil $profil, Correcteur $correcteur)
@@ -490,33 +536,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
     )
     {
         $expression = "0";
-        foreach ((
-            self::FP_ANX_REPONSES +
-            self::FP_INSTROS_REPONSES +
-            self::FP_HDEP_REPONSES +
-            self::FP_DEV_REPONSES +
-            self::FP_GEN_REPONSES +
-            self::ME_CE_REPONSES +
-            self::ME_MODES_REPONSES +
-            self::ME_COOPE_REPONSES +
-            self::ME_AMB_REPONSES +
-            self::ME_DROIT_REPONSES +
-            self::CP_FIAB_REPONSES +
-            self::CP_AUTODISC_REPONSES +
-            self::CP_REFL_REPONSES +
-            self::CP_RIG_REPONSES +
-            self::CP_SVA_REPONSES +
-            self::AR_CONF_REPONSES +
-            self::AR_GREGA_REPONSES +
-            self::AR_SPONT_REPONSES +
-            self::AR_NOUV_REPONSES +
-            self::AR_DYN_REPONSES +
-            self::PM_1_REPONSES +
-            self::PM_AFFIRM_REPONSES +
-            self::PM_EMP_REPONSES +
-            self::PM_ING_REPONSES +
-            self::PM_SINTEL_REPONSES
-        ) as $index => $type
+        foreach (self::ALL_PERSONNALITE as $index => $type
         ) {
             $expression = $expression . "+vraiC(" . $index . ")";
         }
@@ -1240,6 +1260,34 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
     ];
 
     const RC = "rc";
+
+    const ALL_PERSONNALITE = (
+        self::FP_ANX_REPONSES +
+        self::FP_INSTROS_REPONSES +
+        self::FP_HDEP_REPONSES +
+        self::FP_DEV_REPONSES +
+        self::FP_GEN_REPONSES +
+        self::ME_CE_REPONSES +
+        self::ME_MODES_REPONSES +
+        self::ME_COOPE_REPONSES +
+        self::ME_AMB_REPONSES +
+        self::ME_DROIT_REPONSES +
+        self::CP_FIAB_REPONSES +
+        self::CP_AUTODISC_REPONSES +
+        self::CP_REFL_REPONSES +
+        self::CP_RIG_REPONSES +
+        self::CP_SVA_REPONSES +
+        self::AR_CONF_REPONSES +
+        self::AR_GREGA_REPONSES +
+        self::AR_SPONT_REPONSES +
+        self::AR_NOUV_REPONSES +
+        self::AR_DYN_REPONSES +
+        self::PM_1_REPONSES +
+        self::PM_AFFIRM_REPONSES +
+        self::PM_EMP_REPONSES +
+        self::PM_ING_REPONSES +
+        self::PM_SINTEL_REPONSES
+    );
 }
 
 
