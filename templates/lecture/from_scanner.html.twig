@@ -22,7 +22,7 @@
             date_naissance: {asked: true, expected: false, print: true},
             sexe: {asked: true, expected: false, print: true},
             concours: {asked: true, expected: false, print: true},
-            SGAP: {asked: true, expected: '{{ session.sgap.indice }}', print: true},
+            SGAP: {asked: true, expected: '{% if session.sgap.indice < 10 %}0{% endif %}{{ session.sgap.indice }}', print: true},
             date_examen: {asked: true, expected: false, print: true},
             type_concours: {asked: true, expected: '{{ session.concours.type_concours }}', print: true},
             batterie: {asked: true, expected: '{{ session.concours.version_batterie }}', print: true},
