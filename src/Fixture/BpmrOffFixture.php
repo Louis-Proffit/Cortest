@@ -14,6 +14,8 @@ use App\Entity\QuestionConcours;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Entity\Sgap;
+use App\Entity\Graphique;
+use App\Repository\ProfilRepository;
 use App\Repository\GrilleRepository;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -21,6 +23,8 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use App\Core\Renderer\RendererRepository;
+
 
 class BpmrOffFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
 {
@@ -38,6 +42,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
     public function load(ObjectManager $manager)
     {
         $concours = $this->concours();
+        
 
         $this->questions($concours);
 
@@ -59,6 +64,8 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             "Correcteur par défaut",
             new ArrayCollection()
         );
+        
+        $graphique = $this->graphique($profil);
 
         $this->vt($profil, $correcteur);
         $this->sp($profil, $correcteur);
@@ -85,6 +92,7 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
         $manager->persist($profil);
         $manager->persist($correcteur);
         $manager->persist($etalonnage);
+        $manager->persist($graphique);
 
 
         $session = $this->session_exemple(
@@ -640,6 +648,18 @@ class BpmrOffFixture extends Fixture implements FixtureGroupInterface, Dependent
             "[Version batterie]",
             new ArrayCollection()
         );
+    }
+    
+    private function graphique($profil, RendererRepository $renderer_repository,): Graphique
+    {
+        $renderer = $renderer_repository->fromIndex(0);
+        $g = new Graphique(0,$renderer->initializeOptions(), $profil,new ArrayCollection(), "Version 1", 0);
+        
+        Graphique::initializeEchelles($g,$renderer);
+        
+        
+        
+        
     }
 
     const INDEX_EXEMPLES = [1, 52, 53, 74, 75, 76, 92, 113, 129, 150];
