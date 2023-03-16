@@ -29,10 +29,10 @@
             <ul>
                 <li>Echelle de bonnes réponses : <strong>{{ echelle_br_mr[0]|echelle_graphique_nom }}</strong></li>
                 <li>Echelle de mauvaises réponses : <strong>{{ echelle_br_mr[1]|echelle_graphique_nom }}</strong></li>
+                <li><a class="btn btn-link btn-sm fw-bold"
+                       href="{{ path("graphique_subtest_supprimer_composite", {"id_subtest": subtest.id, "id_composite": echelle_br_mr[0] }) }}">Supprimer
+                        l'échelle composite</a></li>
             </ul>
-            <a class="btn btn-link"
-               href="{{ path("graphique_subtest_supprimer_composite", {"id_subtest": subtest.id, "id_composite": echelle_br_mr[0] }) }}">Supprimer
-                l'échelle composite</a>
         {% endfor %}
     </ul>
     {% endif %}
@@ -54,7 +54,7 @@
     <ul>
         {% for footer in subtest.echelles_footer %}
             <li> {{ footer[0]|echelle_graphique_nom }} ( {{ footer[0]|echelle_graphique_nom_affiche }} )
-                ({{ footer[1]|footer_type }})<a class="btn btn-link"
+                ({{ footer[1]|footer_type }})<a class="btn btn-link btn-sm fw-bold"
                                                 href="{{ path("graphique_supprimer_footer", {"id_subtest":subtest.id, "id_footer": footer[0]}) }}">Supprimer {{ footer[0]|echelle_graphique_nom }}</a>
             </li>
         {% endfor %}

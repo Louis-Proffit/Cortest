@@ -39,6 +39,31 @@
     <br>
     <hr class="hr hr-blurry">
     <br>
+    <h5>Echelles</h5>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            {% for option in renderer.echelleOptions %}
+                <th scope="col">{{ option.nom }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for echelleGraphique in graphique.echelles %}
+            <tr>
+                <td>{{ echelleGraphique.echelle.nom }}</td>
+                {% for option in renderer.echelleOptions %}
+                    <td>{{ echelleGraphique.options[option.nom_php] }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <hr class="hr hr-blurry">
+    <br>
     <h3>Subtests</h3>
     <br>
     <div class="row row-cols-auto">
@@ -64,9 +89,9 @@
                 <tr>
                     <td>{{ subtest.nom }}</td>
                     <td>{{ subtest.type|subtest_type }}</td>
-                    <td><a href="{{ path("graphique_consulter_subtest", {"id_subtest":subtest.id}) }}">Consulter</a>
+                    <td><a class="btn btn-link btn-sm fw-bold" href="{{ path("graphique_consulter_subtest", {"id_subtest":subtest.id}) }}">Consulter</a>
                     </td>
-                    <td><a href="{{ path("graphique_supprimer_subtest", {"id_subtest":subtest.id}) }}">Supprimer</a>
+                    <td><a class="btn btn-link btn-sm fw-bold" href="{{ path("graphique_supprimer_subtest", {"id_subtest":subtest.id}) }}">Supprimer</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -74,30 +99,5 @@
         </table>
     {% endif %}
     <br>
-    <hr class="hr hr-blurry">
-    <br>
-    <h5>Echelles</h5>
-    <br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Nom</th>
-            {% for option in renderer.echelleOptions %}
-                <th scope="col">{{ option.nom }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for echelleGraphique in graphique.echelles %}
-            <tr>
-                <td>{{ echelleGraphique.echelle.nom }}</td>
-                {% for option in renderer.echelleOptions %}
-                    <td>{{ echelleGraphique.options[option.nom_php] }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
 {% endblock %}
 

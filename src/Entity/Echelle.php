@@ -12,8 +12,6 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
-#[UniqueEntity('nom')]
-#[UniqueEntity('nom_php')]
 class Echelle
 {
 
@@ -42,12 +40,12 @@ class Echelle
     public int $id;
 
     #[NotBlank]
-    #[ORM\Column(unique: true)]
+    #[ORM\Column]
     public string $nom;
 
     #[NotBlank]
     #[PhpIdentifier]
-    #[ORM\Column(unique: true)]
+    #[ORM\Column]
     public string $nom_php;
 
     #[Choice(choices: self::TYPE_ECHELLE_OPTIONS)]

@@ -1,69 +1,103 @@
 <?php
 
-namespace App\Fixture\Bmpr;
+namespace App\Fixture\Bpmr;
 
+use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
+use App\Entity\Graphique;
 use App\Entity\Profil;
-use App\Repository\ConcoursRepository;
-use App\Repository\ProfilRepository;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use App\Entity\QuestionConcours;
+use App\Entity\Subtest;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Persistence\ObjectManager;
 
-class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class BpmrOffFixture extends AbstractBpmrFixture
 {
 
-    public function __construct(
-        private readonly ProfilRepository   $profil_repository,
-        private readonly ConcoursRepository $concours_repository,
-    )
+    public function __construct()
     {
-    }
-
-    public static function getGroups(): array
-    {
-        return ["bpmr"];
-    }
-
-    public function getDependencies(): array
-    {
-        return [BpmrOffFixture::class];
-    }
-
-    public function load(ObjectManager $manager)
-    {
-        $concours = $this->concours_repository->findOneBy(["nom" => BpmrOffFixture::CONCOURS_NOM]);
-        $profil = $this->profil_repository->findOneBy(["nom" => BpmrOffFixture::PROFIL_NOM]);
-
-        // -------------------- correcteurs
-
-        $correcteur = new Correcteur(
-            0,
-            $concours,
-            $profil,
+        parent::__construct(
+            456,
+            self::CONCOURS_NOM,
+            self::PROFIL_NOM,
             self::CORRECTEUR_NOM,
+            self::ETALONNAGE_NOM,
+            9,
+            self::GRAPHIQUE_NOM
+        );
+    }
+
+    protected function aptitudesCognitives(Profil $profil)
+    {
+        $this->echellesSimplesAptitudesCognitives($profil, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
+
+        $profil->echelles->add(new Echelle(
+            0,
+            "EG",
+            self::EG,
+            Echelle::TYPE_ECHELLE_COMPOSITE,
+            new ArrayCollection(),
             new ArrayCollection()
+        ));
+        $profil->echelles->add(new Echelle(
+            0,
+            "QR",
+            self::QR,
+            Echelle::TYPE_ECHELLE_COMPOSITE,
+            new ArrayCollection(),
+            new ArrayCollection()
+        ));
+    }
+
+    protected function personnalite(Profil $profil)
+    {
+        $this->echellesSimplesEtCompositesPersonnalite(
+            $profil,
+            self::PERSONNALITE_NOM_PHP_TO_NOM_SIMPLE,
+            self::PERSONNALITE_NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE
         );
 
-        $this->echelleAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
-        $this->echelleAptitudeCognitive($profil, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
-        $this->eg($profil, $correcteur);
-        $this->qr($profil, $correcteur);
+        $profil->echelles->add(new Echelle(
+            0,
+            "DS",
+            self::DS,
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            new ArrayCollection(),
+            new ArrayCollection()
+        ));
 
-        $this->echellesPersonnalite($profil, $correcteur, self::NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE_TO_INDEX_TO_TYPE);
-        $this->at($profil, $correcteur);
-        $this->ds($profil, $correcteur);
-        $this->rc($profil, $correcteur);
+        $profil->echelles->add(new Echelle(
+            0,
+            "AT",
+            self::AT,
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            new ArrayCollection(),
+            new ArrayCollection()
+        ));
 
-        $manager->persist($correcteur);
-        $manager->flush();
+        $profil->echelles->add(new Echelle(
+            0,
+            "RC",
+            self::RC,
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            new ArrayCollection(),
+            new ArrayCollection()
+        ));
     }
 
-    private function eg(
+    protected function questions(Concours $concours)
+    {
+        $this->questionsTypeIndexAsValue($concours, self::INDEX_EXEMPLES, QuestionConcours::TYPE_EXEMPLE);
+        $this->questionsTypeIndexAsKey($concours,
+            self::ALL_APTITUDES_COGNITIVES,
+            QuestionConcours::TYPE_VRAI_FAUX);
+        $this->questionsTypeIndexAsKey($concours,
+            self::ALL_PERSONNALITE_INDEX_TO_TYPE,
+            QuestionConcours::TYPE_SCORE);
+    }
+
+    private function correcteurEg(
         Profil     $profil,
         Correcteur $correcteur
     )
@@ -79,7 +113,7 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         ));
     }
 
-    private function qr(
+    private function correcteurQr(
         Profil     $profil,
         Correcteur $correcteur
     )
@@ -98,15 +132,7 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
     private function nombreReponsesTraiteesCognitif(): string
     {
         $nombre_reponses_traitees = "0";
-        foreach ((
-            self::REPONSES_VT_INDEX_TO_VRAI +
-            self::REPONSES_SP_INDEX_TO_VRAI +
-            self::REPONSES_RAIS_INDEX_TO_VRAI +
-            self::REPONSES_CV_INDEX_TO_VRAI +
-            self::REPONSES_SL_INDEX_TO_VRAI +
-            self::REPONSES_DIC_INDEX_TO_VRAI +
-            self::REPONSES_AS_INDEX_TO_VRAI
-        ) as $index => $vrai) {
+        foreach (self::ALL_APTITUDES_COGNITIVES as $index => $vrai) {
             $nombre_reponses_traitees = $nombre_reponses_traitees . "+repondu(" . $index . ")";
         }
 
@@ -117,38 +143,38 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
     {
         $nombre_bonnes_reponses = "0";
 
-        foreach (BpmrOffFixture::APTITUDES_COGNITIVES_ALL_BR as $echelle) {
+        foreach (BpmrOffFixture::APTITUDES_COGNITIVES_NOM_PHP_BR as $echelle) {
             $nombre_bonnes_reponses = $nombre_bonnes_reponses . "+echelle(\"" . $echelle . "\")";
         }
 
         return $nombre_bonnes_reponses;
     }
 
-    private function at(
+    private function correcteurAt(
         Profil     $profil,
         Correcteur $correcteur
     )
     {
-        $correcteur->echelles->add($this->echelleFromIndexToType(
+        $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
             $this->findEchelleInProfil($profil, BpmrOffFixture::AT),
             self::AT_REPONSES
         ));
     }
 
-    private function ds(
+    private function correcteurDs(
         Profil     $profil,
         Correcteur $correcteur
     )
     {
-        $correcteur->echelles->add($this->echelleFromIndexToType(
+        $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
             $this->findEchelleInProfil($profil, BpmrOffFixture::DS),
             self::DS_REPONSES
         ));
     }
 
-    private function rc(
+    private function correcteurRc(
         Profil     $profil,
         Correcteur $correcteur
     )
@@ -167,78 +193,258 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         ));
     }
 
-    private function echellesPersonnalite(Profil $profil, Correcteur $correcteur, array $nom_php_composite_to_nom_php_simple_to_index_to_type)
+    protected function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur)
     {
-
-        foreach ($nom_php_composite_to_nom_php_simple_to_index_to_type as $nom_php_composite => $nom_php_simple_to_index_to_type) {
-
-            $expression_composite = "0";
-            $echelle_composite = $this->findEchelleInProfil($profil, $nom_php_composite);
-
-            foreach ($nom_php_simple_to_index_to_type as $nom_php_simple => $index_to_type) {
-
-                $echelle_simple = $this->findEchelleInProfil($profil, $nom_php_simple);
-
-                $expression_composite = $expression_composite . "+echelle(\"" . $nom_php_simple . "\")";
-
-                $correcteur->echelles->add($this->echelleFromIndexToType($correcteur, $echelle_simple, $index_to_type));
-            }
-
-            $correcteur->echelles->add(new EchelleCorrecteur(
-                0,
-                $expression_composite,
-                $echelle_composite,
-                $correcteur
-            ));
-        }
+        $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
+        $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
+        $this->correcteurEg($profil, $correcteur);
+        $this->correcteurQr($profil, $correcteur);
     }
 
-    private function echelleFromIndexToType(Correcteur $correcteur, Echelle $echelle, array $index_to_type): EchelleCorrecteur
+    protected function correcteurPersonnalite(Profil $profil, Correcteur $correcteur)
     {
-        $expression = "0";
-        foreach ($index_to_type as $index => $type) {
-            $expression = $expression . "+" . $type . "(" . $index . ")";
+        $this->echellesCorrecteurPersonnalite($profil,
+            $correcteur,
+            self::NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE_TO_INDEX_TO_TYPE);
+        $this->correcteurAt($profil, $correcteur);
+        $this->correcteurDs($profil, $correcteur);
+        $this->correcteurRc($profil, $correcteur);
+    }
+
+    private function subtestAptitudesCognitives(Graphique $graphique): Subtest
+    {
+        $echelles_bas_de_cadre = array(
+            array($this->findEchelleInGraphique($graphique,
+                BpmrOffFixture::EG)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+            array($this->findEchelleInGraphique($graphique,
+                BpmrOffFixture::QR)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+        );
+
+        $echelles_core = [];
+
+        foreach (BpmrOffFixture::APTITUDES_COGNITIVES_BR_TO_MR as $br => $mr) {
+            $echelle_br = $this->findEchelleInGraphique($graphique, $br);
+            $echelle_mr = $this->findEchelleInGraphique($graphique, $mr);
+            $echelles_core[] = array($echelle_br->id, $echelle_mr->id);
         }
 
-        return new EchelleCorrecteur(
-            0,
-            $expression,
-            $echelle,
-            $correcteur
+        return new Subtest(
+            id: 0,
+            nom: "Aptitudes cognitives",
+            type: Subtest::TYPE_SUBTEST_BR_MR,
+            echelles_core: $echelles_core,
+            echelles_bas_de_cadre: $echelles_bas_de_cadre,
+            graphique: $graphique
         );
     }
 
-    private function echelleAptitudeCognitive(Profil $profil, Correcteur $correcteur, array $nom_php_to_index_to_vrai, $base)
+    private function subtestPersonnalite(Graphique $graphique): Subtest
     {
-        foreach ($nom_php_to_index_to_vrai as $nom_php => $index_to_vrai) {
-            $echelle = $this->findEchelleInProfil($profil, $nom_php);
-            $expression = "0";
+        $echelles_bas_de_cadre = array(
+            array($this->findEchelleInGraphique($graphique,
+                BpmrOffFixture::DS)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+            array($this->findEchelleInGraphique($graphique, BpmrOffFixture::AT)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
+            array($this->findEchelleInGraphique($graphique, BpmrOffFixture::RC)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
+        );
 
-            foreach ($index_to_vrai as $index => $vrai) {
-                $expression = $expression . "+" . $base . $vrai . "(" . $index . ")";
+        $echelles_core = array();
+
+        foreach (self::PERSONNALITE_NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE as $nom_php_composite => $noms_php_simples) {
+
+            $echelle_composite_dependencies = array();
+            $echelle_composite = $this->findEchelleInGraphique($graphique, $nom_php_composite);
+
+            foreach ($noms_php_simples as $nom_php_simple) {
+                $echelle_simple = $this->findEchelleInGraphique($graphique, $nom_php_simple);
+                $echelle_composite_dependencies[] = $echelle_simple->id;
             }
 
-            $correcteur->echelles->add(new EchelleCorrecteur(
-                0,
-                $expression,
-                $echelle,
-                $correcteur
-            ));
+            $echelles_core[] = array($echelle_composite->id, $echelle_composite_dependencies);
         }
+
+        return new Subtest(
+            id: 0,
+            nom: "Personnalité",
+            type: Subtest::TYPE_SUBTEST_COMPOSITE,
+            echelles_core: $echelles_core,
+            echelles_bas_de_cadre: $echelles_bas_de_cadre,
+            graphique: $graphique
+        );
     }
 
-    private function findEchelleInProfil(Profil $profil, string $nom_php): Echelle|null
+    protected function subtests(Graphique $graphique)
     {
-        /** @var Echelle $echelle */
-        foreach ($profil->echelles as $echelle) {
-            if ($echelle->nom_php === $nom_php) {
-                return $echelle;
-            }
-        }
-        return null;
+        $graphique->subtests->add($this->subtestAptitudesCognitives($graphique));
+        $graphique->subtests->add($this->subtestPersonnalite($graphique));
     }
 
-    const CORRECTEUR_NOM = "Correcteur par défaut";
+
+    const CONCOURS_NOM = "Concours BPMR - Officier";
+    const PROFIL_NOM = "BPMR - Officier";
+    const CORRECTEUR_NOM = "Correcteur par défaut BPMR - OFF";
+    const ETALONNAGE_NOM = "Etalonnage de test BPMR - OFF";
+    const GRAPHIQUE_NOM = "Graphique par défaut BPMR - OFF";
+
+    const INDEX_EXEMPLES = [1, 52, 53, 74, 75, 76, 92, 113, 129, 150];
+
+    const EG = "eg";
+    const QR = "qr";
+    const VT_BR = "vt_br";
+    const VT_MR = "vt_mr";
+    const SP_BR = "sp_br";
+    const SP_MR = "sp_mr";
+    const RAIS_BR = "rais_br";
+    const RAIS_MR = "rais_mr";
+    const CV_BR = "cv_br";
+    const CV_MR = "cv_mr";
+    const SL_BR = "sl_br";
+    const SL_MR = "sl_mr";
+    const DIC_BR = "dic_br";
+    const DIC_MR = "dic_mr";
+    const AS_BR = "as_br";
+    const AS_MR = "as_mr";
+
+    const APTITUDES_COGNITIVES_NOM_PHP_TO_NOM = [
+        self::VT_BR => "VT",
+        self::SP_BR => "SP",
+        self::RAIS_BR => "Rais",
+        self::CV_BR => "CV",
+        self::SL_BR => "SL",
+        self::DIC_BR => "DIC",
+        self::AS_BR => "AS",
+        self::VT_MR => "VT Mauvaises réponses",
+        self::SP_MR => "SP Mauvaises réponses",
+        self::RAIS_MR => "Rais Mauvaises réponses",
+        self::CV_MR => "CV Mauvaises réponses",
+        self::SL_MR => "SL Mauvaises réponses",
+        self::DIC_MR => "DIC Mauvaises réponses",
+        self::AS_MR => "AS Mauvaises réponses",
+    ];
+
+    const APTITUDES_COGNITIVES_NOM_PHP_BR = [
+        self::VT_BR,
+        self::SP_BR,
+        self::RAIS_BR,
+        self::CV_BR,
+        self::SL_BR,
+        self::DIC_BR,
+        self::AS_BR
+    ];
+
+    const APTITUDES_COGNITIVES_BR_TO_MR = [
+        self::VT_BR => self::VT_MR,
+        self::SP_BR => self::SP_MR,
+        self::RAIS_BR => self::RAIS_MR,
+        self::CV_BR => self::CV_MR,
+        self::SL_BR => self::SL_MR,
+        self::DIC_BR => self::DIC_MR,
+        self::AS_BR => self::AS_MR
+    ];
+
+    const AT = "at";
+    const DS = "ds";
+    const FP = "fp";
+    const FP_ANX = "fp1_anx";
+    const FP_INTROS = "fp2_instros";
+    const FP_HDEP = "fp3_hdep";
+    const FP_DEV = "fp4_dev";
+    const FP_GEN = "fp5_gen";
+    const ME = "me";
+    const ME_CE = "me1_ce";
+    const ME_MODES = "me2_modes";
+    const ME_COOPE = "me3_coope";
+    const ME_AMB = "me4_amb";
+    const ME_DROIT = "me5_droit";
+    const CP = "cp";
+    const CP_FIAB = "cp1_fiab";
+    const CP_AUTODISC = "cp2_autodisc";
+    const CP_REFL = "cp3_refl";
+    const CP_RIG = "cp4_rig";
+    const CP_SVA = "cp5_sva";
+    const AR = "ar";
+    const AR_CONF = "ar1_conf";
+    const AR_GREGA = "ar2_grega";
+    const AR_SPONT = "ar3_spont";
+    const AR_NOUV = "ar4_nouv";
+    const AR_DYN = "ar5_dyn";
+    const PM = "pm";
+    const PM_LEAD = "pm1_lead";
+    const PM_AFFIRM = "pm2_affirm";
+    const PM_EMP = "pm3_emp";
+    const PM_ING = "pm4_ing";
+    const PM_SINTEL = "pm5_sintel";
+    const RC = "rc";
+
+    const PERSONNALITE_NOM_PHP_TO_NOM_SIMPLE = [
+        self::FP => "FP",
+        self::FP_ANX => "Anx",
+        self::FP_INTROS => "Intros",
+        self::FP_HDEP => "H.Dep",
+        self::FP_DEV => "Dev",
+        self::FP_GEN => "Gen",
+        self::ME => "ME",
+        self::ME_CE => "CE",
+        self::ME_MODES => "Modes",
+        self::ME_COOPE => "Coopé",
+        self::ME_AMB => "Amb",
+        self::ME_DROIT => "Droit",
+        self::CP => "CP",
+        self::CP_FIAB => "Fiab",
+        self::CP_AUTODISC => "Autodisc",
+        self::CP_REFL => "Refl",
+        self::CP_RIG => "Rig",
+        self::CP_SVA => "Sva",
+        self::AR => "Ar",
+        self::AR_CONF => "Conf",
+        self::AR_GREGA => "Grega",
+        self::AR_SPONT => "Spont",
+        self::AR_NOUV => "Nouv",
+        self::AR_DYN => "Dyn",
+        self::PM => "PM",
+        self::PM_LEAD => "Lead",
+        self::PM_AFFIRM => "Affirm",
+        self::PM_EMP => "Emp",
+        self::PM_ING => "Ing",
+        self::PM_SINTEL => "S.Intel"
+    ];
+
+    const PERSONNALITE_NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE = [
+        self::FP => [
+            self::FP_ANX,
+            self::FP_INTROS,
+            self::FP_HDEP,
+            self::FP_DEV,
+            self::FP_GEN,
+        ],
+        self::ME => [
+            self::ME_CE,
+            self::ME_MODES,
+            self::ME_COOPE,
+            self::ME_AMB,
+            self::ME_DROIT,
+        ],
+        self::CP => [
+            self::CP_FIAB,
+            self::CP_AUTODISC,
+            self::CP_REFL,
+            self::CP_RIG,
+            self::CP_SVA,
+        ],
+        self::AR => [
+            self::AR_CONF,
+            self::AR_GREGA,
+            self::AR_SPONT,
+            self::AR_NOUV,
+            self::AR_DYN,
+        ],
+        self::PM => [
+            self::PM_LEAD,
+            self::PM_AFFIRM,
+            self::PM_EMP,
+            self::PM_ING,
+            self::PM_SINTEL,
+        ],
+    ];
 
     const A = "A";
     const B = "B";
@@ -300,11 +506,11 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         31 => self::B,
         32 => self::A,
         33 => self::C,
-        34 => self::C,
+        34 => self::D,
         35 => self::A,
         36 => self::A,
         37 => self::B,
-        38 => self::B,
+        38 => self::C,
         39 => self::B,
         40 => self::C,
         41 => self::C,
@@ -358,7 +564,7 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         86 => self::C,
         87 => self::C,
         88 => self::A,
-        89 => self::D,
+        89 => self::A,
         90 => self::B,
         91 => self::C,
     ];
@@ -496,7 +702,7 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         ],
         BpmrOffFixture::ME => [
             BpmrOffFixture::ME_CE => self::ME_CE_REPONSES,
-            BpmrOffFixture::ME_HU => self::ME_HU_REPONSES,
+            BpmrOffFixture::ME_MODES => self::ME_MODES_REPONSES,
             BpmrOffFixture::ME_COOPE => self::ME_COOPE_REPONSES,
             BpmrOffFixture::ME_AMB => self::ME_AMB_REPONSES,
             BpmrOffFixture::ME_DROIT => self::ME_DROIT_REPONSES,
@@ -624,7 +830,7 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         437 => self::INVERSE,
     ];
 
-    const ME_HU_REPONSES = [
+    const ME_MODES_REPONSES = [
         219 => self::INVERSE,
         245 => self::INVERSE,
         271 => self::INVERSE,
@@ -878,32 +1084,47 @@ class BpmrOffCorrecteurFixture extends Fixture implements FixtureGroupInterface,
         self::FP_HDEP_REPONSES +
         self::FP_DEV_REPONSES +
         self::FP_GEN_REPONSES;
+
     const ALL_ME_REPONSES =
         self::ME_CE_REPONSES +
-        self::ME_HU_REPONSES +
+        self::ME_MODES_REPONSES +
         self::ME_COOPE_REPONSES +
         self::ME_AMB_REPONSES +
         self::ME_DROIT_REPONSES;
+
     const ALL_CP_REPONSES =
         self::CP_FIAB_REPONSES +
         self::CP_AUTODISC_REPONSES +
         self::CP_REFL_REPONSES +
         self::CP_RIG_REPONSES +
         self::CP_SVA_REPONSES;
+
     const ALL_AR_REPONSES =
         self::AR_CONF_REPONSES +
         self::AR_GREGA_REPONSES +
         self::AR_SPONT_REPONSES +
         self::AR_NOUV_REPONSES +
         self::AR_DYN_REPONSES;
+
     const ALL_PM_PERSONNALITE =
         self::PM_LEAD_REPONSES +
         self::PM_AFFIRM_REPONSES +
         self::PM_EMP_REPONSES +
         self::PM_ING_REPONSES +
         self::PM_SINTEL_REPONSES;
-    const ALL_PERSONNALITE_INDEX_TO_TYPE = self::ALL_FP_REPONSES + self::ALL_ME_REPONSES + self::ALL_CP_REPONSES + self::ALL_AR_REPONSES + self::ALL_PM_PERSONNALITE;
+
+    const ALL_PERSONNALITE_INDEX_TO_TYPE =
+        self::ALL_FP_REPONSES +
+        self::ALL_ME_REPONSES +
+        self::ALL_CP_REPONSES +
+        self::ALL_AR_REPONSES +
+        self::ALL_PM_PERSONNALITE;
 }
+
+
+
+
+
 
 
 

@@ -26,16 +26,19 @@ class PdfManager
     private string $tmp_dir;
 
     public function __construct(
-        // ContainerBagInterface               $params,
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
-        string                              $tmp_dir = "tmp"
+        string                              $tmp_dir = "tmp",
+        int                                 $new_time_limit = 300
     )
     {
         $this->tmp_dir = getcwd() . self::SEPARATOR . $tmp_dir;
         $this->logger->debug("Tmp dir : " . $this->tmp_dir);
+
+        // Autorise un temps de compilation supérieur
+        set_time_limit($new_time_limit);
     }
 
     private function fileName(ReponseCandidat $candidat_reponse): string

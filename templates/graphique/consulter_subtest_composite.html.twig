@@ -33,17 +33,19 @@
                     ({{ echelle_composite[0]|echelle_graphique_nom_affiche }}) :
                 </li>
                 <ul>
-                    <li><a class="btn btn-link"
-                           href="{{ path("graphique_ajouter_simple", {"id_subtest":subtest.id, "id_composite":echelle_composite[0]}) }}">Ajouter
-                            échelle simple</a></li>
-                    <li><a class="btn btn-link"
-                           href="{{ path("graphique_subtest_supprimer_composite", {"id_subtest":subtest.id, "id_composite":echelle_composite[0]}) }}">Supprimer l'échelle composite</a>
-                    </li>
                     {% for echelle_simple in echelle_composite[1] %}
                         <li>{{ echelle_simple|echelle_graphique_nom }}
                             ( {{ echelle_simple|echelle_graphique_nom_affiche }} )
                         </li>
                     {% endfor %}
+
+                    <li><a class="btn btn-link btn-sm fw-bold"
+                           href="{{ path("graphique_ajouter_simple", {"id_subtest":subtest.id, "id_composite":echelle_composite[0]}) }}">Ajouter
+                            échelle simple</a></li>
+                    <li><a class="btn btn-link btn-sm fw-bold"
+                           href="{{ path("graphique_subtest_supprimer_composite", {"id_subtest":subtest.id, "id_composite":echelle_composite[0]}) }}">Supprimer
+                            l'échelle composite</a>
+                    </li>
                 </ul>
 
             {% endfor %}
@@ -68,7 +70,7 @@
             {% for footer in subtest.echelles_footer %}
                 <li> {{ footer[0]|echelle_graphique_nom }} ( {{ footer[0]|echelle_graphique_nom_affiche }} )
                     ({{ footer[1]|footer_type }})
-                    <a class="btn btn-link"
+                    <a class="btn btn-link btn-sm fw-bold"
                        href="{{ path("graphique_supprimer_footer", {"id_subtest":subtest.id, "id_footer": footer[0]}) }}">Supprimer</a>
                 </li>
 
