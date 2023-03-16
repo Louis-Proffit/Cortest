@@ -16,12 +16,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[UniqueEntity('nom')]
 class Graphique
 {
-    const SUBTEST_BRMR = 0;
-    const SUBTEST_COMPOSITE = 1;
-    const TYPE_SUBTEST = array("Subtest de type BR/MR" => self::SUBTEST_BRMR, "Subtest de type composite" => self::SUBTEST_COMPOSITE);
-    const FOOTER_S_AND_C = 0;
-    const FOOTER_S = 1;
-    const TYPE_FOOTER = array("Bas de cadre affichant score et classe" => self::FOOTER_S_AND_C, "Bas de cadre affichant le score uniquement" => self::FOOTER_S);
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -46,9 +40,8 @@ class Graphique
     #[ORM\Column]
     public int $renderer_index;
 
-    #[IsGraphiqueOptions]
-    #[ORM\Column]
-    public array $subtests;
+    #[ORM\OneToMany(mappedBy: "graphique", targetEntity: Subtest::class, cascade: ["persist", "remove"])]
+    public Collection $subtests;
 
     /**
      * @param int $id
@@ -57,8 +50,9 @@ class Graphique
      * @param Collection $echelles
      * @param string $nom
      * @param int $renderer_index
+     * @param Collection $subtests
      */
-    public function __construct(int $id, array $options, Profil $profil, Collection $echelles, string $nom, int $renderer_index)
+    public function __construct(int $id, array $options, Profil $profil, Collection $echelles, string $nom, int $renderer_index, Collection $subtests)
     {
         $this->id = $id;
         $this->options = $options;
@@ -66,8 +60,27 @@ class Graphique
         $this->echelles = $echelles;
         $this->nom = $nom;
         $this->renderer_index = $renderer_index;
-        $this->subtests = array();
+        $this->subtests = $subtests;
     }
+
+    public function echellesOfType(string $type): array
+    {
+        return array_filter(
+            $this->echelles->toArray(),
+            fn(EchelleGraphique $echelle) => $echelle->echelle->type === $type
+        );
+    }
+
+    public function echellesComposite(): array
+    {
+        return $this->echellesOfType(Echelle::TYPE_ECHELLE_COMPOSITE);
+    }
+
+    public function echellesSimples(): array
+    {
+        return $this->echellesOfType(Echelle::TYPE_ECHELLE_SIMPLE);
+    }
+
 
     public function getTypeEchelle(): array
     {
@@ -86,19 +99,32 @@ class Graphique
             ));
         }
     }
-    public function getArrayEchelle() : array
+
+    public function getEchellesNomToNomPhp(): array
     {
         $arrayEchelle = array();
-        foreach ($this->echelles as $echelle){
+        foreach ($this->echelles as $echelle) {
             $arrayEchelle[$echelle->echelle->nom] = $echelle->echelle->nom_php;
         }
         return $arrayEchelle;
     }
 
-    public function getArrayEchelleAffiches() : array
+    /**
+     * @return EchelleGraphique[]
+     */
+    public function getEchellesNomPhpToEchelle(): array
     {
         $arrayEchelle = array();
-        foreach ($this->echelles as $echelle){
+        foreach ($this->echelles as $echelle) {
+            $arrayEchelle[$echelle->echelle->nom_php] = $echelle;
+        }
+        return $arrayEchelle;
+    }
+
+    public function getEchellesNomPhpToNomAffiche(): array
+    {
+        $arrayEchelle = array();
+        foreach ($this->echelles as $echelle) {
             $arrayEchelle[$echelle->echelle->nom_php] = $echelle->options[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP];
         }
         return $arrayEchelle;

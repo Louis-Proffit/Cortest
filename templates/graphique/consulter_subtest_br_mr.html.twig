@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Subtest {{ subtest.nom }}, type BR/MR</h1>
+    <br>
+    <a class="btn btn-primary"
+       href="{{ path("graphique_supprimer_subtest", {"id_subtest":subtest.id}) }}">Supprimer</a>
+    <a class="btn btn-secondary"
+       href="{{ path("graphique_consulter", {"id":subtest.graphique.id}) }}">Retour</a>
+    <br>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Echelles composites</h3>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("graphique_subtest_ajouter_echelle", { "id_subtest": subtest.id}) }}">Ajouter</a>
+        </div>
+    </div>
+    <br>
+    {% if subtest.echelles_core is empty %}
+        <strong>Pas d'échelle BR/MR pour le moment</strong>
+    {% else %}
+    <ul>
+        {% for echelle_br_mr in subtest.echelles_core %}
+            <li>Echelle composite :</li>
+            <ul>
+                <li>Echelle de bonnes réponses : <strong>{{ echelle_br_mr[0]|echelle_graphique_nom }}</strong></li>
+                <li>Echelle de mauvaises réponses : <strong>{{ echelle_br_mr[1]|echelle_graphique_nom }}</strong></li>
+            </ul>
+            <a class="btn btn-link"
+               href="{{ path("graphique_subtest_supprimer_composite", {"id_subtest": subtest.id, "id_composite": echelle_br_mr[0] }) }}">Supprimer
+                l'échelle composite</a>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <br>
+    <hr class="hr hr-blurry">
+    <br>
+    <h3>Echelles de bas de cadre: </h3>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-secondary"
+               href="{{ path("graphique_ajouter_footer", {"id_subtest":subtest.id}) }}">Ajouter</a>
+        </div>
+    </div>
+    <br>
+    {% if subtest.echelles_footer is empty %}
+        <strong>Pas d'échelle de bas de cadre pour le moment</strong>
+    {% endif %}
+    <ul>
+        {% for footer in subtest.echelles_footer %}
+            <li> {{ footer[0]|echelle_graphique_nom }} ( {{ footer[0]|echelle_graphique_nom_affiche }} )
+                ({{ footer[1]|footer_type }})<a class="btn btn-link"
+                                                href="{{ path("graphique_supprimer_footer", {"id_subtest":subtest.id, "id_footer": footer[0]}) }}">Supprimer {{ footer[0]|echelle_graphique_nom }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

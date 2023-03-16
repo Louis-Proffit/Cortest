@@ -8,8 +8,8 @@ use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
+use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -32,7 +32,7 @@ class RendererBatonnets implements Renderer
 
     private string $imagesDirectory;
 
-    private array $etalonnageParameters;
+    // private array $etalonnageParameters;
 
     public function __construct()
     {
@@ -50,12 +50,12 @@ class RendererBatonnets implements Renderer
             new RendererOption(nom: EchelleGraphique::OPTION_NOM_AFFICHAGE,
                 nom_php: EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP, default: "", form_type: TextType::class)
         ];
-        $this->etalonnageParameters = [
+        /*$this->etalonnageParameters = [
             new RendererOption(nom: "nombreClasses",
                 nom_php: "nombre_classes",
                 default: 10,
                 form_type: IntegerType::class)
-        ];
+        ];*/
         $this->imagesDirectory = str_replace("\\", "/", getCwd()) . "/../templates/renderer/images/";
     }
 
@@ -69,26 +69,23 @@ class RendererBatonnets implements Renderer
         ReponseCandidat $reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
-        array           $options,
-        array           $echelleOptions,
-        array           $etalonnageParameters,
+        Graphique       $graphique,
         array           $score,
         array           $profil,
-        array           $typeEchelle,
-        array           $arborescence,
+        array           $options,
+        array           $optionsEchelle,
     ): string
     {
 
         return $environment->render("renderer/batonnet_cahier_des_charges.tex.twig", [
             "reponse" => $reponse,
+            "etalonnage" => $etalonnage,
             "session" => $reponse->session,
             "options" => $options,
-            "echelleOptions" => $echelleOptions,
-            "etalonnageParameters" => $etalonnageParameters,
+            "optionsEchelle" => $optionsEchelle,
             "score" => $score,
             "profil" => $profil,
-            "typeEchelle" => $typeEchelle,
-            "arborescence" => $arborescence,
+            "graphique" => $graphique,
             "imagesDirectory" => $this->imagesDirectory,
         ]);
     }

@@ -51,6 +51,4 @@ class Profil
         $this->etalonnages = $etalonnages;
         $this->graphiques = $graphiques;
     }
-
-
 }
