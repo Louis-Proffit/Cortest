@@ -66,7 +66,6 @@ class SessionProfilController extends AbstractController
     public function sessionProfilForm(
         SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
-        EtalonnageRepository $etalonnage_repository,
         Request              $request,
         int                  $session_id,
         int                  $correcteur_id): Response

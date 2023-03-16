@@ -13,7 +13,6 @@ use FilesystemIterator;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
@@ -61,33 +60,28 @@ class PdfManager
     {
         $renderer = $this->renderer_repository->fromIndex($graphique->renderer_index);
 
-        $echelleOptions = [];
+        $optionsEchelle = [];
+        $score_for_id = array();
+        $profil_for_id = array();
 
         /** @var EchelleGraphique $echelleGraphique */
         foreach ($graphique->echelles as $echelleGraphique) {
+            $optionsEchelle[$echelleGraphique->id] = $echelleGraphique->options;
 
-            $echelleOptions[$echelleGraphique->echelle->nom_php] = $echelleGraphique->options;
+            $score_for_id[$echelleGraphique->id] = $score[$echelleGraphique->echelle->nom_php];
+            $profil_for_id[$echelleGraphique->id] = $profil[$echelleGraphique->echelle->nom_php];
 
         }
-
-        $etalonnageParameters = [];
-
-        $etalonnageParameters['nombreClasses'] = $etalonnage->nombre_classes;
-
-        $typeEchelle = $graphique->getTypeEchelle();
-
         return $renderer->render(
             environment: $this->twig,
             reponse: $reponse,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
+            graphique: $graphique,
+            score: $score_for_id,
+            profil: $profil_for_id,
             options: $graphique->options,
-            echelleOptions: $echelleOptions,
-            etalonnageParameters: $etalonnageParameters,
-            score: $score,
-            profil: $profil,
-            typeEchelle: $typeEchelle,
-            arborescence: $graphique->subtests
+            optionsEchelle: $optionsEchelle
         );
     }
 

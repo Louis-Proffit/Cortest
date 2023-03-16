@@ -6,6 +6,7 @@ use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
+use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
 use Symfony\Component\Form\FormTypeInterface;
 use Twig\Environment;
@@ -17,13 +18,11 @@ interface Renderer
         ReponseCandidat $reponse,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
-        array           $options,
-        array           $echelleOptions,
-        array           $etalonnageParameters,
+        Graphique       $graphique,
         array           $score,
         array           $profil,
-        array           $typeEchelle,
-        array           $arborescence,
+        array           $options,
+        array           $optionsEchelle,
     ): string;
 
     /**

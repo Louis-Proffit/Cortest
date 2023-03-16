@@ -4,15 +4,19 @@ namespace App\Controller;
 
 use App\Core\Renderer\RendererRepository;
 use App\Entity\Graphique;
+use App\Entity\Subtest;
 use App\Form\CreerGraphiqueType;
+use App\Form\Data\EchelleSubtestBrMr;
+use App\Form\Data\EchelleGraphiqueChoice;
 use App\Form\Data\GraphiqueCreer;
 use App\Form\GraphiqueType;
 use App\Repository\GraphiqueRepository;
-use App\Form\GraphiqueBRMRType;
-use App\Form\GraphiqueFooterType;
-use App\Form\GraphiqueSubtestEchelleType;
-use App\Form\GraphiqueSubtestsType;
+use App\Form\EchelleSubtestBrMrType;
+use App\Form\EchelleSubtestFooter;
+use App\Form\EchelleGraphiqueChoiceType;
+use App\Form\SubtestType;
 use App\Repository\ProfilRepository;
+use App\Repository\SubtestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,24 +39,6 @@ class GraphiqueController extends AbstractController
         return $this->render('graphique/index.html.twig',
             ["graphiques" => $graphiques]);
     }
-
-    #[Route("/consulter/{id}", name: 'consulter')]
-    public function consulter(
-        GraphiqueRepository $graphique_repository,
-        RendererRepository  $renderer_repository,
-        int                 $id
-    ): Response
-    {
-        $graphique = $graphique_repository->find($id);
-        $renderer = $renderer_repository->fromIndex($graphique->renderer_index);
-
-        return $this->render("graphique/graphique.html.twig", ["graphique" => $graphique,
-            "renderer" => $renderer,
-            'arrayType' => array_flip(Graphique::TYPE_SUBTEST),
-            'footerType' => array_flip(Graphique::TYPE_FOOTER),
-            'echelleNoms' => array_flip($graphique->getArrayEchelle()),
-            'echelleAffiche' => $graphique->getArrayEchelleAffiches(),
-        ]);    }
 
     #[Route("/creer", name: "creer")]
     public function creer(
@@ -90,7 +76,8 @@ class GraphiqueController extends AbstractController
                 profil: $profil,
                 echelles: new ArrayCollection(),
                 nom: $creer_graphique->nom,
-                renderer_index: $creer_graphique->renderer_index
+                renderer_index: $creer_graphique->renderer_index,
+                subtests: new ArrayCollection()
             );
 
             Graphique::initializeEchelles($graphique, $renderer);
@@ -103,6 +90,25 @@ class GraphiqueController extends AbstractController
         }
 
         return $this->render("graphique/creer.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/consulter/{id}", name: 'consulter')]
+    public function consulter(
+        GraphiqueRepository $graphique_repository,
+        RendererRepository  $renderer_repository,
+        int                 $id
+    ): Response
+    {
+        $graphique = $graphique_repository->find($id);
+        $renderer = $renderer_repository->fromIndex($graphique->renderer_index);
+
+        return $this->render("graphique/graphique.html.twig", ["graphique" => $graphique,
+            "renderer" => $renderer,
+            'arrayType' => array_flip(Subtest::TYPES_SUBTEST_CHOICES),
+            'footerType' => array_flip(Subtest::TYPES_FOOTER_CHOICES),
+            'echelleNoms' => array_flip($graphique->getEchellesNomToNomPhp()),
+            'echelleAffiche' => $graphique->getEchellesNomPhpToNomAffiche(),
+        ]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
@@ -128,228 +134,332 @@ class GraphiqueController extends AbstractController
             return $this->redirectToRoute("graphique_consulter", ["id" => $graphique->id]);
         }
 
-        return $this->render("graphique/modifier.html.twig", ["form" => $form]);
+        return $this->render("graphique/modifier.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/ajouter-subtests/{id}", name: "ajouter_subtests")]
+    #[Route("/creer-subtest/{id}", name: "creer_subtest")]
     public function ajouterSubtest(
-        Request             $request,
-        GraphiqueRepository $graphique_repository,
-        ManagerRegistry     $doctrine,
-        int                 $id,
+        Request                $request,
+        GraphiqueRepository    $graphique_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id,
     ): Response
     {
         $graphique = $graphique_repository->find($id);
 
-        $form = $this->createForm(GraphiqueSubtestsType::class);
+        if ($graphique == null) {
+            $this->addFlash("warning", "Le graphique n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
 
+        $subtest = new Subtest(
+            0,
+            "",
+            Subtest::TYPE_SUBTEST_BR_MR,
+            array(),
+            array(),
+            $graphique
+        );
+
+        $form = $this->createForm(SubtestType::class, $subtest);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $inputs = $form->getData();
-            $graphique->subtests[] = array($inputs['Nouveau_Subtest'], $inputs['Type_Subtest'], array(), array());
 
-            $entityManager = $doctrine->getManager();
-            $entityManager->flush();
+            $entity_manager->persist($subtest);
+            $entity_manager->flush();
 
-            return $this->redirectToRoute("graphique_ajouter_composite", ["id" => $graphique->id, "idSub" => count($graphique->subtests)-1]);
+            return $this->redirectToRoute("graphique_consulter_subtest",
+                ["id_subtest" => $subtest->id]);
         }
 
-        return $this->render('graphique/ajouter_subtests.html.twig', [
-            'form' => $form->createView(),
-            'graphique' => $graphique,
-            'arrayType' => array_flip(Graphique::TYPE_SUBTEST),
-            'footerType' => array_flip(Graphique::TYPE_FOOTER),
-            'echelleNoms' => array_flip($graphique->getArrayEchelle()),
-            'echelleAffiche' => $graphique->getArrayEchelleAffiches(),
+        return $this->render('graphique/subtest_form.twig', [
+            "form" => $form->createView(),
+            "subtest" => $subtest,
+            "titre_form" => "Créer un subtest"
         ]);
     }
 
-    #[Route("/supprimer-subtest/{id}/{idSub}", name: "supprimer_subtest")]
+    #[Route("/supprimer-subtest/{id_subtest}", name: "supprimer_subtest")]
     public function supprimerSubtest(
         EntityManagerInterface $entity_manager,
-        GraphiqueRepository    $graphique_repository,
-        int                    $id,
-        int                    $idSub,
+        SubtestRepository      $subtest_repository,
+        int                    $id_subtest,
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $subtest = $subtest_repository->find($id_subtest);
 
-        if (array_key_exists($idSub, $graphique->subtests)) {
-            array_splice($graphique->subtests, $idSub, 1);
-
-            $entity_manager->flush();
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
         }
 
-        return $this->redirectToRoute("graphique_ajouter_subtests", ['id' => $id]);
+        $graphique_id = $subtest->graphique->id;
+        $entity_manager->remove($subtest);
+        $entity_manager->flush();
+
+        return $this->redirectToRoute("graphique_consulter", ["id" => $graphique_id]);
     }
 
-    #[Route("/ajouter-composite/{id}/{idSub}", name: "ajouter_composite")]
-    public function ajouterComposite(
-        Request             $request,
-        GraphiqueRepository $graphique_repository,
-        ManagerRegistry     $doctrine,
-        int                 $id,
-        int                 $idSub,
+    #[Route("/consulter-subtest/{id_subtest}", name: "consulter_subtest")]
+    public function consulterSubtest(
+        SubtestRepository $subtest_repository,
+        int               $id_subtest,
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $subtest = $subtest_repository->find($id_subtest);
 
-        if ($graphique->subtests[$idSub][1] == Graphique::SUBTEST_BRMR){
-            $form = $this->createForm(GraphiqueBRMRType::class, options: ['choices' => $graphique->getArrayEchelle()]);
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        if ($subtest->type == Subtest::TYPE_SUBTEST_BR_MR) {
+
+            return $this->render("graphique/consulter_subtest_br_mr.html.twig",
+                ["subtest" => $subtest]);
+        } else {
+            return $this->render("graphique/consulter_subtest_composite.html.twig",
+                ["subtest" => $subtest]);
+        }
+    }
+
+
+    #[Route("/ajouter-echelle-subtest/{id_subtest}", name: "subtest_ajouter_echelle")]
+    public function modifierSubtest(
+        Request                $request,
+        SubtestRepository      $subtest_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id_subtest,
+    ): Response
+    {
+        $subtest = $subtest_repository->find($id_subtest);
+
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphique = $subtest->graphique;
+
+        if ($graphique->echelles->isEmpty()) {
+            $this->addFlash("warning", "Le graphique n'a pas d'échelles, impossible");
+            return $this->redirectToRoute("graphique_consulter", ["id" => $graphique->id]);
+        }
+
+        if ($subtest->type == Subtest::TYPE_SUBTEST_BR_MR) {
+
+            $echelle_subtest_br_mr = new EchelleSubtestBrMr(
+                $graphique->echelles[0],
+                $graphique->echelles[0],
+            );
+
+            $form = $this->createForm(
+                EchelleSubtestBrMrType::class,
+                $echelle_subtest_br_mr,
+                options: ["echelles" => $graphique->echelles->toArray()]
+            );
 
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $inputs = $form->getData();
-                $graphique->subtests[$idSub][2][] = array($inputs['Nouvelle_Echelle'], array($inputs['Echelle_Bonnes_Reponses'], $inputs['Echelle_Mauvaises_Reponses']));
 
-                $entityManager = $doctrine->getManager();
-                $entityManager->flush();
+                $subtest->echelles_core[] = array(
+                    $echelle_subtest_br_mr->echelle_br->echelle->id,
+                    $echelle_subtest_br_mr->echelle_mr->echelle->id,
+                );
 
-                return $this->redirectToRoute("graphique_ajouter_composite", ["id" => $id, "idSub" => $idSub]);
+                $entity_manager->flush();
+
+                return $this->redirectToRoute("graphique_consulter_subtest",
+                    ["id_subtest" => $id_subtest]);
             }
-        }
-        else {
-            $form = $this->createForm(GraphiqueSubtestEchelleType::class, options: ['choices' => $graphique->getArrayEchelle()]);
+        } else {
+            $echelle_subtest_simple = new EchelleGraphiqueChoice($graphique->echelles[0]);
+
+            $form = $this->createForm(
+                EchelleGraphiqueChoiceType::class,
+                $echelle_subtest_simple,
+                options: ["echelles" => $graphique->echellesComposite()]
+            );
 
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $graphique->subtests[$idSub][2][] = array($form->getData()['Nouvelle_Echelle'], array());
+                $subtest->echelles_core[] = array($echelle_subtest_simple->echelle->id, array());
 
-                $entityManager = $doctrine->getManager();
-                $entityManager->flush();
+                $entity_manager->flush();
 
-                return $this->redirectToRoute("graphique_ajouter_simple", ["id" => $graphique->id, "idSub" => $idSub, "idComp" => count($graphique->subtests[$idSub][2])-1]);
+                return $this->redirectToRoute("graphique_consulter_subtest",
+                    ["id_subtest" => $id_subtest]);
             }
         }
 
-        return $this->render('graphique/modifier_subtest.html.twig', [
-            'form' => $form->createView(),
-            'graphique' => $graphique,
-            'idSubtest' => $idSub,
-            'idComposite' => -1,
-            'arrayType' => array_flip(Graphique::TYPE_SUBTEST),
-            'footerType' => array_flip(Graphique::TYPE_FOOTER),
-            'echelleNoms' => array_flip($graphique->getArrayEchelle()),
-            'echelleAffiche' => $graphique->getArrayEchelleAffiches(),
+        return $this->render('graphique/subtest_form.twig', [
+            "form" => $form->createView(),
+            "subtest" => $subtest,
+            "titre_form" => "Ajouter une échelle au subtest"
         ]);
     }
 
-    #[Route("/supprimer-composite/{id}/{idSub}/{idComp}", name: "supprimer_composite")]
+    #[Route("/supprimer-composite/{id_subtest}/{id_composite}", name: "subtest_supprimer_composite")]
     public function supprimerComposite(
         EntityManagerInterface $entity_manager,
-        GraphiqueRepository    $graphique_repository,
-        int                    $id,
-        int                    $idSub,
-        int                    $idComp,
+        SubtestRepository      $subtest_repository,
+        int                    $id_subtest,
+        int                    $id_composite,
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $subtest = $subtest_repository->find($id_subtest);
 
-        if (array_key_exists($idComp, $graphique->subtests[$idSub][2])) {
-            array_splice($graphique->subtests[$idSub][2], $idComp, 1);
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $subtest->echelles_core = array_filter(
+            $subtest->echelles_core,
+            function (array $id_composite_et_ids_simples) use ($id_composite) {
+
+                return $id_composite_et_ids_simples[0] != $id_composite;
+            }
+        );
+
+        $entity_manager->flush();
+
+        return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $id_subtest]);
+    }
+
+    #[Route("/ajouter-simple/{id_subtest}/{id_composite}", name: "ajouter_simple")]
+    public function ajouterSimple(
+        Request                $request,
+        SubtestRepository      $subtest_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id_subtest,
+        int                    $id_composite,
+    ): Response
+    {
+        $subtest = $subtest_repository->find($id_subtest);
+
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        if (empty($subtest->graphique->echellesSimples())) {
+            $this->addFlash("warning", "Le graphique n'a pas d'échelles simples");
+            return $this->redirectToRoute("graphique_consulter", ["id" => $subtest->graphique->id]);
+        }
+
+        $echelle_graphique_choice = new EchelleGraphiqueChoice(
+            $subtest->graphique->echellesSimples()[0]
+        );
+
+        $form = $this->createForm(
+            EchelleGraphiqueChoiceType::class,
+            $echelle_graphique_choice,
+            options: ["echelles" => $subtest->graphique->echellesSimples()]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            /** @var array $echelles_composites */
+            foreach ($subtest->echelles_core as &$echelles_composites) {
+                if (count($echelles_composites) == 2 and $echelles_composites[0] == $id_composite) {
+                    $echelles_composites[1][] = $echelle_graphique_choice->echelle->id;
+                    break;
+                }
+            }
 
             $entity_manager->flush();
+
+            $this->addFlash("info", "Echelle ajoutée avec succès");
+            return $this->redirectToRoute("graphique_consulter_subtest",
+                ["id_subtest" => $id_subtest]);
         }
 
-        return $this->redirectToRoute("graphique_ajouter_composite", ['id' => $id, 'idSub' => $idSub]);
-    }
-
-    #[Route("/ajouter-simple/{id}/{idSub}/{idComp}", name: "ajouter_simple")]
-    public function ajouterSimple(
-        Request             $request,
-        GraphiqueRepository $graphique_repository,
-        ManagerRegistry     $doctrine,
-        int                 $id,
-        int                 $idSub,
-        int                 $idComp,
-    ): Response
-    {
-        $graphique = $graphique_repository->find($id);
-
-        $form = $this->createForm(GraphiqueSubtestEchelleType::class, options: ['choices' => $graphique->getArrayEchelle()]);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $graphique->subtests[$idSub][2][$idComp][1][] = $form->getData()['Nouvelle_Echelle'];
-
-            $entityManager = $doctrine->getManager();
-            $entityManager->flush();
-
-            return $this->redirectToRoute("graphique_ajouter_simple", ["id" => $graphique->id, "idSub" => $idSub, "idComp" => $idComp]);
-        }
-
-        return $this->render('graphique/modifier_subtest.html.twig', [
-            'form' => $form->createView(),
-            'graphique' => $graphique,
-            'idSubtest' => $idSub,
-            'idComposite' => $idComp,
-            'arrayType' => array_flip(Graphique::TYPE_SUBTEST),
-            'footerType' => array_flip(Graphique::TYPE_FOOTER),
-            'echelleNoms' => array_flip($graphique->getArrayEchelle()),
-            'echelleAffiche' => $graphique->getArrayEchelleAffiches(),
+        return $this->render("graphique/subtest_form.twig", [
+            "form" => $form->createView(),
+            "subtest" => $subtest,
+            "titre_form" => "Ajouter une échelle simple"
         ]);
     }
 
-    #[Route("/ajouter-footer/{id}/{idSub}", name: "ajouter_footer")]
+    #[Route("/ajouter-footer/{id_subtest}", name: "ajouter_footer")]
     public function ajouterFooter(
-        Request             $request,
-        GraphiqueRepository $graphique_repository,
-        ManagerRegistry     $doctrine,
-        int                 $id,
-        int                 $idSub,
+        Request                $request,
+        SubtestRepository      $subtest_repository,
+        EntityManagerInterface $entity_manager,
+        int                    $id_subtest,
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $subtest = $subtest_repository->find($id_subtest);
 
-        $form = $this->createForm(GraphiqueFooterType::class, options: ['choices' => $graphique->getArrayEchelle()]);
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphique = $subtest->graphique;
+        if ($graphique->echelles->isEmpty()) {
+            $this->addFlash("warning", "Pas d'échelles dans le graphique");
+            return $this->redirectToRoute("graphique_index", ["id" => $graphique->id]);
+        }
+
+        $echelle_subtest_footer = new \App\Form\Data\EchelleSubtestFooter(
+            $graphique->echelles[0],
+            Subtest::TYPE_FOOTER_SCORE_AND_CLASSE
+        );
+
+        $form = $this->createForm(
+            EchelleSubtestFooter::class,
+            $echelle_subtest_footer,
+            options: ["echelles" => $graphique->echelles->toArray()]
+        );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $inputs = $form->getData();
-            $graphique->subtests[$idSub][3][] = array($inputs['Nouveau_Bas_De_Cadre'], $inputs['Type_Bas_De_Cadre']);
 
-            $entityManager = $doctrine->getManager();
-            $entityManager->flush();
+            $subtest->echelles_footer[] = array($echelle_subtest_footer->echelle->id, $echelle_subtest_footer->type);
+            $entity_manager->flush();
 
-            return $this->redirectToRoute("graphique_ajouter_footer", ["id" => $graphique->id, "idSub" => $idSub]);
+            return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $id_subtest]);
         }
 
-        return $this->render('graphique/modifier_subtest.html.twig', [
-            'form' => $form->createView(),
-            'graphique' => $graphique,
-            'idSubtest' => $idSub,
-            'arrayType' => array_flip(Graphique::TYPE_SUBTEST),
-            'footerType' => array_flip(Graphique::TYPE_FOOTER),
-            'echelleNoms' => array_flip($graphique->getArrayEchelle()),
-            'echelleAffiche' => $graphique->getArrayEchelleAffiches(),
-            'idComposite' => -1,
-            'isFooter' => true,
+        return $this->render('graphique/subtest_form.twig', [
+            "form" => $form->createView(),
+            "subtest" => $subtest,
+            "titre_form" => "Ajouter une échelle de bas de page"
         ]);
     }
 
-    #[Route("/supprimer-footer/{id}/{idSub}/{idFoot}", name: "supprimer_footer")]
+    #[Route("/supprimer-footer/{id_subtest}/{id_footer}", name: "supprimer_footer")]
     public function supprimerFooter(
         EntityManagerInterface $entity_manager,
-        GraphiqueRepository    $graphique_repository,
-        int                    $id,
-        int                    $idSub,
-        int                    $idFoot,
+        SubtestRepository      $subtest_repository,
+        int                    $id_subtest,
+        int                    $id_footer,
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $subtest = $subtest_repository->find($id_subtest);
 
-        if (array_key_exists($idFoot, $graphique->subtests[$idSub][3])) {
-            array_splice($graphique->subtests[$idSub][3], $idFoot, 1);
-
-            $entity_manager->flush();
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
         }
 
-        return $this->redirectToRoute("graphique_ajouter_composite", ['id' => $id, 'idSub' => $idSub]);
+        $subtest->echelles_footer = array_filter(
+            $subtest->echelles_footer,
+            fn(array $echelle_id_and_type) => $echelle_id_and_type[0] != $id_footer
+        );
+
+        $entity_manager->flush();
+
+        return $this->redirectToRoute("graphique_consulter_subtest",
+            ["id_subtest" => $id_subtest]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
@@ -361,14 +471,8 @@ class GraphiqueController extends AbstractController
     {
         $graphique = $graphique_repository->find($id);
 
-        if ($graphique != null) {
-            $entity_manager->remove($graphique);
-
-            foreach ($graphique->echelles as $echelle) {
-                $entity_manager->remove($echelle);
-            }
-            $entity_manager->flush();
-        }
+        $entity_manager->remove($graphique);
+        $entity_manager->flush();
 
         return $this->redirectToRoute("graphique_index");
     }

@@ -46,63 +46,64 @@
     \noindent\fbox{
         \begin{minipage}{\linewidth}
             \begin{tabular}{m{3.5cm} m{5.2cm} m{3.5cm} m{5.2cm}}
-                Nom de naissance:       & {{ reponse.nom|raw }}                             & Type du concours:         & {{ session.concours.type_concours|raw }}       \\
-                Prénom:                 & {{ reponse.prenom|raw }}                          & Version Batterie:         & {{ session.concours.version_batterie|raw }}    \\
-                Nom d'usage:            & {{ reponse.nom_jeune_fille|raw }}                 & Date d'examen:            & {{ session.date|date('d/m/Y') }}      \\
-                Sexe:                   & {{ reponse.sexe|sexe }}                           & SGAMI/SGAP:               & {{ session.sgap.nom|raw }}            \\
-                Date de naissance:      & {{ reponse.date_de_naissance|date('d/m/Y') }}     & Numéro d'identification   & xxx                                   \\
-                Niveau scolaire:        & {{ reponse.niveau_scolaire.nom|raw }}             \\
+                Nom de naissance:  & {{ reponse.nom|raw }}                         & Type du concours:       & {{ session.concours.type_concours|raw }}    \\
+                Prénom:            & {{ reponse.prenom|raw }}                      & Version Batterie:       & {{ session.concours.version_batterie|raw }} \\
+                Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & Date d'examen:          & {{ session.date|date('d/m/Y') }}            \\
+                Sexe:              & {{ reponse.sexe|sexe }}                       & SGAMI/SGAP:             & {{ session.sgap.nom|raw }}                  \\
+                Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & Numéro d'identification   & xxx                                   \\
+                Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }} \\
             \end{tabular}
         \end{minipage}
     }
 
     \vspace{-1mm}
 
-    {% for subtest in arborescence %}
+    {% for subtest in graphique.subtests %}
     \noindent
     \begin{longtable}{ | wr{4cm} wc{0.7cm} wc{0.7cm} wc{12.25cm} | }
         \hline
 
-        {% if subtest[1] == 0 %}
-        \underline{\textbf{ {{ subtest[0]|raw }} }} & & & {% if subtest[2]|length > 0 %} \textit{classes} {% endif %} \\
-        {% if subtest[2]|length > 0 %} & BR & MR &
-        \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
-            \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_BR_MR") %}
+        \underline{\textbf{ {{ subtest.nom|raw }} }} & & & {% if subtest.echelles_core|length > 0 %} \textit{classes} {% endif %} \\
+        {% if subtest.echelles_core|length > 0 %} & BR & MR &
+        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{X}}
+            \hfill I {% for i in 1..(etalonnage.nombre_classes-1) %} & \hfill {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
         {% endif %}
-        {% for echelle in subtest[2] %}
-        {{ echelleOptions[echelle[0]].nom_affichage|raw }} & \fbox{ {{ score[echelle[1][0]] }} } & \fbox{ {{ score[echelle[1][0]] }} } &\printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        {% for echelle in subtest.echelles_core %}
+        {{ optionsEchelle[echelle[0]].nom_affichage|raw }} & \fbox{ {{ score[echelle[0]] }} } & \fbox{ {{ score[echelle[1]] }} } & \printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
         {% endfor %}
         {% else %}
-        \underline{\textbf{ {{ subtest[0]|raw }} }} & & {% if subtest[2]|length > 0 %} \textit{scores} &
-        \begin{tabularx}{4.5in}{*{ {{ etalonnageParameters.nombreClasses }} }{X}}
-            \hfill I {% for i in 1..attribute(etalonnageParameters, 'nombreClasses')-1 %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        \underline{\textbf{ {{ subtest.nom|raw }} }} & & {% if subtest.echelles_core|length > 0 %} \textit{scores} &
+        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{X}}
+            \hfill I {% for i in 1..(etalonnage.nombre_classes-1) %} & \hfill {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
         {% else %} & \\ {% endif %}
-        {% for echelle in subtest[2] %}
+        {% for echelle in subtest.echelles_core %}
         {% if echelle.1|length > 0 %}
         \hline
-        \multirow{ {{ echelle.1|length }} }*{\textit{class} \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        \multirow{ {{ echelle.1|length }} }*{\textit{classe} \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
         {% for echelleSimple in echelle[1] %}
-        & {{ echelleOptions[echelleSimple].nom_affichage|raw }} & \fbox{ {{ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnageParameters.nombreClasses }} } \\
+        & {{ optionsEchelle[echelleSimple].nom_affichage|raw }} & \fbox{ {{ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
         {% endfor %}
         {% else %}
-        \multirow{ 1 }*{\textit{class} \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
-        &  & \fbox{  } & Il faut au moins une échelle simple dans cette échelle composite! \\
+        \multirow{ 1 }*{\textit{classe} \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        & & \fbox{  } & Il faut au moins une échelle simple dans cette échelle composite! \\
         {% endif %}
         {% endfor %}
         {% endif %}
-        {% if subtest[3]|length > 0 %}
-        {% if subtest[2] == 1 %} \hline {% endif %}
+        {% if subtest.echelles_footer|length > 0 %}
+        {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_COMPOSITE") %} \hline \underline{\textbf{Fiabilité des réponses}}\\ {% endif %}
+
         \multicolumn{4}{|c|}{
-            \begin{tabular}{ {% for echelle in subtest[3] %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }
-            {% for echelle in subtest[3] %}
-            {% if echelle[1] == 0 %}
-                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]]|number_format(2) }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
+            \begin{tabular}{ {% for echelle in subtest.echelles_footer %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }
+            {% for echelle in subtest.echelles_footer %}
+            {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %}
+                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
                 {% else %}
-                \textbf{ {{ echelleOptions[echelle[0]].nom_affichage|raw }} } & \textit{ score } &\fbox{ {{ score[echelle[0]]|number_format(2) }} } &
+                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} } &
             {% endif %}
             {% endfor %}
             \end{tabular}
