@@ -166,7 +166,7 @@ class GrilleManager {
 
     removeFID(code_barre) {
 //supprime une fid de la liste des fids traités
-        console.log("on supprime : "+ code_barre);
+        console.log("on supprime : " + code_barre);
         this.FIDs = this.FIDs.splice(this.FIDs.findIndex((e) => e.code_barre === code_barre), 1);
         $("#nb-fid-lues").text(parseInt($("#nb-fid-lues").text()) - 1);
         this.gridOptions.api.setRowData(this.FIDs);
@@ -320,7 +320,7 @@ class GrilleManager {
         const corresp = {'A': 1, 'B': 2, 'D': 3, 'H': 4, 'P': 5};
         var toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
-            if (this.questions[(i + 1).toString()] !== 'Inutilisé') {
+            if ((i + 1).toString() in this.questions) {
                 if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
                     qcm[i] = corresp[qcm[i]];
                 } else {
@@ -371,13 +371,13 @@ class GrilleManager {
             fid[field] = text.slice(cursor, cursor + step);
             cursor += step;
         }
-        if(this.hasFID(fid.code_barre)) {
+        if (this.hasFID(fid.code_barre)) {
             tell('G');
-                this.readFIDs();
+            this.readFIDs();
         } else {
             this.correctFID(fid);
         }
-        
+
     }
 
     readQCM(text) {
@@ -385,13 +385,13 @@ class GrilleManager {
         for (let i = 0; i < this.nbQuestions; i++) {
             qcm[i] = text[8 + i];
         }
-        if(this.hasQCM(text.slice(0, 8))) {
+        if (this.hasQCM(text.slice(0, 8))) {
             tell('G');
             this.readQCMs();
         } else {
             this.correctQCM(text.slice(0, 8), qcm);
         }
-        
+
     }
 
     static codesErreurs = [
