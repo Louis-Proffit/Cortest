@@ -20,12 +20,12 @@ class FauxB extends CortestFunction
 
     public function evaluer($arguments, $index): int
     {
-        return $this->innerEvaluer($arguments, $index, 1,1,0,1,1,1);
+        return $this->innerEvaluer($arguments, $index, 0,1,0,1,1,1);
     }
 
 
     public function compiler($index): string
     {
-        return $this->innerCompiler($index, 1,1,0,1,1,1);
+        return $this->innerCompiler($index, 0,1,0,1,1,1);
     }
 }
