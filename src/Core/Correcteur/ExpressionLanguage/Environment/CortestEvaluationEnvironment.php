@@ -45,6 +45,9 @@ class CortestEvaluationEnvironment
             }
         }
 
+        dump($result);
+        dump($this->reponses);
+
         return $result;
     }
 }

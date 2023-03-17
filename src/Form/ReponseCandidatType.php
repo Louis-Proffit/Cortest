@@ -5,10 +5,8 @@ namespace App\Form;
 use App\Entity\ReponseCandidat;
 use App\Repository\NiveauScolaireRepository;
 use App\Repository\SessionRepository;
-use SebastianBergmann\CodeCoverage\Report\Text;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -35,7 +33,7 @@ class ReponseCandidatType extends AbstractType
             ->add("niveau_scolaire", ChoiceType::class, [
                 "choices" => $this->niveau_scolaire_repository->choices()
             ])
-            ->add("date_de_naissance", DateType::class)
+            ->add("date_de_naissance", CortestDateType::class)
             ->add("sexe", ChoiceType::class, [
                 "choices" => [
                     "Homme" => ReponseCandidat::INDEX_HOMME,
