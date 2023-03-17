@@ -31,6 +31,8 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
 {
 
     public function __construct(
+        private readonly string $type_concours,
+        private readonly string $version_batterie,
         private readonly int    $nombre_questions,
         private readonly string $concours_nom,
         private readonly string $profil_nom,
@@ -61,8 +63,8 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             new ArrayCollection(),
             new ArrayCollection(),
             GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-            "[Type concours]",
-            "[Version batterie]",
+            $this->type_concours,
+            $this->version_batterie,
             new ArrayCollection()
         );
 

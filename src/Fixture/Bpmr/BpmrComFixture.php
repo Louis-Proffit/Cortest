@@ -18,6 +18,8 @@ class BpmrComFixture extends AbstractBpmrFixture
     public function __construct()
     {
         parent::__construct(
+            "55",
+            "550",
             468,
             self::CONCOURS_NOM,
             self::PROFIL_NOM,

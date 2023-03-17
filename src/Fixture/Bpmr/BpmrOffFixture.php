@@ -18,6 +18,8 @@ class BpmrOffFixture extends AbstractBpmrFixture
     public function __construct()
     {
         parent::__construct(
+            "44",
+            "440",
             456,
             self::CONCOURS_NOM,
             self::PROFIL_NOM,
