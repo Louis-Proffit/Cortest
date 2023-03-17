@@ -104,7 +104,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         Correcteur $correcteur
     )
     {
-        $echelle = $this->findEchelleInProfil($profil, BpmrOffFixture::EG);
+        $echelle = $this->findEchelleInProfil($profil, self::EG);
         $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")*(" . $this->nombreReponsesTraiteesCognitif() . ")) ** 0.5";
 
         $correcteur->echelles->add(new EchelleCorrecteur(
@@ -120,7 +120,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         Correcteur $correcteur
     )
     {
-        $echelle = $this->findEchelleInProfil($profil, BpmrOffFixture::QR);
+        $echelle = $this->findEchelleInProfil($profil, self::QR);
         $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")/(" . $this->nombreReponsesTraiteesCognitif() . ")) * 100";
 
         $correcteur->echelles->add(new EchelleCorrecteur(
@@ -145,7 +145,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     {
         $nombre_bonnes_reponses = "0";
 
-        foreach (BpmrOffFixture::APTITUDES_COGNITIVES_NOM_PHP_BR as $echelle) {
+        foreach (self::APTITUDES_COGNITIVES_NOM_PHP_BR as $echelle) {
             $nombre_bonnes_reponses = $nombre_bonnes_reponses . "+echelle(\"" . $echelle . "\")";
         }
 
@@ -159,7 +159,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     {
         $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
-            $this->findEchelleInProfil($profil, BpmrOffFixture::AT),
+            $this->findEchelleInProfil($profil, self::AT),
             self::AT_REPONSES
         ));
     }
@@ -171,7 +171,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     {
         $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
-            $this->findEchelleInProfil($profil, BpmrOffFixture::DS),
+            $this->findEchelleInProfil($profil, self::DS),
             self::DS_REPONSES
         ));
     }
@@ -186,7 +186,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
             $expression = $expression . "+vraiC(" . $index . ")";
         }
 
-        $echelle = $this->findEchelleInProfil($profil, BpmrOffFixture::RC);
+        $echelle = $this->findEchelleInProfil($profil, self::RC);
         $correcteur->echelles->add(new EchelleCorrecteur(
             0,
             $expression,
@@ -217,14 +217,14 @@ class BpmrOffFixture extends AbstractBpmrFixture
     {
         $echelles_bas_de_cadre = array(
             array($this->findEchelleInGraphique($graphique,
-                BpmrOffFixture::EG)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+                self::EG)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
             array($this->findEchelleInGraphique($graphique,
-                BpmrOffFixture::QR)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+                self::QR)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
         );
 
         $echelles_core = [];
 
-        foreach (BpmrOffFixture::APTITUDES_COGNITIVES_BR_TO_MR as $br => $mr) {
+        foreach (self::APTITUDES_COGNITIVES_BR_TO_MR as $br => $mr) {
             $echelle_br = $this->findEchelleInGraphique($graphique, $br);
             $echelle_mr = $this->findEchelleInGraphique($graphique, $mr);
             $echelles_core[] = array($echelle_br->id, $echelle_mr->id);
@@ -244,9 +244,9 @@ class BpmrOffFixture extends AbstractBpmrFixture
     {
         $echelles_bas_de_cadre = array(
             array($this->findEchelleInGraphique($graphique,
-                BpmrOffFixture::DS)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
-            array($this->findEchelleInGraphique($graphique, BpmrOffFixture::AT)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
-            array($this->findEchelleInGraphique($graphique, BpmrOffFixture::RC)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
+                self::DS)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
+            array($this->findEchelleInGraphique($graphique, self::AT)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
+            array($this->findEchelleInGraphique($graphique, self::RC)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
         );
 
         $echelles_core = array();
@@ -455,23 +455,23 @@ class BpmrOffFixture extends AbstractBpmrFixture
     const E = "E";
 
     const VRAI_NOM_PHP_TO_INDEX_VRAI = [
-        BpmrOffFixture::VT_BR => self::REPONSES_VT_INDEX_TO_VRAI,
-        BpmrOffFixture::SP_BR => self::REPONSES_SP_INDEX_TO_VRAI,
-        BpmrOffFixture::RAIS_BR => self::REPONSES_RAIS_INDEX_TO_VRAI,
-        BpmrOffFixture::CV_BR => self::REPONSES_CV_INDEX_TO_VRAI,
-        BpmrOffFixture::SL_BR => self::REPONSES_SL_INDEX_TO_VRAI,
-        BpmrOffFixture::DIC_BR => self::REPONSES_DIC_INDEX_TO_VRAI,
-        BpmrOffFixture::AS_BR => self::REPONSES_AS_INDEX_TO_VRAI,
+        self::VT_BR => self::REPONSES_VT_INDEX_TO_VRAI,
+        self::SP_BR => self::REPONSES_SP_INDEX_TO_VRAI,
+        self::RAIS_BR => self::REPONSES_RAIS_INDEX_TO_VRAI,
+        self::CV_BR => self::REPONSES_CV_INDEX_TO_VRAI,
+        self::SL_BR => self::REPONSES_SL_INDEX_TO_VRAI,
+        self::DIC_BR => self::REPONSES_DIC_INDEX_TO_VRAI,
+        self::AS_BR => self::REPONSES_AS_INDEX_TO_VRAI,
     ];
 
     const FAUX_NOM_PHP_TO_INDEX_VRAI = [
-        BpmrOffFixture::VT_MR => self::REPONSES_VT_INDEX_TO_VRAI,
-        BpmrOffFixture::SP_MR => self::REPONSES_SP_INDEX_TO_VRAI,
-        BpmrOffFixture::RAIS_MR => self::REPONSES_RAIS_INDEX_TO_VRAI,
-        BpmrOffFixture::CV_MR => self::REPONSES_CV_INDEX_TO_VRAI,
-        BpmrOffFixture::SL_MR => self::REPONSES_SL_INDEX_TO_VRAI,
-        BpmrOffFixture::DIC_MR => self::REPONSES_DIC_INDEX_TO_VRAI,
-        BpmrOffFixture::AS_MR => self::REPONSES_AS_INDEX_TO_VRAI,
+        self::VT_MR => self::REPONSES_VT_INDEX_TO_VRAI,
+        self::SP_MR => self::REPONSES_SP_INDEX_TO_VRAI,
+        self::RAIS_MR => self::REPONSES_RAIS_INDEX_TO_VRAI,
+        self::CV_MR => self::REPONSES_CV_INDEX_TO_VRAI,
+        self::SL_MR => self::REPONSES_SL_INDEX_TO_VRAI,
+        self::DIC_MR => self::REPONSES_DIC_INDEX_TO_VRAI,
+        self::AS_MR => self::REPONSES_AS_INDEX_TO_VRAI,
     ];
 
 
@@ -695,40 +695,40 @@ class BpmrOffFixture extends AbstractBpmrFixture
     self::REPONSES_AS_INDEX_TO_VRAI;
 
     const NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE_TO_INDEX_TO_TYPE = [
-        BpmrOffFixture::FP => [
-            BpmrOffFixture::FP_ANX => self::FP_ANX_REPONSES,
-            BpmrOffFixture::FP_INTROS => self::FP_INTROS_REPONSES,
-            BpmrOffFixture::FP_HDEP => self::FP_HDEP_REPONSES,
-            BpmrOffFixture::FP_DEV => self::FP_DEV_REPONSES,
-            BpmrOffFixture::FP_GEN => self::FP_GEN_REPONSES,
+        self::FP => [
+            self::FP_ANX => self::FP_ANX_REPONSES,
+            self::FP_INTROS => self::FP_INTROS_REPONSES,
+            self::FP_HDEP => self::FP_HDEP_REPONSES,
+            self::FP_DEV => self::FP_DEV_REPONSES,
+            self::FP_GEN => self::FP_GEN_REPONSES,
         ],
-        BpmrOffFixture::ME => [
-            BpmrOffFixture::ME_CE => self::ME_CE_REPONSES,
-            BpmrOffFixture::ME_MODES => self::ME_MODES_REPONSES,
-            BpmrOffFixture::ME_COOPE => self::ME_COOPE_REPONSES,
-            BpmrOffFixture::ME_AMB => self::ME_AMB_REPONSES,
-            BpmrOffFixture::ME_DROIT => self::ME_DROIT_REPONSES,
+        self::ME => [
+            self::ME_CE => self::ME_CE_REPONSES,
+            self::ME_MODES => self::ME_MODES_REPONSES,
+            self::ME_COOPE => self::ME_COOPE_REPONSES,
+            self::ME_AMB => self::ME_AMB_REPONSES,
+            self::ME_DROIT => self::ME_DROIT_REPONSES,
         ],
-        BpmrOffFixture::CP => [
-            BpmrOffFixture::CP_FIAB => self::CP_FIAB_REPONSES,
-            BpmrOffFixture::CP_AUTODISC => self::CP_AUTODISC_REPONSES,
-            BpmrOffFixture::CP_REFL => self::CP_REFL_REPONSES,
-            BpmrOffFixture::CP_RIG => self::CP_RIG_REPONSES,
-            BpmrOffFixture::CP_SVA => self::CP_SVA_REPONSES,
+        self::CP => [
+            self::CP_FIAB => self::CP_FIAB_REPONSES,
+            self::CP_AUTODISC => self::CP_AUTODISC_REPONSES,
+            self::CP_REFL => self::CP_REFL_REPONSES,
+            self::CP_RIG => self::CP_RIG_REPONSES,
+            self::CP_SVA => self::CP_SVA_REPONSES,
         ],
-        BpmrOffFixture::AR => [
-            BpmrOffFixture::AR_CONF => self::AR_CONF_REPONSES,
-            BpmrOffFixture::AR_GREGA => self::AR_GREGA_REPONSES,
-            BpmrOffFixture::AR_SPONT => self::AR_SPONT_REPONSES,
-            BpmrOffFixture::AR_NOUV => self::AR_NOUV_REPONSES,
-            BpmrOffFixture::AR_DYN => self::AR_DYN_REPONSES,
+        self::AR => [
+            self::AR_CONF => self::AR_CONF_REPONSES,
+            self::AR_GREGA => self::AR_GREGA_REPONSES,
+            self::AR_SPONT => self::AR_SPONT_REPONSES,
+            self::AR_NOUV => self::AR_NOUV_REPONSES,
+            self::AR_DYN => self::AR_DYN_REPONSES,
         ],
-        BpmrOffFixture::PM => [
-            BpmrOffFixture::PM_LEAD => self::PM_LEAD_REPONSES,
-            BpmrOffFixture::PM_AFFIRM => self::PM_AFFIRM_REPONSES,
-            BpmrOffFixture::PM_EMP => self::PM_EMP_REPONSES,
-            BpmrOffFixture::PM_ING => self::PM_ING_REPONSES,
-            BpmrOffFixture::PM_SINTEL => self::PM_SINTEL_REPONSES,
+        self::PM => [
+            self::PM_LEAD => self::PM_LEAD_REPONSES,
+            self::PM_AFFIRM => self::PM_AFFIRM_REPONSES,
+            self::PM_EMP => self::PM_EMP_REPONSES,
+            self::PM_ING => self::PM_ING_REPONSES,
+            self::PM_SINTEL => self::PM_SINTEL_REPONSES,
         ],
     ];
 
@@ -859,16 +859,16 @@ class BpmrOffFixture extends AbstractBpmrFixture
     ];
 
     const ME_AMB_REPONSES = [
-        214 => self::INVERSE,
-        240 => self::INVERSE,
-        266 => self::INVERSE,
-        292 => self::INVERSE,
-        317 => self::INVERSE,
-        344 => self::INVERSE,
-        370 => self::INVERSE,
-        396 => self::INVERSE,
-        421 => self::INVERSE,
-        447 => self::INVERSE,
+        214 => self::NORMAL,
+        240 => self::NORMAL,
+        266 => self::NORMAL,
+        292 => self::NORMAL,
+        317 => self::NORMAL,
+        344 => self::NORMAL,
+        370 => self::NORMAL,
+        396 => self::NORMAL,
+        421 => self::NORMAL,
+        447 => self::NORMAL,
     ];
 
     const ME_DROIT_REPONSES = [
