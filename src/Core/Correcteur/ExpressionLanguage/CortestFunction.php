@@ -33,7 +33,7 @@ class CortestFunction
 
     protected function innerEvaluer(array $arguments, int $index, float $si_vide, float $si_a, float $si_b, float $si_c, float $si_d, float $si_e): float
     {
-        return match ($arguments["reponses"][$index - 1]) {
+        return match ($arguments["reponses"][$index]) {
             0 => $si_vide,
             1 => $si_a,
             2 => $si_b,
@@ -44,12 +44,13 @@ class CortestFunction
         };
     }
 
-    protected function innerCompiler(int $index, float $si_0, float $si_a, float $si_b, float $si_c, float $si_d, float $si_e): string
+    protected function innerCompiler(int $index, float $si_vide, float $si_a, float $si_b, float $si_c, float $si_d, float $si_e): string
     {
-        $true_index = $index - 1;
+        // TODO CHECK
+        $true_index = $index;
         return sprintf('(reponses[%1$d] == 0 ? %2$d : (reponses[%1$d] == 1 ? %3$d : (reponses[%1$d] == 2 ? %4$d : (reponses[%1$d] == 3 ? %5$d : (reponses[%1$d] == 4 ? %6$d : %7$d)))))',
             $true_index,
-            $si_0,
+            $si_vide,
             $si_a,
             $si_b,
             $si_c,

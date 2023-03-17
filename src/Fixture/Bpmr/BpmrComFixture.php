@@ -1130,7 +1130,9 @@ class BpmrComFixture extends AbstractBpmrFixture
         self::ALL_ME_REPONSES +
         self::ALL_CP_REPONSES +
         self::ALL_AR_REPONSES +
-        self::ALL_PM_PERSONNALITE;
+        self::ALL_PM_PERSONNALITE +
+        self::AT_REPONSES +
+        self::DS_REPONSES;
 }
 
 
