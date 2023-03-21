@@ -2,6 +2,8 @@
 
 namespace App\Fixture\Bpmr;
 
+use App\Core\Renderer\RendererOption;
+use App\Core\Renderer\Values\RendererBatonnets;
 use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
@@ -274,8 +276,11 @@ class BpmrOffFixture extends AbstractBpmrFixture
         );
     }
 
+
     protected function subtests(Graphique $graphique)
     {
+        $graphique->options[RendererBatonnets::OPTION_TITRE_PHP] = "PROFIL BPMR-OFF";
+
         $graphique->subtests->add($this->subtestAptitudesCognitives($graphique));
         $graphique->subtests->add($this->subtestPersonnalite($graphique));
     }

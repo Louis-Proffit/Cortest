@@ -5,7 +5,15 @@
     <br>
     <h1>Générer un (des) pdf</h1>
     <br>
-    {{ form(form) }}
+    {{ form_start(form) }}
+    {{ form_row(form.graphique) }}
+    <div class="row row-cols-auto">
+        {{ form_row(form.submit) }}
+        <div class="col">
+            <a onclick="window.history.go(-1)" class="btn btn-secondary">Précédent</a>
+        </div>
+    </div>
+    {{ form_end(form) }}
 
 {% endblock %}
 

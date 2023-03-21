@@ -46,11 +46,11 @@
     \noindent\fbox{
         \begin{minipage}{\linewidth}
             \begin{tabular}{m{3.5cm} m{5.2cm} m{3.5cm} m{5.2cm}}
-                Nom de naissance:  & {{ reponse.nom|raw }}                         & Type du concours:       & {{ session.concours.type_concours|raw }}    \\
-                Prénom:            & {{ reponse.prenom|raw }}                      & Version Batterie:       & {{ session.concours.version_batterie|raw }} \\
-                Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & Date d'examen:          & {{ session.date|date('d/m/Y') }}            \\
-                Sexe:              & {{ reponse.sexe|sexe }}                       & SGAMI/SGAP:             & {{ session.sgap.nom|raw }}                  \\
-                Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & Numéro d'identification   & xxx                                   \\
+                Nom de naissance:  & {{ reponse.nom|raw }}                         & Type du concours:       & {{ reponse.eirs|raw }} | {{ reponse.session.concours.nom|raw }} \\
+                Prénom:            & {{ reponse.prenom|raw }}                      & Version Batterie:       & {{ reponse.session.concours.version_batterie|raw }}                   \\
+                Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & Date d'examen:          & {{ reponse.session.date|date('d/m/Y') }}                              \\
+                Sexe:              & {{ reponse.sexe|sexe }}                       & SGAMI/SGAP:             & {{ reponse.session.sgap.nom|raw }}                                    \\
+                Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & Numéro d'identification   & {{ reponse.code_barre|raw }}                                   \\
                 Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }} \\
             \end{tabular}
         \end{minipage}
@@ -95,7 +95,7 @@
         {% endfor %}
         {% endif %}
         {% if subtest.echelles_footer|length > 0 %}
-        {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_COMPOSITE") %} \hline \underline{\textbf{Fiabilité des réponses}}\\ {% endif %}
+        {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_COMPOSITE") %} \hline \underline{\textbf{Fiabilité des réponses}} \\ {% endif %}
 
         \multicolumn{4}{|c|}{
             \begin{tabular}{ {% for echelle in subtest.echelles_footer %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }

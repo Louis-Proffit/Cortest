@@ -53,20 +53,21 @@ class LectureController extends AbstractController
         }
 
         $reponse = new ReponseCandidat(
-            0,
-            $session,
-            array(),
-            "",
-            "",
-            "",
-            $niveau_scolaire,
-            new DateTime("now"),
-            1,
-            "",
-            "",
-            "",
-            0,
-            null
+            id: 0,
+            session: $session,
+            reponses: array(),
+            nom: "",
+            prenom: "",
+            nom_jeune_fille: "",
+            niveau_scolaire: $niveau_scolaire,
+            date_de_naissance: new DateTime("now"),
+            sexe: 1,
+            reserve: "",
+            autre_1: "",
+            autre_2: "",
+            code_barre: 0,
+            eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+            raw: null
         );
 
 
@@ -111,7 +112,7 @@ class LectureController extends AbstractController
 
                 $reponse_array = str_split($reponse_string);
 
-                dump($reponse_array);
+                // dump($reponse_array);
 
                 $reponse_candidat = new ReponseCandidat(
                     id: 0,
@@ -127,6 +128,7 @@ class LectureController extends AbstractController
                     autre_1: $reponses_candidat_json["autre_1"],
                     autre_2: $reponses_candidat_json["autre_2"],
                     code_barre: $reponses_candidat_json["code_barre"],
+                    eirs: ReponseCandidat::TYPE_E, // TODO change to correct
                     raw: $reponses_candidat_json
                 );
                 $manager->persist($reponse_candidat);
@@ -143,9 +145,9 @@ class LectureController extends AbstractController
     }
 
     #[Route("/scanner", name: "scanner")]
-    public function scanner(ManagerRegistry $doctrine,
+    public function scanner(ManagerRegistry          $doctrine,
                             NiveauScolaireRepository $niveauScolaireRepository,
-                            Request         $request): Response
+                            Request                  $request): Response
     {
 
         $manager = $doctrine->getManager();
@@ -159,50 +161,52 @@ class LectureController extends AbstractController
 
             $session = $uploadSessionBase->session;
             return $this->render("lecture/from_scanner.html.twig",
-                ["form" => null, 
-                 "session" => $session,
-                 "niveaux" => $niveauScolaireRepository->findAll(),
-                    ]);
+                ["form" => null,
+                    "session" => $session,
+                    "niveaux" => $niveauScolaireRepository->findAll(),
+                ]);
         }
 
         return $this->render('lecture/from_scanner_parameters.html.twig', [
             'form' => $form
         ]);
     }
-    
+
     #[Route("/scanner/save", name: 'saveFromScanner')]
-    public function saveFromScanner(Request $request, 
-            EntityManagerInterface  $entity_manager,
-            SessionRepository        $session_repository,
-            NiveauScolaireRepository $niveau_scolaire_repository
-            ) : Response {
-        
+    public function saveFromScanner(Request                  $request,
+                                    EntityManagerInterface   $entity_manager,
+                                    SessionRepository        $session_repository,
+                                    NiveauScolaireRepository $niveau_scolaire_repository
+    ): Response
+    {
+
         $data = json_decode($request->request->get("data"), true);
-        
-        
+
+
         foreach ($data as $i => $ligne) {
             $rep = new ReponseCandidat(
-                0,
-                $session_repository->find($request->request->get('session')),
-                $ligne['qcm'],
-                $ligne['nom'],
-                $ligne['prenom'],
-                $ligne['nom_jeune_fille'],
-                $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
-                new DateTime($ligne['date_naissance']),
-                $ligne['sexe'],
-                $ligne['reserve'],
-                $ligne['option_1'],
-                $ligne['option_2'],
-                $i,
-                null
+                id: 0,
+                session: $session_repository->find($request->request->get('session')),
+                reponses: $ligne['qcm'],
+                nom: $ligne['nom'],
+                prenom: $ligne['prenom'],
+                nom_jeune_fille: $ligne['nom_jeune_fille'],
+                niveau_scolaire: $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
+                date_de_naissance: new DateTime($ligne['date_naissance']),
+                sexe: $ligne['sexe'],
+                reserve: $ligne['reserve'],
+                autre_1: $ligne['option_1'],
+                autre_2: $ligne['option_2'],
+                code_barre: "" . $i,
+                eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+                raw: null
             );
             $entity_manager->persist($rep);
             $entity_manager->flush();
         }
-        
-         
-            return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
+
+
+        return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
     }
 
 }

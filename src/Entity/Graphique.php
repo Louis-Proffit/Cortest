@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 #[ORM\Entity]
-#[UniqueEntity]
 class Graphique
 {
 

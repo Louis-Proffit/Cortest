@@ -18,6 +18,12 @@ class ReponseCandidat
     public const INDEX_HOMME = 1;
     public const INDEX_FEMME = 2;
 
+    const TYPE_E = "E";
+    const TYPE_I = "I";
+    const TYPE_R = "R";
+    const TYPE_S = "S";
+    const TYPES = [self::TYPE_E, self::TYPE_I, self::TYPE_R, self::TYPE_S];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -67,7 +73,11 @@ class ReponseCandidat
     public string $autre_2;
 
     #[ORM\Column]
-    public int $code_barre;
+    public string $code_barre;
+
+    #[Choice(choices: self::TYPES)]
+    #[ORM\Column]
+    public string $eirs;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     public ?array $raw;
@@ -85,10 +95,11 @@ class ReponseCandidat
      * @param string $reserve
      * @param string $autre_1
      * @param string $autre_2
-     * @param int $code_barre
+     * @param string $code_barre
+     * @param string $eirs
      * @param array|null $raw
      */
-    public function __construct(int $id, Session $session, array $reponses, string $nom, string $prenom, string $nom_jeune_fille, NiveauScolaire $niveau_scolaire, DateTime $date_de_naissance, int $sexe, string $reserve, string $autre_1, string $autre_2, int $code_barre, ?array $raw)
+    public function __construct(int $id, Session $session, array $reponses, string $nom, string $prenom, string $nom_jeune_fille, NiveauScolaire $niveau_scolaire, DateTime $date_de_naissance, int $sexe, string $reserve, string $autre_1, string $autre_2, string $code_barre, string $eirs, ?array $raw)
     {
         $this->id = $id;
         $this->session = $session;
@@ -103,6 +114,7 @@ class ReponseCandidat
         $this->autre_1 = $autre_1;
         $this->autre_2 = $autre_2;
         $this->code_barre = $code_barre;
+        $this->eirs = $eirs;
         $this->raw = $raw;
     }
 

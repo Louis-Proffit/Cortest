@@ -161,20 +161,21 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
 
         foreach (range(1, 20) as $index) {
             $session->reponses_candidats->add(new ReponseCandidat(
-                0,
-                $session,
-                $reponses,
-                "NOM " . $index,
-                "PRENOM " . $index,
-                "Sans objet",
-                $niveau_scolaire,
-                new DateTime("now"),
-                ReponseCandidat::INDEX_HOMME,
-                "RESERVE TEST",
-                "AUTRE 1",
-                "AUTRE 2",
-                1,
-                null
+                id: 0,
+                session: $session,
+                reponses: $reponses,
+                nom: "NOM " . $index,
+                prenom: "PRENOM " . $index,
+                nom_jeune_fille: "Sans objet",
+                niveau_scolaire: $niveau_scolaire,
+                date_de_naissance: new DateTime("now"),
+                sexe: ReponseCandidat::INDEX_HOMME,
+                reserve: "RESERVE TEST",
+                autre_1: "AUTRE 1",
+                autre_2: "AUTRE 2",
+                code_barre: 1,
+                eirs: ReponseCandidat::TYPE_E,
+                raw: null
             ));
         }
 
@@ -306,7 +307,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         }
     }
 
-    private function echellesGraphiques(Profil $profil, Graphique $graphique, RendererBatonnets $renderer)
+    protected function echellesGraphiques(Profil $profil, Graphique $graphique, RendererBatonnets $renderer)
     {
         /** @var Echelle $echelle */
         foreach ($profil->echelles as $echelle) {
