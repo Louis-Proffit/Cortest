@@ -98,12 +98,14 @@
         {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_COMPOSITE") %} \hline \underline{\textbf{Fiabilité des réponses}} \\ {% endif %}
 
         \multicolumn{4}{|c|}{
-            \begin{tabular}{ {% for echelle in subtest.echelles_footer %} {% if echelle[1] == 0 %} c c c c c {% else %} c c c {% endif %} c {% endfor %} }
+            \begin{tabular}{ {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} c c c c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} c c c {% else %} c c {% endif %} c {% endfor %} }
             {% for echelle in subtest.echelles_footer %}
             {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %}
                 \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
-                {% else %}
-                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} } &
+            {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %}
+                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} }
+            {% else %}
+                \textit{ pourcentage } & \fbox{ {{ score[echelle[0]] }} {{ "\\%" }} }
             {% endif %}
             {% endfor %}
             \end{tabular}

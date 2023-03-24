@@ -21,8 +21,9 @@ class Subtest
 
     const TYPE_FOOTER_SCORE_AND_CLASSE = 0;
     const TYPE_FOOTER_SCORE_ONLY = 1;
-    const TYPES_FOOTERS = [self::TYPE_FOOTER_SCORE_AND_CLASSE, self::TYPE_FOOTER_SCORE_ONLY];
-    const TYPES_FOOTER_CHOICES = array("Score et classe" => self::TYPE_FOOTER_SCORE_AND_CLASSE, "Score uniquement" => self::TYPE_FOOTER_SCORE_ONLY);
+    const TYPE_FOOTER_POURCENT = 2;
+    const TYPES_FOOTERS = [self::TYPE_FOOTER_SCORE_AND_CLASSE, self::TYPE_FOOTER_SCORE_ONLY, self::TYPE_FOOTER_POURCENT];
+    const TYPES_FOOTER_CHOICES = array("Score et classe" => self::TYPE_FOOTER_SCORE_AND_CLASSE, "Score uniquement" => self::TYPE_FOOTER_SCORE_ONLY, "Pourcentage (en complément d'un score)" => self::TYPE_FOOTER_POURCENT);
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

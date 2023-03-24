@@ -88,6 +88,15 @@ class BpmrOffFixture extends AbstractBpmrFixture
             new ArrayCollection(),
             new ArrayCollection()
         ));
+
+        $profil->echelles->add(new Echelle(
+            0,
+            "RCPOURCENT",
+            self::RCPOURCENT,
+            Echelle::TYPE_ECHELLE_SIMPLE,
+            new ArrayCollection(),
+            new ArrayCollection()
+        ));
     }
 
     protected function questions(Concours $concours)
@@ -197,6 +206,22 @@ class BpmrOffFixture extends AbstractBpmrFixture
         ));
     }
 
+    private function correcteurRcPourcent(
+        Profil     $profil,
+        Correcteur $correcteur
+    )
+    {
+        $expression = "echelle(\"". self::RC ."\")*100/" . count(self::ALL_PERSONNALITE_INDEX_TO_TYPE);
+
+        $echelle = $this->findEchelleInProfil($profil, self::RCPOURCENT);
+        $correcteur->echelles->add(new EchelleCorrecteur(
+            0,
+            $expression,
+            $echelle,
+            $correcteur
+        ));
+    }
+
     protected function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur)
     {
         $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
@@ -213,6 +238,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         $this->correcteurAt($profil, $correcteur);
         $this->correcteurDs($profil, $correcteur);
         $this->correcteurRc($profil, $correcteur);
+        $this->correcteurRcPourcent($profil, $correcteur);
     }
 
     private function subtestAptitudesCognitives(Graphique $graphique): Subtest
@@ -249,6 +275,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
                 self::DS)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
             array($this->findEchelleInGraphique($graphique, self::AT)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
             array($this->findEchelleInGraphique($graphique, self::RC)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
+            array($this->findEchelleInGraphique($graphique, self::RCPOURCENT)->id, Subtest::TYPE_FOOTER_POURCENT),
         );
 
         $echelles_core = array();
@@ -381,6 +408,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     const PM_ING = "pm4_ing";
     const PM_SINTEL = "pm5_sintel";
     const RC = "rc";
+    const RCPOURCENT = "rc_pourcent";
 
     const PERSONNALITE_NOM_PHP_TO_NOM_SIMPLE = [
         self::FP => "FP",
