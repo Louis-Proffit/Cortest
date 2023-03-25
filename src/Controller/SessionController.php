@@ -30,7 +30,7 @@ class SessionController extends AbstractController
     ): Response
     {
         /** @var array $session */
-        $sessions = $session_repository->findAll();
+        $sessions = $session_repository->findBy(array(),array('id' => 'desc'));
 
         $grilles = $grille_repository->indexToInstance();
 
