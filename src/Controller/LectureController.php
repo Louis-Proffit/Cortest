@@ -11,6 +11,7 @@ use App\Form\ParametresLectureOptiqueType;
 use App\Form\ReponseCandidatType;
 use App\Repository\NiveauScolaireRepository;
 use App\Repository\SessionRepository;
+use App\Repository\ReponseCandidatRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -160,23 +161,41 @@ class LectureController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $session = $uploadSessionBase->session;
-            return $this->render("lecture/from_scanner.html.twig",
-                ["form" => null,
-                    "session" => $session,
-                    "niveaux" => $niveauScolaireRepository->findAll(),
-                ]);
+            return $this->redirectToRoute("lecture_optique", ["id" => $session->id]);
         }
 
         return $this->render('lecture/from_scanner_parameters.html.twig', [
             'form' => $form
         ]);
     }
+    
+    #[Route("/optique/{id}", name: "optique")]
+    public function scannerid(ManagerRegistry          $doctrine,
+                            NiveauScolaireRepository $niveauScolaireRepository,
+                            SessionRepository        $session_repository,
+                            Request                  $request,
+                            int $id): Response
+    {
+
+        $manager = $doctrine->getManager();
+        $session = $session_repository->find($id);
+        return $this->render("lecture/from_scanner.html.twig",
+                ["form" => null,
+                    "session" => $session,
+                    "niveaux" => $niveauScolaireRepository->findAll(),
+                ]
+        );
+    }
+    
+
+    
 
     #[Route("/scanner/save", name: 'saveFromScanner')]
     public function saveFromScanner(Request                  $request,
                                     EntityManagerInterface   $entity_manager,
                                     SessionRepository        $session_repository,
-                                    NiveauScolaireRepository $niveau_scolaire_repository
+                                    NiveauScolaireRepository $niveau_scolaire_repository,
+                                    ReponseCandidatRepository $reponse_candidat_repository
     ): Response
     {
 
@@ -184,25 +203,28 @@ class LectureController extends AbstractController
 
 
         foreach ($data as $i => $ligne) {
-            $rep = new ReponseCandidat(
-                id: 0,
-                session: $session_repository->find($request->request->get('session')),
-                reponses: $ligne['qcm'],
-                nom: $ligne['nom'],
-                prenom: $ligne['prenom'],
-                nom_jeune_fille: $ligne['nom_jeune_fille'],
-                niveau_scolaire: $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
-                date_de_naissance: new DateTime($ligne['date_naissance']),
-                sexe: $ligne['sexe'],
-                reserve: $ligne['reserve'],
-                autre_1: $ligne['option_1'],
-                autre_2: $ligne['option_2'],
-                code_barre: "" . $i,
-                eirs: ReponseCandidat::TYPE_E, // TODO change to correct
-                raw: null
-            );
-            $entity_manager->persist($rep);
-            $entity_manager->flush();
+            if(count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
+                $rep = new ReponseCandidat(
+                    id: 0,
+                    session: $session_repository->find($request->request->get('session')),
+                    reponses: $ligne['qcm'],
+                    nom: $ligne['nom'],
+                    prenom: $ligne['prenom'],
+                    nom_jeune_fille: $ligne['nom_jeune_fille'],
+                    niveau_scolaire: $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
+                    date_de_naissance: new DateTime($ligne['date_naissance']),
+                    sexe: $ligne['sexe'],
+                    reserve: $ligne['reserve'],
+                    autre_1: $ligne['option_1'],
+                    autre_2: $ligne['option_2'],
+                    code_barre: "" . $i,
+                    eirs: $ligne['concours'],
+                    raw: null
+                );
+                $entity_manager->persist($rep);
+                $entity_manager->flush();
+            }
+            
         }
 
 
