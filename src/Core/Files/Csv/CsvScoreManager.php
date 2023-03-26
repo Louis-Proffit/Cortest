@@ -31,10 +31,12 @@ class CsvScoreManager
         /** @var ReponseCandidat $reponse */
         foreach ($session->reponses_candidats as $reponse) {
             $toAdd = [
+                "Code barre" => $reponse->code_barre,
                 "Nom" => $reponse->nom,
                 "Prenom" => $reponse->prenom,
                 "Nom de jeune fille" => $reponse->nom_jeune_fille,
                 "Date de naissance" => $reponse->date_de_naissance->format("d/m/Y"),
+                "Type concours" => $reponse->eirs,
             ];
 
             $candidat_scores = $scores[$reponse->id];
