@@ -61,7 +61,7 @@ class InitFixture extends Fixture
 
         $psycologue = new CortestUser(
             id: 0,
-            username: "psycologue",
+            username: "psychologue",
             password: "UvsTr8L7Fz76m4",
             role: CortestUser::ROLE_PSYCOLOGUE
         );
