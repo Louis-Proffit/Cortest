@@ -6,6 +6,9 @@
     <br>
     <div class="row">
         <div class="mb-3 col-md-auto">
+            <a class="btn btn-primary" href="{{ path("session_modifier", {"id":session.id}) }}">Modifier</a>
+        </div>
+        <div class="mb-3 col-md-auto">
             <a class="btn btn-primary" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
         </div>
         <div class="mb-3 col-md-auto">
@@ -44,6 +47,8 @@
         <dd class="col-md-9">{{ session.concours.version_batterie }}</dd>
         <dt class="col-md-3">Type de concours</dt>
         <dd class="col-md-9">{{ session.concours.type_concours }}</dd>
+        <dt class="col-md-3">Observations</dt>
+        <dd class="col-md-9">{{ session.observations }}</dd>
     </dl>
     <br>
     <hr class="hr hr-blurry">
