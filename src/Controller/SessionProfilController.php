@@ -29,6 +29,7 @@ class SessionProfilController extends AbstractController
         SessionRepository $session_repository,
         Request           $request,
         int               $session_id,
+        array|null        $reponsesRecherche=null
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -52,7 +53,8 @@ class SessionProfilController extends AbstractController
                 [
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur->id,
-                    "etalonnage_id" => $etalonnage->id
+                    "etalonnage_id" => $etalonnage->id,
+                    "reponsesRecherche" => $reponsesRecherche,
                 ]
             );
         }
@@ -68,7 +70,8 @@ class SessionProfilController extends AbstractController
         CorrecteurRepository $correcteur_repository,
         Request              $request,
         int                  $session_id,
-        int                  $correcteur_id): Response
+        int                  $correcteur_id,
+        array|null           $reponsesRecherche): Response
     {
         $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
@@ -100,7 +103,8 @@ class SessionProfilController extends AbstractController
                 [
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur_id,
-                    "etalonnage_id" => $etalonnage->id
+                    "etalonnage_id" => $etalonnage->id,
+                    "reponsesRecherche" => $reponsesRecherche
                 ]
             );
         }
@@ -119,7 +123,8 @@ class SessionProfilController extends AbstractController
         CorrecteurRepository $correcteur_repository,
         int                  $session_id,
         int                  $correcteur_id,
-        int                  $etalonnage_id
+        int                  $etalonnage_id,
+        array|null           $reponsesRecherche
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -134,7 +139,12 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        $reponses = $session->reponses_candidats->toArray();
+        if ($reponsesRecherche === null){
+            $reponses = $session->reponses_candidats->toArray();
+        }
+        else{
+            $reponses = $reponsesRecherche;
+        }
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,

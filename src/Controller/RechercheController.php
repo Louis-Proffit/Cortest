@@ -2,8 +2,13 @@
 
 namespace App\Controller;
 
+use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Files\Csv\CsvReponseManager;
+use App\Core\Files\Csv\CsvScoreManager;
 use App\Entity\ReponseCandidat;
+use App\Entity\Session;
+use App\Form\CorrecteurChoiceType;
+use App\Form\Data\CorrecteurChoice;
 use App\Form\Data\RechercheFiltre;
 use App\Form\Data\ReponseCandidatChecked;
 use App\Form\Data\RechercheReponsesCandidat;
@@ -11,7 +16,9 @@ use App\Form\RechercheFiltreType;
 use App\Form\RechercheReponsesCandidatType;
 use App\Recherche\FiltreSessionStorage;
 use App\Recherche\ReponsesCandidatSessionStorage;
+use App\Repository\CorrecteurRepository;
 use App\Repository\ReponseCandidatRepository;
+use App\Repository\SessionRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -47,12 +54,119 @@ class RechercheController extends AbstractController
     }
 
     #[Route("/calculer/scores", name: "calculer_scores")]
-    public function calculerScores(): Response
+    public function calculerScores(
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
+    ): Response
     {
-        $this->addFlash("warning", "Pas encore implémenté");
-        return $this->redirectToRoute("recherche_index");
+        $cached_reponses_ids = $reponses_candidat_session_storage->get();
+        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+
+        if (count($cached_reponses) == 0) {
+            $this->addFlash("warning", "Il faut sélectionner au moins un candidat");
+            return $this->redirectToRoute("recherche_index");
+        }
+
+        $session_id = $cached_reponses[0]->session->id;
+        foreach ($cached_reponses as $reponse){
+            if ($session_id != $reponse->session->id){
+                $this->addFlash("warning", "Pour calculer les scores les candidats doivent appartenir à la même session");
+                return $this->redirectToRoute("recherche_index");
+            }
+        }
+
+        return $this->redirectToRoute("recherche_form_correcteur", ['session_id' => $session_id]);
+    }
+    #[Route('/form/correcteur/{session_id}', name: "form_correcteur")]
+    public function formCorrecteur(
+        SessionRepository $session_repository,
+        Request           $request,
+        int               $session_id): Response
+    {
+        /** @var Session $session */
+        $session = $session_repository->find($session_id);
+
+        $parametres_calcul_score = new CorrecteurChoice();
+        $form = $this->createForm(CorrecteurChoiceType::class,
+            $parametres_calcul_score,
+            [CorrecteurChoiceType::OPTION_SESSION => $session]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $correcteur = $parametres_calcul_score->correcteur;
+
+            return $this->redirectToRoute("recherche_score",
+                ["session_id" => $session_id, "correcteur_id" => $correcteur->id]);
+        }
+
+        return $this->render('score/form.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+    #[Route("/score/{session_id}/{correcteur_id}", name: "score")]
+    public function consulter_score(
+        SessionRepository    $session_repository,
+        CorrecteurRepository $correcteur_repository,
+        CorrecteurManager    $correcteur_manager,
+        int                  $session_id,
+        int                  $correcteur_id,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
+    ): Response
+    {
+        $cached_reponses_ids = $reponses_candidat_session_storage->get();
+        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+
+        $session = $session_repository->find($session_id);
+        $correcteur = $correcteur_repository->find($correcteur_id);
+
+        $scores = $correcteur_manager->corriger($correcteur, $reponses);
+
+        return $this->render("recherche/score_index.html.twig",
+            ["scores" => $scores,
+                "session" => $session,
+                "correcteur" => $correcteur,
+                "reponses" => $reponses]);
+    }
+    #[Route("/score/csv/{session_id}/{correcteur_id}", name: "score_csv")]
+    public function score_csv(
+        SessionRepository    $session_repository,
+        CorrecteurRepository $correcteur_repository,
+        CorrecteurManager    $correcteur_manager,
+        CsvScoreManager      $csv_score_manager,
+        int                  $session_id,
+        int                  $correcteur_id,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
+    ): Response
+    {
+        $cached_reponses_ids = $reponses_candidat_session_storage->get();
+        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+
+        $session = $session_repository->find($session_id);
+        $correcteur = $correcteur_repository->find($correcteur_id);
+
+        $scores = $correcteur_manager->corriger($correcteur, $reponses);
+
+        return $csv_score_manager->export($session, $correcteur->profil, $scores);
     }
 
+    #[Route("/profil/{session_id}/{correcteur_id}", name: "profil")]
+    public function profil(
+        int                  $session_id,
+        int                  $correcteur_id,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
+    ): Response
+    {
+        $cached_reponses_ids = $reponses_candidat_session_storage->get();
+        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+
+        return $this->redirectToRoute("calcul_profil_score_form", ['session_id' => $session_id, 'correcteur_id' => $correcteur_id, 'reponsesRecherche' => $reponses]);
+    }
     #[Route("/enlever/reponse/{id}", "enlever_reponse")]
     public function removeReponseCandidat(ReponsesCandidatSessionStorage $reponses_candidat_session_storage, int $id): RedirectResponse
     {
