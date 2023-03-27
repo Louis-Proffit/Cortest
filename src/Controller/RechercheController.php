@@ -137,10 +137,10 @@ class RechercheController extends AbstractController
         CorrecteurRepository $correcteur_repository,
         CorrecteurManager    $correcteur_manager,
         CsvScoreManager      $csv_score_manager,
-        int                  $session_id,
-        int                  $correcteur_id,
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
+        int                  $session_id,
+        int                  $correcteur_id,
     ): Response
     {
         $cached_reponses_ids = $reponses_candidat_session_storage->get();
@@ -151,22 +151,43 @@ class RechercheController extends AbstractController
 
         $scores = $correcteur_manager->corriger($correcteur, $reponses);
 
-        return $csv_score_manager->export($session, $correcteur->profil, $scores);
+        return $csv_score_manager->export($session, $correcteur->profil, $scores, $reponses);
     }
 
     #[Route("/profil/{session_id}/{correcteur_id}", name: "profil")]
     public function profil(
         int                  $session_id,
         int                  $correcteur_id,
+    ): Response
+    {
+        return $this->redirectToRoute("calcul_profil_score_form", ['session_id' => $session_id, 'correcteur_id' => $correcteur_id, 'recherche' => 1]);
+    }
+
+    #[Route("/calculer/profils", name: "calculer_profils")]
+    public function calculerProfils(
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
     ): Response
     {
         $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
 
-        return $this->redirectToRoute("calcul_profil_score_form", ['session_id' => $session_id, 'correcteur_id' => $correcteur_id, 'reponsesRecherche' => $reponses]);
+        if (count($cached_reponses) == 0) {
+            $this->addFlash("warning", "Il faut sélectionner au moins un candidat");
+            return $this->redirectToRoute("recherche_index");
+        }
+
+        $session_id = $cached_reponses[0]->session->id;
+        foreach ($cached_reponses as $reponse){
+            if ($session_id != $reponse->session->id){
+                $this->addFlash("warning", "Pour calculer les profils les candidats doivent appartenir à la même session");
+                return $this->redirectToRoute("recherche_index");
+            }
+        }
+
+        return $this->redirectToRoute("calcul_profil_session_form", ['session_id' => $session_id, 'recherche' => 1]);
     }
+
     #[Route("/enlever/reponse/{id}", "enlever_reponse")]
     public function removeReponseCandidat(ReponsesCandidatSessionStorage $reponses_candidat_session_storage, int $id): RedirectResponse
     {

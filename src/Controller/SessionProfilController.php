@@ -12,8 +12,10 @@ use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
 use App\Form\EtalonnageChoiceType;
+use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
+use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,12 +26,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionProfilController extends AbstractController
 {
 
-    #[Route("/session/form/{session_id}", name: "session_form")]
+    #[Route("/session/form/{session_id}/{recherche}", name: "session_form")]
     public function form(
         SessionRepository $session_repository,
         Request           $request,
         int               $session_id,
-        array|null        $reponsesRecherche=null
+        int               $recherche=0
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -54,7 +56,7 @@ class SessionProfilController extends AbstractController
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur->id,
                     "etalonnage_id" => $etalonnage->id,
-                    "reponsesRecherche" => $reponsesRecherche,
+                    "recherche" => $recherche,
                 ]
             );
         }
@@ -64,14 +66,14 @@ class SessionProfilController extends AbstractController
         ]);
     }
 
-    #[Route('/score/form/{session_id}/{correcteur_id}', name: "score_form")]
+    #[Route('/score/form/{session_id}/{correcteur_id}/{recherche}', name: "score_form")]
     public function sessionProfilForm(
         SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
         Request              $request,
         int                  $session_id,
         int                  $correcteur_id,
-        array|null           $reponsesRecherche): Response
+        int                  $recherche=0): Response
     {
         $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
@@ -104,7 +106,7 @@ class SessionProfilController extends AbstractController
                     "session_id" => $session_id,
                     "correcteur_id" => $correcteur_id,
                     "etalonnage_id" => $etalonnage->id,
-                    "reponsesRecherche" => $reponsesRecherche
+                    "recherche" => $recherche
                 ]
             );
         }
@@ -114,17 +116,19 @@ class SessionProfilController extends AbstractController
         ]);
     }
 
-    #[Route("/index/{session_id}/{correcteur_id}/{etalonnage_id}", name: "index")]
+    #[Route("/index/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "index")]
     public function consulter(
         CorrecteurManager    $correcteur_manager,
         EtalonnageManager    $etalonnage_manager,
         SessionRepository    $session_repository,
         EtalonnageRepository $etalonnage_repository,
         CorrecteurRepository $correcteur_repository,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
         int                  $session_id,
         int                  $correcteur_id,
         int                  $etalonnage_id,
-        array|null           $reponsesRecherche
+        int                  $recherche=0,
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -139,11 +143,12 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        if ($reponsesRecherche === null){
+        if ($recherche === 0){
             $reponses = $session->reponses_candidats->toArray();
         }
         else{
-            $reponses = $reponsesRecherche;
+            $cached_reponses_ids = $reponses_candidat_session_storage->get();
+            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
         }
 
         $scores = $correcteur_manager->corriger(
@@ -156,6 +161,16 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
+        if ($recherche === 1){
+            return $this->render("recherche/profil_index.html.twig",
+                ["profils" => $profils,
+                    "scores" => $scores,
+                    "session" => $session,
+                    "correcteur" => $correcteur,
+                    "etalonnage" => $etalonnage,
+                    "reponses" => $reponses]);
+        }
+
         return $this->render("profil/index_calcul.html.twig",
             ["profils" => $profils,
                 "scores" => $scores,
@@ -164,7 +179,7 @@ class SessionProfilController extends AbstractController
                 "etalonnage" => $etalonnage]);
     }
 
-    #[Route("/csv/{session_id}/{correcteur_id}/{etalonnage_id}", name: "csv")]
+    #[Route("/csv/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "csv")]
     public function csv(
         CorrecteurManager    $correcteur_manager,
         EtalonnageManager    $etalonnage_manager,
@@ -172,9 +187,12 @@ class SessionProfilController extends AbstractController
         EtalonnageRepository $etalonnage_repository,
         CorrecteurRepository $correcteur_repository,
         CsvProfilManager     $csv_profil_manager,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
         int                  $session_id,
         int                  $correcteur_id,
-        int                  $etalonnage_id
+        int                  $etalonnage_id,
+        int                  $recherche=0,
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -189,7 +207,13 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        $reponses = $session->reponses_candidats->toArray();
+        if ($recherche === 0){
+            $reponses = $session->reponses_candidats->toArray();
+        }
+        else{
+            $cached_reponses_ids = $reponses_candidat_session_storage->get();
+            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        }
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,
@@ -204,7 +228,8 @@ class SessionProfilController extends AbstractController
         return $csv_profil_manager->export(
             session: $session,
             profil: $correcteur->profil,
-            profils: $profils
+            profils: $profils,
+            reponses: $reponses
         );
     }
 

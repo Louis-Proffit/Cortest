@@ -7,6 +7,7 @@ use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Files\PdfManager;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
+use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\GraphiqueRepository;
@@ -21,15 +22,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class PdfController extends AbstractController
 {
 
-    #[Route("/session/form/{session_id}/{correcteur_id}/{etalonnage_id}", name: "session_form")]
+    #[Route("/session/form/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "session_form")]
     public function downloadZip(
         CorrecteurRepository $correcteur_repository,
         GraphiqueRepository  $graphique_repository,
         Request              $request,
         int                  $session_id,
         int                  $correcteur_id,
-        int                  $etalonnage_id
-    ): Response
+        int                  $etalonnage_id,
+        int                  $recherche=0): Response
     {
         $correcteur = $correcteur_repository->find($correcteur_id);
 
@@ -53,7 +54,8 @@ class PdfController extends AbstractController
                 "session_id" => $session_id,
                 "etalonnage_id" => $etalonnage_id,
                 "correcteur_id" => $correcteur_id,
-                "graphique_id" => $graphique_choice->graphique->id
+                "graphique_id" => $graphique_choice->graphique->id,
+                "recherche" => $recherche,
             ]);
         }
 
@@ -96,7 +98,7 @@ class PdfController extends AbstractController
         );
     }
 
-    #[Route("/session/form/{session_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "session_download")]
+    #[Route("/session/download/{session_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}/{recherche}", name: "session_download")]
     public function form_session(
         SessionRepository    $session_repository,
         EtalonnageRepository $etalonnage_repository,
@@ -105,10 +107,13 @@ class PdfController extends AbstractController
         CorrecteurManager    $correcteur_manager,
         EtalonnageManager    $etalonnage_manager,
         PdfManager           $pdf_manager,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
         int                  $session_id,
         int                  $correcteur_id,
         int                  $etalonnage_id,
-        int                  $graphique_id
+        int                  $graphique_id,
+        int                  $recherche=0,
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -117,7 +122,15 @@ class PdfController extends AbstractController
 
         $graphique = $graphique_repository->find($graphique_id);
 
-        $scores = $correcteur_manager->corriger($correcteur, $session->reponses_candidats->toArray());
+        if ($recherche === 0){
+            $reponses = $session->reponses_candidats->toArray();
+        }
+        else{
+            $cached_reponses_ids = $reponses_candidat_session_storage->get();
+            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        }
+
+        $scores = $correcteur_manager->corriger($correcteur, $reponses);
         $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
 
         return $pdf_manager->createZipFile(
@@ -127,6 +140,7 @@ class PdfController extends AbstractController
             scores: $scores,
             profils: $profils,
             graphique: $graphique,
+            reponses: $reponses
         );
     }
 
@@ -137,8 +151,7 @@ class PdfController extends AbstractController
         Request              $request,
         int                  $candidat_reponse_id,
         int                  $correcteur_id,
-        int                  $etalonnage_id
-    ): Response
+        int                  $etalonnage_id): Response
     {
         $correcteur = $correcteur_repository->find($correcteur_id);
 
@@ -164,7 +177,7 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("pdf_download", [
                 "candidat_reponse_id" => $candidat_reponse_id,
                 "etalonnage_id" => $etalonnage_id,
-                "graphique_id" => $graphique_choice->graphique->id,
+                "graphique_id"  => $graphique_choice->graphique->id,
                 "correcteur_id" => $correcteur_id]);
 
         }

@@ -18,18 +18,11 @@
             {% else %}
                 <h3>Candidats sélectionnés</h3>
                 <br>
-                <div class="row row-cols-auto">
-                    <div class="col">
-                        <a class="btn btn-primary" href="{{ path("recherche_download_reponses") }}">Exporter les
-                            réponses</a>
-                    </div>
-                    <div class="col">
-                        <a class="btn btn-secondary" href="{{ path("recherche_calculer_scores") }}">Calculer les
-                            scores</a>
-                    </div>
-                    <div class="col">
-                        <a class="btn btn-secondary" href="{{ path("recherche_vider") }}">Vider</a>
-                    </div>
+                <div class="btn-group d-flex" role="group" aria-label="Button group with four buttons">
+                    <a class="btn btn-primary flex-grow-1" href="{{ path("recherche_download_reponses") }}">Exporter les réponses</a>
+                    <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_calculer_scores") }}">Calculer les scores</a>
+                    <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_calculer_profils") }}">Calculer les profils</a>
+                    <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_vider") }}">Vider</a>
                 </div>
                 <br>
                 <div class="table-responsive">

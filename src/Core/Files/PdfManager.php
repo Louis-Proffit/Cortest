@@ -236,7 +236,8 @@ class PdfManager
         Etalonnage $etalonnage,
         array      $scores,
         array      $profils,
-        Graphique  $graphique): BinaryFileResponse|false
+        Graphique  $graphique,
+        array|null $reponses=null): BinaryFileResponse|false
     {
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
 
@@ -245,8 +246,12 @@ class PdfManager
             $zip = new ZipArchive();
             $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
+            if ($reponses === null){
+                $reponses = $session->reponses_candidats;
+            }
+
             /** @var ReponseCandidat $reponses_candidat */
-            foreach ($session->reponses_candidats as $reponses_candidat) {
+            foreach ($reponses as $reponses_candidat) {
 
                 $fileNameWithoutExtension = $this->fileName($reponses_candidat);
 

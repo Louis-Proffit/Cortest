@@ -24,12 +24,16 @@ class CsvScoreManager
         return "scores_session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
     }
 
-    public function export(Session $session, Profil $profil, array $scores): BinaryFileResponse
+    public function export(Session $session, Profil $profil, array $scores, array|null $reponses=null): BinaryFileResponse
     {
         $data = [];
 
+        if ($reponses === null){
+            $reponses = $session->reponses_candidats;
+        }
+
         /** @var ReponseCandidat $reponse */
-        foreach ($session->reponses_candidats as $reponse) {
+        foreach ($reponses as $reponse) {
             $toAdd = [
                 "Code barre" => $reponse->code_barre,
                 "Nom" => $reponse->nom,

@@ -25,12 +25,16 @@ class CsvProfilManager
         return "profils_session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
     }
 
-    public function export(Session $session, Profil $profil, array $profils): BinaryFileResponse
+    public function export(Session $session, Profil $profil, array $profils, array|null $reponses=null): BinaryFileResponse
     {
         $data = [];
 
+        if ($reponses === null){
+            $reponses = $session->reponses_candidats;
+        }
+
         /** @var ReponseCandidat $reponse */
-        foreach ($session->reponses_candidats as $reponse) {
+        foreach ($reponses as $reponse) {
             $toAdd = [
                 "Nom" => $reponse->nom,
                 "Prenom" => $reponse->prenom,
