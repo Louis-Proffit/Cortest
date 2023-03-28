@@ -23,6 +23,10 @@ class ReponseCandidat
     const TYPE_R = "R";
     const TYPE_S = "S";
     const TYPES = [self::TYPE_E, self::TYPE_I, self::TYPE_R, self::TYPE_S];
+    const CHAMPS_EXPORT = ["Nom"=>0, "Prenom"=>1, "Nom de jeune fille"=>2, "Niveau scolaire"=>3,
+        "Date de naissance"=>4, "Sexe"=>5, "Réservé"=>6, "Autre 1"=>7, "Autre 2"=>8, "Code barre"=>9];
+    const NOMBRE_CHAMPS_EXPORT = 10;
+    const OPTIONS_SEXE = ['Homme' => self::INDEX_HOMME, 'Femme' => self::INDEX_FEMME];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

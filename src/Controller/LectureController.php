@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Core\Files\Csv\CsvManager;
+use App\Core\Files\Csv\CsvReponseManager;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
+use App\Form\Data\ParametresLectureCsv;
 use App\Form\Data\ParametresLectureJSON;
 use App\Form\Data\ParametresLectureOptique;
+use App\Form\ParametresLectureFichierCsvType;
 use App\Form\ParametresLectureFichierType;
 use App\Form\ParametresLectureOptiqueType;
 use App\Form\ReponseCandidatType;
@@ -113,8 +117,6 @@ class LectureController extends AbstractController
 
                 $reponse_array = str_split($reponse_string);
 
-                // dump($reponse_array);
-
                 $reponse_candidat = new ReponseCandidat(
                     id: 0,
                     session: $uploadSessionBase->session,
@@ -134,15 +136,85 @@ class LectureController extends AbstractController
                 );
                 $manager->persist($reponse_candidat);
             }
-
             $manager->flush();
 
+            $this->addFlash('success', 'Le fichier a bien été introduit dans la base de données');
             return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session->id]);
         }
 
         return $this->render('lecture/from_file.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route("/fichierCsv", name: 'fichier_csv')]
+    public function importCsv(ManagerRegistry   $doctrine,
+                              NiveauScolaireRepository $niveau_scolaire_repository,
+                              Request           $request,
+                              CsvManager        $csvManager,
+    ): Response
+    {
+        $manager = $doctrine->getManager();
+
+        $uploadSessionBase = new ParametresLectureCsv();
+        $form = $this->createForm(ParametresLectureFichierCsvType::class, $uploadSessionBase);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $uploadSessionBase->contents->move(getcwd() . $csvManager::SEPARATOR . $csvManager::CSV_TMP_DIRECTORY, $csvManager::CSV_TMP_FILE_NAME);
+            $csvData = $csvManager->import(getcwd() . $csvManager::SEPARATOR . $csvManager::CSV_TMP_LOCAL_PATH);
+
+            $check = $this->checkHeader($csvData[0]);
+            if ($check !== null){
+                $this->addFlash('warning', $check);
+                return $this->redirectToRoute("lecture_fichier_csv");
+            }
+
+            foreach(array_slice($csvData, 1) as $row){
+                $reponseCandidat = new ReponseCandidat(
+                    id: 0,
+                    session: $uploadSessionBase->session,
+                    reponses: array_slice($row, ReponseCandidat::NOMBRE_CHAMPS_EXPORT),
+                    nom: $row[ReponseCandidat::CHAMPS_EXPORT['Nom']],
+                    prenom: $row[ReponseCandidat::CHAMPS_EXPORT['Prenom']],
+                    nom_jeune_fille: $row[ReponseCandidat::CHAMPS_EXPORT['Nom de jeune fille']],
+                    niveau_scolaire: $niveau_scolaire_repository->findOneBy(['nom' => $row[ReponseCandidat::CHAMPS_EXPORT['Niveau scolaire']]]),
+                    date_de_naissance: \DateTime::createFromFormat('d/m/Y', $row[ReponseCandidat::CHAMPS_EXPORT['Date de naissance']]),
+                    sexe: ReponseCandidat::OPTIONS_SEXE[$row[ReponseCandidat::CHAMPS_EXPORT['Sexe']]],
+                    reserve: $row[ReponseCandidat::CHAMPS_EXPORT['Réservé']],
+                    autre_1: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 1']],
+                    autre_2: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 2']],
+                    code_barre: $row[ReponseCandidat::CHAMPS_EXPORT['Code barre']],
+                    eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+                    raw: null,
+                );
+                $manager->persist($reponseCandidat);
+            }
+            $manager->flush();
+            $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
+            return $this->redirectToRoute('home');
+        }
+
+        return $this->render('lecture/from_file.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    public function checkHeader(array $header): string|null
+    {
+        foreach (ReponseCandidat::CHAMPS_EXPORT as $champ => $key){
+            if ($header[$key] !== $champ){
+                return("la colonne numéro {$key} et intitulee {$header[$key]} doit contenir les valeurs de type {$champ}");
+            }
+        }
+        foreach (array_slice($header, ReponseCandidat::NOMBRE_CHAMPS_EXPORT) as $key => $reponse){
+            $key += 1;
+            if ($reponse !== "Réponse " . $key){
+                return("La colonne intitulée {$reponse} devrait contenir le champ 'Réponse {$key}'");
+            }
+        }
+        return null;
     }
 
     #[Route("/scanner", name: "scanner")]

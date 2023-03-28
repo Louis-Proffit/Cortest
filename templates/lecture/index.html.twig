@@ -10,25 +10,32 @@
         encore.</p>
     <br>
     <div class="row row-cols-auto">
-        <div class="card col">
+        <div class="card col-lg">
             <div class="card-body">
                 <h5 class="card-title">Lecteur optique</h5>
                 <p class="card-text">Utilisation du lecteur optique</p>
                 <a type="button" class="btn btn-primary" href="{{ path("lecture_scanner") }}">Choisir</a>
             </div>
         </div>
-        <div class="card col ms-3">
+        <div class="card col-lg ms-3">
             <div class="card-body">
                 <h5 class="card-title">Manuel</h5>
                 <p class="card-text">Saisir manuellement les réponses d'un candidat.</p>
                 <a type="button" class="btn btn-primary" href="{{ path("lecture_form") }}">Choisir</a>
             </div>
         </div>
-        <div class="card col ms-3">
+        <div class="card col-lg ms-3">
             <div class="card-body">
                 <h5 class="card-title">.JSON</h5>
                 <p class="card-text">Lecture d'un fichier de notes au format .json</p>
                 <a type="button" class="btn btn-primary" href="{{ path("lecture_fichier") }}">Choisir</a>
+            </div>
+        </div>
+        <div class="card col-lg ms-3">
+            <div class="card-body">
+                <h5 class="card-title">.CSV</h5>
+                <p class="card-text">Lecture d'un fichier de notes au format .csv</p>
+                <a type="button" class="btn btn-primary" href="{{ path("lecture_fichier_csv") }}">Choisir</a>
             </div>
         </div>
     </div>

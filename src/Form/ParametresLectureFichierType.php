@@ -27,7 +27,9 @@ class ParametresLectureFichierType extends AbstractType
         return "Session : "
             . $session->date->format('Y-m-d')
             . " | "
-            . $session->sgap->nom;
+            . $session->sgap->nom
+            . " | "
+            . $session->concours->nom;
     }
 
     private function sessionChoices(): array
@@ -56,7 +58,7 @@ class ParametresLectureFichierType extends AbstractType
                 $builder->create("contents", FileType::class, [
                     // "mapped" => false,
                     "required" => true,
-                    "label" => "Fichier de notes",
+                    "label" => "Fichier de notes JSON",
                     'constraints' => [
                         new File([
                             'mimeTypes' => [
