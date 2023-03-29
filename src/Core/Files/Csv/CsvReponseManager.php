@@ -38,6 +38,7 @@ class CsvReponseManager
                 "Autre 1" => $reponse->autre_1,
                 "Autre 2" => $reponse->autre_2,
                 "Code barre" => $reponse->code_barre,
+                "EIRS" => $reponse->eirs,
             ];
 
             $index = 1;

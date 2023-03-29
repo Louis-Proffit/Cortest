@@ -71,7 +71,7 @@ class LectureController extends AbstractController
             autre_1: "",
             autre_2: "",
             code_barre: 0,
-            eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+            eirs: ReponseCandidat::TYPE_E,
             raw: null
         );
 
@@ -131,7 +131,7 @@ class LectureController extends AbstractController
                     autre_1: $reponses_candidat_json["autre_1"],
                     autre_2: $reponses_candidat_json["autre_2"],
                     code_barre: $reponses_candidat_json["code_barre"],
-                    eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+                    eirs: $reponses_candidat_json["EIRS"],
                     raw: $reponses_candidat_json
                 );
                 $manager->persist($reponse_candidat);
@@ -186,7 +186,7 @@ class LectureController extends AbstractController
                     autre_1: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 1']],
                     autre_2: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 2']],
                     code_barre: $row[ReponseCandidat::CHAMPS_EXPORT['Code barre']],
-                    eirs: ReponseCandidat::TYPE_E, // TODO change to correct
+                    eirs: $row[ReponseCandidat::CHAMPS_EXPORT['EIRS']],
                     raw: null,
                 );
                 $manager->persist($reponseCandidat);
