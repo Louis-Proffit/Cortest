@@ -512,7 +512,7 @@ class GrilleManager {
                 var my = this;
                 await tell('S');
                 askCodeBarre(propal, function (r) {
-                    return my.readFID(r + suite);
+                    return my.readQCM(r + suite);
                 }, function () {
                     my.noCodeBarreQCM = my.noCodeBarreQCM + 1;
                     return my.readQCM(propal + suite);
