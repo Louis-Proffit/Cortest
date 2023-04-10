@@ -11,7 +11,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     texlive-fonts-extra \
     texlive-latex-extra  \
     libzip-dev \
-    git  \
+    unzip \
     wget && apt-get clean
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -23,11 +23,11 @@ RUN wget https://getcomposer.org/download/latest-stable/composer.phar \
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
+VOLUME ["/var/www"]
 WORKDIR /var/www
-COPY . /var/www
 
 RUN chown -R www-data:www-data /var/www
 
-RUN composer update
+# RUN composer update
 
 CMD ["apache2-foreground"]
