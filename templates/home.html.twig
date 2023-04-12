@@ -1,10 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    <br>
-    <h1>Cortest</h1>
-    <br>
-    <p class="lead">Page d'accueil de Cortest, rajouter les infos importantes (notre contact, les resources...)</p>
-    <br>
+    <h1>Bienvenue sur Cortest</h1>
+    <p class="lead">Cortest est l'outil de correction des évaluations psychologiques dans les forces de l'ordre.</p>
+    <p>Cette application a été développée par XProjets, Junior Entreprise de l'école Polytechnique, pour la cellule Psychologie de la Police Nationale.</p>
+    <p>Ressources :</p>
+    <ul>
+        <li><a href="{{ asset('/docs/Cortest_manuel_utilisateur.pdf') }}" target="_blank">Manuel d'utilisation</a></li>
+        <li><a href="{{ asset('/docs/Cortest_installation.pdf') }}" target="_blank">Guide d'installation et de mise à jour</a></li>
+    </ul>
 {% endblock %}
-
