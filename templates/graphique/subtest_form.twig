@@ -7,8 +7,6 @@
     <br>
     {{ form(form) }}
     <a class="btn btn-secondary"
-       href="{{ path("graphique_consulter_subtest", {"id_subtest":subtest.id}) }}">Retour au subtest</a>
-    <a class="btn btn-secondary"
        href="{{ path("graphique_consulter", {"id":subtest.graphique.id}) }}">Retour au graphique</a>
 
 {% endblock %}
