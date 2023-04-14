@@ -2,6 +2,7 @@
 
 namespace App\Core\Files\Csv;
 
+use App\Core\Files\PdfManager;
 use SplFileObject;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -13,11 +14,18 @@ class CsvManager
     const SEPARATOR = "/";
     const CSV_TMP_FILE_NAME = "tmp.csv";
     const CSV_TMP_LOCAL_PATH = self::CSV_TMP_DIRECTORY . self::SEPARATOR . self::CSV_TMP_FILE_NAME;
+    private string $tmp_dir;
 
-
+    public function __construct(string $tmp_dir = "tmp")
+    {
+        $this->tmp_dir = getcwd() . PdfManager::SEPARATOR . $tmp_dir;
+    }
     public function export(array $data, string $file_name): BinaryFileResponse
     {
         $encoder = new CsvEncoder();
+        if (!is_dir($this->tmp_dir)) {
+            mkdir($this->tmp_dir);
+        }
 
         $encoded = $encoder->encode($data, CsvEncoder::FORMAT);
 
