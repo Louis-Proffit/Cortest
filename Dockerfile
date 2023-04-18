@@ -2,9 +2,10 @@ FROM php:8.1-apache
 
 RUN a2enmod rewrite
 
-RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
-    --mount=target=/var/cache/apt,type=cache,sharing=locked \
-    rm -f /etc/apt/apt.conf.d/docker-clean \
+VOLUME /var/lib/apt/lists
+VOLUME /var/cache/apt
+
+RUN rm -f /etc/apt/apt.conf.d/docker-clean \
     && apt-get update \
     && apt-get -y --no-install-recommends install texlive-latex-base \
     texlive-fonts-recommended  \
