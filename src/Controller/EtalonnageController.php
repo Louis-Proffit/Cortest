@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Core\Etalonnage\EtalonnageManager;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
 use App\Form\Data\EtalonnageCreer;
+use App\Form\Data\EchelleEtalonnageGaussienCreer;
+use App\Form\Data\EtalonnageGaussienCreer;
 use App\Form\EtalonnageCreerType;
+use App\Form\EtalonnageGaussienType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
 use App\Repository\ProfilRepository;
@@ -105,10 +109,96 @@ class EtalonnageController extends AbstractController
     }
 
     #[Route("/creer/gaussien", name: "creer_gaussien")]
-    public function creerGaussien(): Response
+    public function creerGaussien(
+        EntityManagerInterface $entity_manager,
+        ProfilRepository       $profil_repository,
+        Request                $request
+    ): Response
     {
-        $this->addFlash("warning", "En cours d'implémentation");
-        return $this->redirectToRoute("etalonnage_creer");
+        $profils = $profil_repository->findAll();
+
+        if (empty($profils)) {
+            $this->addFlash("warning", "Pas de profils disponibles, créez en un");
+            return $this->redirectToRoute("profil_index");
+        }
+
+        $etalonnageCreer = new EtalonnageCreer(
+            profil: $profils[0],
+            nombre_classes: 0,
+            nom: ""
+        );
+
+        $form = $this->createForm(EtalonnageCreerType::class, $etalonnageCreer);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $nombreClasses = $etalonnageCreer->nombre_classes;
+            $profil = $etalonnageCreer->profil;
+
+            $etalonnage = new Etalonnage(
+                id: 0,
+                profil: $profil,
+                nom: $etalonnageCreer->nom,
+                nombre_classes: $nombreClasses,
+                echelles: new ArrayCollection()
+            );
+
+            foreach ($profil->echelles as $echelle) {
+                $etalonnage->echelles->add(EchelleEtalonnage::rangeEchelle(
+                    $echelle,
+                    $etalonnage,
+                    $nombreClasses
+                ));
+            }
+
+            $entity_manager->persist($etalonnage);
+            $entity_manager->flush();
+
+
+            return $this->redirectToRoute("etalonnage_ajout_echelles_gaussiennes", ["id" => $etalonnage->id]);
+        }
+
+        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
+    public function ajoutEchellesGaussiennes(
+        EtalonnageRepository $etalonnage_repository,
+        EntityManagerInterface $entity_manager,
+        EtalonnageManager $etalonnageManager,
+        Request              $request,
+        int                  $id,
+    ): Response
+    {
+        $etalonnage = $etalonnage_repository->find($id);
+
+
+        $etalonnageGaussienCreer = new EtalonnageGaussienCreer(array());
+        foreach ($etalonnage->echelles as $echelle){
+            $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]=new EchelleEtalonnageGaussienCreer($echelle, 0, 1);
+        }
+
+        $form = $this->createForm(EtalonnageGaussienType::class, $etalonnageGaussienCreer, ['bounds_number' => $etalonnage->nombre_classes]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+            foreach ($etalonnage->echelles as $echelle){
+                $echelle->bounds = $etalonnageManager->calculateBounds(
+                    $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]->mean,
+                    $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]->stdDev,
+                    $etalonnage->nombre_classes - 1,
+                );
+            }
+            $entity_manager->persist($etalonnage);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
+        }
+
+        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
