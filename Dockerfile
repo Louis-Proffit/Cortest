@@ -29,6 +29,12 @@ COPY . /var/www
 
 RUN chown -R www-data:www-data /var/www
 
+RUN groupadd cortest-users \
+    && usermod -a -G cortest-users www-data \
+    && usermod -a -G cortest-users $(whoami) \
+    && chgrp -R cortest-users /var/www/public \
+    && chmod -R g+w /var/www/public
+
 RUN composer update
 
 CMD ["apache2-foreground"]
