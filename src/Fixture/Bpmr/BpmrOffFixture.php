@@ -839,18 +839,17 @@ class BpmrOffFixture extends AbstractBpmrFixture
     ];
 
     const FP_GEN_REPONSES = [
-        205 => self::NORMAL,
-        231 => self::NORMAL,
-        256 => self::NORMAL,
-        282 => self::NORMAL,
-        308 => self::NORMAL,
-        334 => self::NORMAL,
-        360 => self::NORMAL,
-        386 => self::NORMAL,
-        412 => self::NORMAL,
-        438 => self::NORMAL,
+        215 => self::NORMAL,
+        241 => self::NORMAL,
+        267 => self::NORMAL,
+        293 => self::NORMAL,
+        318 => self::NORMAL,
+        345 => self::NORMAL,
+        371 => self::NORMAL,
+        397 => self::NORMAL,
+        422 => self::NORMAL,
+        448 => self::NORMAL,
     ];
-
 
     const ME_CE_REPONSES = [
         204 => self::INVERSE,
