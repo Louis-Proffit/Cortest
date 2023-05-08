@@ -275,7 +275,7 @@ class LectureController extends AbstractController
 
 
         foreach ($data as $i => $ligne) {
-            if(count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
+            if(count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom'], "session" => $session_repository->find($request->request->get('session'))])) == 0) {
                 $rep = new ReponseCandidat(
                     id: 0,
                     session: $session_repository->find($request->request->get('session')),
