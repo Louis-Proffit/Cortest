@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
+use App\Core\Import\ImportCorrecteurXML;
+use App\Core\Import\ImportCorrecteurXMLException;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
+use App\Form\Data\CorrecteurChoice;
 use App\Form\Data\CorrecteurCreer;
+use App\Form\ImportCorrecteurType;
 use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
 use App\Repository\GrilleRepository;
@@ -16,9 +20,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route("/correcteur", name: "correcteur_")]
 class CorrecteurController extends AbstractController
@@ -30,8 +38,6 @@ class CorrecteurController extends AbstractController
     ): Response
     {
         $correcteurs = $correcteur_repository->findAll();
-
-        $grilles = [];
 
         $grilles = $grille_repository->indexToInstance();
 
@@ -50,6 +56,49 @@ class CorrecteurController extends AbstractController
         $grille = $grille_repository->getFromIndex($correcteur->concours->index_grille);
         return $this->render("correcteur/correcteur.html.twig",
             ["correcteur" => $correcteur, "grille" => $grille]);
+    }
+
+    #[Route("/importer", name: "importer")]
+    public function importer(
+        EntityManagerInterface $entityManager,
+        ValidatorInterface     $validator,
+        ImportCorrecteurXML    $importCorrecteurXML,
+        Request                $request
+    ): Response
+    {
+        $form = $this->createForm(ImportCorrecteurType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            /** @var UploadedFile $file */
+            $file = $form->get(ImportCorrecteurType::FILE_KEY)->getData();
+
+            try {
+                $correcteur = $importCorrecteurXML->load($file->getContent());
+
+                $errors = $validator->validate($correcteur);
+
+                if (count($errors) == 0) {
+                    $entityManager->persist($correcteur);
+                    $entityManager->flush();
+
+                    $this->addFlash("success", "Correcteur importé");
+
+                    return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
+                } else {
+                    /** @var ConstraintViolation $error */
+                    foreach ($errors as $error) {
+                        $form->addError(new FormError($error->getMessage()));
+                    }
+                }
+            } catch (ImportCorrecteurXMLException $e) {
+                $form->addError(new FormError($e->getMessage()));
+            }
+        }
+
+        return $this->render("correcteur/form_importer.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/creer", name: "creer")]

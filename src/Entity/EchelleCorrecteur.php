@@ -38,6 +38,4 @@ class EchelleCorrecteur
         $this->echelle = $echelle;
         $this->correcteur = $correcteur;
     }
-
-
 }
