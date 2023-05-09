@@ -12,6 +12,8 @@
         <div class="col">
             <a class="btn btn-secondary"
                href="{{ path("graphique_consulter", {"id":subtest.graphique.id}) }}">Retour</a>
+            <a class="btn btn-secondary"
+               href="{{ path("graphique_modifier_nom_subtest", {"id":subtest.graphique.id, "idSubtest":subtest.id}) }}">Modifier le nom du subtest</a>
         </div>
     </div>
     <br>

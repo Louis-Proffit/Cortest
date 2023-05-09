@@ -8,6 +8,8 @@
        href="{{ path("graphique_supprimer_subtest", {"id_subtest":subtest.id}) }}">Supprimer</a>
     <a class="btn btn-secondary"
        href="{{ path("graphique_consulter", {"id":subtest.graphique.id}) }}">Retour</a>
+    <a class="btn btn-secondary"
+       href="{{ path("graphique_modifier_nom_subtest", {"id":subtest.graphique.id, "idSubtest":subtest.id}) }}">Modifier le nom du subtest</a>
     <br>
     <hr class="hr hr-blurry">
     <br>

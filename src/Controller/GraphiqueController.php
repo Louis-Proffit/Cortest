@@ -10,6 +10,7 @@ use App\Form\Data\EchelleSubtestBrMr;
 use App\Form\Data\EchelleGraphiqueChoice;
 use App\Form\Data\GraphiqueCreer;
 use App\Form\GraphiqueType;
+use App\Form\SubtestNomType;
 use App\Repository\GraphiqueRepository;
 use App\Form\EchelleSubtestBrMrType;
 use App\Form\EchelleSubtestFooter;
@@ -177,6 +178,42 @@ class GraphiqueController extends AbstractController
             "form" => $form->createView(),
             "subtest" => $subtest,
             "titre_form" => "Créer un subtest"
+        ]);
+    }
+
+    #[Route("/modifier-nom-subtest/{id}/{idSubtest}", name: "modifier_nom_subtest")]
+    public function modifierNomSubtest(
+        Request                $request,
+        GraphiqueRepository    $graphique_repository,
+        SubtestRepository      $subtestRepository,
+        EntityManagerInterface $entity_manager,
+        int                    $id,
+        int                    $idSubtest,
+    ): Response
+    {
+        $subtest = $subtestRepository->find($idSubtest);
+
+        if ($subtest == null) {
+            $this->addFlash("warning", "Le subtest n'existe pas");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $form = $this->createForm(SubtestNomType::class, $subtest);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $entity_manager->persist($subtest);
+            $entity_manager->flush();
+
+            return $this->redirectToRoute("graphique_consulter_subtest",
+                ["id_subtest" => $subtest->id]);
+        }
+
+        return $this->render('graphique/subtest_form.twig', [
+            "form" => $form->createView(),
+            "subtest" => $subtest,
+            "titre_form" => "Modifier le nom du subtest"
         ]);
     }
 

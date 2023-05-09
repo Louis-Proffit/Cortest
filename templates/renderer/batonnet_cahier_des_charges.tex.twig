@@ -102,12 +102,12 @@
 
         \multicolumn{4}{|p{19cm}|}{
             \centering
-            \begin{tabular}{ c {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} |m{1.5cm} c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} |m{1.5cm} c {% else %} c {% endif %} {% endfor %} }
+            \begin{tabular}{ c {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} m{1.5cm} c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} m{1.5cm} c {% else %} c {% endif %} {% endfor %} }
             {% for echelle in subtest.echelles_footer %}
             {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %}
-                & \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \small{\textit{ score }} \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil[echelle[0]] }} }
+                & {% if not loop.first %} \vline {% endif %} \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \small{\textit{ score }} \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil[echelle[0]] }} }
                 {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %}
-                & \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } \fbox{ {{ score[echelle[0]]|number_format(2) }} }
+                & {% if not loop.first %} \vline {% endif %} \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } \fbox{ {{ score[echelle[0]]|number_format(2) }} }
                 {% else %}
                 & \fbox{ {{ score[echelle[0]]|number_format(0) }} {{ "\\%" }} }
                 {% endif %}
