@@ -15,7 +15,6 @@
 \usepackage{xcolor}
 \setlength\headheight{70pt}
 \usepackage{multirow}
-\usepackage[normalem]{ulem}
 \graphicspath{ {{ "\{" ~ imagesDirectory ~ "\}" }} }
 
 \newcommand{\printChartResult}[3]{
@@ -68,7 +67,7 @@
         \hline
 
         {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_BR_MR") %}
-        \multicolumn{2}{|l}{\uline{\textbf{ \large {{ subtest.nom|raw }} }}} & & {% if subtest.echelles_core|length > 0 %} \textit{classes} {% endif %} \rule{0pt}{2.25ex} \\
+        \multicolumn{2}{|l}{\underline{\textbf{ \large {{ subtest.nom|raw }} }}} & & {% if subtest.echelles_core|length > 0 %} \textit{classes} {% endif %} \rule{0pt}{2.25ex} \\
         {% if subtest.echelles_core|length > 0 %} & BR & MR &
         \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{|X}|}
             \rule{0pt}{2.7ex} \centering I {% for i in 1..(etalonnage.nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
@@ -79,7 +78,7 @@
         {{ optionsEchelle[echelle[0]].nom_affichage|raw }} & \fbox{ {{ (score[echelle[0]] < 10 ? '0') ~ score[echelle[0]] }} } & \fbox{ {{ (score[echelle[1]] < 10 ? '0') ~ score[echelle[1]] }} } & \printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
         {% endfor %}
         {% else %}
-        \multicolumn{2}{|l}{\uline{\textbf{ \large {{ subtest.nom|raw }} }}} & {% if subtest.echelles_core|length > 0 %} \fbox{\textit{\small scores}} &
+        \multicolumn{2}{|l}{\underline{\textbf{ \large {{ subtest.nom|raw }} }}} & {% if subtest.echelles_core|length > 0 %} \fbox{\textit{\small scores}} &
         \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{|X}|}
             \centering \rule{0pt}{2.7ex} I {% for i in 1..(etalonnage.nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
