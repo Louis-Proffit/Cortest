@@ -325,7 +325,12 @@ class GrilleManager {
                     qcm[i] = corresp[qcm[i]];
                 } else {
                     if (qcm[i] === '@') {
-                        toCorrect.push({numero: i, blanck: true, unknown: false});
+                        if(questions[i] == "Score") {
+                            toCorrect.push({numero: i, blanck: true, unknown: false});
+                        }
+                        else {
+                            qcm[i] = blanck;
+                        }
                     } else {
                         toCorrect.push({numero: i, blanck: false, unknown: true});
                     }

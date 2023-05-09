@@ -16,26 +16,26 @@
     <table class="table">
         <thead>
         <tr>
+            <th>Lot</th>
             <th>Date</th>
-            <th>Grille</th>
             <th>SGAP</th>
-            <th>Numéro de session</th>
             <th>Concours</th>
             <th>Type concours</th>
-            <th>Version batterie</th>
+            <th>Nb candidats</th>
+            <th>Observations</th>
             <th>Consulter</th>
         </tr>
         </thead>
         <tbody>
         {% for session in sessions %}
             <tr>
+                <td><a class="btn btn-link btn-sm" href="{{ path("session_consulter", {"id":session.id}) }}">{{ session.id }}</a></td>
                 <td>{{ session.date|date('d-m-Y') }}</td>
-                <td>{{ grilles[session.concours.index_grille].nom }}</td>
-                <td>{{ session.sgap.nom }}</td>
-                <td>{{ session.concours.type_concours }}-{{ session.date|date("Y") }}-{{ session.numero_ordre }}</td>
+                <td>{{ session.sgap.nom }} ({{ session.sgap.indice }})</td>
                 <td>{{ session.concours.nom }}</td>
                 <td>{{ session.concours.type_concours }}</td>
-                <td>{{ session.concours.version_batterie }}</td>
+                <td>{{ session.reponses_candidats.count() }}</td>
+                <td>{{ session.obseravtions }}</td>
                 <td><a class="btn btn-link btn-sm" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
                 </td>
             </tr>
