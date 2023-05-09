@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Core\Files\Csv\CsvManager;
 use App\Core\Files\Csv\CsvReponseManager;
+use App\Core\Files\Csv\Reponses\ReponsesCandidatExport;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\ConcoursRepository;
@@ -30,7 +32,7 @@ class SessionController extends AbstractController
     ): Response
     {
         /** @var array $session */
-        $sessions = $session_repository->findBy(array(),array('id' => 'desc'));
+        $sessions = $session_repository->findBy(array(), array('id' => 'desc'));
 
         $grilles = $grille_repository->indexToInstance();
 
@@ -117,30 +119,30 @@ class SessionController extends AbstractController
     {
         $session = $session_repository->find($id);
 
-        return $this->render(
-            'session/session.html.twig',
-            ["session" => $session]
-        );
+        return $this->render('session/session.html.twig', ["session" => $session]);
     }
 
     #[Route("/csv/{id}", name: "csv")]
     public function csv(
-        CsvReponseManager $csv_reponse_manager,
-        SessionRepository $session_repository,
-        int               $id
+        ReponsesCandidatExport $reponsesCandidatExport,
+        CsvManager             $csvManager,
+        SessionRepository      $session_repository,
+        int                    $id
     ): BinaryFileResponse
     {
         $session = $session_repository->find($id);
 
-        $file_name = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
+        $fileName = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
 
-        return $csv_reponse_manager->export($session->reponses_candidats->toArray(), $file_name);
+        $raw = $reponsesCandidatExport->export($session->reponses_candidats->toArray());
+
+        return $csvManager->export($raw, $fileName);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry $doctrine,
+    public function supprimer(ManagerRegistry   $doctrine,
                               SessionRepository $session_repository,
-                              int $id): Response
+                              int               $id): Response
     {
 
         $session = $session_repository->find($id);
@@ -158,5 +160,4 @@ class SessionController extends AbstractController
 
         return $this->redirectToRoute("session_index");
     }
-
 }

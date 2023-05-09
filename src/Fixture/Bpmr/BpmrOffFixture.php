@@ -32,7 +32,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         );
     }
 
-    protected function aptitudesCognitives(Profil $profil)
+    protected function aptitudesCognitives(Profil $profil): void
     {
         $this->echellesSimplesAptitudesCognitives($profil, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
 
@@ -54,7 +54,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         ));
     }
 
-    protected function personnalite(Profil $profil)
+    protected function personnalite(Profil $profil): void
     {
         $this->echellesSimplesEtCompositesPersonnalite(
             $profil,
@@ -99,12 +99,12 @@ class BpmrOffFixture extends AbstractBpmrFixture
         ));
     }
 
-    protected function questions(Concours $concours)
+    protected function questions(Concours $concours): void
     {
         $this->questionsTypeIndexAsValue($concours, self::INDEX_EXEMPLES, QuestionConcours::TYPE_EXEMPLE);
-        $this->questionsTypeIndexAsKey($concours,
-            self::ALL_APTITUDES_COGNITIVES,
-            QuestionConcours::TYPE_VRAI_FAUX);
+        $this->questionsTypeIndexAsKey(concours: $concours,
+            index_to_any: self::ALL_APTITUDES_COGNITIVES,
+            type: QuestionConcours::TYPE_VRAI_FAUX);
         $this->questionsTypeIndexAsKey($concours,
             self::ALL_PERSONNALITE_INDEX_TO_TYPE,
             QuestionConcours::TYPE_SCORE);
@@ -113,7 +113,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurEg(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $echelle = $this->findEchelleInProfil($profil, self::EG);
         $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")*(" . $this->nombreReponsesTraiteesCognitif() . ")) ** 0.5";
@@ -129,7 +129,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurQr(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $echelle = $this->findEchelleInProfil($profil, self::QR);
         $expression = "((" . $this->nombreBonnesReponsesCognitif() . ")/(" . $this->nombreReponsesTraiteesCognitif() . ")) * 100";
@@ -166,7 +166,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurAt(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
@@ -178,7 +178,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurDs(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $correcteur->echelles->add($this->echelleCorrecteur(
             $correcteur,
@@ -190,7 +190,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurRc(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $expression = "0";
         foreach (self::ALL_PERSONNALITE_INDEX_TO_TYPE as $index => $type) {
@@ -209,7 +209,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     private function correcteurRcPourcent(
         Profil     $profil,
         Correcteur $correcteur
-    )
+    ): void
     {
         $expression = "echelle(\"". self::RC ."\")*100/" . count(self::ALL_PERSONNALITE_INDEX_TO_TYPE);
 
@@ -222,7 +222,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         ));
     }
 
-    protected function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur)
+    protected function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur): void
     {
         $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
         $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
@@ -230,7 +230,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
         $this->correcteurQr($profil, $correcteur);
     }
 
-    protected function correcteurPersonnalite(Profil $profil, Correcteur $correcteur)
+    protected function correcteurPersonnalite(Profil $profil, Correcteur $correcteur): void
     {
         $this->echellesCorrecteurPersonnalite($profil,
             $correcteur,
@@ -304,7 +304,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
     }
 
 
-    protected function subtests(Graphique $graphique)
+    protected function subtests(Graphique $graphique): void
     {
         $graphique->options[RendererBatonnets::OPTION_TITRE_PHP] = "PROFIL BPMR-OFF";
 

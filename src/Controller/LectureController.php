@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Core\Files\Csv\CsvManager;
-use App\Core\Files\Csv\CsvReponseManager;
+use App\Core\Files\Csv\Reponses\ReponsesCandidatImport;
 use App\Entity\ReponseCandidat;
-use App\Entity\Session;
 use App\Form\Data\ParametresLectureCsv;
 use App\Form\Data\ParametresLectureJSON;
 use App\Form\Data\ParametresLectureOptique;
@@ -148,10 +147,10 @@ class LectureController extends AbstractController
     }
 
     #[Route("/fichierCsv", name: 'fichier_csv')]
-    public function importCsv(ManagerRegistry   $doctrine,
-                              NiveauScolaireRepository $niveau_scolaire_repository,
-                              Request           $request,
-                              CsvManager        $csvManager,
+    public function importCsv(ManagerRegistry        $doctrine,
+                              Request                $request,
+                              CsvManager             $csvManager,
+                              ReponsesCandidatImport $reponsesCandidatImport
     ): Response
     {
         $manager = $doctrine->getManager();
@@ -162,35 +161,16 @@ class LectureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $uploadSessionBase->contents->move(getcwd() . $csvManager::SEPARATOR . $csvManager::CSV_TMP_DIRECTORY, $csvManager::CSV_TMP_FILE_NAME);
-            $csvData = $csvManager->import(getcwd() . $csvManager::SEPARATOR . $csvManager::CSV_TMP_LOCAL_PATH);
 
-            $check = $this->checkHeader($csvData[0]);
-            if ($check !== null){
-                $this->addFlash('warning', $check);
-                return $this->redirectToRoute("lecture_fichier_csv");
-            }
+            $rawReponsesCandidats = $csvManager->import($uploadSessionBase->contents->getPathname());
+            $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
 
-            foreach(array_slice($csvData, 1) as $row){
-                $reponseCandidat = new ReponseCandidat(
-                    id: 0,
-                    session: $uploadSessionBase->session,
-                    reponses: array_slice($row, ReponseCandidat::NOMBRE_CHAMPS_EXPORT),
-                    nom: $row[ReponseCandidat::CHAMPS_EXPORT['Nom']],
-                    prenom: $row[ReponseCandidat::CHAMPS_EXPORT['Prenom']],
-                    nom_jeune_fille: $row[ReponseCandidat::CHAMPS_EXPORT['Nom de jeune fille']],
-                    niveau_scolaire: $niveau_scolaire_repository->findOneBy(['nom' => $row[ReponseCandidat::CHAMPS_EXPORT['Niveau scolaire']]]),
-                    date_de_naissance: \DateTime::createFromFormat('d/m/Y', $row[ReponseCandidat::CHAMPS_EXPORT['Date de naissance']]),
-                    sexe: ReponseCandidat::OPTIONS_SEXE[$row[ReponseCandidat::CHAMPS_EXPORT['Sexe']]],
-                    reserve: $row[ReponseCandidat::CHAMPS_EXPORT['Réservé']],
-                    autre_1: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 1']],
-                    autre_2: $row[ReponseCandidat::CHAMPS_EXPORT['Autre 2']],
-                    code_barre: $row[ReponseCandidat::CHAMPS_EXPORT['Code barre']],
-                    eirs: $row[ReponseCandidat::CHAMPS_EXPORT['EIRS']],
-                    raw: null,
-                );
+            dump($reponsesCandidats);
+
+            foreach ($reponsesCandidats as $reponseCandidat) {
                 $manager->persist($reponseCandidat);
             }
+
             $manager->flush();
             $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
             return $this->redirectToRoute('home');
@@ -201,19 +181,13 @@ class LectureController extends AbstractController
         ]);
     }
 
+    /**
+     * TODO reutiliser cette fonction pour permettre la vérification du fichier
+     * @param array $header
+     * @return string|null
+     */
     public function checkHeader(array $header): string|null
     {
-        foreach (ReponseCandidat::CHAMPS_EXPORT as $champ => $key){
-            if ($header[$key] !== $champ){
-                return("la colonne numéro {$key} et intitulee {$header[$key]} doit contenir les valeurs de type {$champ}");
-            }
-        }
-        foreach (array_slice($header, ReponseCandidat::NOMBRE_CHAMPS_EXPORT) as $key => $reponse){
-            $key += 1;
-            if ($reponse !== "Réponse " . $key){
-                return("La colonne intitulée {$reponse} devrait contenir le champ 'Réponse {$key}'");
-            }
-        }
         return null;
     }
 
@@ -240,33 +214,31 @@ class LectureController extends AbstractController
             'form' => $form
         ]);
     }
-    
+
     #[Route("/optique/{id}", name: "optique")]
     public function scannerid(ManagerRegistry          $doctrine,
-                            NiveauScolaireRepository $niveauScolaireRepository,
-                            SessionRepository        $session_repository,
-                            Request                  $request,
-                            int $id): Response
+                              NiveauScolaireRepository $niveauScolaireRepository,
+                              SessionRepository        $session_repository,
+                              Request                  $request,
+                              int                      $id): Response
     {
 
         $manager = $doctrine->getManager();
         $session = $session_repository->find($id);
         return $this->render("lecture/from_scanner.html.twig",
-                ["form" => null,
-                    "session" => $session,
-                    "niveaux" => $niveauScolaireRepository->findAll(),
-                ]
+            ["form" => null,
+                "session" => $session,
+                "niveaux" => $niveauScolaireRepository->findAll(),
+            ]
         );
     }
-    
 
-    
 
     #[Route("/scanner/save", name: 'saveFromScanner')]
-    public function saveFromScanner(Request                  $request,
-                                    EntityManagerInterface   $entity_manager,
-                                    SessionRepository        $session_repository,
-                                    NiveauScolaireRepository $niveau_scolaire_repository,
+    public function saveFromScanner(Request                   $request,
+                                    EntityManagerInterface    $entity_manager,
+                                    SessionRepository         $session_repository,
+                                    NiveauScolaireRepository  $niveau_scolaire_repository,
                                     ReponseCandidatRepository $reponse_candidat_repository
     ): Response
     {
@@ -275,7 +247,7 @@ class LectureController extends AbstractController
 
 
         foreach ($data as $i => $ligne) {
-            if(count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
+            if (count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
                 $rep = new ReponseCandidat(
                     id: 0,
                     session: $session_repository->find($request->request->get('session')),
@@ -296,7 +268,7 @@ class LectureController extends AbstractController
                 $entity_manager->persist($rep);
                 $entity_manager->flush();
             }
-            
+
         }
 
 

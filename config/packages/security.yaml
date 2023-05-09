@@ -33,11 +33,11 @@ security:
         - { path: ^/lecture, roles: ROLE_CORRECTEUR }
         - { path: ^/recherche, roles: ROLE_CORRECTEUR }
         - { path: ^/$, roles: ROLE_CORRECTEUR }
-        - { path: ^/, roles: ROLE_PSYCOLOGUE }
+        - { path: ^/, roles: ROLE_PSYCHOLOGUE }
 
     role_hierarchy:
-        ROLE_ADMINISTRATEUR: ROLE_PSYCOLOGUE
-        ROLE_PSYCOLOGUE: ROLE_CORRECTEUR
+        ROLE_ADMINISTRATEUR: ROLE_PSYCHOLOGUE
+        ROLE_PSYCHOLOGUE: ROLE_CORRECTEUR
 
 when@dev:
     security:

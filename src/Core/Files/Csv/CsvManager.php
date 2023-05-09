@@ -20,6 +20,7 @@ class CsvManager
     {
         $this->tmp_dir = getcwd() . PdfManager::SEPARATOR . $tmp_dir;
     }
+
     public function export(array $data, string $file_name): BinaryFileResponse
     {
         $encoder = new CsvEncoder();
@@ -48,12 +49,22 @@ class CsvManager
         $file->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY);
 
         $rows = [];
+
         foreach ($file as $row) {
-            if (gettype($row) === "array"){
+            if (gettype($row) === "array") {
                 $rows[] = $row;
             }
         }
 
-        return $rows;
+        $columnNames = $rows[0];
+        $associated_rows = [];
+
+        foreach ($rows as $index => $row) {
+            if($index > 0) {
+                $associated_rows[] = array_combine($columnNames, $row);
+            }
+        }
+
+        return $associated_rows;
     }
 }
