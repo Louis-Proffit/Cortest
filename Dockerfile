@@ -25,7 +25,9 @@ RUN wget https://getcomposer.org/download/latest-stable/composer.phar \
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
 WORKDIR /var/www
+
 COPY . /var/www
+RUN mkdir -p /var/www/public/tmp
 
 RUN chown -R www-data:www-data /var/www
 
@@ -34,6 +36,7 @@ RUN groupadd cortest-users \
     && usermod -a -G cortest-users $(whoami) \
     && chgrp -R cortest-users /var/www/public \
     && chmod -R g+w /var/www/public
+
 
 RUN composer update
 

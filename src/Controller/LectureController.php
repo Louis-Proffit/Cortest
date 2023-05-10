@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\Files\Csv\CsvManager;
 use App\Core\Files\Csv\Reponses\ReponsesCandidatImport;
+use App\Core\Files\Csv\Reponses\ReponsesCandidatImportException;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ParametresLectureCsv;
 use App\Form\Data\ParametresLectureJSON;
@@ -146,7 +147,7 @@ class LectureController extends AbstractController
         ]);
     }
 
-    #[Route("/fichierCsv", name: 'fichier_csv')]
+    #[Route("/fichier-csv", name: 'fichier_csv')]
     public function importCsv(ManagerRegistry        $doctrine,
                               Request                $request,
                               CsvManager             $csvManager,
@@ -163,17 +164,23 @@ class LectureController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $rawReponsesCandidats = $csvManager->import($uploadSessionBase->contents->getPathname());
-            $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
 
-            dump($reponsesCandidats);
+            try{
+                $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
 
-            foreach ($reponsesCandidats as $reponseCandidat) {
-                $manager->persist($reponseCandidat);
+                dump($reponsesCandidats); // TODO remove ?
+
+                foreach ($reponsesCandidats as $reponseCandidat) {
+                    $manager->persist($reponseCandidat);
+                }
+
+                $manager->flush();
+                $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
+
+                return $this->redirectToRoute('home');
+            } catch (ReponsesCandidatImportException $e) {
+                $this->addFlash("danger", $e->getMessage());
             }
-
-            $manager->flush();
-            $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
-            return $this->redirectToRoute('home');
         }
 
         return $this->render('lecture/from_file.html.twig', [

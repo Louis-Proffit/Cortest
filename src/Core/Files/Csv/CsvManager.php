@@ -14,6 +14,7 @@ class CsvManager
     const SEPARATOR = "/";
     const CSV_TMP_FILE_NAME = "tmp.csv";
     const CSV_TMP_LOCAL_PATH = self::CSV_TMP_DIRECTORY . self::SEPARATOR . self::CSV_TMP_FILE_NAME;
+
     private string $tmp_dir;
 
     public function __construct(string $tmp_dir = "tmp")
@@ -43,6 +44,13 @@ class CsvManager
         return $result;
     }
 
+    /**
+     * Produit un array associatif.
+     * La première ligne du fichier doit être un en-tête de colonne
+     * Les autre lignes sont des données, dont les clés sont les en-têtes de colonne
+     * @param string $filePath le chemin absolu vers le fichier
+     * @return array
+     */
     public function import(string $filePath): array
     {
         $file = new SplFileObject($filePath);
@@ -60,7 +68,7 @@ class CsvManager
         $associated_rows = [];
 
         foreach ($rows as $index => $row) {
-            if($index > 0) {
+            if ($index > 0) {
                 $associated_rows[] = array_combine($columnNames, $row);
             }
         }
