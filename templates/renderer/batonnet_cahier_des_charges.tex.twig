@@ -1,6 +1,8 @@
 \documentclass[10pt, letterpaper, twoside]{article}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
 \usepackage[utf8]{inputenc}
-\usepackage[a4paper, total={19cm, 26cm}]{geometry}
+\usepackage[a4paper, total={19cm, 26cm}, top=0cm, headsep=0pt]{geometry}
 \usepackage{tabularx}
 \usepackage{textcomp}
 \usepackage{caption}
@@ -12,7 +14,6 @@
 \usepackage{xcolor}
 \setlength\headheight{70pt}
 \usepackage{multirow}
-
 \graphicspath{ {{ "\{" ~ imagesDirectory ~ "\}" }} }
 
 \newcommand{\printChartResult}[3]{
@@ -29,29 +30,30 @@
             grid=major,
             ymajorgrids=false,
         ]
-            \addplot+[xbar, fill=gray, draw=gray, mark=none, bar width=20] coordinates { (#2,0) };
-            \addplot+[xbar, draw=black, fill=black, mark=none, bar width=5] coordinates { (#1,0) };
+            \addplot+[xbar, fill=gray, draw=gray, mark=none, bar width=20] coordinates { (#2-0.5,0) };
+            \addplot+[xbar, draw=black, fill=black, mark=none, bar width=5] coordinates { (#1-0.5,0) };
 
         \end{axis}
     \end{tikzpicture}
 }
 
 {% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
+{% set typeConcours = {'E':'Externe', 'I':'Interne', 'R':'Réservé', 'S':'Spécial'} %}
 
-\fancyhead[C]{\textbf{ {{ options.titre }} }}
+\fancyhead[C]{\Large\textbf{ {{ options.titre }} }}
 \rhead{\includegraphics[width=3cm]{logo.png}}
+\renewcommand{\headrulewidth}{0pt}
 
 \begin{document}
-
     \noindent\fbox{
         \begin{minipage}{\linewidth}
-            \begin{tabular}{m{3.5cm} m{5.2cm} m{3.5cm} m{5.2cm}}
-                Nom de naissance:  & {{ reponse.nom|raw }}                         & Type du concours:       & {{ reponse.eirs|raw }} | {{ reponse.session.concours.nom|raw }} \\
-                Prénom:            & {{ reponse.prenom|raw }}                      & Version Batterie:       & {{ reponse.session.concours.version_batterie|raw }}                   \\
-                Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & Date d'examen:          & {{ reponse.session.date|date('d/m/Y') }}                              \\
-                Sexe:              & {{ reponse.sexe|sexe }}                       & SGAMI/SGAP:             & {{ reponse.session.sgap.nom|raw }}                                    \\
-                Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & Numéro d'identification   & {{ reponse.code_barre|raw }}                                   \\
-                Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }} \\
+            \begin{tabular}{m{3cm} m{4.4cm} m{3.8cm} m{6.2cm}}
+                \hfill Nom de naissance:  & {{ reponse.nom|raw }}                         & \hfill Type du concours:        & {{ reponse.session.concours.nom|raw }} -- {{ typeConcours[reponse.eirs]|raw }} \\
+                \hfill Prénom:            & {{ reponse.prenom|raw }}                      & \hfill Version Batterie:        & {{ reponse.session.concours.version_batterie|raw }} -- {{ reponse.session.concours.type_concours|raw }} \\
+                \hfill Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & \hfill Date d'examen:           & {{ reponse.session.date|date('d/m/Y') }}                              \\
+                \hfill Sexe:              & {{ reponse.sexe|sexe }}                       & \hfill SGAMI/SGAP:              & {{ reponse.session.sgap.nom|raw }}                                    \\
+                \hfill Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & \hfill Numéro d'identification: & {{ reponse.code_barre|raw }}                                   \\
+                \hfill Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }} \\
             \end{tabular}
         \end{minipage}
     }
@@ -60,54 +62,54 @@
 
     {% for subtest in graphique.subtests %}
     \noindent
-    \begin{longtable}{ | wr{4cm} wc{0.7cm} wc{0.7cm} wc{12.25cm} | }
+    \begin{longtable}{ | wr{4.2cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
         \hline
 
         {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_BR_MR") %}
-        \underline{\textbf{ {{ subtest.nom|raw }} }} & & & {% if subtest.echelles_core|length > 0 %} \textit{classes} {% endif %} \\
+        \multicolumn{2}{|l}{\underline{\textbf{ \large {{ subtest.nom|raw }} }}} & & {% if subtest.echelles_core|length > 0 %} \textit{classes} {% endif %} \rule{0pt}{2.25ex} \\
         {% if subtest.echelles_core|length > 0 %} & BR & MR &
-        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{X}}
-            \hfill I {% for i in 1..(etalonnage.nombre_classes-1) %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{|X}|}
+            \rule{0pt}{2.7ex} \centering I {% for i in 1..(etalonnage.nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
         {% endif %}
         {% for echelle in subtest.echelles_core %}
-        {{ optionsEchelle[echelle[0]].nom_affichage|raw }} & \fbox{ {{ score[echelle[0]] }} } & \fbox{ {{ score[echelle[1]] }} } & \printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
+        {{ optionsEchelle[echelle[0]].nom_affichage|raw }} & \fbox{ {{ (score[echelle[0]] < 10 ? '0') ~ score[echelle[0]] }} } & \fbox{ {{ (score[echelle[1]] < 10 ? '0') ~ score[echelle[1]] }} } & \printChartResult{ {{ profil[echelle[0]] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
         {% endfor %}
         {% else %}
-        \underline{\textbf{ {{ subtest.nom|raw }} }} & & {% if subtest.echelles_core|length > 0 %} \textit{scores} &
-        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{X}}
-            \hfill I {% for i in 1..(etalonnage.nombre_classes-1) %} & \hfill {{ romanNumbers[i] }} {% endfor %}
+        \multicolumn{2}{|l}{\underline{\textbf{ \large {{ subtest.nom|raw }} }}} & {% if subtest.echelles_core|length > 0 %} \fbox{\textit{\small scores}} &
+        \begin{tabularx}{4.5in}{*{ {{ etalonnage.nombre_classes }} }{|X}|}
+            \centering \rule{0pt}{2.7ex} I {% for i in 1..(etalonnage.nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
         \end{tabularx}
         \\
-        {% else %} & \\ {% endif %}
+        {% else %} & \rule{0pt}{2.25ex} \\ {% endif %}
         {% for echelle in subtest.echelles_core %}
         {% if echelle.1|length > 0 %}
-        \hline
-        \multirow{ {{ echelle.1|length }} }*{\textit{classe} \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        \multirow{ {{ echelle.1|length }} }*{ \begin{tabular}{c c} & \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } \\ \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } \end{tabular}}
+        \rule{0pt}{3.25ex}
         {% for echelleSimple in echelle[1] %}
-        & {{ optionsEchelle[echelleSimple].nom_affichage|raw }} & \fbox{ {{ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
+        & {{ optionsEchelle[echelleSimple].nom_affichage|raw }} & \fbox{ {{ (score[echelleSimple] < 10 ? '0') ~ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
         {% endfor %}
         {% else %}
-        \multirow{ 1 }*{\textit{classe} \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} }  \fbox{ {{ profil[echelle[0]] }} }}
+        \multirow{ 1 }*{ \tabular{c c} & \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } \\ \textit{classe} & \fbox{ {{ profil[echelle[0]] }} }}
         & & \fbox{  } & Il faut au moins une échelle simple dans cette échelle composite! \\
         {% endif %}
         {% endfor %}
         {% endif %}
         {% if subtest.echelles_footer|length > 0 %}
-        {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_COMPOSITE") %} \hline \underline{\textbf{Fiabilité des réponses}} \\ {% endif %}
 
-        \multicolumn{4}{|c|}{
-            \begin{tabular}{ {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} c c c c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} c c c {% else %} c c {% endif %} c {% endfor %} }
+        \multicolumn{4}{|p{19cm}|}{
+            \centering
+            \begin{tabular}{ c {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} m{1.5cm} c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} m{1.5cm} c {% else %} c {% endif %} {% endfor %} }
             {% for echelle in subtest.echelles_footer %}
             {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %}
-                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } &
-            {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %}
-                \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } & \fbox{ {{ score[echelle[0]]|number_format(2) }} }
-            {% else %}
-                \textit{ pourcentage } & \fbox{ {{ score[echelle[0]] }} {{ "\\%" }} }
-            {% endif %}
-            {% endfor %}
+                & {% if not loop.first %} \vline {% endif %} \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \small{\textit{ score }} \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil[echelle[0]] }} }
+                {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %}
+                & {% if not loop.first %} \vline {% endif %} \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \textit{ score } \fbox{ {{ score[echelle[0]]|number_format(2) }} }
+                {% else %}
+                & \fbox{ {{ score[echelle[0]]|number_format(0) }} {{ "\\%" }} }
+                {% endif %}
+                {% endfor %} \rule{0pt}{2.5ex}
             \end{tabular}
         }
         \\
