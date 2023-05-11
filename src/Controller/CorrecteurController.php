@@ -4,12 +4,11 @@ namespace App\Controller;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\Import\ImportCorrecteurXML;
-use App\Core\Import\ImportCorrecteurXMLException;
+use App\Core\Import\ImportCorrecteurXMLErrorHandler;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
-use App\Form\Data\CorrecteurChoice;
 use App\Form\Data\CorrecteurCreer;
 use App\Form\ImportCorrecteurType;
 use App\Repository\ConcoursRepository;
@@ -20,13 +19,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route("/correcteur", name: "correcteur_")]
 class CorrecteurController extends AbstractController
@@ -61,7 +58,7 @@ class CorrecteurController extends AbstractController
     #[Route("/importer", name: "importer")]
     public function importer(
         EntityManagerInterface $entityManager,
-        ValidatorInterface     $validator,
+        Session                $session,
         ImportCorrecteurXML    $importCorrecteurXML,
         Request                $request
     ): Response
@@ -75,26 +72,15 @@ class CorrecteurController extends AbstractController
             /** @var UploadedFile $file */
             $file = $form->get(ImportCorrecteurType::FILE_KEY)->getData();
 
-            try {
-                $correcteur = $importCorrecteurXML->load($file->getContent());
+            $correcteur = $importCorrecteurXML->load(new ImportCorrecteurXMLErrorHandler($session), $file->getContent());
 
-                $errors = $validator->validate($correcteur);
+            if ($correcteur) {
+                $entityManager->persist($correcteur);
+                $entityManager->flush();
 
-                if (count($errors) == 0) {
-                    $entityManager->persist($correcteur);
-                    $entityManager->flush();
+                $this->addFlash("success", "Correcteur importé");
 
-                    $this->addFlash("success", "Correcteur importé");
-
-                    return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
-                } else {
-                    /** @var ConstraintViolation $error */
-                    foreach ($errors as $error) {
-                        $form->addError(new FormError($error->getMessage()));
-                    }
-                }
-            } catch (ImportCorrecteurXMLException $e) {
-                $form->addError(new FormError($e->getMessage()));
+                return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
             }
         }
 

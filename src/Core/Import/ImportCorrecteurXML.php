@@ -17,72 +17,82 @@ class ImportCorrecteurXML
 
     public function __construct(
         private readonly ProfilRepository   $profilRepository,
-        private readonly ConcoursRepository $concoursRepository
+        private readonly ConcoursRepository $concoursRepository,
     )
     {
     }
 
-    /**
-     * @throws ImportCorrecteurXMLException
-     */
-    public function load(string $content): Correcteur
+    public function load(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, string $content): Correcteur|false
     {
+        libxml_use_internal_errors(true);
         $xml = simplexml_load_string($content);
 
-        $profil = $this->profil($xml);
-        $concours = $this->concours($xml);
-        $nom = $xml->nom;
+        $errors = libxml_get_errors();
+        if (!empty($errors)) {
+            foreach (libxml_get_errors() as $error) {
+                $correcteurXMLErrorHandler->handleError($error->message, $error->line, $error->column);
+            }
+            return false;
+        }
 
+        $profil = $this->profil($correcteurXMLErrorHandler, $xml);
+        $concours = $this->concours($correcteurXMLErrorHandler, $xml);
+
+        if (!$concours || !$profil) {
+            return false;
+        }
+        $nom = $xml->nom;
         $correcteur = new Correcteur(id: 0, concours: $concours, profil: $profil, nom: $nom, echelles: new ArrayCollection());
 
-        $echelles = $this->echelles($xml, $correcteur);
+        $echelles = $this->echelles($correcteurXMLErrorHandler, $xml, $correcteur);
 
+        if ($echelles == null) {
+            return false;
+        }
         $correcteur->echelles = new ArrayCollection($echelles);
 
         return $correcteur;
     }
 
-    /**
-     * @throws ImportCorrecteurXMLException
-     */
-    private function profil(SimpleXMLElement $xml): Profil
+    private function profil(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Profil|false
     {
         $nom_profil = $xml->profil;
         $profils = $this->profilRepository->findBy(["nom" => $nom_profil]);
 
         if (empty($profils)) {
-            throw new ImportCorrecteurXMLException("Aucun profil n'existe au nom de $nom_profil");
+            $correcteurXMLErrorHandler->handleError("Aucun profil n'existe au nom de $nom_profil");
+            return false;
         } else if (count($profils) > 1) {
-            throw new ImportCorrecteurXMLException("Plusieurs profils existent au nom de $nom_profil");
+            $correcteurXMLErrorHandler->handleError("Plusieurs profils existent au nom de $nom_profil");
+            return false;
         }
 
         return $profils[0];
     }
 
-    /**
-     * @throws ImportCorrecteurXMLException
-     */
-    private function concours(SimpleXMLElement $xml): Concours
+    private function concours(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Concours|false
     {
         $nom_concours = $xml->concours;
         $concours = $this->concoursRepository->findBy(["nom" => $nom_concours]);
 
         if (empty($concours)) {
-            throw new ImportCorrecteurXMLException("Aucun concours n'existe au nom de $nom_concours");
+            $correcteurXMLErrorHandler->handleError("Aucun concours n'existe au nom de $nom_concours");
+            return false;
         } else if (count($concours) > 1) {
-            throw new ImportCorrecteurXMLException("Plusieurs concours existent au nom de $nom_concours");
+            $correcteurXMLErrorHandler->handleError("Plusieurs concours existent au nom de $nom_concours");
+            return false;
         }
 
         return $concours[0];
     }
 
     /**
+     * @param ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler
      * @param SimpleXMLElement $xml
      * @param Correcteur $correcteur
-     * @return EchelleCorrecteur[]
-     * @throws ImportCorrecteurXMLException
+     * @return EchelleCorrecteur[]|false
      */
-    private function echelles(SimpleXMLElement $xml, Correcteur $correcteur): array
+    private function echelles(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml, Correcteur $correcteur): array|false
     {
         $defined_echelles = [];
         /** @var Echelle $echelle */
@@ -90,6 +100,7 @@ class ImportCorrecteurXML
             $defined_echelles[$echelle->nom_php] = false;
         }
 
+        $valid = true;
         $echelles = [];
 
         /** @var SimpleXMLElement $echelle */
@@ -98,13 +109,15 @@ class ImportCorrecteurXML
             $nom_echelle = (string)$echelle->echelle;
 
             if (key_exists($nom_echelle, $defined_echelles) && $defined_echelles[$nom_echelle]) {
-                throw new ImportCorrecteurXMLException("L'échelle $nom_echelle est définie plusieurs fois");
+                $correcteurXMLErrorHandler->handleError("L'échelle $nom_echelle est définie plusieurs fois");
+                $valid = false;
             }
 
             $echelle_entity = $this->echelleFromProfil($correcteur->profil, $nom_echelle);
 
             if ($echelle_entity == null) {
-                throw new ImportCorrecteurXMLException("Aucune echelle n'a le nom $nom_echelle dans le profil " . $correcteur->profil->nom);
+                $correcteurXMLErrorHandler->handleError("Aucune echelle n'a le nom $nom_echelle dans le profil " . $correcteur->profil->nom);
+                $valid = false;
             }
 
             $expression = $echelle->expression;
@@ -114,11 +127,16 @@ class ImportCorrecteurXML
 
         foreach ($defined_echelles as $nom => $defined) {
             if (!$defined) {
-                throw new ImportCorrecteurXMLException("L'échelle $nom n'est pas définie dans le fichier");
+                $correcteurXMLErrorHandler->handleError("L'échelle $nom n'est pas définie dans le fichier");
+                $valid = false;
             }
         }
 
-        return $echelles;
+        if (!$valid) {
+            return false;
+        } else {
+            return $echelles;
+        }
     }
 
     private function echelleFromProfil(Profil $profil, string $nom): Echelle|null
