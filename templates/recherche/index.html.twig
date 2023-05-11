@@ -56,9 +56,30 @@
             {% endif %}
         </div>
         <div class="col-6">
-            <h3>Candidats</h3>
+            <h3>Filtres</h3>
+            <br>
+            {{ form_start(form_filtre) }}
+            <fieldset class="mb-3">
+                <legend class="col-form-label">Identification du candidat</legend>
+                <div class="input-group">
+                    <div class="input-group-text">Prénom</div>
+                    {{ form_widget(form_filtre.filtre_prenom) }}
+                    <div class="input-group-text">Nom</div>
+                    {{ form_widget(form_filtre.filtre_nom) }}
+                </div>
+            </fieldset>
+            {{ form_row(form_filtre.filtre_date_de_naissance_min) }}
+            {{ form_row(form_filtre.filtre_date_de_naissance_max) }}
+            {{ form_row(form_filtre.niveau_scolaire) }}
+            {{ form_row(form_filtre.session) }}
+            {{ form_row(form_filtre.submit) }}
+            {{ form_end(form_filtre) }}
             <br>
             {{ form_start(form_reponses) }}
+            <h3>Candidats</h3>
+            <br>
+            <hr class="hr hr-blurry">
+            <br>
             <table class="table">
                 <thead>
                 <tr>
@@ -85,19 +106,6 @@
             </table>
             {{ form_row(form_reponses.submit) }}
             {{ form_end(form_reponses) }}
-            <br>
-            <hr class="hr hr-blurry">
-            <br>
-            <h3>Filtres</h3>
-            <br>
-            {{ form_start(form_filtre) }}
-            <div class="mb-3 input-group">
-                <div class="input-group-text">Prénom</div>
-                {{ form_widget(form_filtre.filtre_prenom) }}
-                <div class="input-group-text">Nom</div>
-                {{ form_widget(form_filtre.filtre_nom) }}
-            </div>
-            {{ form_end(form_filtre) }}
         </div>
     </div>
 {% endblock %}
