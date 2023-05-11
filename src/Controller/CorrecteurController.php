@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Import\ImportCorrecteurXML;
-use App\Core\Import\ImportCorrecteurXMLErrorHandler;
+use App\Core\IO\Correcteur\ExportCorrecteurXML;
+use App\Core\IO\Correcteur\ImportCorrecteurXML;
+use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandler;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
@@ -18,11 +19,15 @@ use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Header;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/correcteur", name: "correcteur_")]
@@ -180,6 +185,33 @@ class CorrecteurController extends AbstractController
 
         return $this->render("correcteur/modifier.html.twig",
             ["form" => $form->createView(), "fonctions" => $fonctions]);
+    }
+
+    #[Route("/exporter/{id}", name: "exporter")]
+    public function exporter(
+        CorrecteurRepository $correcteurRepository,
+        ExportCorrecteurXML  $exportCorrecteurXML,
+        int                  $id,
+    ): Response
+    {
+        $correcteur = $correcteurRepository->find($id);
+
+        $xml = $exportCorrecteurXML->export($correcteur);
+        if (!$xml) {
+            $this->addFlash("danger", "Erreur lors de l'export");
+            return $this->redirectToRoute("correcteur_consulter", ["id" => $id]);
+        } else {
+
+            $response = new Response($xml);
+
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                'correcteur.xml'
+            );
+
+            $response->headers->set("Content-Disposition", $disposition);
+            return $response;
+        }
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

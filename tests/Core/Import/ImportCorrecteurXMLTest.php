@@ -2,7 +2,7 @@
 
 namespace App\Tests\Core\Import;
 
-use App\Core\Import\ImportCorrecteurXML;
+use App\Core\IO\Correcteur\ImportCorrecteurXML;
 use App\Entity\Correcteur;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

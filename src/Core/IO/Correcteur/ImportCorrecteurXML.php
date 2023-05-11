@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Import;
+namespace App\Core\IO\Correcteur;
 
 use App\Entity\Concours;
 use App\Entity\Correcteur;
@@ -14,6 +14,14 @@ use SimpleXMLElement;
 
 class ImportCorrecteurXML
 {
+    const CORRECTEUR_KEY = "correcteur";
+    const PROFIL_KEY = "profil";
+    const NOM_KEY = "nom";
+    const CONCOURS_KEY = "concours";
+    const ECHELLES_KEY = "echelles";
+    const ECHELLE_KEY = "echelle";
+    const ECHELLE_NOM_KEY = "nom";
+    const ECHELLE_EXPRESSION_KEY = "expression";
 
     public function __construct(
         private readonly ProfilRepository   $profilRepository,
@@ -41,7 +49,7 @@ class ImportCorrecteurXML
         if (!$concours || !$profil) {
             return false;
         }
-        $nom = $xml->nom;
+        $nom = $xml->{self::NOM_KEY};
         $correcteur = new Correcteur(id: 0, concours: $concours, profil: $profil, nom: $nom, echelles: new ArrayCollection());
 
         $echelles = $this->echelles($correcteurXMLErrorHandler, $xml, $correcteur);
@@ -49,6 +57,7 @@ class ImportCorrecteurXML
         if ($echelles == null) {
             return false;
         }
+
         $correcteur->echelles = new ArrayCollection($echelles);
 
         return $correcteur;
@@ -56,7 +65,7 @@ class ImportCorrecteurXML
 
     private function profil(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Profil|false
     {
-        $nom_profil = $xml->profil;
+        $nom_profil = $xml->{self::PROFIL_KEY};
         $profils = $this->profilRepository->findBy(["nom" => $nom_profil]);
 
         if (empty($profils)) {
@@ -72,7 +81,7 @@ class ImportCorrecteurXML
 
     private function concours(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Concours|false
     {
-        $nom_concours = $xml->concours;
+        $nom_concours = $xml->{self::CONCOURS_KEY};
         $concours = $this->concoursRepository->findBy(["nom" => $nom_concours]);
 
         if (empty($concours)) {
@@ -104,9 +113,9 @@ class ImportCorrecteurXML
         $echelles = [];
 
         /** @var SimpleXMLElement $echelle */
-        foreach ($xml->echelles->echelle as $echelle) {
+        foreach ($xml->{self::ECHELLES_KEY}->{self::ECHELLE_KEY} as $echelle) {
 
-            $nom_echelle = (string)$echelle->echelle;
+            $nom_echelle = (string)$echelle->{self::ECHELLE_NOM_KEY};
 
             if (key_exists($nom_echelle, $defined_echelles) && $defined_echelles[$nom_echelle]) {
                 $correcteurXMLErrorHandler->handleError("L'échelle $nom_echelle est définie plusieurs fois");
@@ -120,7 +129,7 @@ class ImportCorrecteurXML
                 $valid = false;
             }
 
-            $expression = $echelle->expression;
+            $expression = $echelle->{self::ECHELLE_EXPRESSION_KEY};
             $echelles[] = new EchelleCorrecteur(id: 0, expression: $expression, echelle: $echelle_entity, correcteur: $correcteur);
             $defined_echelles[$nom_echelle] = true;
         }

@@ -6,202 +6,202 @@
     <echelles>
         <echelle>
             <expression>0</expression>
-            <echelle>eg</echelle>
+            <nom>eg</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>qr</echelle>
+            <nom>qr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>vt_br</echelle>
+            <nom>vt_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>vt_mr</echelle>
+            <nom>vt_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>sp_br</echelle>
+            <nom>sp_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>sp_mr</echelle>
+            <nom>sp_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>rais_br</echelle>
+            <nom>rais_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>rais_mr</echelle>
+            <nom>rais_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>cv_br</echelle>
+            <nom>cv_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>cv_mr</echelle>
+            <nom>cv_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>sl_br</echelle>
+            <nom>sl_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>sl_mr</echelle>
+            <nom>sl_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>dic_br</echelle>
+            <nom>dic_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>dic_mr</echelle>
+            <nom>dic_mr</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>as_br</echelle>
+            <nom>as_br</nom>
         </echelle>
         <echelle>
             <expression>0</expression>
-            <echelle>as_mr</echelle>
+            <nom>as_mr</nom>
         </echelle>
         <echelle>
-            <echelle>at</echelle>
+            <nom>at</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ds</echelle>
+            <nom>ds</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp</echelle>
+            <nom>fp</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp1_anx</echelle>
+            <nom>fp1_anx</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp2_instros</echelle>
+            <nom>fp2_instros</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp3_hdep</echelle>
+            <nom>fp3_hdep</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp4_dev</echelle>
+            <nom>fp4_dev</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>fp5_gen</echelle>
+            <nom>fp5_gen</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me</echelle>
+            <nom>me</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me1_ce</echelle>
+            <nom>me1_ce</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me2_modes</echelle>
+            <nom>me2_modes</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me3_coope</echelle>
+            <nom>me3_coope</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me4_amb</echelle>
+            <nom>me4_amb</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>me5_droit</echelle>
+            <nom>me5_droit</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp</echelle>
+            <nom>cp</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp1_fiab</echelle>
+            <nom>cp1_fiab</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp2_autodisc</echelle>
+            <nom>cp2_autodisc</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp3_refl</echelle>
+            <nom>cp3_refl</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp4_rig</echelle>
+            <nom>cp4_rig</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>cp5_sva</echelle>
+            <nom>cp5_sva</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar</echelle>
+            <nom>ar</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar1_conf</echelle>
+            <nom>ar1_conf</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar2_grega</echelle>
+            <nom>ar2_grega</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar3_spont</echelle>
+            <nom>ar3_spont</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar4_nouv</echelle>
+            <nom>ar4_nouv</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>ar5_dyn</echelle>
+            <nom>ar5_dyn</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm</echelle>
+            <nom>pm</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm1_lead</echelle>
+            <nom>pm1_lead</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm2_affirm</echelle>
+            <nom>pm2_affirm</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm3_emp</echelle>
+            <nom>pm3_emp</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm4_ing</echelle>
+            <nom>pm4_ing</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>pm5_sintel</echelle>
+            <nom>pm5_sintel</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>rc</echelle>
+            <nom>rc</nom>
             <expression>0</expression>
         </echelle>
         <echelle>
-            <echelle>rc_pourcent</echelle>
+            <nom>rc_pourcent</nom>
             <expression>lama</expression>
         </echelle>
     </echelles>

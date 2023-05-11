@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Import;
+namespace App\Core\IO\Correcteur;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
