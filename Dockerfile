@@ -7,13 +7,14 @@ VOLUME /var/cache/apt
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean \
     && apt-get update \
-    && apt-get -y --no-install-recommends install texlive-latex-base \
+    && apt-get -y --no-install-recommends install texlive-latex-base\
     texlive-fonts-recommended  \
     texlive-fonts-extra \
     texlive-latex-extra  \
     libzip-dev \
     unzip \
-    wget && apt-get clean
+    wget \
+    poppler-utils && apt-get clean
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

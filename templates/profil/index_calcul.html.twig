@@ -7,7 +7,11 @@
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("pdf_session_form", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Générer les feuilles de profil .zip</a>
+               href="{{ path("pdf_session_form_zip", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Générer les feuilles de profil .zip</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary"
+               href="{{ path("pdf_session_form_pdf", {"session_id":session.id, "correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Générer les feuilles de profil .pdf</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary"

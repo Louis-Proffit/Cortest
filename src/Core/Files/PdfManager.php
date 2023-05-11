@@ -21,7 +21,12 @@ use ZipArchive;
 class PdfManager
 {
 
-    const SEPARATOR = "/";
+    const MERGED_PDF_FILE_NAME = "merged.pdf";
+    const TEMP_ZIP_FILE_NAME = "temp.zip";
+
+    const ZIP_EXTENSION = ".zip";
+    const TEX_EXTENSION = ".tex";
+    const PDF_EXTENSION = ".pdf";
 
     private string $tmp_dir;
 
@@ -30,11 +35,12 @@ class PdfManager
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
+        private readonly string             $pdfMergeExecutable = "pdfunite",
         string                              $tmp_dir = "tmp",
         int                                 $new_time_limit = 300
     )
     {
-        $this->tmp_dir = getcwd() . self::SEPARATOR . $tmp_dir;
+        $this->tmp_dir = getcwd() . DIRECTORY_SEPARATOR . $tmp_dir;
         $this->logger->debug("Tmp dir : " . $this->tmp_dir);
 
         // Autorise un temps de compilation supérieur
@@ -46,9 +52,14 @@ class PdfManager
         return str_replace(" ", "_", $candidat_reponse->nom . "_" . $candidat_reponse->prenom);
     }
 
+    private function outputPdfMergedFileName(Session $session): string
+    {
+        return "Profils_Session_" . $session->date->format("Y-m-d") . self::PDF_EXTENSION;
+    }
+
     private function outputZipFileName(Session $session): string
     {
-        return "Profils_Session_" . $session->date->format("Y-m-d") . ".zip";
+        return "Profils_Session_" . $session->date->format("Y-m-d") . self::ZIP_EXTENSION;
     }
 
 
@@ -88,7 +99,7 @@ class PdfManager
         );
     }
 
-    private function deleteFolderWithContent(string $dir): void
+    /*private function deleteFolderWithContent(string $dir): void
     {
         $it = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
         $files = new RecursiveIteratorIterator($it,
@@ -101,7 +112,7 @@ class PdfManager
             }
         }
         rmdir($dir);
-    }
+    }*/
 
     private function createTempDirIfNotExists(): void
     {
@@ -112,12 +123,17 @@ class PdfManager
 
     private function getOutputDirPath(): string
     {
-        return $this->tmp_dir . self::SEPARATOR . time();
+        return $this->tmp_dir . DIRECTORY_SEPARATOR . time();
+    }
+
+    private function getTempMergedPdfFilePath(string $outputDirectoryPath): string
+    {
+        return $outputDirectoryPath . DIRECTORY_SEPARATOR . self::MERGED_PDF_FILE_NAME;
     }
 
     private function getTempZipFilePath(string $outputDirectoryPath): string
     {
-        return $outputDirectoryPath . self::SEPARATOR . "temp.zip";
+        return $outputDirectoryPath . DIRECTORY_SEPARATOR . self::TEMP_ZIP_FILE_NAME;
     }
 
     private function addExtensionToFile(string $fileName, string $extension): string
@@ -144,7 +160,17 @@ class PdfManager
         }
     }
 
-    private function buildCommand(string $outputDirectory, string $texFileName): string
+    /**
+     * @param string[] $toMerge files to merge
+     * @param string $output output to produce
+     * @return string the runnable command
+     */
+    private function buildMergePdfCommand(array $toMerge, string $output): string
+    {
+        return $this->pdfMergeExecutable . " " . implode(" ", $toMerge) . " " . $output;
+    }
+
+    private function buildCompileTexToPdfCommand(string $outputDirectory, string $texFileName): string
     {
         return $this->latexCompilerExecutable . " --output-directory=\"" . $outputDirectory . "\" \"" . $texFileName . "\"";
     }
@@ -168,9 +194,9 @@ class PdfManager
             profil: $profil
         );
 
-        $filePathWithoutExtension = $outputDirectoryPath . self::SEPARATOR . $fileNameWithoutExtension;
+        $filePathWithoutExtension = $outputDirectoryPath . DIRECTORY_SEPARATOR . $fileNameWithoutExtension;
 
-        $texFilePath = $this->addExtensionToFile($filePathWithoutExtension, ".tex");
+        $texFilePath = $this->addExtensionToFile($filePathWithoutExtension, self::TEX_EXTENSION);
 
         $file = fopen($texFilePath, 'w');
         fwrite($file, $content);
@@ -178,11 +204,11 @@ class PdfManager
 
         $this->logger->debug("Wrote to file " . $texFilePath);
 
-        $command = $this->buildCommand($outputDirectoryPath, $texFilePath);
+        $command = $this->buildCompileTexToPdfCommand($outputDirectoryPath, $texFilePath);
         $this->logger->debug("Executing command : " . $command);
         exec($command);
 
-        return $this->addExtensionToFile($filePathWithoutExtension, ".pdf");
+        return $this->addExtensionToFile($filePathWithoutExtension, self::PDF_EXTENSION);
     }
 
     private
@@ -222,7 +248,7 @@ class PdfManager
 
             return $this->produceResponse(
                 filePath: $filePath,
-                outputFileNameWithExtension: $fileNameWithoutExtension . ".pdf"
+                outputFileNameWithExtension: $fileNameWithoutExtension . self::PDF_EXTENSION
             );
         }
 
@@ -237,7 +263,7 @@ class PdfManager
         array      $scores,
         array      $profils,
         Graphique  $graphique,
-        array|null $reponses=null): BinaryFileResponse|false
+        array|null $reponses = null): BinaryFileResponse|false
     {
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
 
@@ -246,7 +272,7 @@ class PdfManager
             $zip = new ZipArchive();
             $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-            if ($reponses === null){
+            if ($reponses === null) {
                 $reponses = $session->reponses_candidats;
             }
 
@@ -266,13 +292,71 @@ class PdfManager
                     fileNameWithoutExtension: $fileNameWithoutExtension
                 );
 
-                $zip->addFile($pdfFilePath, $fileNameWithoutExtension . ".pdf");
+                $zip->addFile($pdfFilePath, $fileNameWithoutExtension . self::PDF_EXTENSION);
             }
 
             $zip->close();
 
             return $this->produceResponse($zipFilePath, $this->outputZipFileName($session));
 
+        }
+
+        return false;
+    }
+
+    public
+    function createPdfMergedFile(
+        Session    $session,
+        Correcteur $correcteur,
+        Etalonnage $etalonnage,
+        array      $scores,
+        array      $profils,
+        Graphique  $graphique,
+        array|null $reponses = null): BinaryFileResponse|false
+    {
+
+        if ($outputDirectoryPath = $this->prepareOutputDir()) {
+
+            if ($reponses === null) {
+                $reponses = $session->reponses_candidats;
+            }
+
+            $mergedPdfFilePath = $this->getTempMergedPdfFilePath($outputDirectoryPath);
+
+            $pdfFilePaths = [];
+
+            /** @var ReponseCandidat $reponses_candidat */
+            foreach ($reponses as $reponses_candidat) {
+
+                $fileNameWithoutExtension = $this->fileName($reponses_candidat);
+
+                $pdfFilePath = $this->producePdfAndGetPath(
+                    graphique: $graphique,
+                    candidat_reponse: $reponses_candidat,
+                    correcteur: $correcteur,
+                    etalonnage: $etalonnage,
+                    score: $scores[$reponses_candidat->id],
+                    profil: $profils[$reponses_candidat->id],
+                    outputDirectoryPath: $outputDirectoryPath,
+                    fileNameWithoutExtension: $fileNameWithoutExtension
+                );
+
+                $pdfFilePaths[] = $pdfFilePath;
+
+            }
+
+            $command = $this->buildMergePdfCommand($pdfFilePaths, $mergedPdfFilePath);
+
+            $this->logger->info("Merging pdf files with command : " . $command);
+
+            exec($command);
+
+            if (!file_exists($mergedPdfFilePath)) {
+                $this->logger->error("Failed to produce merged pdf file");
+                return false;
+            }
+
+            return $this->produceResponse($mergedPdfFilePath, $this->outputPdfMergedFileName($session));
         }
 
         return false;
