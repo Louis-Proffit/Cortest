@@ -128,7 +128,7 @@ class SessionController extends AbstractController
         CsvManager             $csvManager,
         SessionRepository      $session_repository,
         int                    $id
-    ): BinaryFileResponse
+    ): Response
     {
         $session = $session_repository->find($id);
 

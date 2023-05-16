@@ -6,6 +6,7 @@ use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\IO\Correcteur\ExportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandler;
+use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandlerAddFlash;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
@@ -77,7 +78,7 @@ class CorrecteurController extends AbstractController
             /** @var UploadedFile $file */
             $file = $form->get(ImportCorrecteurType::FILE_KEY)->getData();
 
-            $correcteur = $importCorrecteurXML->load(new ImportCorrecteurXMLErrorHandler($session), $file->getContent());
+            $correcteur = $importCorrecteurXML->load(new ImportCorrecteurXMLErrorHandlerAddFlash($session), $file->getContent());
 
             if ($correcteur) {
                 $entityManager->persist($correcteur);

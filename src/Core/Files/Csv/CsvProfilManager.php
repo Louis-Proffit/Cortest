@@ -7,6 +7,7 @@ use App\Entity\Profil;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
@@ -25,7 +26,7 @@ class CsvProfilManager
         return "profils_session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
     }
 
-    public function export(Session $session, Profil $profil, array $profils, array|null $reponses=null): BinaryFileResponse
+    public function export(Session $session, Profil $profil, array $profils, array|null $reponses=null): Response
     {
         $data = [];
 

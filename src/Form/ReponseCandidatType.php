@@ -23,7 +23,7 @@ class ReponseCandidatType extends AbstractType
     }
 
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add("session", ChoiceType::class, [
             "choices" => $this->session_repository->choices()])
@@ -46,6 +46,8 @@ class ReponseCandidatType extends AbstractType
             ->add("code_barre", IntegerType::class)
             ->add("reponses", TextType::class, [
                 "getter" => function (ReponseCandidat $reponse_candidat) {
+                    /** @noinspection PhpRedundantOptionalArgumentInspection */
+                    # Ne pas enlever separator, même si l'ide le propose !
                     return implode(separator: "", array: $reponse_candidat->reponses);
                 },
                 "setter" => function (ReponseCandidat $reponse_candidat, string $value) {

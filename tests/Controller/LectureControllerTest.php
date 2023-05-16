@@ -42,7 +42,6 @@ class LectureControllerTest extends WebTestCase
 
     public function testForm()
     {
-
         $this->client->request(Request::METHOD_GET, "/lecture/form");
         self::assertResponseIsSuccessful();
     }

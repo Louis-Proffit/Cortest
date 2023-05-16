@@ -16,10 +16,11 @@ class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
     const ROLE_ADMINISTRATEUR = "ROLE_ADMINISTRATEUR";
-    const ROLE_PSYCOLOGUE = "ROLE_PSYCHOLOGUE";
+    const ROLE_PSYCHOLOGUE = "ROLE_PSYCHOLOGUE";
     const ROLE_CORRECTEUR = "ROLE_CORRECTEUR";
+
     const ROLES = [
-        self::ROLE_ADMINISTRATEUR, self::ROLE_PSYCOLOGUE, self::ROLE_CORRECTEUR
+        self::ROLE_ADMINISTRATEUR, self::ROLE_PSYCHOLOGUE, self::ROLE_CORRECTEUR
     ];
 
     #[ORM\Id]

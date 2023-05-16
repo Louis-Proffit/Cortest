@@ -3,6 +3,7 @@
 namespace App\Tests\Core\Import;
 
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
+use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandler;
 use App\Entity\Correcteur;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,7 +21,7 @@ class ImportCorrecteurXMLTest extends KernelTestCase
 
         $xml = file_get_contents(__DIR__ . "\\" . "import.xml");
 
-        $correcteur = $importCorrecteur->load($xml);
+        $correcteur = $importCorrecteur->load(new ImportCorrecteurXMLErrorHandlerEmpty(), $xml);
 
         self::assertInstanceOf(Correcteur::class, $correcteur);
 
