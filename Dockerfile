@@ -28,15 +28,13 @@ WORKDIR /var/www
 
 COPY . /var/www
 
-RUN mkdir -p /var/www/public/tmp
-
 RUN chown -R www-data:www-data /var/www
 
 RUN groupadd cortest-users \
     && usermod -a -G cortest-users www-data \
     && usermod -a -G cortest-users $(whoami) \
-    && chgrp -R cortest-users /var/www/public \
-    && chmod -R g+w /var/www/public
+    && chgrp -R cortest-users /tmp \
+    && chmod -R g+w /tmp
 
 RUN composer install
 

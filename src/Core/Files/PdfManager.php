@@ -36,11 +36,10 @@ class PdfManager
         private readonly RendererRepository $renderer_repository,
         private readonly string             $latexCompilerExecutable = "pdflatex",
         private readonly string             $pdfMergeExecutable = "pdfunite",
-        string                              $tmp_dir = "tmp",
         int                                 $new_time_limit = 300
     )
     {
-        $this->tmp_dir = getcwd() . DIRECTORY_SEPARATOR . $tmp_dir;
+        $this->tmp_dir = sys_get_temp_dir();
         $this->logger->debug("Tmp dir : " . $this->tmp_dir);
 
         // Autorise un temps de compilation supérieur
