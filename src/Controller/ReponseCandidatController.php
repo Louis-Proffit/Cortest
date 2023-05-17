@@ -20,6 +20,11 @@ class ReponseCandidatController extends AbstractController
     {
         $reponse_candidat = $reponse_candidat_repository->find($id);
 
+        if ($reponse_candidat == null) {
+            $this->addFlash("danger", "Les réponses de ce candidat n'existent pas ou ont déja été supprimées.");
+            return $this->redirectToRoute("home");
+        }
+
         $session_id = $reponse_candidat->session->id;
 
         $entity_manager->remove($reponse_candidat);

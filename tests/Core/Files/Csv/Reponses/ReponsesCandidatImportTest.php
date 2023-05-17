@@ -2,8 +2,8 @@
 
 namespace App\Tests\Core\Files\Csv\Reponses;
 
-use App\Core\Files\Csv\Reponses\ReponsesCandidatExport;
-use App\Core\Files\Csv\Reponses\ReponsesCandidatImport;
+use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
+use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
 use App\Entity\ReponseCandidat;
 use App\Repository\SessionRepository;
 use ArrayIterator;
@@ -21,8 +21,8 @@ class ReponsesCandidatImportTest extends KernelTestCase
 
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
 
-        $reponsesCandidatExport = self::getContainer()->get(ReponsesCandidatExport::class);
-        $reponsesCandidatImport = self::getContainer()->get(ReponsesCandidatImport::class);
+        $reponsesCandidatExport = self::getContainer()->get(ExportReponsesCandidat::class);
+        $reponsesCandidatImport = self::getContainer()->get(ImportReponsesCandidat::class);
 
         $exported = $reponsesCandidatExport->export($session->reponses_candidats->toArray());
         $reimported = $reponsesCandidatImport->import($session, $exported);

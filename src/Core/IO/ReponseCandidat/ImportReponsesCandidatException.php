@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Core\Files\Csv\Reponses;
+namespace App\Core\IO\ReponseCandidat;
 
 use Exception;
 
-class ReponsesCandidatImportException extends Exception
+class ImportReponsesCandidatException extends Exception
 {
 
     public function __construct(string $message)

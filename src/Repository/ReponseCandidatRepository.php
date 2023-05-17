@@ -55,6 +55,10 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /**
+     * @param array $ids
+     * @return ReponseCandidat[]
+     */
     public function findAllByIds(array $ids): array
     {
         return $this->createQueryBuilder("r")

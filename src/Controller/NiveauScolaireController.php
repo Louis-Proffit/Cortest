@@ -33,9 +33,7 @@ class NiveauScolaireController extends AbstractController
         Request                $request
     ): RedirectResponse|Response
     {
-        $item = new NiveauScolaire(
-            id: 0, indice: 0, nom: ""
-        );
+        $item = new NiveauScolaire(id: 0, indice: 0, nom: "");
 
         $form = $this->createForm(NiveauScolaireType::class, $item);
 

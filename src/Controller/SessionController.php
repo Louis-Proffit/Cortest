@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Core\Files\Csv\CsvManager;
 use App\Core\Files\Csv\CsvReponseManager;
-use App\Core\Files\Csv\Reponses\ReponsesCandidatExport;
+use App\Core\Files\CsvManager;
+use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\ConcoursRepository;
@@ -16,7 +16,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -124,7 +123,7 @@ class SessionController extends AbstractController
 
     #[Route("/csv/{id}", name: "csv")]
     public function csv(
-        ReponsesCandidatExport $reponsesCandidatExport,
+        ExportReponsesCandidat $reponsesCandidatExport,
         CsvManager             $csvManager,
         SessionRepository      $session_repository,
         int                    $id

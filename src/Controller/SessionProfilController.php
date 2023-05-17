@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\Csv\CsvProfilManager;
+use App\Core\Files\CsvManager;
+use App\Core\Files\FileNameManager;
+use App\Core\IO\Profil\ExportProfils;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
 use App\Entity\Session;
@@ -26,12 +28,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionProfilController extends AbstractController
 {
 
+    /**
+     * Formulaire pour calculer les profils directement à partir d'une session.
+     * Permet de choisir le correcteur et l'etalonnage
+     * @param SessionRepository $session_repository
+     * @param Request $request
+     * @param int $session_id
+     * @param int $recherche
+     * @return Response
+     */
     #[Route("/session/form/{session_id}/{recherche}", name: "session_form")]
     public function form(
         SessionRepository $session_repository,
         Request           $request,
         int               $session_id,
-        int               $recherche=0
+        int               $recherche = 0
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -73,7 +84,7 @@ class SessionProfilController extends AbstractController
         Request              $request,
         int                  $session_id,
         int                  $correcteur_id,
-        int                  $recherche=0): Response
+        int                  $recherche = 0): Response
     {
         $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
@@ -118,17 +129,17 @@ class SessionProfilController extends AbstractController
 
     #[Route("/index/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "index")]
     public function consulter(
-        CorrecteurManager    $correcteur_manager,
-        EtalonnageManager    $etalonnage_manager,
-        SessionRepository    $session_repository,
-        EtalonnageRepository $etalonnage_repository,
-        CorrecteurRepository $correcteur_repository,
+        CorrecteurManager              $correcteur_manager,
+        EtalonnageManager              $etalonnage_manager,
+        SessionRepository              $session_repository,
+        EtalonnageRepository           $etalonnage_repository,
+        CorrecteurRepository           $correcteur_repository,
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
-        int                  $session_id,
-        int                  $correcteur_id,
-        int                  $etalonnage_id,
-        int                  $recherche=0,
+        int                            $session_id,
+        int                            $correcteur_id,
+        int                            $etalonnage_id,
+        int                            $recherche = 0,
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -143,10 +154,9 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        if ($recherche === 0){
+        if ($recherche === 0) {
             $reponses = $session->reponses_candidats->toArray();
-        }
-        else{
+        } else {
             $cached_reponses_ids = $reponses_candidat_session_storage->get();
             $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
         }
@@ -161,7 +171,7 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        if ($recherche === 1){
+        if ($recherche === 1) {
             return $this->render("recherche/profil_index.html.twig",
                 ["profils" => $profils,
                     "scores" => $scores,
@@ -181,18 +191,20 @@ class SessionProfilController extends AbstractController
 
     #[Route("/csv/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "csv")]
     public function csv(
-        CorrecteurManager    $correcteur_manager,
-        EtalonnageManager    $etalonnage_manager,
-        SessionRepository    $session_repository,
-        EtalonnageRepository $etalonnage_repository,
-        CorrecteurRepository $correcteur_repository,
-        CsvProfilManager     $csv_profil_manager,
+        CorrecteurManager              $correcteur_manager,
+        EtalonnageManager              $etalonnage_manager,
+        SessionRepository              $session_repository,
+        EtalonnageRepository           $etalonnage_repository,
+        CorrecteurRepository           $correcteur_repository,
+        ExportProfils                  $exportProfils,
+        FileNameManager                $fileNameManager,
+        CsvManager                     $csvManager,
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
-        int                  $session_id,
-        int                  $correcteur_id,
-        int                  $etalonnage_id,
-        int                  $recherche=0,
+        int                            $session_id,
+        int                            $correcteur_id,
+        int                            $etalonnage_id,
+        int                            $recherche = 0,
     ): Response
     {
         $session = $session_repository->find($session_id);
@@ -207,10 +219,9 @@ class SessionProfilController extends AbstractController
             return $response;
         }
 
-        if ($recherche === 0){
+        if ($recherche === 0) {
             $reponses = $session->reponses_candidats->toArray();
-        }
-        else{
+        } else {
             $cached_reponses_ids = $reponses_candidat_session_storage->get();
             $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
         }
@@ -225,12 +236,9 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        return $csv_profil_manager->export(
-            session: $session,
-            profil: $correcteur->profil,
-            profils: $profils,
-            reponses: $reponses
-        );
+        $data = $exportProfils->export(profil: $correcteur->profil, profils: $profils, reponses: $reponses);
+        $fileName = $fileNameManager->sessionProfilCsvFileName($session);
+        return $csvManager->export($data, $fileName);
     }
 
 

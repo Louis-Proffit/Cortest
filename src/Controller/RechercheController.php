@@ -3,15 +3,14 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Files\Csv\CsvReponseManager;
-use App\Core\Files\Csv\CsvScoreManager;
+use App\Core\Files\CsvManager;
+use App\Core\Files\FileNameManager;
+use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
+use App\Core\IO\Score\ExportScores;
 use App\Entity\ReponseCandidat;
-use App\Entity\Session;
-use App\Form\CorrecteurChoiceType;
-use App\Form\Data\CorrecteurChoice;
 use App\Form\Data\RechercheFiltre;
-use App\Form\Data\ReponseCandidatChecked;
 use App\Form\Data\RechercheReponsesCandidat;
+use App\Form\Data\ReponseCandidatChecked;
 use App\Form\RechercheFiltreType;
 use App\Form\RechercheReponsesCandidatType;
 use App\Recherche\FiltreSessionStorage;
@@ -31,29 +30,31 @@ use Symfony\Component\Routing\Annotation\Route;
 class RechercheController extends AbstractController
 {
 
-    #[Route("/download/reponses", name: "download_reponses")]
-    public function downloadReponses(
+    #[Route("/reponse/csv", name: "reponses_csv")]
+    public function downloadReponsesCsv(
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
-        CsvReponseManager              $csv_reponse_manager,
-    ): BinaryFileResponse
+        ExportReponsesCandidat         $exportReponsesCandidat,
+        CsvManager                     $csvManager,
+    ): Response
     {
         $cached_reponses_ids = $reponses_candidat_session_storage->get();
         $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-        return $csv_reponse_manager->export($cached_reponses, "export_recherche_reponses.csv");
+
+        $data = $exportReponsesCandidat->export($cached_reponses);
+
+        return $csvManager->export($data, "export_recherche_reponses.csv");
     }
 
     #[Route("/vider", name: "vider")]
-    public function vider(
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage
-    ): Response
+    public function vider(ReponsesCandidatSessionStorage $reponses_candidat_session_storage): Response
     {
         $reponses_candidat_session_storage->set(array());
         $this->addFlash("success", "Les candidats ont été retirés, vous pouvez en sélectionner de nouveaux.");
         return $this->redirectToRoute("recherche_index");
     }
 
-    #[Route("/calculer/scores", name: "calculer_scores")]
+    #[Route("/calculer/score", name: "calculer_scores")]
     public function calculerScores(
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
@@ -68,8 +69,9 @@ class RechercheController extends AbstractController
         }
 
         $session_id = $cached_reponses[0]->session->id;
-        foreach ($cached_reponses as $reponse){
-            if ($session_id != $reponse->session->id){
+
+        foreach ($cached_reponses as $reponse) {
+            if ($session_id != $reponse->session->id) {
                 $this->addFlash("warning", "Pour calculer les scores les candidats doivent appartenir à la même session");
                 return $this->redirectToRoute("recherche_index");
             }
@@ -78,10 +80,33 @@ class RechercheController extends AbstractController
         return $this->redirectToRoute("calcul_score_recherche_form_correcteur", ['session_id' => $session_id]);
     }
 
-    #[Route("/profil/{session_id}/{correcteur_id}", name: "profil")]
+
+    #[Route("/score/csv/{correcteur_id}", name: "scores_csv")]
+    public function score_csv(
+        CorrecteurRepository           $correcteur_repository,
+        CorrecteurManager              $correcteur_manager,
+        ExportScores                   $exportScores,
+        CsvManager                     $csvManager,
+        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
+        ReponseCandidatRepository      $reponse_candidat_repository,
+        int                            $correcteur_id,
+    ): Response
+    {
+        $cached_reponses_ids = $reponses_candidat_session_storage->get();
+        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+
+        $correcteur = $correcteur_repository->find($correcteur_id);
+
+        $scores = $correcteur_manager->corriger(correcteur: $correcteur, reponses_candidat: $reponses);
+
+        $data = $exportScores->export(profil: $correcteur->profil, scores: $scores, reponses: $reponses);
+
+        return $csvManager->export($data, "scores_recherche.csv");
+    }
+
+    #[Route("/calculer/profil/{correcteur_id}", name: "profil")]
     public function profil(
-        int                  $session_id,
-        int                  $correcteur_id,
+        int $correcteur_id,
     ): Response
     {
         return $this->redirectToRoute("calcul_profil_score_form", ['session_id' => $session_id, 'correcteur_id' => $correcteur_id, 'recherche' => 1]);
@@ -102,8 +127,8 @@ class RechercheController extends AbstractController
         }
 
         $session_id = $cached_reponses[0]->session->id;
-        foreach ($cached_reponses as $reponse){
-            if ($session_id != $reponse->session->id){
+        foreach ($cached_reponses as $reponse) {
+            if ($session_id != $reponse->session->id) {
                 $this->addFlash("warning", "Pour calculer les profils les candidats doivent appartenir à la même session");
                 return $this->redirectToRoute("recherche_index");
             }

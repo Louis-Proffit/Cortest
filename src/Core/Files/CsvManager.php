@@ -1,30 +1,27 @@
 <?php
 
-namespace App\Core\Files\Csv;
+namespace App\Core\Files;
 
 use SplFileObject;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 class CsvManager
 {
 
-    public function export(array $data, string $file_name): Response
+    /**
+     * Produit une réponse http contenant un fichier à partir de ses données brutes et du nom du fichier
+     * @param array $data
+     * @param string $fileName
+     * @return Response
+     * @see CsvEncoder::encode()
+     */
+    public function export(array $data, string $fileName): Response
     {
         $encoder = new CsvEncoder();
-
         $encoded = $encoder->encode($data, CsvEncoder::FORMAT);
-
         $response = new Response($encoded);
-
-        $disposition = HeaderUtils::makeDisposition(
-            HeaderUtils::DISPOSITION_ATTACHMENT,
-            $file_name
-        );
-
-        $response->headers->set("Content-Disposition", $disposition);
-
+        FileUtils::setFileResponseFileName($response, $fileName);
         return $response;
     }
 
@@ -43,7 +40,7 @@ class CsvManager
         $rows = [];
 
         foreach ($file as $row) {
-            if (gettype($row) === "array") {
+            if (is_array($row)) {
                 $rows[] = $row;
             }
         }

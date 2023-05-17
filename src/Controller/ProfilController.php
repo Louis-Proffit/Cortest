@@ -17,7 +17,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProfilController extends AbstractController
 {
 
-
     #[Route("/index", name: "index")]
     public function index(
         ProfilRepository $profil_repository
@@ -38,7 +37,8 @@ class ProfilController extends AbstractController
             id: 0,
             nom: "",
             echelles: new ArrayCollection(),
-            etalonnages: new ArrayCollection(), graphiques: new ArrayCollection()
+            etalonnages: new ArrayCollection(),
+            graphiques: new ArrayCollection()
         );
 
         $form = $this->createForm(ProfilType::class, $item);

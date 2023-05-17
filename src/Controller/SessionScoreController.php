@@ -4,8 +4,9 @@ namespace App\Controller;
 
 
 use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Files\Csv\CsvManager;
-use App\Core\Files\Csv\CsvScoreManager;
+use App\Core\Files\CsvManager;
+use App\Core\Files\FileNameManager;
+use App\Core\IO\Score\ExportScores;
 use App\Entity\Session;
 use App\Form\CorrecteurChoiceType;
 use App\Form\Data\CorrecteurChoice;
@@ -79,7 +80,9 @@ class SessionScoreController extends AbstractController
         SessionRepository    $session_repository,
         CorrecteurRepository $correcteur_repository,
         CorrecteurManager    $correcteur_manager,
-        CsvScoreManager           $csv_score_manager,
+        ExportScores         $csv_score_manager,
+        FileNameManager      $fileNameManager,
+        CsvManager           $csvManager,
         int                  $session_id,
         int                  $correcteur_id
     ): Response
@@ -91,7 +94,10 @@ class SessionScoreController extends AbstractController
 
         $scores = $correcteur_manager->corriger($correcteur, $reponses);
 
-        return $csv_score_manager->export($session, $correcteur->profil, $scores);
+        $data = $csv_score_manager->export(profil: $correcteur->profil, scores: $scores, reponses: $reponses);
+        $file_name = $fileNameManager->sessionScoreCsvFileName($session);
+
+        return $csvManager->export($data, $file_name);
     }
 
     #[Route('/recherche/form/correcteur/{session_id}', name: "recherche_form_correcteur")]
@@ -123,15 +129,16 @@ class SessionScoreController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
     #[Route("/recherche/score/{session_id}/{correcteur_id}", name: "recherche_score")]
-    public function consulter_score(
-        SessionRepository    $session_repository,
-        CorrecteurRepository $correcteur_repository,
-        CorrecteurManager    $correcteur_manager,
-        int                  $session_id,
-        int                  $correcteur_id,
+    public function consulterScore(
+        SessionRepository              $session_repository,
+        CorrecteurRepository           $correcteur_repository,
+        CorrecteurManager              $correcteur_manager,
         ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
         ReponseCandidatRepository      $reponse_candidat_repository,
+        int                            $session_id,
+        int                            $correcteur_id,
     ): Response
     {
         $cached_reponses_ids = $reponses_candidat_session_storage->get();
@@ -147,27 +154,5 @@ class SessionScoreController extends AbstractController
                 "session" => $session,
                 "correcteur" => $correcteur,
                 "reponses" => $reponses]);
-    }
-    #[Route("/recherche/score/csv/{session_id}/{correcteur_id}", name: "calcul_score_recherche_score_csv")]
-    public function score_csv(
-        SessionRepository    $session_repository,
-        CorrecteurRepository $correcteur_repository,
-        CorrecteurManager    $correcteur_manager,
-        CsvScoreManager      $csv_score_manager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                  $session_id,
-        int                  $correcteur_id,
-    ): Response
-    {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-
-        $session = $session_repository->find($session_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        $scores = $correcteur_manager->corriger($correcteur, $reponses);
-
-        return $csv_score_manager->export($session, $correcteur->profil, $scores, $reponses);
     }
 }

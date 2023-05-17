@@ -9,10 +9,7 @@ use App\Entity\Etalonnage;
 use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
-use FilesystemIterator;
 use Psr\Log\LoggerInterface;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
@@ -34,6 +31,7 @@ class PdfManager
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $renderer_repository,
+        private readonly FileNameManager    $fileNameManager, // TODO export that dependency out of the file
         private readonly string             $latexCompilerExecutable = "pdflatex",
         private readonly string             $pdfMergeExecutable = "pdfunite",
         int                                 $new_time_limit = 300
@@ -45,22 +43,6 @@ class PdfManager
         // Autorise un temps de compilation supérieur
         set_time_limit($new_time_limit);
     }
-
-    private function fileName(ReponseCandidat $candidat_reponse): string
-    {
-        return str_replace(" ", "_", $candidat_reponse->nom . "_" . $candidat_reponse->prenom);
-    }
-
-    private function outputPdfMergedFileName(Session $session): string
-    {
-        return "Profils_Session_" . $session->date->format("Y-m-d") . self::PDF_EXTENSION;
-    }
-
-    private function outputZipFileName(Session $session): string
-    {
-        return "Profils_Session_" . $session->date->format("Y-m-d") . self::ZIP_EXTENSION;
-    }
-
 
     public function getFeuilleProfilContent(
         Graphique       $graphique,
@@ -225,7 +207,7 @@ class PdfManager
     public
     function createPdfFile(
         Graphique       $graphique,
-        ReponseCandidat $candidat_reponse,
+        ReponseCandidat $reponseCandidat,
         Correcteur      $correcteur,
         Etalonnage      $etalonnage,
         array           $score,
@@ -233,10 +215,12 @@ class PdfManager
     {
 
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
-            $fileNameWithoutExtension = $this->fileName($candidat_reponse);
+
+            $fileNameWithoutExtension = $this->fileNameManager->singlePdfFileName($reponseCandidat);
+
             $filePath = $this->producePdfAndGetPath(
                 graphique: $graphique,
-                candidat_reponse: $candidat_reponse,
+                candidat_reponse: $reponseCandidat,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage,
                 score: $score,
@@ -254,15 +238,22 @@ class PdfManager
         return false;
     }
 
-    public
-    function createZipFile(
-        Session    $session,
+    /**
+     * @param Correcteur $correcteur
+     * @param Etalonnage $etalonnage
+     * @param array $scores
+     * @param array $profils
+     * @param Graphique $graphique
+     * @param ReponseCandidat[] $reponsesCandidat
+     * @return BinaryFileResponse|false
+     */
+    public function createZipFile(
         Correcteur $correcteur,
         Etalonnage $etalonnage,
         array      $scores,
         array      $profils,
         Graphique  $graphique,
-        array|null $reponses = null): BinaryFileResponse|false
+        array      $reponsesCandidat): BinaryFileResponse|false
     {
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
 
@@ -271,22 +262,18 @@ class PdfManager
             $zip = new ZipArchive();
             $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-            if ($reponses === null) {
-                $reponses = $session->reponses_candidats;
-            }
-
             /** @var ReponseCandidat $reponses_candidat */
-            foreach ($reponses as $reponses_candidat) {
+            foreach ($reponsesCandidat as $reponseCandidat) {
 
-                $fileNameWithoutExtension = $this->fileName($reponses_candidat);
+                $fileNameWithoutExtension = $this->fileNameManager->singlePdfFileName($reponseCandidat);
 
                 $pdfFilePath = $this->producePdfAndGetPath(
                     graphique: $graphique,
-                    candidat_reponse: $reponses_candidat,
+                    candidat_reponse: $reponseCandidat,
                     correcteur: $correcteur,
                     etalonnage: $etalonnage,
-                    score: $scores[$reponses_candidat->id],
-                    profil: $profils[$reponses_candidat->id],
+                    score: $scores[$reponseCandidat->id],
+                    profil: $profils[$reponseCandidat->id],
                     outputDirectoryPath: $outputDirectoryPath,
                     fileNameWithoutExtension: $fileNameWithoutExtension
                 );
@@ -296,46 +283,48 @@ class PdfManager
 
             $zip->close();
 
-            return $this->produceResponse($zipFilePath, $this->outputZipFileName($session));
+            return $this->produceResponse($zipFilePath, $this->fileNameManager->mergedProfilsZipFileName($reponsesCandidat));
 
         }
 
         return false;
     }
 
-    public
-    function createPdfMergedFile(
-        Session    $session,
+    /**
+     * @param Correcteur $correcteur
+     * @param Etalonnage $etalonnage
+     * @param array $scores
+     * @param array $profils
+     * @param Graphique $graphique
+     * @param ReponseCandidat[] $reponsesCandidat
+     * @return BinaryFileResponse|false
+     */
+    public function createPdfMergedFile(
         Correcteur $correcteur,
         Etalonnage $etalonnage,
         array      $scores,
         array      $profils,
         Graphique  $graphique,
-        array|null $reponses = null): BinaryFileResponse|false
+        array      $reponsesCandidat): BinaryFileResponse|false
     {
-
         if ($outputDirectoryPath = $this->prepareOutputDir()) {
-
-            if ($reponses === null) {
-                $reponses = $session->reponses_candidats;
-            }
 
             $mergedPdfFilePath = $this->getTempMergedPdfFilePath($outputDirectoryPath);
 
             $pdfFilePaths = [];
 
             /** @var ReponseCandidat $reponses_candidat */
-            foreach ($reponses as $reponses_candidat) {
+            foreach ($reponsesCandidat as $reponseCandidat) {
 
-                $fileNameWithoutExtension = $this->fileName($reponses_candidat);
+                $fileNameWithoutExtension = $this->fileNameManager->singlePdfFileName($reponseCandidat);
 
                 $pdfFilePath = $this->producePdfAndGetPath(
                     graphique: $graphique,
-                    candidat_reponse: $reponses_candidat,
+                    candidat_reponse: $reponseCandidat,
                     correcteur: $correcteur,
                     etalonnage: $etalonnage,
-                    score: $scores[$reponses_candidat->id],
-                    profil: $profils[$reponses_candidat->id],
+                    score: $scores[$reponseCandidat->id],
+                    profil: $profils[$reponseCandidat->id],
                     outputDirectoryPath: $outputDirectoryPath,
                     fileNameWithoutExtension: $fileNameWithoutExtension
                 );
@@ -355,7 +344,7 @@ class PdfManager
                 return false;
             }
 
-            return $this->produceResponse($mergedPdfFilePath, $this->outputPdfMergedFileName($session));
+            return $this->produceResponse($mergedPdfFilePath, $this->fileNameManager->mergedProfilsPdfFileName($reponsesCandidat));
         }
 
         return false;

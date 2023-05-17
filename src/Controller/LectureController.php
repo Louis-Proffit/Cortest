@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Core\Files\Csv\CsvManager;
-use App\Core\Files\Csv\Reponses\ReponsesCandidatImport;
-use App\Core\Files\Csv\Reponses\ReponsesCandidatImportException;
+use App\Core\Files\CsvManager;
+use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
+use App\Core\IO\ReponseCandidat\ImportReponsesCandidatException;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ParametresLectureCsv;
 use App\Form\Data\ParametresLectureJSON;
@@ -14,17 +14,17 @@ use App\Form\ParametresLectureFichierType;
 use App\Form\ParametresLectureOptiqueType;
 use App\Form\ReponseCandidatType;
 use App\Repository\NiveauScolaireRepository;
-use App\Repository\SessionRepository;
 use App\Repository\ReponseCandidatRepository;
+use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route("/lecture", name: "lecture_")]
 class LectureController extends AbstractController
@@ -151,7 +151,7 @@ class LectureController extends AbstractController
     public function importCsv(ManagerRegistry        $doctrine,
                               Request                $request,
                               CsvManager             $csvManager,
-                              ReponsesCandidatImport $reponsesCandidatImport
+                              ImportReponsesCandidat $reponsesCandidatImport
     ): Response
     {
         $manager = $doctrine->getManager();
@@ -178,7 +178,7 @@ class LectureController extends AbstractController
                 $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
 
                 return $this->redirectToRoute('home');
-            } catch (ReponsesCandidatImportException $e) {
+            } catch (ImportReponsesCandidatException $e) {
                 $this->addFlash("danger", $e->getMessage());
             }
         }

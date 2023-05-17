@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Core\Files\Csv\Reponses;
+namespace App\Core\IO\ReponseCandidat;
 
 use App\Entity\QuestionConcours;
 use App\Entity\ReponseCandidat;
 
-class ReponsesCandidatExport
+class ExportReponsesCandidat
 {
 
     const NOM_KEY = "Nom";
