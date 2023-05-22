@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Files\PdfManager;
+use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
 use App\Recherche\ReponsesCandidatSessionStorage;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PdfController extends AbstractController
 {
 
-    #[Route("/form/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form_single")]
+    #[Route("/form/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form_single")]
     public function form(
         GraphiqueRepository  $graphique_repository,
         CorrecteurRepository $correcteur_repository,
@@ -134,7 +135,7 @@ class PdfController extends AbstractController
 
     }
 
-    #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
+    #[Route("/download/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
     public function download(
         GraphiqueRepository       $graphique_repository,
         ReponseCandidatRepository $candidat_reponse_repository,
@@ -158,7 +159,6 @@ class PdfController extends AbstractController
         $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
         $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
 
-
         return $pdf_manager->createPdfFile(
             graphique: $graphique,
             reponseCandidat: $candidat_reponse,
@@ -171,31 +171,30 @@ class PdfController extends AbstractController
 
     #[Route("/download/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
     public function formSessionZip(
-        EtalonnageRepository           $etalonnage_repository,
-        CorrecteurRepository           $correcteur_repository,
-        GraphiqueRepository            $graphique_repository,
-        CorrecteurManager              $correcteur_manager,
-        EtalonnageManager              $etalonnage_manager,
-        PdfManager                     $pdf_manager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $correcteur_id,
-        int                            $etalonnage_id,
-        int                            $graphique_id,
+        EtalonnageRepository    $etalonnageRepository,
+        CorrecteurRepository    $correcteurRepository,
+        GraphiqueRepository     $graphiqueRepository,
+        CorrecteurManager       $correcteurManager,
+        EtalonnageManager       $etalonnageManager,
+        PdfManager              $pdfManager,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        int                     $correcteur_id,
+        int                     $etalonnage_id,
+        int                     $graphique_id,
     ): Response
     {
-        $correcteur = $correcteur_repository->find($correcteur_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+        $correcteur = $correcteurRepository->find($correcteur_id);
+        $etalonnage = $etalonnageRepository->find($etalonnage_id);
 
-        $graphique = $graphique_repository->find($graphique_id);
+        $graphique = $graphiqueRepository->find($graphique_id);
 
-        $reponses_candidat_ids = $reponses_candidat_session_storage->get();
-        $reponses_candidat = $reponse_candidat_repository->findAllByIds($reponses_candidat_ids);
+        // TODO get session (for file name) and check it is consistent
+        $reponses_candidat = $reponsesCandidatStorage->get();
 
-        $scores = $correcteur_manager->corriger($correcteur, $reponses_candidat);
-        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+        $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
+        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
 
-        return $pdf_manager->createZipFile(
+        return $pdfManager->createZipFile(
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             scores: $scores,
@@ -207,31 +206,30 @@ class PdfController extends AbstractController
 
     #[Route("/download/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
     public function formSessionPdf(
-        EtalonnageRepository           $etalonnage_repository,
-        CorrecteurRepository           $correcteur_repository,
-        GraphiqueRepository            $graphique_repository,
-        CorrecteurManager              $correcteur_manager,
-        EtalonnageManager              $etalonnage_manager,
-        PdfManager                     $pdf_manager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $correcteur_id,
-        int                            $etalonnage_id,
-        int                            $graphique_id,
+        EtalonnageRepository    $etalonnageRepository,
+        CorrecteurRepository    $correcteurRepository,
+        GraphiqueRepository     $graphiqueRepository,
+        CorrecteurManager       $correcteurManager,
+        EtalonnageManager       $etalonnageManager,
+        PdfManager              $pdfManager,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        int                     $correcteur_id,
+        int                     $etalonnage_id,
+        int                     $graphique_id,
     ): Response
     {
-        $correcteur = $correcteur_repository->find($correcteur_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+        $correcteur = $correcteurRepository->find($correcteur_id);
+        $etalonnage = $etalonnageRepository->find($etalonnage_id);
 
-        $graphique = $graphique_repository->find($graphique_id);
+        $graphique = $graphiqueRepository->find($graphique_id);
 
-        $reponses_candidat_ids = $reponses_candidat_session_storage->get();
-        $reponses_candidat = $reponse_candidat_repository->findAllByIds($reponses_candidat_ids);
+        // TODO get session (for file name) and check it is consistent
+        $reponses_candidat = $reponsesCandidatStorage->get();
 
-        $scores = $correcteur_manager->corriger($correcteur, $reponses_candidat);
-        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+        $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
+        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
 
-        return $pdf_manager->createPdfMergedFile(
+        return $pdfManager->createPdfMergedFile(
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             scores: $scores,

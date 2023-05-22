@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Core\Files\Csv\CsvReponseManager;
-use App\Core\Files\CsvManager;
-use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
+use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\SessionType;
+use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
 use App\Repository\SessionRepository;
@@ -123,30 +123,28 @@ class SessionController extends AbstractController
 
     #[Route("/csv/{id}", name: "csv")]
     public function csv(
-        ExportReponsesCandidat $reponsesCandidatExport,
-        CsvManager             $csvManager,
-        SessionRepository      $session_repository,
-        int                    $id
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        SessionRepository       $sessionRepository,
+        int                     $id
     ): Response
     {
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
+        $reponsesCandidatStorage->setFromSession($session);
 
-        $fileName = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
-
-        $raw = $reponsesCandidatExport->export($session->reponses_candidats->toArray());
-
-        return $csvManager->export($raw, $fileName);
+        return $this->redirectToRoute("csv_reponses");
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry   $doctrine,
-                              SessionRepository $session_repository,
-                              int               $id): Response
+    public function supprimer(ManagerRegistry         $doctrine,
+                              ReponsesCandidatStorage $reponsesCandidatStorage,
+                              SessionRepository       $sessionRepository,
+                              int                     $id): Response
     {
-
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
 
         if ($session != null) {
+
+            $reponsesCandidatStorage->set(array()); // TODO be more specific ?, that is very conservative
 
             foreach ($session->reponses_candidats->toArray() as $candidat_reponse) {
                 $doctrine->getManager()->remove($candidat_reponse);

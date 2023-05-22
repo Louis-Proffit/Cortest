@@ -2,11 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Files\CsvManager;
-use App\Core\Files\FileNameManager;
-use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
-use App\Core\IO\Score\ExportScores;
+use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\RechercheFiltre;
 use App\Form\Data\RechercheReponsesCandidat;
@@ -15,9 +11,7 @@ use App\Form\RechercheFiltreType;
 use App\Form\RechercheReponsesCandidatType;
 use App\Recherche\FiltreSessionStorage;
 use App\Recherche\ReponsesCandidatSessionStorage;
-use App\Repository\CorrecteurRepository;
 use App\Repository\ReponseCandidatRepository;
-use App\Repository\SessionRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -30,118 +24,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class RechercheController extends AbstractController
 {
 
-    #[Route("/reponse/csv", name: "reponses_csv")]
-    public function downloadReponsesCsv(
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        ExportReponsesCandidat         $exportReponsesCandidat,
-        CsvManager                     $csvManager,
-    ): Response
-    {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-
-        $data = $exportReponsesCandidat->export($cached_reponses);
-
-        return $csvManager->export($data, "export_recherche_reponses.csv");
-    }
+    const LOWEST_TIME = "@1344988800";
 
     #[Route("/vider", name: "vider")]
-    public function vider(ReponsesCandidatSessionStorage $reponses_candidat_session_storage): Response
+    public function vider(ReponsesCandidatStorage $reponsesCandidatStorage): Response
     {
-        $reponses_candidat_session_storage->set(array());
+        $reponsesCandidatStorage->set(array());
         $this->addFlash("success", "Les candidats ont été retirés, vous pouvez en sélectionner de nouveaux.");
         return $this->redirectToRoute("recherche_index");
     }
 
-    #[Route("/calculer/score", name: "calculer_scores")]
-    public function calculerScores(
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-    ): Response
-    {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-
-        if (count($cached_reponses) == 0) {
-            $this->addFlash("warning", "Il faut sélectionner au moins un candidat");
-            return $this->redirectToRoute("recherche_index");
-        }
-
-        $session_id = $cached_reponses[0]->session->id;
-
-        foreach ($cached_reponses as $reponse) {
-            if ($session_id != $reponse->session->id) {
-                $this->addFlash("warning", "Pour calculer les scores les candidats doivent appartenir à la même session");
-                return $this->redirectToRoute("recherche_index");
-            }
-        }
-
-        return $this->redirectToRoute("calcul_score_recherche_form_correcteur", ['session_id' => $session_id]);
-    }
-
-
-    #[Route("/score/csv/{correcteur_id}", name: "scores_csv")]
-    public function score_csv(
-        CorrecteurRepository           $correcteur_repository,
-        CorrecteurManager              $correcteur_manager,
-        ExportScores                   $exportScores,
-        CsvManager                     $csvManager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $correcteur_id,
-    ): Response
-    {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        $scores = $correcteur_manager->corriger(correcteur: $correcteur, reponses_candidat: $reponses);
-
-        $data = $exportScores->export(profil: $correcteur->profil, scores: $scores, reponses: $reponses);
-
-        return $csvManager->export($data, "scores_recherche.csv");
-    }
-
-    #[Route("/calculer/profil/{correcteur_id}", name: "profil")]
-    public function profil(
-        int $correcteur_id,
-    ): Response
-    {
-        return $this->redirectToRoute("calcul_profil_score_form", ['session_id' => $session_id, 'correcteur_id' => $correcteur_id, 'recherche' => 1]);
-    }
-
-    #[Route("/calculer/profils", name: "calculer_profils")]
-    public function calculerProfils(
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-    ): Response
-    {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-
-        if (count($cached_reponses) == 0) {
-            $this->addFlash("warning", "Il faut sélectionner au moins un candidat");
-            return $this->redirectToRoute("recherche_index");
-        }
-
-        $session_id = $cached_reponses[0]->session->id;
-        foreach ($cached_reponses as $reponse) {
-            if ($session_id != $reponse->session->id) {
-                $this->addFlash("warning", "Pour calculer les profils les candidats doivent appartenir à la même session");
-                return $this->redirectToRoute("recherche_index");
-            }
-        }
-
-        return $this->redirectToRoute("calcul_profil_session_form", ['session_id' => $session_id, 'recherche' => 1]);
-    }
-
-    #[Route("/enlever/reponse/{id}", "enlever_reponse")]
-    public function removeReponseCandidat(ReponsesCandidatSessionStorage $reponses_candidat_session_storage, int $id): RedirectResponse
+    #[Route("/deselectionner/{reponse_id}", "deselectionner")]
+    public function removeReponseCandidat(ReponsesCandidatSessionStorage $reponses_candidat_session_storage, int $reponse_id): RedirectResponse
     {
         $cached_reposes = $reponses_candidat_session_storage->get();
-        $reponses_candidat_session_storage->set(array_diff($cached_reposes, [$id]));
+        $reponses_candidat_session_storage->set(array_diff($cached_reposes, array($reponse_id)));
         $this->addFlash("success", "Le candidat a été retiré.");
         return $this->redirectToRoute("recherche_index");
     }
@@ -156,7 +53,7 @@ class RechercheController extends AbstractController
     {
         $filtre = $filtre_session_storage->getOrSetDefault(new RechercheFiltre(filtre_prenom: "",
             filtre_nom: "",
-            filtre_date_de_naissance_min: new DateTime("@1344988800"),
+            filtre_date_de_naissance_min: new DateTime(self::LOWEST_TIME),
             filtre_date_de_naissance_max: new DateTime("now"),
             niveau_scolaire: null,
             session: null
@@ -173,8 +70,7 @@ class RechercheController extends AbstractController
             $reponse_candidat_repository->filtrer($filtre)
         );
 
-        $recherche_reponses_candidat = new RechercheReponsesCandidat(
-            reponses_candidat: $reponse_candidats_checked);
+        $recherche_reponses_candidat = new RechercheReponsesCandidat(reponses_candidat: $reponse_candidats_checked);
         $form_reponses = $this->createForm(RechercheReponsesCandidatType::class, $recherche_reponses_candidat);
         $form_filtre = $this->createForm(RechercheFiltreType::class, $filtre);
 
@@ -182,18 +78,16 @@ class RechercheController extends AbstractController
         if ($form_reponses->isSubmitted() and $form_reponses->isValid()) {
 
             /** @var int[] $to_add */
-            $to_add = [];
+            $initial = $reponses_candidat_session_storage->get();
 
             foreach ($recherche_reponses_candidat->reponses_candidat as $reponse_candidat_checked) {
 
                 if ($reponse_candidat_checked->checked) {
-                    $to_add[] = $reponse_candidat_checked->reponse_candidat->id;
+                    $initial[] = $reponse_candidat_checked->reponse_candidat->id;
                 }
-
-                $reponses_candidat_session_storage->set(
-                    array_merge($reponses_candidat_session_storage->get(), $to_add)
-                );
             }
+
+            $reponses_candidat_session_storage->set($initial);
 
             return $this->redirectToRoute("recherche_index");
         }

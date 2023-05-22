@@ -19,9 +19,12 @@
                 <h3>Candidats sélectionnés</h3>
                 <br>
                 <div class="btn-group d-flex" role="group" aria-label="Button group with four buttons">
-                    <a class="btn btn-primary flex-grow-1" href="{{ path("recherche_reponses_csv") }}">Exporter les réponses (.csv)</a>
-                    <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_calculer_scores") }}">Calculer les scores</a>
-                    <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_calculer_profils") }}">Calculer les profils</a>
+                    <a class="btn btn-primary flex-grow-1" href="{{ path("csv_reponses") }}">Exporter les réponses
+                        (.csv)</a>
+                    <a class="btn btn-secondary flex-grow-1" href="{{ path("calcul_score_form") }}">Calculer les
+                        scores</a>
+                    <a class="btn btn-secondary flex-grow-1" href="{{ path("calcul_profil_form") }}">Calculer les
+                        profils</a>
                     <a class="btn btn-secondary flex-grow-1" href="{{ path("recherche_vider") }}">Vider</a>
                 </div>
                 <br>
@@ -46,7 +49,7 @@
                                 <td>{{ candidat.session.date|date("d/m/Y") }}</td>
                                 <td>{{ candidat.session.sgap.nom }}</td>
                                 <td><a class="btn btn-primary"
-                                       href="{{ path("recherche_enlever_reponse", {"id":candidat.id}) }}">Retirer</a>
+                                       href="{{ path("recherche_deselectionner", {"reponse_id":candidat.id}) }}">Retirer</a>
                                 </td>
                             </tr>
                         {% endfor %}

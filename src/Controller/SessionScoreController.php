@@ -4,15 +4,14 @@ namespace App\Controller;
 
 
 use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Files\CsvManager;
-use App\Core\Files\FileNameManager;
-use App\Core\IO\Score\ExportScores;
+use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\CorrecteurChoiceType;
 use App\Form\Data\CorrecteurChoice;
 use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\CorrecteurRepository;
-use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,136 +22,66 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionScoreController extends AbstractController
 {
 
-    #[Route('/form/{session_id}', name: "form")]
-    public function form(
-        SessionRepository $session_repository,
-        Request           $request,
-        int               $session_id): Response
-    {
-        /** @var Session $session */
-        $session = $session_repository->find($session_id);
-
-        $parametres_calcul_score = new CorrecteurChoice();
-        $form = $this->createForm(CorrecteurChoiceType::class,
-            $parametres_calcul_score,
-            [CorrecteurChoiceType::OPTION_SESSION => $session]
-        );
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $correcteur = $parametres_calcul_score->correcteur;
-
-            return $this->redirectToRoute("calcul_score_index",
-                ["session_id" => $session_id, "correcteur_id" => $correcteur->id]);
-        }
-
-        return $this->render('score/form.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route("/index/{session_id}/{correcteur_id}", name: "index")]
-    public function consulter(
-        SessionRepository    $session_repository,
-        CorrecteurRepository $correcteur_repository,
-        CorrecteurManager    $correcteur_manager,
-        int                  $session_id,
-        int                  $correcteur_id
-    ): Response
-    {
-        $session = $session_repository->find($session_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        $reponses = $session->reponses_candidats->toArray();
-
-        $scores = $correcteur_manager->corriger($correcteur, $reponses);
-
-        return $this->render("score/index.html.twig",
-            ["scores" => $scores,
-                "session" => $session,
-                "correcteur" => $correcteur]);
-    }
-
-    #[Route("/csv/{session_id}/{correcteur_id}", name: "csv")]
-    public function csv(
-        SessionRepository    $session_repository,
-        CorrecteurRepository $correcteur_repository,
-        CorrecteurManager    $correcteur_manager,
-        ExportScores         $csv_score_manager,
-        FileNameManager      $fileNameManager,
-        CsvManager           $csvManager,
-        int                  $session_id,
-        int                  $correcteur_id
-    ): Response
-    {
-        $session = $session_repository->find($session_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        $reponses = $session->reponses_candidats->toArray();
-
-        $scores = $correcteur_manager->corriger($correcteur, $reponses);
-
-        $data = $csv_score_manager->export(profil: $correcteur->profil, scores: $scores, reponses: $reponses);
-        $file_name = $fileNameManager->sessionScoreCsvFileName($session);
-
-        return $csvManager->export($data, $file_name);
-    }
-
-    #[Route('/recherche/form/correcteur/{session_id}', name: "recherche_form_correcteur")]
-    public function rechercheFormCorrecteur(
-        SessionRepository $session_repository,
-        Request           $request,
-        int               $session_id): Response
-    {
-        /** @var Session $session */
-        $session = $session_repository->find($session_id);
-
-        $parametres_calcul_score = new CorrecteurChoice();
-        $form = $this->createForm(CorrecteurChoiceType::class,
-            $parametres_calcul_score,
-            [CorrecteurChoiceType::OPTION_SESSION => $session]
-        );
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $correcteur = $parametres_calcul_score->correcteur;
-
-            return $this->redirectToRoute("calcul_score_recherche_score",
-                ["session_id" => $session_id, "correcteur_id" => $correcteur->id]);
-        }
-
-        return $this->render('score/form.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route("/recherche/score/{session_id}/{correcteur_id}", name: "recherche_score")]
-    public function consulterScore(
+    #[Route('/form/session/{session_id}', name: "session_form")]
+    public function formSession(
         SessionRepository              $session_repository,
+        ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
+        int                            $session_id): Response
+    {
+        /** @var Session $session */
+        $session = $session_repository->find($session_id);
+
+        $reponsesCandidatsIds = array_map(fn(ReponseCandidat $reponseCandidat) => $reponseCandidat->id, $session->reponses_candidats->toArray());
+        $reponsesCandidatSessionStorage->set($reponsesCandidatsIds);
+
+        return $this->redirectToRoute("calcul_score_form");
+    }
+
+    #[Route('/form', name: "form")]
+    public function form(
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
+        Request                 $request): Response
+    {
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
+
+        $parametres_calcul_score = new CorrecteurChoice();
+        $form = $this->createForm(CorrecteurChoiceType::class,
+            $parametres_calcul_score,
+            [CorrecteurChoiceType::OPTION_SESSION => $session]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $correcteur = $parametres_calcul_score->correcteur;
+
+            return $this->redirectToRoute("calcul_score_index", ["correcteur_id" => $correcteur->id]);
+        }
+
+        return $this->render('score/form.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route("/index/{correcteur_id}", name: "index")]
+    public function consulter(
+        ReponsesCandidatStorage        $reponsesCandidatStorage,
+        CheckSingleSession             $checkSingleSession,
         CorrecteurRepository           $correcteur_repository,
         CorrecteurManager              $correcteur_manager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $session_id,
-        int                            $correcteur_id,
+        int                            $correcteur_id
     ): Response
     {
-        $cached_reponses_ids = $reponses_candidat_session_storage->get();
-        $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $session = $session_repository->find($session_id);
         $correcteur = $correcteur_repository->find($correcteur_id);
 
-        $scores = $correcteur_manager->corriger($correcteur, $reponses);
+        $scores = $correcteur_manager->corriger($correcteur, $reponsesCandidats);
 
-        return $this->render("recherche/score_index.html.twig",
-            ["scores" => $scores,
-                "session" => $session,
-                "correcteur" => $correcteur,
-                "reponses" => $reponses]);
+        return $this->render("score/index.html.twig", ["scores" => $scores, "session" => $session, "reponses_candidats" => $reponsesCandidats, "correcteur" => $correcteur]);
     }
 }

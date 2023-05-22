@@ -36,18 +36,16 @@ class SessionProfilControllerTest extends WebTestCase
 
     public function testConsulter()
     {
-        $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
         $correcteur = self::getContainer()->get(CorrecteurRepository::class)->findOneBy([]);
         $etalonnage = self::getContainer()->get(EtalonnageRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET,
-            "/calcul/profil/index/" . $session->id . "/" . $correcteur->id . "/" . $etalonnage->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/profil/index/" . $correcteur->id . "/" . $etalonnage->id);
         self::assertResponseIsSuccessful();
     }
 
     public function testForm()
     {
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET, "/calcul/profil/session/form/" . $session->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/profil/form/session/" . $session->id);
         self::assertResponseIsSuccessful();
     }
 }

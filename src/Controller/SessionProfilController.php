@@ -3,13 +3,12 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
+use App\Core\CorrecteurEtalonnageMatcher;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\CsvManager;
-use App\Core\Files\FileNameManager;
-use App\Core\IO\Profil\ExportProfils;
-use App\Entity\Correcteur;
-use App\Entity\Etalonnage;
-use App\Entity\Session;
+use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Core\SessionCorrecteurMatcher;
+use App\Entity\ReponseCandidat;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
@@ -28,24 +27,40 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionProfilController extends AbstractController
 {
 
+
     /**
-     * Formulaire pour calculer les profils directement à partir d'une session.
-     * Permet de choisir le correcteur et l'etalonnage
+     * Présélectionne toutes les réponses d'une session et redirige vers le formulaire correspondant
      * @param SessionRepository $session_repository
-     * @param Request $request
+     * @param ReponsesCandidatStorage $reponsesCandidatStorage
      * @param int $session_id
-     * @param int $recherche
      * @return Response
      */
-    #[Route("/session/form/{session_id}/{recherche}", name: "session_form")]
-    public function form(
-        SessionRepository $session_repository,
-        Request           $request,
-        int               $session_id,
-        int               $recherche = 0
+    #[Route("/form/session/{session_id}", name: "form_session")]
+    public function formSession(
+        SessionRepository       $session_repository,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        int                     $session_id,
     ): Response
     {
         $session = $session_repository->find($session_id);
+
+        $reponsesCandidatStorage->setFromSession($session);
+
+        return $this->redirectToRoute("calcul_score_form");
+    }
+
+    /**
+     * Formulaire pour choisir à la fois un correcteur et un étalonnage pour calculer un profil, à partir des réponses mises en cache.
+     */
+    #[Route("/form", name: "form")]
+    public function form(
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
+        Request                 $request,
+    ): Response
+    {
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
         $parametres_calcul_profil = new CorrecteurEtEtalonnageChoice();
 
@@ -61,15 +76,7 @@ class SessionProfilController extends AbstractController
             $correcteur = $parametres_calcul_profil->both->correcteur;
             $etalonnage = $parametres_calcul_profil->both->etalonnage;
 
-            return $this->redirectToRoute(
-                "calcul_profil_index",
-                [
-                    "session_id" => $session_id,
-                    "correcteur_id" => $correcteur->id,
-                    "etalonnage_id" => $etalonnage->id,
-                    "recherche" => $recherche,
-                ]
-            );
+            return $this->redirectToRoute("calcul_profil_index", ["correcteur_id" => $correcteur->id, "etalonnage_id" => $etalonnage->id]);
         }
 
         return $this->render('profil/form.html.twig', [
@@ -77,25 +84,43 @@ class SessionProfilController extends AbstractController
         ]);
     }
 
-    #[Route('/score/form/{session_id}/{correcteur_id}/{recherche}', name: "score_form")]
-    public function sessionProfilForm(
-        SessionRepository    $session_repository,
-        CorrecteurRepository $correcteur_repository,
-        Request              $request,
-        int                  $session_id,
-        int                  $correcteur_id,
-        int                  $recherche = 0): Response
+    #[Route("/form/score/session/{session_id}/{correcteur_id}", name: "form_score_session")]
+    public function formScoreSession(
+        SessionRepository       $session_repository,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        int                     $session_id,
+        int                     $correcteur_id,
+    ): Response
     {
         $session = $session_repository->find($session_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
 
-        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
-            return $response;
+        $reponsesCandidatStorage->setFromSession($session);
+
+        return $this->redirectToRoute("calcul_profil_form_score", ["correcteur_id" => $correcteur_id]);
+    }
+
+    #[Route('/form/score/{correcteur_id}', name: "form_score")]
+    public function sessionProfilForm(
+        ReponsesCandidatStorage  $reponsesCandidatStorage,
+        CheckSingleSession       $checkSingleSession,
+        SessionCorrecteurMatcher $sessionCorrecteurMatcher,
+        CorrecteurRepository     $correcteurRepository,
+        Request                  $request,
+        int                      $correcteur_id): Response
+    {
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
+
+        $correcteur = $correcteurRepository->find($correcteur_id);
+
+        if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
+            $this->addFlash("danger", "La session et le correcteur sont incompatibles");
+            return $this->redirectToRoute("home");
         }
 
         if ($correcteur->profil->etalonnages->isEmpty()) {
-            $this->addFlash("warning", "Pas d'étalonnage disponible");
-            return $this->redirectToRoute("home");
+            $this->addFlash("danger", "Pas d'étalonnage disponible pour le profil " . $correcteur->profil->nom);
+            return $this->redirectToRoute("etalonnage_index");
         }
 
         $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $correcteur->profil->etalonnages[0]);
@@ -114,10 +139,8 @@ class SessionProfilController extends AbstractController
             return $this->redirectToRoute(
                 "calcul_profil_index",
                 [
-                    "session_id" => $session_id,
                     "correcteur_id" => $correcteur_id,
                     "etalonnage_id" => $etalonnage->id,
-                    "recherche" => $recherche
                 ]
             );
         }
@@ -127,43 +150,40 @@ class SessionProfilController extends AbstractController
         ]);
     }
 
-    #[Route("/index/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "index")]
-    public function consulter(
-        CorrecteurManager              $correcteur_manager,
-        EtalonnageManager              $etalonnage_manager,
-        SessionRepository              $session_repository,
-        EtalonnageRepository           $etalonnage_repository,
-        CorrecteurRepository           $correcteur_repository,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $session_id,
-        int                            $correcteur_id,
-        int                            $etalonnage_id,
-        int                            $recherche = 0,
+    #[Route("/index/{correcteur_id}/{etalonnage_id}", name: "index")]
+    public function index(
+        ReponsesCandidatStorage     $reponsesCandidatStorage,
+        CheckSingleSession          $checkSingleSession,
+        CorrecteurManager           $correcteur_manager,
+        EtalonnageManager           $etalonnage_manager,
+        EtalonnageRepository        $etalonnageRepository,
+        CorrecteurRepository        $correcteurRepository,
+        SessionCorrecteurMatcher    $sessionCorrecteurMatcher,
+        CorrecteurEtalonnageMatcher $correcteurEtalonnageMatcher,
+        int                         $correcteur_id,
+        int                         $etalonnage_id,
     ): Response
     {
-        $session = $session_repository->find($session_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
-            return $response;
+        $correcteur = $correcteurRepository->find($correcteur_id);
+
+        if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
+            $this->addFlash("danger", "La session et le correcteur sont incompatibles");
+            return $this->redirectToRoute("home");
         }
 
-        if (($response = $this->declineInvalidProfil($correcteur, $etalonnage)) != null) {
-            return $response;
-        }
+        $etalonnage = $etalonnageRepository->find($etalonnage_id);
 
-        if ($recherche === 0) {
-            $reponses = $session->reponses_candidats->toArray();
-        } else {
-            $cached_reponses_ids = $reponses_candidat_session_storage->get();
-            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        if (!$correcteurEtalonnageMatcher->match($correcteur, $etalonnage)) {
+            $this->addFlash("danger", "Le correcteur et l'étalonnage choisis sont incompatibles");
+            return $this->redirectToRoute("home");
         }
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,
-            reponses_candidat: $reponses
+            reponses_candidat: $reponsesCandidats
         );
 
         $profils = $etalonnage_manager->etalonner(
@@ -171,94 +191,12 @@ class SessionProfilController extends AbstractController
             scores: $scores
         );
 
-        if ($recherche === 1) {
-            return $this->render("recherche/profil_index.html.twig",
-                ["profils" => $profils,
-                    "scores" => $scores,
-                    "session" => $session,
-                    "correcteur" => $correcteur,
-                    "etalonnage" => $etalonnage,
-                    "reponses" => $reponses]);
-        }
-
         return $this->render("profil/index_calcul.html.twig",
             ["profils" => $profils,
+                "reponses_candidats" => $reponsesCandidats,
                 "scores" => $scores,
                 "session" => $session,
                 "correcteur" => $correcteur,
                 "etalonnage" => $etalonnage]);
-    }
-
-    #[Route("/csv/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "csv")]
-    public function csv(
-        CorrecteurManager              $correcteur_manager,
-        EtalonnageManager              $etalonnage_manager,
-        SessionRepository              $session_repository,
-        EtalonnageRepository           $etalonnage_repository,
-        CorrecteurRepository           $correcteur_repository,
-        ExportProfils                  $exportProfils,
-        FileNameManager                $fileNameManager,
-        CsvManager                     $csvManager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                            $session_id,
-        int                            $correcteur_id,
-        int                            $etalonnage_id,
-        int                            $recherche = 0,
-    ): Response
-    {
-        $session = $session_repository->find($session_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        if (($response = $this->declineInvalidConcours($session, $correcteur)) != null) {
-            return $response;
-        }
-
-        if (($response = $this->declineInvalidProfil($correcteur, $etalonnage)) != null) {
-            return $response;
-        }
-
-        if ($recherche === 0) {
-            $reponses = $session->reponses_candidats->toArray();
-        } else {
-            $cached_reponses_ids = $reponses_candidat_session_storage->get();
-            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-        }
-
-        $scores = $correcteur_manager->corriger(
-            correcteur: $correcteur,
-            reponses_candidat: $reponses
-        );
-
-        $profils = $etalonnage_manager->etalonner(
-            etalonnage: $etalonnage,
-            scores: $scores
-        );
-
-        $data = $exportProfils->export(profil: $correcteur->profil, profils: $profils, reponses: $reponses);
-        $fileName = $fileNameManager->sessionProfilCsvFileName($session);
-        return $csvManager->export($data, $fileName);
-    }
-
-
-    private function declineInvalidProfil(Correcteur $correcteur, Etalonnage $etalonnage): ?Response
-    {
-        if ($correcteur->profil->id !== $etalonnage->profil->id) {
-            $this->addFlash("warning",
-                "Le correcteur et l'étalonnage sélectionnés ne correspondent pas au même profil.");
-            return new Response("");
-        }
-
-        return null;
-    }
-
-    private function declineInvalidConcours(Session $session, Correcteur $correcteur): ?Response
-    {
-        if ($session->concours->id !== $correcteur->concours->id) {
-            $this->addFlash("warning", "La session correspond à un concours que le correcteur ne support pas.");
-            return new Response("");
-        }
-        return null;
     }
 }
