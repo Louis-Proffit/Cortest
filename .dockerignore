@@ -1,12 +1,11 @@
 node_modules
 doc
+docs
 assets
 migrations
 var
 vendor
-public/tmp
 .idea
-mysql
 composer.lock
 package-lock.json
 .env.local

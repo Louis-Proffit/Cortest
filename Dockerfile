@@ -2,19 +2,18 @@ FROM php:8.1-apache
 
 RUN a2enmod rewrite
 
-VOLUME /var/lib/apt/lists
-VOLUME /var/cache/apt
+RUN rm -f /etc/apt/apt.conf.d/docker-clean
 
-RUN rm -f /etc/apt/apt.conf.d/docker-clean \
-    && apt-get update \
-    && apt-get -y --no-install-recommends install texlive-latex-base\
+RUN apt-get update \
+    && apt-get -y --no-install-recommends --fix-missing install texlive-latex-base\
     texlive-fonts-recommended  \
     texlive-fonts-extra \
     texlive-latex-extra  \
     libzip-dev \
     unzip \
     wget \
-    poppler-utils && apt-get clean
+    poppler-utils  \
+    && apt-get clean
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
