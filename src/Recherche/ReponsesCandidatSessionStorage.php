@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 
 /**
- * @extends AbstractItemStorage<ReponseCandidat[]>
+ * @extends AbstractItemStorage<App\Recherche\ReponseCandidat[]>
  *
  * @method int[] get()
  * @method int[] getOrSetDefault(int[] $default)
