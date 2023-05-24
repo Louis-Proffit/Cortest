@@ -2,7 +2,7 @@
 \usepackage[scaled]{helvet}
 \renewcommand\familydefault{\sfdefault}
 \usepackage[utf8]{inputenc}
-\usepackage[a4paper, total={19cm, 26cm}, top=0cm, headsep=0pt]{geometry}
+\usepackage[a4paper, total={19cm, 27cm}, top=0cm, headsep=0pt]{geometry}
 \usepackage{tabularx}
 \usepackage{textcomp}
 \usepackage{caption}
@@ -15,6 +15,26 @@
 \setlength\headheight{70pt}
 \usepackage{multirow}
 \graphicspath{ {{ "\{" ~ imagesDirectory ~ "\}" }} }
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+\newenvironment{ombrageBoite}
+    {\tcolorbox[
+    enhanced,
+    boxrule=0pt,
+    colback=white,
+    arc=0pt, outer arc=0pt,
+    drop shadow=black!100,
+    sharp corners,
+    hbox,
+    left=-3pt,
+    right=-3pt,
+    top=-3pt,
+    bottom=-3pt
+    ]}
+    {
+    \endtcolorbox
+    }
 
 \newcommand{\printChartResult}[3]{
     \begin{tikzpicture}
@@ -40,29 +60,32 @@
 {% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
 {% set typeConcours = {'E':'Externe', 'I':'Interne', 'R':'Réservé', 'S':'Spécial'} %}
 
+\fancyhf{}
 \fancyhead[C]{\Large\textbf{ {{ options.titre }} }}
 \rhead{\includegraphics[width=3cm]{logo.png}}
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{document}
-    \noindent\fbox{
-        \begin{minipage}{\linewidth}
-            \begin{tabular}{m{3cm} m{4.4cm} m{3.8cm} m{6.2cm}}
-                \hfill Nom de naissance:  & {{ reponse.nom|raw }}                         & \hfill Type du concours:        & {{ reponse.session.concours.nom|raw }} -- {{ typeConcours[reponse.eirs]|raw }} \\
-                \hfill Prénom:            & {{ reponse.prenom|raw }}                      & \hfill Version Batterie:        & {{ reponse.session.concours.version_batterie|raw }} -- {{ reponse.session.concours.type_concours|raw }} \\
-                \hfill Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & \hfill Date d'examen:           & {{ reponse.session.date|date('d/m/Y') }}                              \\
-                \hfill Sexe:              & {{ reponse.sexe|sexe }}                       & \hfill SGAMI/SGAP:              & {{ reponse.session.sgap.nom|raw }}                                    \\
-                \hfill Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & \hfill Numéro d'identification: & {{ reponse.code_barre|raw }}                                   \\
-                \hfill Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }} \\
-            \end{tabular}
-        \end{minipage}
-    }
+    \noindent
+    \begin{ombrageBoite}
+        \begin{tabular}{ | m{3cm} m{4.73cm} m{3.8cm} m{6.2cm} | }
+            \hline
+            \hfill Nom de naissance:  & {{ reponse.nom|raw }}                         & \hfill Type du concours:        & {{ reponse.session.concours.nom|raw }} -- {{ typeConcours[reponse.eirs]|raw }} \\
+            \hfill Prénom:            & {{ reponse.prenom|raw }}                      & \hfill Version Batterie:        & {{ reponse.session.concours.version_batterie|raw }} -- {{ reponse.session.concours.type_concours|raw }} \\
+            \hfill Nom d'usage:       & {{ reponse.nom_jeune_fille|raw }}             & \hfill Date d'examen:           & {{ reponse.session.date|date('d/m/Y') }}                              \\
+            \hfill Sexe:              & {{ reponse.sexe|sexe }}                       & \hfill SGAMI/SGAP:              & {{ reponse.session.sgap.nom|raw }}                                    \\
+            \hfill Date de naissance: & {{ reponse.date_de_naissance|date('d/m/Y') }} & \hfill Numéro d'identification: & {{ reponse.code_barre|raw }}                                   \\
+            \hfill Niveau scolaire: & {{ reponse.niveau_scolaire.nom|raw }}  & & \\
+            \hline
+        \end{tabular}
+    \end{ombrageBoite}
 
-    \vspace{-1mm}
+    \vspace{2.5mm}
 
     {% for subtest in graphique.subtests %}
     \noindent
-    \begin{longtable}{ | wr{4.2cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
+    \begin{ombrageBoite}
+    \begin{tabular}{ | wr{4.23cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
         \hline
 
         {% if subtest.type == constant("App\\Entity\\Subtest::TYPE_SUBTEST_BR_MR") %}
@@ -85,10 +108,10 @@
         {% else %} & \rule{0pt}{2.25ex} \\ {% endif %}
         {% for echelle in subtest.echelles_core %}
         {% if echelle.1|length > 0 %}
-        \multirow{ {{ echelle.1|length }} }*{ \begin{tabular}{c c} & \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } \\ \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } \end{tabular}}
-        \rule{0pt}{3.25ex}
+        \multirow[t]{ {{ echelle.1|length }} }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil[echelle[0]] }} } \end{tabular}}
+        \rule{0pt}{5.7mm}
         {% for echelleSimple in echelle[1] %}
-        & {{ optionsEchelle[echelleSimple].nom_affichage|raw }} & \fbox{ {{ (score[echelleSimple] < 10 ? '0') ~ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnage.nombre_classes }} } \\
+        & {{ optionsEchelle[echelleSimple].nom_affichage|raw }} & \fbox{ {{ (score[echelleSimple] < 10 ? '0') ~ score[echelleSimple] }} } & \printChartResult{ {{ profil[echelleSimple] }} }{0}{ {{ etalonnage.nombre_classes }} } \\{% if loop.last %}[1mm]{% endif %}
         {% endfor %}
         {% else %}
         \multirow{ 1 }*{ \tabular{c c} & \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } \\ \textit{classe} & \fbox{ {{ profil[echelle[0]] }} }}
@@ -101,6 +124,7 @@
         \multicolumn{4}{|p{19cm}|}{
             \centering
             \begin{tabular}{ c {% for echelle in subtest.echelles_footer %} {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %} m{1.5cm} c c {% elseif echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_ONLY") %} m{1.5cm} c {% else %} c {% endif %} {% endfor %} }
+                \rule{0pt}{2.8ex}
             {% for echelle in subtest.echelles_footer %}
             {% if echelle[1] == constant("App\\Entity\\Subtest::TYPE_FOOTER_SCORE_AND_CLASSE") %}
                 & {% if not loop.first %} \vline {% endif %} \hfill \textbf{ {{ optionsEchelle[echelle[0]].nom_affichage|raw }} } & \small{\textit{ score }} \fbox{ {{ score[echelle[0]]|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil[echelle[0]] }} }
@@ -109,15 +133,15 @@
                 {% else %}
                 & \fbox{ {{ score[echelle[0]]|number_format(0) }} {{ "\\%" }} }
                 {% endif %}
-                {% endfor %} \rule{0pt}{2.5ex}
+                {% endfor %} \\[1mm]
             \end{tabular}
         }
         \\
         {% endif %}
         \hline
-    \end{longtable}
-
-    \vspace{-5mm}
+    \end{tabular}
+    \end{ombrageBoite}
+    \vspace{2.5mm}
 {% endfor %}
 
 \end{document}
