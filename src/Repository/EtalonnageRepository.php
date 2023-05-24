@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\Etalonnage;
 use App\Entity\DefinitionScore;
+use App\Entity\Etalonnage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

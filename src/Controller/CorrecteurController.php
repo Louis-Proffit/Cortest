@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\IO\Correcteur\ExportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
-use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandler;
 use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandlerAddFlash;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
@@ -20,15 +19,12 @@ use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Header;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/correcteur", name: "correcteur_")]

@@ -5,7 +5,6 @@ namespace App\Core\IO\Profil;
 use App\Entity\Echelle;
 use App\Entity\Profil;
 use App\Entity\ReponseCandidat;
-use App\Entity\Session;
 
 class ExportProfils
 {

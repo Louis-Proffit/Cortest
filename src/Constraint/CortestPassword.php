@@ -4,7 +4,6 @@ namespace App\Constraint;
 
 use Attribute;
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;

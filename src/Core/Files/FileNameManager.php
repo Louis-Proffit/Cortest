@@ -5,7 +5,6 @@ namespace App\Core\Files;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use DateTime;
-use Psr\Log\LoggerInterface;
 
 /**
  * Fonctions pour nommer les fichiers produits par l'application Cortest

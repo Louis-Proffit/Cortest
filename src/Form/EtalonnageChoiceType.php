@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Etalonnage;
 use App\Entity\Profil;
-use App\Repository\EtalonnageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

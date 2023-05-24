@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Core\Reponses\ReponsesCandidatStorage;
-use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\SessionType;
-use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
 use App\Repository\SessionRepository;

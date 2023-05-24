@@ -2,9 +2,7 @@
 
 namespace App\Recherche;
 
-use App\Form\Data\RechercheFiltre;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @template T

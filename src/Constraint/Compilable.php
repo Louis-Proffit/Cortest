@@ -3,7 +3,6 @@
 namespace App\Constraint;
 
 use Attribute;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 #[Attribute]

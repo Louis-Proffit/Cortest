@@ -2,12 +2,9 @@
 
 namespace App\Entity;
 
-use App\Constraint\ClassName;
 use App\Repository\GrilleRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity]

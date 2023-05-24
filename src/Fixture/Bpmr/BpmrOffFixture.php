@@ -2,7 +2,6 @@
 
 namespace App\Fixture\Bpmr;
 
-use App\Core\Renderer\RendererOption;
 use App\Core\Renderer\Values\RendererBatonnets;
 use App\Entity\Concours;
 use App\Entity\Correcteur;

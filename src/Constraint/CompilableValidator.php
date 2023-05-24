@@ -4,7 +4,6 @@ namespace App\Constraint;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
-use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

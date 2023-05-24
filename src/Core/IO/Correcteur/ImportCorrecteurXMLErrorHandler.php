@@ -2,8 +2,6 @@
 
 namespace App\Core\IO\Correcteur;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-
 interface ImportCorrecteurXMLErrorHandler
 {
 

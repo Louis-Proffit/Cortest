@@ -4,8 +4,6 @@ namespace App\Core;
 
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
-use App\Entity\Session;
-use Symfony\Component\HttpFoundation\Response;
 
 class CorrecteurEtalonnageMatcher
 {

@@ -2,10 +2,6 @@
 
 namespace App\Core\Grille;
 
-use App\Core\Property;
-use Exception;
-use ReflectionClass;
-
 class Grille
 {
     public string $nom;

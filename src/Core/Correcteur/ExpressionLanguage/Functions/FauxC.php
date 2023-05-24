@@ -3,7 +3,6 @@
 namespace App\Core\Correcteur\ExpressionLanguage\Functions;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestFunction;
-use Closure;
 
 class FauxC extends CortestFunction
 {
