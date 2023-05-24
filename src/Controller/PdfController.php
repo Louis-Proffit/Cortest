@@ -4,16 +4,15 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\PdfManager;
+use App\Core\Files\Pdf\LatexCompilationFailedException;
+use App\Core\Files\Pdf\PdfManager;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
-use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\GraphiqueRepository;
 use App\Repository\ReponseCandidatRepository;
-use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -135,6 +134,9 @@ class PdfController extends AbstractController
 
     }
 
+    /**
+     * @throws LatexCompilationFailedException
+     */
     #[Route("/download/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
     public function download(
         GraphiqueRepository       $graphique_repository,
@@ -169,6 +171,9 @@ class PdfController extends AbstractController
         );
     }
 
+    /**
+     * @throws LatexCompilationFailedException
+     */
     #[Route("/download/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
     public function formSessionZip(
         EtalonnageRepository    $etalonnageRepository,
@@ -204,6 +209,9 @@ class PdfController extends AbstractController
         );
     }
 
+    /**
+     * @throws LatexCompilationFailedException
+     */
     #[Route("/download/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
     public function formSessionPdf(
         EtalonnageRepository    $etalonnageRepository,
