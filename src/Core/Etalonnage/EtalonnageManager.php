@@ -27,7 +27,7 @@ class EtalonnageManager
     {
         $etalonne = [];
 
-        foreach ($scores as $reponse_id => $score) {
+        foreach ($scores as $reponseId => $score) {
 
             $result = [];
 
@@ -53,7 +53,7 @@ class EtalonnageManager
 
             }
 
-            $etalonne[$reponse_id] = $result;
+            $etalonne[$reponseId] = $result;
         }
 
         return $etalonne;
@@ -64,13 +64,13 @@ class EtalonnageManager
         $bounds = [];
         for ($i = 1; $i <= $boundsNumber; $i++) {
             $percentile = $i / ($boundsNumber + 1);
-            $value = $this->inverse_normal_pdf($percentile, $mean, $stdDev);
+            $value = $this->inversNormalPdf($percentile, $mean, $stdDev);
             $bounds[] = $value;
         }
         return $bounds;
     }
 
-    private function inverse_normal_pdf(float $p, float $mu, float $sigma): float
+    private function inversNormalPdf(float $p, float $mu, float $sigma): float
     {
         $pdfValue = self::PERCENTILES_NORMAL[intval(round($p, 2) * 100)];
         return $pdfValue * $sigma + $mu;

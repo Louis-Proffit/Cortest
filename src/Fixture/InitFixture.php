@@ -63,7 +63,7 @@ class InitFixture extends Fixture
             id: 0,
             username: "psychologue",
             password: "UvsTr8L7Fz76m4",
-            role: CortestUser::ROLE_PSYCOLOGUE
+            role: CortestUser::ROLE_PSYCHOLOGUE
         );
 
         $correcteur = new CortestUser(

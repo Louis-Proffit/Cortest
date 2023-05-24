@@ -2,10 +2,8 @@
 
 namespace App\Form\Data;
 
-use App\Entity\Concours;
 use App\Entity\NiveauScolaire;
 use App\Entity\Session;
-use App\Entity\Sgap;
 use DateTime;
 
 class RechercheFiltre

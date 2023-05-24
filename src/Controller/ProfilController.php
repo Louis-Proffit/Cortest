@@ -17,20 +17,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProfilController extends AbstractController
 {
 
-
     #[Route("/index", name: "index")]
     public function index(
-        ProfilRepository $profil_repository
+        ProfilRepository $profilRepository
     ): Response
     {
-        $items = $profil_repository->findAll();
+        $items = $profilRepository->findAll();
 
         return $this->render("profil/index.html.twig", ["items" => $items]);
     }
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
+        EntityManagerInterface $entityManager,
         Request                $request
     ): RedirectResponse|Response
     {
@@ -38,7 +37,8 @@ class ProfilController extends AbstractController
             id: 0,
             nom: "",
             echelles: new ArrayCollection(),
-            etalonnages: new ArrayCollection(), graphiques: new ArrayCollection()
+            etalonnages: new ArrayCollection(),
+            graphiques: new ArrayCollection()
         );
 
         $form = $this->createForm(ProfilType::class, $item);
@@ -46,8 +46,8 @@ class ProfilController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($item);
-            $entity_manager->flush();
+            $entityManager->persist($item);
+            $entityManager->flush();
 
             return $this->redirectToRoute("profil_index");
 
@@ -58,16 +58,20 @@ class ProfilController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ProfilRepository       $profil_repository,
-        EntityManagerInterface $entity_manager,
+        ProfilRepository       $profilRepository,
+        EntityManagerInterface $entityManager,
         int                    $id): RedirectResponse
     {
-        $item = $profil_repository->find($id);
+        $item = $profilRepository->find($id);
 
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+        if ($item != null) {
+            $entityManager->remove($item);
+            $entityManager->flush();
 
-        $this->addFlash("success", "Suppression du profil enregistrée.");
+            $this->addFlash("success", "Suppression du profil enregistrée.");
+        } else {
+            $this->addFlash("danger", "Le profil n'existe pas ou a déjà été supprimé.");
+        }
 
         return $this->redirectToRoute("profil_index");
     }

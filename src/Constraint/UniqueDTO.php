@@ -2,9 +2,9 @@
 
 namespace App\Constraint;
 
+use Attribute;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Validator\Constraint;
-use Attribute;
 
 #[Attribute]
 class UniqueDTO extends Constraint

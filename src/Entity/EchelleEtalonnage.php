@@ -2,9 +2,8 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\PseudoTypes\Numeric_;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\Type;

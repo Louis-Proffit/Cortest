@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Correcteur;
 use App\Entity\Session;
 use App\Repository\CorrecteurRepository;
 use Symfony\Component\Form\AbstractType;

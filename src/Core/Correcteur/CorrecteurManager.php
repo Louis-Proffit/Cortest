@@ -49,9 +49,6 @@ class CorrecteurManager
 
 
             $corrige[$reponse_candidat->id] = $cortest_expression_environment->compute_scores();
-
-            // dump($reponse_candidat->reponses);
-            // dump($corrige[$reponse_candidat->id]);
         }
 
         return $corrige;

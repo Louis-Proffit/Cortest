@@ -2,7 +2,6 @@
 
 namespace App\Core\Correcteur\ExpressionLanguage\Environment;
 
-use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
 use App\Entity\Echelle;
 
 class CortestCompilationEnvironment

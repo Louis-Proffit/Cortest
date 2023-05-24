@@ -3,8 +3,8 @@
 namespace App\Entity;
 
 use App\Constraint\IsGraphiqueEchelleOptions;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Entity;
 
 #[Entity]
 class EchelleGraphique

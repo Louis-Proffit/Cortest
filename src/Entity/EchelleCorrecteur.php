@@ -3,8 +3,8 @@
 namespace App\Entity;
 
 use App\Constraint\Compilable;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Entity;
 
 #[Entity]
 class EchelleCorrecteur
@@ -38,6 +38,4 @@ class EchelleCorrecteur
         $this->echelle = $echelle;
         $this->correcteur = $correcteur;
     }
-
-
 }

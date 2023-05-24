@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Files\Csv\CsvReponseManager;
+use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\ConcoursRepository;
@@ -14,7 +14,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,27 +24,27 @@ class SessionController extends AbstractController
 
     #[Route('/index', name: "index")]
     public function index(
-        SessionRepository $session_repository,
-        GrilleRepository  $grille_repository,
+        SessionRepository $sessionRepository,
+        GrilleRepository  $grilleRepository,
     ): Response
     {
         /** @var array $session */
-        $sessions = $session_repository->findBy(array(),array('id' => 'desc'));
+        $sessions = $sessionRepository->findBy(array(), array('id' => 'desc'));
 
-        $grilles = $grille_repository->indexToInstance();
+        $grilles = $grilleRepository->indexToInstance();
 
         return $this->render('session/index.html.twig', ["sessions" => $sessions, "grilles" => $grilles]);
     }
 
     #[Route('/creer', name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
-        SgapRepository         $sgap_repository,
+        EntityManagerInterface $entityManager,
+        SgapRepository         $sgapRepository,
         ConcoursRepository     $concours_repository,
         Request                $request): Response
     {
         $concours = $concours_repository->findAll();
-        $sgaps = $sgap_repository->findAll();
+        $sgaps = $sgapRepository->findAll();
 
 
         if (empty($sgaps)) {
@@ -74,8 +73,8 @@ class SessionController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($session);
-            $entity_manager->flush();
+            $entityManager->persist($session);
+            $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $session->id]);
         }
@@ -88,12 +87,12 @@ class SessionController extends AbstractController
 
     #[Route('/modifier/{id}', name: "modifier")]
     public function modifier(
-        EntityManagerInterface $entity_manager,
-        SessionRepository      $session_repository,
+        EntityManagerInterface $entityManager,
+        SessionRepository      $sessionRepository,
         Request                $request,
         int                    $id): Response
     {
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
 
         $form = $this->createForm(SessionType::class, $session);
 
@@ -101,7 +100,7 @@ class SessionController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $session->id]);
         }
@@ -113,39 +112,37 @@ class SessionController extends AbstractController
     }
 
     #[Route('/consulter/{id}', name: "consulter")]
-    public function consulter(SessionRepository $session_repository, int $id): Response
+    public function consulter(SessionRepository $sessionRepository, int $id): Response
     {
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
 
-        return $this->render(
-            'session/session.html.twig',
-            ["session" => $session]
-        );
+        return $this->render('session/session.html.twig', ["session" => $session]);
     }
 
     #[Route("/csv/{id}", name: "csv")]
     public function csv(
-        CsvReponseManager $csv_reponse_manager,
-        SessionRepository $session_repository,
-        int               $id
-    ): BinaryFileResponse
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        SessionRepository       $sessionRepository,
+        int                     $id
+    ): Response
     {
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
+        $reponsesCandidatStorage->setFromSession($session);
 
-        $file_name = "session_" . $session->date->format("d-m-Y") . "_" . $session->concours->nom . ".csv";
-
-        return $csv_reponse_manager->export($session->reponses_candidats->toArray(), $file_name);
+        return $this->redirectToRoute("csv_reponses");
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(ManagerRegistry $doctrine,
-                              SessionRepository $session_repository,
-                              int $id): Response
+    public function supprimer(ManagerRegistry         $doctrine,
+                              ReponsesCandidatStorage $reponsesCandidatStorage,
+                              SessionRepository       $sessionRepository,
+                              int                     $id): Response
     {
-
-        $session = $session_repository->find($id);
+        $session = $sessionRepository->find($id);
 
         if ($session != null) {
+
+            $reponsesCandidatStorage->set(array()); // TODO be more specific ?, that is very conservative
 
             foreach ($session->reponses_candidats->toArray() as $candidat_reponse) {
                 $doctrine->getManager()->remove($candidat_reponse);
@@ -153,10 +150,12 @@ class SessionController extends AbstractController
 
             $doctrine->getManager()->remove($session);
             $doctrine->getManager()->flush();
-        }
 
+            $this->addFlash("success", "La session a bien été supprimée.");
+        } else {
+            $this->addFlash("danger", "La session n'existe pas ou a déjà été supprimée.");
+        }
 
         return $this->redirectToRoute("session_index");
     }
-
 }

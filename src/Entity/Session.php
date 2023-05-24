@@ -38,7 +38,7 @@ class Session
     #[ORM\ManyToOne(targetEntity: Sgap::class, inversedBy: "sessions")]
     public Sgap $sgap;
 
-    #[ORM\OneToMany(mappedBy: "session", targetEntity: ReponseCandidat::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "session", targetEntity: ReponseCandidat::class, cascade: ["remove", "persist"], fetch: 'EAGER')]
     public Collection $reponses_candidats;
 
     /**

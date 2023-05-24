@@ -12,7 +12,7 @@ class CortestAccessDeniedListener extends AbstractController implements AccessDe
 {
     public function handle(Request $request, AccessDeniedException $accessDeniedException): ?Response
     {
-        $this->addFlash("warning", "Accès refusé");
+        $this->addFlash("error", "Accès refusé");
         return $this->redirectToRoute("login");
     }
 }

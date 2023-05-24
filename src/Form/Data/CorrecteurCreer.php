@@ -2,7 +2,6 @@
 
 namespace App\Form\Data;
 
-use App\Constraint\ClassName;
 use App\Entity\Concours;
 use App\Entity\Profil;
 use Symfony\Component\Validator\Constraints\NotBlank;

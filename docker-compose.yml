@@ -3,7 +3,7 @@ version: '3.3'
 services:
     database:
         container_name: mysql
-        image: mysql:8.0
+        image: mysql:latest
         command: --default-authentication-plugin=mysql_native_password
         environment:
             MYSQL_ROOT_PASSWORD: mysql_root
@@ -11,17 +11,30 @@ services:
             MYSQL_USER: mysql
             MYSQL_PASSWORD: mysql
         ports:
-            - "4306:3306"
+            - "3306:3306"
+        volumes:
+            - data:/var/lib/mysql
+    phpmyadmin:
+        image: phpmyadmin:latest
+        restart: always
+        depends_on:
+            - database
+        ports:
+            - "8081:80"
+        environment:  # Same as database service
+            PMA_HOST: database
+            PMA_PORT: 3306
+            PMA_USER: mysql
+            PMA_PASSWORD: mysql
+    composer:
+        image: composer/composer:latest
+        command: install
     web:
         build: .
         ports:
             - "8080:80"
         depends_on:
             - database
-    phpmyadmin:
-        image: phpmyadmin
-        restart: always
-        ports:
-            - "8081:80"
-        environment:
-            - PMA_ARBITRARY=1
+            - composer
+volumes:
+    data:

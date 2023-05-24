@@ -7,7 +7,6 @@ use App\Form\SgapType;
 use App\Repository\SgapRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,17 +18,17 @@ class SgapController extends AbstractController
 
     #[Route("/index", name: "index")]
     public function index(
-        SgapRepository $sgap_repository,
+        SgapRepository $sgapRepository,
     ): Response
     {
-        $sgaps = $sgap_repository->findAll();
+        $sgaps = $sgapRepository->findAll();
 
         return $this->render("sgap/index.html.twig", ["sgaps" => $sgaps]);
     }
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
+        EntityManagerInterface $entityManager,
         Request                $request
     ): RedirectResponse|Response
     {
@@ -44,8 +43,8 @@ class SgapController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($item);
-            $entity_manager->flush();
+            $entityManager->persist($item);
+            $entityManager->flush();
 
             return $this->redirectToRoute("sgap_index");
 
@@ -56,13 +55,13 @@ class SgapController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        SgapRepository         $sgap_repository,
-        EntityManagerInterface $entity_manager,
+        SgapRepository         $sgapRepository,
+        EntityManagerInterface $entityManager,
         Request                $request,
         int                    $id
     ): Response
     {
-        $item = $sgap_repository->find($id);
+        $item = $sgapRepository->find($id);
 
         $form = $this->createForm(SgapType::class, $item);
 
@@ -70,7 +69,7 @@ class SgapController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute("sgap_index");
         }
@@ -80,14 +79,14 @@ class SgapController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        SgapRepository         $sgap_repository,
-        EntityManagerInterface $entity_manager,
+        SgapRepository         $sgapRepository,
+        EntityManagerInterface $entityManager,
         int                    $id): RedirectResponse
     {
-        $item = $sgap_repository->find($id);
+        $item = $sgapRepository->find($id);
 
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+        $entityManager->remove($item);
+        $entityManager->flush();
 
         $this->addFlash("success", "Suppression du SGAP enregistrée");
 

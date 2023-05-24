@@ -22,10 +22,14 @@ class ReponseCandidatControllerTest extends WebTestCase
         $this->login($this->client);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testSupprimer()
     {
         $reponse_candidat = self::getContainer()->get(ReponseCandidatRepository::class)->findOneBy([]);
+        $session_id = $reponse_candidat->session->id;
         $this->client->request(Request::METHOD_GET, "/reponse-candidat/supprimer/" . $reponse_candidat->id);
-        self::assertResponseRedirects("/session/index");
+        self::assertResponseRedirects("/session/consulter/" . $session_id);
     }
 }

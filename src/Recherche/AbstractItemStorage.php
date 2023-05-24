@@ -2,9 +2,7 @@
 
 namespace App\Recherche;
 
-use App\Form\Data\RechercheFiltre;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @template T
@@ -13,8 +11,8 @@ class AbstractItemStorage
 {
 
     public function __construct(
-        private readonly RequestStack $session,
-        private readonly string           $key
+        private readonly RequestStack $requestStack,
+        private readonly string       $key
     )
     {
     }
@@ -25,12 +23,12 @@ class AbstractItemStorage
      */
     public function set($item): void
     {
-        $this->session->getSession()->set($this->key, $item);
+        $this->requestStack->getSession()->set($this->key, $item);
     }
 
     public function has(): bool
     {
-        return $this->session->getSession()->has($this->key);
+        return $this->requestStack->getSession()->has($this->key);
     }
 
     /**
@@ -51,7 +49,7 @@ class AbstractItemStorage
      */
     public function get(): mixed
     {
-        return $this->session->getSession()->get($this->key);
+        return $this->requestStack->getSession()->get($this->key);
     }
 
 }

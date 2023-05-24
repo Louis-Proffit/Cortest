@@ -2,11 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\Correcteur;
 use App\Entity\Graphique;
 use App\Entity\Profil;
-use App\Entity\Session;
-use App\Repository\CorrecteurRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

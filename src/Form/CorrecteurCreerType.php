@@ -5,7 +5,6 @@ namespace App\Form;
 use App\Constraint\UniqueDTO;
 use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
-use App\Repository\GrilleRepository;
 use App\Repository\ProfilRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

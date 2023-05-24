@@ -35,7 +35,7 @@ class AdminControllerTest extends WebTestCase
         $client = self::createClient();
         $this->login($client);
 
-        $psycologue = $this->loadUser(CortestUser::ROLE_PSYCOLOGUE);
+        $psycologue = $this->loadUser(CortestUser::ROLE_PSYCHOLOGUE);
 
         $client->request(Request::METHOD_GET, "/admin/modifier/" . $psycologue->id);
         self::assertResponseIsSuccessful();
@@ -75,7 +75,7 @@ class AdminControllerTest extends WebTestCase
         $client = self::createClient();
         $this->login($client);
 
-        $psycologue = $this->loadUser(CortestUser::ROLE_PSYCOLOGUE);
+        $psycologue = $this->loadUser(CortestUser::ROLE_PSYCHOLOGUE);
 
         $client->request(Request::METHOD_GET, "/admin/supprimer/" . $psycologue->id);
         self::assertResponseRedirects("/admin/index");

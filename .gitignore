@@ -4,7 +4,6 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/public/build/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -21,12 +20,6 @@ yarn-error.log
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-
-/public/tmp/*
-/public/tmp
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
-
 .composer.lock
+
+/docs

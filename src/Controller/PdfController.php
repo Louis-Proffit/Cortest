@@ -4,15 +4,18 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\PdfManager;
+use App\Core\Files\Pdf\LatexCompilationFailedException;
+use App\Core\Files\Pdf\PdfManager;
+use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\DifferentSessionException;
+use App\Core\Reponses\NoReponsesCandidatException;
+use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
-use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\GraphiqueRepository;
 use App\Repository\ReponseCandidatRepository;
-use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,129 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PdfController extends AbstractController
 {
 
-    #[Route("/session/form/{session_id}/{correcteur_id}/{etalonnage_id}/{recherche}", name: "session_form")]
-    public function downloadZip(
-        CorrecteurRepository $correcteur_repository,
-        GraphiqueRepository  $graphique_repository,
-        Request              $request,
-        int                  $session_id,
-        int                  $correcteur_id,
-        int                  $etalonnage_id,
-        int                  $recherche=0): Response
-    {
-        $correcteur = $correcteur_repository->find($correcteur_id);
-
-        $graphiques = $graphique_repository->findAll();
-
-        if (empty($graphiques)) {
-            $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
-            return $this->redirectToRoute("graphique_index");
-        }
-
-        $graphique_choice = new GraphiqueChoice(graphique: $graphiques[0]);
-        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
-            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
-        ]);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() and $form->isValid()) {
-
-            return $this->redirectToRoute("pdf_session_download", [
-                "session_id" => $session_id,
-                "etalonnage_id" => $etalonnage_id,
-                "correcteur_id" => $correcteur_id,
-                "graphique_id" => $graphique_choice->graphique->id,
-                "recherche" => $recherche,
-            ]);
-        }
-
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
-
-    }
-
-    #[Route("/download/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "download")]
-    public function download(
-        GraphiqueRepository       $graphique_repository,
-        ReponseCandidatRepository $candidat_reponse_repository,
-        CorrecteurRepository      $correcteur_repository,
-        EtalonnageRepository      $etalonnage_repository,
-        CorrecteurManager         $correcteur_manager,
-        EtalonnageManager         $etalonnage_manager,
-        PdfManager                $pdf_manager,
-        int                       $candidat_reponse_id,
-        int                       $correcteur_id,
-        int                       $etalonnage_id,
-        int                       $graphique_id
-    ): Response
-    {
-        $correcteur = $correcteur_repository->find($correcteur_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
-        $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
-
-        $graphique = $graphique_repository->find($graphique_id);
-
-        $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
-        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
-
-
-        return $pdf_manager->createPdfFile(
-            graphique: $graphique,
-            candidat_reponse: $candidat_reponse,
-            correcteur: $correcteur,
-            etalonnage: $etalonnage,
-            score: $scores[$candidat_reponse_id],
-            profil: $profils[$candidat_reponse_id]
-        );
-    }
-
-    #[Route("/session/download/{session_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}/{recherche}", name: "session_download")]
-    public function form_session(
-        SessionRepository    $session_repository,
-        EtalonnageRepository $etalonnage_repository,
-        CorrecteurRepository $correcteur_repository,
-        GraphiqueRepository  $graphique_repository,
-        CorrecteurManager    $correcteur_manager,
-        EtalonnageManager    $etalonnage_manager,
-        PdfManager           $pdf_manager,
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        ReponseCandidatRepository      $reponse_candidat_repository,
-        int                  $session_id,
-        int                  $correcteur_id,
-        int                  $etalonnage_id,
-        int                  $graphique_id,
-        int                  $recherche=0,
-    ): Response
-    {
-        $session = $session_repository->find($session_id);
-        $correcteur = $correcteur_repository->find($correcteur_id);
-        $etalonnage = $etalonnage_repository->find($etalonnage_id);
-
-        $graphique = $graphique_repository->find($graphique_id);
-
-        if ($recherche === 0){
-            $reponses = $session->reponses_candidats->toArray();
-        }
-        else{
-            $cached_reponses_ids = $reponses_candidat_session_storage->get();
-            $reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
-        }
-
-        $scores = $correcteur_manager->corriger($correcteur, $reponses);
-        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
-
-        return $pdf_manager->createZipFile(
-            session: $session,
-            correcteur: $correcteur,
-            etalonnage: $etalonnage,
-            scores: $scores,
-            profils: $profils,
-            graphique: $graphique,
-            reponses: $reponses
-        );
-    }
-
-    #[Route("/form/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form")]
+    #[Route("/form/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form_single")]
     public function form(
         GraphiqueRepository  $graphique_repository,
         CorrecteurRepository $correcteur_repository,
@@ -162,11 +43,9 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("graphique_index");
         }
 
-        $graphique_choice = new GraphiqueChoice(
-            graphique: $graphiques[0]
-        );
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
 
-        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
             GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
         ]);
 
@@ -174,14 +53,233 @@ class PdfController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            return $this->redirectToRoute("pdf_download", [
+            return $this->redirectToRoute("pdf_single", [
                 "candidat_reponse_id" => $candidat_reponse_id,
                 "etalonnage_id" => $etalonnage_id,
-                "graphique_id"  => $graphique_choice->graphique->id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
                 "correcteur_id" => $correcteur_id]);
-
         }
 
         return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+    }
+
+    #[Route("/form/zip/{correcteur_id}/{etalonnage_id}", name: "form_zip")]
+    public function downloadZip(
+        CorrecteurRepository $correcteur_repository,
+        GraphiqueRepository  $graphique_repository,
+        Request              $request,
+        int                  $correcteur_id,
+        int                  $etalonnage_id): Response
+    {
+        $correcteur = $correcteur_repository->find($correcteur_id);
+
+        $graphiques = $graphique_repository->findAll();
+
+        if (empty($graphiques)) {
+            $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            return $this->redirectToRoute("pdf_zip", [
+                "etalonnage_id" => $etalonnage_id,
+                "correcteur_id" => $correcteur_id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
+            ]);
+        }
+
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+
+    }
+
+    #[Route("/form/merged/{correcteur_id}/{etalonnage_id}", name: "form_merged")]
+    public function downloadPdf(
+        CorrecteurRepository $correcteurRepository,
+        GraphiqueRepository  $graphiqueRepository,
+        Request              $request,
+        int                  $correcteur_id,
+        int                  $etalonnage_id): Response
+    {
+        $correcteur = $correcteurRepository->find($correcteur_id);
+
+        $graphiques = $graphiqueRepository->findAll();
+
+        if (empty($graphiques)) {
+            $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
+            return $this->redirectToRoute("graphique_index");
+        }
+
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            return $this->redirectToRoute("pdf_merged", [
+                "etalonnage_id" => $etalonnage_id,
+                "correcteur_id" => $correcteur_id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
+            ]);
+        }
+
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+
+    }
+
+    /**
+     * @throws LatexCompilationFailedException
+     */
+    #[Route("/download/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
+    public function download(
+        GraphiqueRepository       $graphique_repository,
+        ReponseCandidatRepository $candidat_reponse_repository,
+        CorrecteurRepository      $correcteur_repository,
+        EtalonnageRepository      $etalonnage_repository,
+        CorrecteurManager         $correcteur_manager,
+        EtalonnageManager         $etalonnage_manager,
+        PdfManager                $pdf_manager,
+        int                       $candidat_reponse_id,
+        int                       $correcteur_id,
+        int                       $etalonnage_id,
+        int                       $graphique_id
+    ): Response
+    {
+        $correcteur = $correcteur_repository->find($correcteur_id);
+        $etalonnage = $etalonnage_repository->find($etalonnage_id);
+
+        $reponseCandidat = $candidat_reponse_repository->find($candidat_reponse_id);
+
+        $graphique = $graphique_repository->find($graphique_id);
+
+        $scores = $correcteur_manager->corriger($correcteur, [$reponseCandidat]);
+        $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
+
+        return $pdf_manager->createPdfFile(
+            graphique: $graphique,
+            reponseCandidat: $reponseCandidat,
+            correcteur: $correcteur,
+            etalonnage: $etalonnage,
+            score: $scores[$candidat_reponse_id],
+            profil: $profils[$candidat_reponse_id]
+        );
+    }
+
+    /**
+     * @param EtalonnageRepository $etalonnageRepository
+     * @param CorrecteurRepository $correcteurRepository
+     * @param GraphiqueRepository $graphiqueRepository
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param PdfManager $pdfManager
+     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param CheckSingleSession $checkSingleSession
+     * @param int $correcteur_id
+     * @param int $etalonnage_id
+     * @param int $graphique_id
+     * @return Response
+     * @throws DifferentSessionException
+     * @throws LatexCompilationFailedException
+     * @throws NoReponsesCandidatException
+     */
+    #[Route("/download/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
+    public function formSessionZip(
+        EtalonnageRepository    $etalonnageRepository,
+        CorrecteurRepository    $correcteurRepository,
+        GraphiqueRepository     $graphiqueRepository,
+        CorrecteurManager       $correcteurManager,
+        EtalonnageManager       $etalonnageManager,
+        PdfManager              $pdfManager,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
+        int                     $correcteur_id,
+        int                     $etalonnage_id,
+        int                     $graphique_id,
+    ): Response
+    {
+        $correcteur = $correcteurRepository->find($correcteur_id);
+        $etalonnage = $etalonnageRepository->find($etalonnage_id);
+
+        $graphique = $graphiqueRepository->find($graphique_id);
+
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
+
+        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
+        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
+
+        return $pdfManager->createZipFile(
+            session: $session,
+            correcteur: $correcteur,
+            etalonnage: $etalonnage,
+            scores: $scores,
+            profils: $profils,
+            graphique: $graphique,
+            reponsesCandidat: $reponsesCandidats
+        );
+    }
+
+    /**
+     * @param EtalonnageRepository $etalonnageRepository
+     * @param CorrecteurRepository $correcteurRepository
+     * @param GraphiqueRepository $graphiqueRepository
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param PdfManager $pdfManager
+     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param CheckSingleSession $checkSingleSession
+     * @param int $correcteur_id
+     * @param int $etalonnage_id
+     * @param int $graphique_id
+     * @return Response
+     * @throws LatexCompilationFailedException
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
+    #[Route("/download/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
+    public function formSessionPdf(
+        EtalonnageRepository    $etalonnageRepository,
+        CorrecteurRepository    $correcteurRepository,
+        GraphiqueRepository     $graphiqueRepository,
+        CorrecteurManager       $correcteurManager,
+        EtalonnageManager       $etalonnageManager,
+        PdfManager              $pdfManager,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
+        int                     $correcteur_id,
+        int                     $etalonnage_id,
+        int                     $graphique_id,
+    ): Response
+    {
+        $correcteur = $correcteurRepository->find($correcteur_id);
+        $etalonnage = $etalonnageRepository->find($etalonnage_id);
+
+        $graphique = $graphiqueRepository->find($graphique_id);
+
+        $reponses_candidat = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponses_candidat);
+
+        $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
+        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
+
+        return $pdfManager->createPdfMergedFile(
+            session: $session,
+            correcteur: $correcteur,
+            etalonnage: $etalonnage,
+            scores: $scores,
+            profils: $profils,
+            graphique: $graphique,
+            reponsesCandidat: $reponses_candidat
+        );
     }
 }

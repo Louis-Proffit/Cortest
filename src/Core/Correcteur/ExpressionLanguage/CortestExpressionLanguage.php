@@ -3,7 +3,6 @@
 namespace App\Core\Correcteur\ExpressionLanguage;
 
 use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Core\Correcteur\ExpressionLanguage\Functions\Echelle;
 use App\Core\Correcteur\ExpressionLanguage\Functions\FauxA;
 use App\Core\Correcteur\ExpressionLanguage\Functions\FauxB;
@@ -19,15 +18,12 @@ use App\Core\Correcteur\ExpressionLanguage\Functions\VraiB;
 use App\Core\Correcteur\ExpressionLanguage\Functions\VraiC;
 use App\Core\Correcteur\ExpressionLanguage\Functions\VraiD;
 use App\Core\Correcteur\ExpressionLanguage\Functions\VraiE;
-use App\Entity\EchelleCorrecteur;
 use BadMethodCallException;
 use JetBrains\PhpStorm\Deprecated;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\SyntaxError;
-use TypeError;
 
 class CortestExpressionLanguage extends ExpressionLanguage implements ExpressionFunctionProviderInterface
 {

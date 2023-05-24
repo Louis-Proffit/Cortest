@@ -18,7 +18,7 @@ class LoginControllerTest extends WebTestCase
     public function provideSecurityCases(): Generator
     {
         yield [CortestUser::ROLE_ADMINISTRATEUR, "/admin/index", true];
-        yield [CortestUser::ROLE_PSYCOLOGUE, "/admin/index", false];
+        yield [CortestUser::ROLE_PSYCHOLOGUE, "/admin/index", false];
         yield [CortestUser::ROLE_CORRECTEUR, "/admin/index", false];
         // TODO add cases
     }
@@ -60,23 +60,27 @@ class LoginControllerTest extends WebTestCase
     public function testLogin(string $role): void
     {
         $client = self::createClient();
-        $client->request(Request::METHOD_GET, "/login");
-        self::assertResponseIsSuccessful();
+        $client->request(Request::METHOD_GET, "/");
+        self::assertResponseRedirects();
 
-        // dump($client->getCrawler());
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
 
         $user = $this->loadUser($role);
 
         $client->submitForm("Connexion", [
             "_username" => $user->username,
-            "_password" => $user->username
+            "_password" => $user->password
         ]);
+
         self::assertResponseRedirects("http://localhost/");
 
         $client->followRedirect();
         self::assertResponseIsSuccessful();
-        assertStringContainsString("Cortest", $client->getCrawler()->text());
-        assertStringContainsString("Se deconnecter", $client->getCrawler()->text());
+
+        $text = $client->getCrawler()->text();
+        assertStringContainsString("Cortest", $text);
+        assertStringContainsString("Se deconnecter", $text);
     }
 
     /**

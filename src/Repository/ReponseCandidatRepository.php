@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\ReponseCandidat;
 use App\Form\Data\RechercheFiltre;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -55,6 +54,10 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /**
+     * @param array $ids
+     * @return ReponseCandidat[]
+     */
     public function findAllByIds(array $ids): array
     {
         return $this->createQueryBuilder("r")

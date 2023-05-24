@@ -12,14 +12,13 @@
             <a class="btn btn-primary" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary" href="{{ path("calcul_score_form", {"session_id":session.id}) }}">Calculer
+            <a class="btn btn-secondary" href="{{ path("calcul_score_session_form", {"session_id":session.id}) }}">Calculer
                 les
                 scores</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary" href="{{ path("calcul_profil_session_form", {"session_id":session.id}) }}">Calculer
-                les
-                profils</a>
+            <a class="btn btn-secondary" href="{{ path("calcul_profil_form_session", {"session_id":session.id}) }}">Calculer
+                les profils</a>
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("session_csv", {"id":session.id}) }}">Exporter en .csv</a>
@@ -82,7 +81,7 @@
                 <td>{{ reponse.date_de_naissance|date("d/m/Y") }}</td>
                 <td>{{ reponse.sexe|sexe }}</td>
                 <td>{{ reponse.niveau_scolaire.nom }}</td>
-                <td>{{ reponse.eirs}}</td>
+                <td>{{ reponse.eirs }}</td>
                 <td><a class="btn btn-primary"
                        href="{{ path("reponse_candidat_supprimer", {"id":reponse.id}) }}">Supprimer</a>
                 </td>

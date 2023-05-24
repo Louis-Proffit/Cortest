@@ -31,17 +31,16 @@ class SessionScoreControllerTest extends WebTestCase
 
     public function testConsulter()
     {
-        $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
         $correcteur = self::getContainer()->get(CorrecteurRepository::class)->findOneBy([]);
         $this->client->request(Request::METHOD_GET,
-            "/calcul/score/index/" . $session->id . "/" . $correcteur->id);
+            "/calcul/score/index/". $correcteur->id);
         self::assertResponseIsSuccessful();
     }
 
     public function testForm()
     {
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET, "/calcul/score/form/" . $session->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/score/form");
         self::assertResponseIsSuccessful();
     }
 }

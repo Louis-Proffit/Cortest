@@ -8,7 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Type;
 
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
@@ -23,11 +25,6 @@ class ReponseCandidat
     const TYPE_R = "R";
     const TYPE_S = "S";
     const TYPES = [self::TYPE_E, self::TYPE_I, self::TYPE_R, self::TYPE_S];
-    const CHAMPS_EXPORT = ["Nom"=>0, "Prenom"=>1, "Nom de jeune fille"=>2, "Niveau scolaire"=>3,
-        "Date de naissance"=>4, "Sexe"=>5, "Réservé"=>6, "Autre 1"=>7, "Autre 2"=>8, "Code barre"=>9,
-        "EIRS" => 10];
-    const NOMBRE_CHAMPS_EXPORT = 11;
-    const OPTIONS_SEXE = ['Homme' => self::INDEX_HOMME, 'Femme' => self::INDEX_FEMME];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,7 +35,9 @@ class ReponseCandidat
     public Session $session;
 
     #[All([
-        new Type("int")
+        new Type("int"),
+        new LessThanOrEqual(5),
+        new GreaterThanOrEqual(0)
     ])]
     #[ORM\Column]
     public array $reponses;
