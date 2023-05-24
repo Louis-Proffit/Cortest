@@ -6,6 +6,9 @@ use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Files\Pdf\LatexCompilationFailedException;
 use App\Core\Files\Pdf\PdfManager;
+use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\DifferentSessionException;
+use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Form\Data\GraphiqueChoice;
 use App\Form\GraphiqueChoiceType;
@@ -40,9 +43,9 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("graphique_index");
         }
 
-        $graphique_choice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
 
-        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
             GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
         ]);
 
@@ -53,7 +56,7 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("pdf_single", [
                 "candidat_reponse_id" => $candidat_reponse_id,
                 "etalonnage_id" => $etalonnage_id,
-                "graphique_id" => $graphique_choice->graphique->id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
                 "correcteur_id" => $correcteur_id]);
         }
 
@@ -77,8 +80,8 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("graphique_index");
         }
 
-        $graphique_choice = new GraphiqueChoice(graphique: $graphiques[0]);
-        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
             GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
         ]);
 
@@ -89,7 +92,7 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("pdf_zip", [
                 "etalonnage_id" => $etalonnage_id,
                 "correcteur_id" => $correcteur_id,
-                "graphique_id" => $graphique_choice->graphique->id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
             ]);
         }
 
@@ -99,23 +102,23 @@ class PdfController extends AbstractController
 
     #[Route("/form/merged/{correcteur_id}/{etalonnage_id}", name: "form_merged")]
     public function downloadPdf(
-        CorrecteurRepository $correcteur_repository,
-        GraphiqueRepository  $graphique_repository,
+        CorrecteurRepository $correcteurRepository,
+        GraphiqueRepository  $graphiqueRepository,
         Request              $request,
         int                  $correcteur_id,
         int                  $etalonnage_id): Response
     {
-        $correcteur = $correcteur_repository->find($correcteur_id);
+        $correcteur = $correcteurRepository->find($correcteur_id);
 
-        $graphiques = $graphique_repository->findAll();
+        $graphiques = $graphiqueRepository->findAll();
 
         if (empty($graphiques)) {
             $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
             return $this->redirectToRoute("graphique_index");
         }
 
-        $graphique_choice = new GraphiqueChoice(graphique: $graphiques[0]);
-        $form = $this->createForm(GraphiqueChoiceType::class, $graphique_choice, [
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
             GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
         ]);
 
@@ -126,7 +129,7 @@ class PdfController extends AbstractController
             return $this->redirectToRoute("pdf_merged", [
                 "etalonnage_id" => $etalonnage_id,
                 "correcteur_id" => $correcteur_id,
-                "graphique_id" => $graphique_choice->graphique->id,
+                "graphique_id" => $graphiqueChoice->graphique->id,
             ]);
         }
 
@@ -154,16 +157,17 @@ class PdfController extends AbstractController
     {
         $correcteur = $correcteur_repository->find($correcteur_id);
         $etalonnage = $etalonnage_repository->find($etalonnage_id);
-        $candidat_reponse = $candidat_reponse_repository->find($candidat_reponse_id);
+
+        $reponseCandidat = $candidat_reponse_repository->find($candidat_reponse_id);
 
         $graphique = $graphique_repository->find($graphique_id);
 
-        $scores = $correcteur_manager->corriger($correcteur, [$candidat_reponse]);
+        $scores = $correcteur_manager->corriger($correcteur, [$reponseCandidat]);
         $profils = $etalonnage_manager->etalonner($etalonnage, $scores);
 
         return $pdf_manager->createPdfFile(
             graphique: $graphique,
-            reponseCandidat: $candidat_reponse,
+            reponseCandidat: $reponseCandidat,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             score: $scores[$candidat_reponse_id],
@@ -172,7 +176,21 @@ class PdfController extends AbstractController
     }
 
     /**
+     * @param EtalonnageRepository $etalonnageRepository
+     * @param CorrecteurRepository $correcteurRepository
+     * @param GraphiqueRepository $graphiqueRepository
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param PdfManager $pdfManager
+     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param CheckSingleSession $checkSingleSession
+     * @param int $correcteur_id
+     * @param int $etalonnage_id
+     * @param int $graphique_id
+     * @return Response
+     * @throws DifferentSessionException
      * @throws LatexCompilationFailedException
+     * @throws NoReponsesCandidatException
      */
     #[Route("/download/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
     public function formSessionZip(
@@ -183,6 +201,7 @@ class PdfController extends AbstractController
         EtalonnageManager       $etalonnageManager,
         PdfManager              $pdfManager,
         ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
         int                     $correcteur_id,
         int                     $etalonnage_id,
         int                     $graphique_id,
@@ -193,24 +212,39 @@ class PdfController extends AbstractController
 
         $graphique = $graphiqueRepository->find($graphique_id);
 
-        // TODO get session (for file name) and check it is consistent
-        $reponses_candidat = $reponsesCandidatStorage->get();
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
+        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
         $profils = $etalonnageManager->etalonner($etalonnage, $scores);
 
         return $pdfManager->createZipFile(
+            session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             scores: $scores,
             profils: $profils,
             graphique: $graphique,
-            reponsesCandidat: $reponses_candidat
+            reponsesCandidat: $reponsesCandidats
         );
     }
 
     /**
+     * @param EtalonnageRepository $etalonnageRepository
+     * @param CorrecteurRepository $correcteurRepository
+     * @param GraphiqueRepository $graphiqueRepository
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param PdfManager $pdfManager
+     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param CheckSingleSession $checkSingleSession
+     * @param int $correcteur_id
+     * @param int $etalonnage_id
+     * @param int $graphique_id
+     * @return Response
      * @throws LatexCompilationFailedException
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
      */
     #[Route("/download/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
     public function formSessionPdf(
@@ -221,6 +255,7 @@ class PdfController extends AbstractController
         EtalonnageManager       $etalonnageManager,
         PdfManager              $pdfManager,
         ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
         int                     $correcteur_id,
         int                     $etalonnage_id,
         int                     $graphique_id,
@@ -231,13 +266,14 @@ class PdfController extends AbstractController
 
         $graphique = $graphiqueRepository->find($graphique_id);
 
-        // TODO get session (for file name) and check it is consistent
         $reponses_candidat = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponses_candidat);
 
         $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
         $profils = $etalonnageManager->etalonner($etalonnage, $scores);
 
         return $pdfManager->createPdfMergedFile(
+            session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             scores: $scores,

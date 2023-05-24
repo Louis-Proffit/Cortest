@@ -9,7 +9,6 @@ class NoReponsesCandidatException extends Exception
 
     public function __construct()
     {
-        parent::__construct("Aucune réponse candidat : impossible de trouver la session correspondante");
+        parent::__construct("Aucune réponse de candidat sélectionnée : impossible de trouver la session correspondante");
     }
-
 }

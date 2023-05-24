@@ -9,6 +9,7 @@ use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
+use App\Entity\Session;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -229,6 +230,7 @@ class PdfManager
     }
 
     /**
+     * @param Session $session la session commune à toutes les réponses. Toutes les réponses ne sont pas forcément incluses
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
      * @param array $scores
@@ -239,6 +241,7 @@ class PdfManager
      * @throws LatexCompilationFailedException
      */
     public function createZipFile(
+        Session    $session,
         Correcteur $correcteur,
         Etalonnage $etalonnage,
         array      $scores,
@@ -274,7 +277,7 @@ class PdfManager
 
             $zip->close();
 
-            return $this->produceResponse($zipFilePath, $this->fileNameManager->mergedProfilsZipFileName($reponsesCandidat));
+            return $this->produceResponse($zipFilePath, $this->fileNameManager->mergedProfilsZipFileName($session));
 
         }
 
@@ -282,6 +285,7 @@ class PdfManager
     }
 
     /**
+     * @param Session $session la session commune à toutes les réponses. Toutes les réponses ne sont pas forcément incluses
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
      * @param array $scores
@@ -292,6 +296,7 @@ class PdfManager
      * @throws LatexCompilationFailedException
      */
     public function createPdfMergedFile(
+        Session    $session,
         Correcteur $correcteur,
         Etalonnage $etalonnage,
         array      $scores,
@@ -336,7 +341,7 @@ class PdfManager
                 return false;
             }
 
-            return $this->produceResponse($mergedPdfFilePath, $this->fileNameManager->mergedProfilsPdfFileName($reponsesCandidat));
+            return $this->produceResponse($mergedPdfFilePath, $this->fileNameManager->mergedProfilsPdfFileName($session));
         }
 
         return false;

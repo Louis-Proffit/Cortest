@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
  * @see LatexCompilationFailedException
  */
 #[AsEventListener]
-final class LatexCompilationFailedEventListener extends AbstractController
+final class LatexCompilationFailedExceptionEventListener extends AbstractController
 {
 
     public function __construct(

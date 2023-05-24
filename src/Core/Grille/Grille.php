@@ -2,20 +2,17 @@
 
 namespace App\Core\Grille;
 
-class Grille
+/**
+ * Type de base pour une grille. Cela correspond à la description abstraite d'une feuille de réponse que remplit un candidat.
+ */
+abstract class Grille
 {
-    public string $nom;
-    public int $nombre_questions;
 
     /**
      * @param string $nom
      * @param int $nombre_questions
      */
-    public function __construct(string $nom, int $nombre_questions)
+    public function __construct(public string $nom, public int $nombre_questions)
     {
-        $this->nom = $nom;
-        $this->nombre_questions = $nombre_questions;
     }
-
-
 }

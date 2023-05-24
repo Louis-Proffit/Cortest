@@ -38,20 +38,12 @@ class FileNameManager
     }
 
     /**
-     * @param ReponseCandidat[] $reponsesCandidat
+     * @param Session $session
      * @return string
      */
-    public function mergedProfilsPdfFileName(array $reponsesCandidat): string
+    public function mergedProfilsPdfFileName(Session $session): string
     {
-        $singleSession = $this->singleSession($reponsesCandidat);
-
-        if (!$singleSession) {
-            // Tous les profils appartiennent à la même session, l'utiliser dans le nom du fichier
-            return "tous_profils_session_" . $this->formatDate($singleSession->date) . self::PDF_EXTENSION;
-        }
-
-        // Nom par défaut, impossible de faire mieux.
-        return "tous_profils" . self::PDF_EXTENSION;
+        return "tous_profils_session_" . $this->formatDate($session->date) . self::PDF_EXTENSION;
     }
 
     /**
@@ -65,33 +57,14 @@ class FileNameManager
     }
 
     /**
-     * @param ReponseCandidat[] $reponsesCandidat
+     * @param Session $session
      * @return string
      */
-    public function mergedProfilsZipFileName(array $reponsesCandidat): string
+    public function mergedProfilsZipFileName(Session $session): string
     {
-        $singleSession = $this->singleSession($reponsesCandidat);
-
-        if (!$singleSession) {
-            // Tous les profils appartiennent à la même session, l'utiliser dans le nom du fichier
-            return "tous_profils_session_" . $this->formatDate($singleSession->date) . self::ZIP_EXTENSION;
-        }
-
-        // Nom par défaut, impossible de faire mieux.
-        return "tous_profils" . self::ZIP_EXTENSION;
+        return "tous_profils_session_" . $this->formatDate($session->date) . self::ZIP_EXTENSION;
     }
 
-    private function singleSession(array $reponsesCandidat): Session|false
-    {
-        $sessions_by_id = [];
-
-        foreach ($reponsesCandidat as $reponseCandidat) {
-            $sessions_by_id[$reponseCandidat->session->id] = $reponseCandidat->session;
-        }
-
-        # reset a exactement le comportement attendu
-        return reset($sessions_by_id);
-    }
 
     private function formatDate(DateTime $dateTime): string
     {

@@ -24,10 +24,16 @@ class CheckSingleSession
         $session = $first->session;
         $sessionId = $session->id;
 
+        $sessions = [$sessionId => $session];
+
         foreach ($reponsesCandidats as $reponseCandidat) {
             if ($reponseCandidat->session->id != $sessionId) {
-                throw new DifferentSessionException();
+                $sessions[$reponseCandidat->session->id] = $reponseCandidat->session;
             }
+        }
+
+        if (count($sessions) > 1) {
+            throw new DifferentSessionException(sessions: $sessions);
         }
 
         return $session;

@@ -2,13 +2,13 @@
 
 namespace App\Core\Files\Pdf;
 
-use App\Controller\Exception\LatexCompilationFailedEventListener;
+use App\Controller\Exception\LatexCompilationFailedExceptionEventListener;
 use App\Entity\ReponseCandidat;
 use Exception;
 
 /**
  * Exception lancée par l'échec d'une compilation Latex.
- * @see LatexCompilationFailedEventListener
+ * @see LatexCompilationFailedExceptionEventListener
  */
 class LatexCompilationFailedException extends Exception
 {

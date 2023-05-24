@@ -72,7 +72,7 @@ class RechercheController extends AbstractController
 
         $recherche_reponses_candidat = new RechercheReponsesCandidat(reponses_candidat: $reponse_candidats_checked);
         $form_reponses = $this->createForm(RechercheReponsesCandidatType::class, $recherche_reponses_candidat);
-        $form_filtre = $this->createForm(RechercheFiltreType::class, $filtre);
+        $formFiltre = $this->createForm(RechercheFiltreType::class, $filtre);
 
         $form_reponses->handleRequest($request);
         if ($form_reponses->isSubmitted() and $form_reponses->isValid()) {
@@ -92,8 +92,8 @@ class RechercheController extends AbstractController
             return $this->redirectToRoute("recherche_index");
         }
 
-        $form_filtre->handleRequest($request);
-        if ($form_filtre->isSubmitted() and $form_filtre->isValid()) {
+        $formFiltre->handleRequest($request);
+        if ($formFiltre->isSubmitted() and $formFiltre->isValid()) {
 
             $filtre_session_storage->set($filtre);
 
@@ -102,7 +102,7 @@ class RechercheController extends AbstractController
 
         return $this->render("recherche/index.html.twig",
             ["selectionnes" => $cached_reponses,
-                "form_filtre" => $form_filtre->createView(),
+                "form_filtre" => $formFiltre->createView(),
                 "form_reponses" => $form_reponses->createView()]);
     }
 

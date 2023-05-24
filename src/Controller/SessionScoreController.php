@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\DifferentSessionException;
+use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
@@ -24,12 +26,12 @@ class SessionScoreController extends AbstractController
 
     #[Route('/form/session/{session_id}', name: "session_form")]
     public function formSession(
-        SessionRepository              $session_repository,
+        SessionRepository              $sessionRepository,
         ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
         int                            $session_id): Response
     {
         /** @var Session $session */
-        $session = $session_repository->find($session_id);
+        $session = $sessionRepository->find($session_id);
 
         $reponsesCandidatsIds = array_map(fn(ReponseCandidat $reponseCandidat) => $reponseCandidat->id, $session->reponses_candidats->toArray());
         $reponsesCandidatSessionStorage->set($reponsesCandidatsIds);
@@ -37,6 +39,10 @@ class SessionScoreController extends AbstractController
         return $this->redirectToRoute("calcul_score_form");
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route('/form', name: "form")]
     public function form(
         ReponsesCandidatStorage $reponsesCandidatStorage,
@@ -46,9 +52,9 @@ class SessionScoreController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $parametres_calcul_score = new CorrecteurChoice();
+        $parametresCalculScore = new CorrecteurChoice();
         $form = $this->createForm(CorrecteurChoiceType::class,
-            $parametres_calcul_score,
+            $parametresCalculScore,
             [CorrecteurChoiceType::OPTION_SESSION => $session]
         );
 
@@ -56,7 +62,7 @@ class SessionScoreController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $parametres_calcul_score->correcteur;
+            $correcteur = $parametresCalculScore->correcteur;
 
             return $this->redirectToRoute("calcul_score_index", ["correcteur_id" => $correcteur->id]);
         }
@@ -66,13 +72,17 @@ class SessionScoreController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route("/index/{correcteur_id}", name: "index")]
     public function consulter(
-        ReponsesCandidatStorage        $reponsesCandidatStorage,
-        CheckSingleSession             $checkSingleSession,
-        CorrecteurRepository           $correcteur_repository,
-        CorrecteurManager              $correcteur_manager,
-        int                            $correcteur_id
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        CheckSingleSession      $checkSingleSession,
+        CorrecteurRepository    $correcteur_repository,
+        CorrecteurManager       $correcteur_manager,
+        int                     $correcteur_id
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();

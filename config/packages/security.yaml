@@ -26,12 +26,15 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }
         - { path: ^/session, roles: ROLE_CORRECTEUR }
         - { path: ^/lecture, roles: ROLE_CORRECTEUR }
         - { path: ^/recherche, roles: ROLE_CORRECTEUR }
+        - { path: ^/csv, roles: ROLE_CORRECTEUR }
+        - { path: ^/pdf, roles: ROLE_CORRECTEUR }
+        - { path: ^/calcul, roles: ROLE_CORRECTEUR }
         - { path: ^/$, roles: ROLE_CORRECTEUR }
         - { path: ^/, roles: ROLE_PSYCHOLOGUE }
 

@@ -18,10 +18,10 @@ class FiltreSessionStorage extends AbstractItemStorage
     const KEY = "recherche_filtre_key";
 
     public function __construct(
-        private readonly RequestStack $session
+        private readonly RequestStack $requestStack
     )
     {
-        parent::__construct($this->session, self::KEY);
+        parent::__construct($this->requestStack, self::KEY);
     }
 
 

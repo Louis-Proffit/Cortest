@@ -6,6 +6,8 @@ use App\Core\Correcteur\CorrecteurManager;
 use App\Core\CorrecteurEtalonnageMatcher;
 use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\DifferentSessionException;
+use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Core\SessionCorrecteurMatcher;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
@@ -15,6 +17,7 @@ use App\Form\EtalonnageChoiceType;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\SessionRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,27 +30,29 @@ class SessionProfilController extends AbstractController
 
     /**
      * Présélectionne toutes les réponses d'une session et redirige vers le formulaire correspondant
-     * @param SessionRepository $session_repository
+     * @param SessionRepository $sessionRepository
      * @param ReponsesCandidatStorage $reponsesCandidatStorage
      * @param int $session_id
      * @return Response
      */
     #[Route("/form/session/{session_id}", name: "form_session")]
     public function formSession(
-        SessionRepository       $session_repository,
+        SessionRepository       $sessionRepository,
         ReponsesCandidatStorage $reponsesCandidatStorage,
         int                     $session_id,
     ): Response
     {
-        $session = $session_repository->find($session_id);
+        $session = $sessionRepository->find($session_id);
 
         $reponsesCandidatStorage->setFromSession($session);
 
-        return $this->redirectToRoute("calcul_score_form");
+        return $this->redirectToRoute("calcul_profil_form");
     }
 
     /**
      * Formulaire pour choisir à la fois un correcteur et un étalonnage pour calculer un profil, à partir des réponses mises en cache.
+     * @throws NoReponsesCandidatException
+     * @throws DifferentSessionException
      */
     #[Route("/form", name: "form")]
     public function form(
@@ -59,19 +64,19 @@ class SessionProfilController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $parametres_calcul_profil = new CorrecteurEtEtalonnageChoice();
+        $parametresCalculProfil = new CorrecteurEtEtalonnageChoice();
 
         $form = $this->createForm(
             CorrecteurEtEtalonnageChoiceType::class,
-            $parametres_calcul_profil,
+            $parametresCalculProfil,
             [CorrecteurEtEtalonnageChoiceType::OPTION_SESSION => $session]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $parametres_calcul_profil->both->correcteur;
-            $etalonnage = $parametres_calcul_profil->both->etalonnage;
+            $correcteur = $parametresCalculProfil->both->correcteur;
+            $etalonnage = $parametresCalculProfil->both->etalonnage;
 
             return $this->redirectToRoute("calcul_profil_index", ["correcteur_id" => $correcteur->id, "etalonnage_id" => $etalonnage->id]);
         }
@@ -83,19 +88,32 @@ class SessionProfilController extends AbstractController
 
     #[Route("/form/score/session/{session_id}/{correcteur_id}", name: "form_score_session")]
     public function formScoreSession(
-        SessionRepository       $session_repository,
+        SessionRepository       $sessionRepository,
         ReponsesCandidatStorage $reponsesCandidatStorage,
+        LoggerInterface         $logger,
         int                     $session_id,
         int                     $correcteur_id,
     ): Response
     {
-        $session = $session_repository->find($session_id);
+        $session = $sessionRepository->find($session_id);
 
-        $reponsesCandidatStorage->setFromSession($session);
+        if ($session != null) {
+            $reponsesCandidatStorage->setFromSession($session);
 
-        return $this->redirectToRoute("calcul_profil_form_score", ["correcteur_id" => $correcteur_id]);
+            return $this->redirectToRoute("calcul_profil_form_score", ["correcteur_id" => $correcteur_id]);
+        } else {
+            $this->addFlash("danger", "La session n'existe pas, ou a été supprimée");
+
+            $logger->error("Ajout des réponses à partir d'une session qui n'existe pas : " . $session_id);
+
+            return $this->redirectToRoute("home");
+        }
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route('/form/score/{correcteur_id}', name: "form_score")]
     public function sessionProfilForm(
         ReponsesCandidatStorage  $reponsesCandidatStorage,
@@ -147,6 +165,10 @@ class SessionProfilController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route("/index/{correcteur_id}/{etalonnage_id}", name: "index")]
     public function index(
         ReponsesCandidatStorage     $reponsesCandidatStorage,

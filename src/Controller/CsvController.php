@@ -11,6 +11,8 @@ use App\Core\IO\Profil\ExportProfils;
 use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
 use App\Core\IO\Score\ExportScores;
 use App\Core\Reponses\CheckSingleSession;
+use App\Core\Reponses\DifferentSessionException;
+use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Core\SessionCorrecteurMatcher;
 use App\Repository\CorrecteurRepository;
@@ -33,11 +35,15 @@ class CsvController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
 
         $data = $exportReponsesCandidat->export($reponsesCandidats);
-        $fileName = "export_recherche_reponses.csv"; // TODO generify ?
+        $fileName = "reponses_candidat.csv";
 
         return $csvManager->export($data, $fileName);
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route("/scores/{correcteur_id}", name: "scores")]
     public function scores(
         ReponsesCandidatStorage $reponsesCandidatStorage,
@@ -64,6 +70,10 @@ class CsvController extends AbstractController
         return $csvManager->export($data, $file_name);
     }
 
+    /**
+     * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
+     */
     #[Route("/profils/{correcteur_id}/{etalonnage_id}", name: "profils")]
     public function profils(
         ReponsesCandidatStorage     $reponsesCandidatStorage,

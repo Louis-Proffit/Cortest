@@ -18,18 +18,18 @@ class ReponseCandidatController extends AbstractController
         ReponseCandidatRepository $reponse_candidat_repository,
         int                       $id): Response
     {
-        $reponse_candidat = $reponse_candidat_repository->find($id);
+        $reponseCandidat = $reponse_candidat_repository->find($id);
 
-        if ($reponse_candidat == null) {
-            $this->addFlash("danger", "Les réponses de ce candidat n'existent pas ou ont déja été supprimées.");
+        if ($reponseCandidat == null) {
+            $this->addFlash("danger", "Les réponses de ce candidat n'existent pas ou ont été supprimées.");
             return $this->redirectToRoute("home");
         }
 
-        $session_id = $reponse_candidat->session->id;
+        $sessionId = $reponseCandidat->session->id;
 
-        $entity_manager->remove($reponse_candidat);
+        $entity_manager->remove($reponseCandidat);
         $entity_manager->flush();
 
-        return $this->redirectToRoute("session_consulter", ["id" => $session_id]);
+        return $this->redirectToRoute("session_consulter", ["id" => $sessionId]);
     }
 }
