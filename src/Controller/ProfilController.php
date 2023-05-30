@@ -7,6 +7,7 @@ use App\Form\ProfilType;
 use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,20 +59,16 @@ class ProfilController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ProfilRepository       $profilRepository,
+        LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
-        int                    $id): RedirectResponse
+        Profil                 $profil): RedirectResponse
     {
-        $item = $profilRepository->find($id);
+        $logger->info("Suppression du profil : " . $profil->id);
 
-        if ($item != null) {
-            $entityManager->remove($item);
-            $entityManager->flush();
+        $entityManager->remove($profil);
+        $entityManager->flush();
 
-            $this->addFlash("success", "Suppression du profil enregistrée.");
-        } else {
-            $this->addFlash("danger", "Le profil n'existe pas ou a déjà été supprimé.");
-        }
+        $this->addFlash("success", "Suppression du profil enregistrée.");
 
         return $this->redirectToRoute("profil_index");
     }

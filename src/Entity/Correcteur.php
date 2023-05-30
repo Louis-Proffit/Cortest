@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
-#[UniqueEntity('nom')]
+#[UniqueEntity('nom', message: "Ce nom de correcteur est déjà utilisé")]
 class Correcteur
 {
     #[ORM\Id]
@@ -65,6 +65,10 @@ class Correcteur
         return $result;
     }
 
+    /**
+     * TODO inutile ?
+     * @return array
+     */
     public function get_echelles_ids(): array
     {
         $echelles_ids = array();
@@ -75,6 +79,4 @@ class Correcteur
         }
         return $echelles_ids;
     }
-
-
 }

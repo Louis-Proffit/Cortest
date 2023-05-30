@@ -20,5 +20,11 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+
+    # Choix du compilateur pdflatex pour la production de fichiers pdf
+    # Pdflatex est le seul proposé pour le moment
+    App\Core\Files\Pdf\Compiler\PdflatexLatexCompiler: ~
+    App\Core\Files\Pdf\Compiler\LatexCompiler: '@App\Core\Files\Pdf\Compiler\PdflatexLatexCompiler'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

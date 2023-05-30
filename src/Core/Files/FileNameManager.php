@@ -2,6 +2,7 @@
 
 namespace App\Core\Files;
 
+use App\Entity\Correcteur;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use DateTime;
@@ -12,6 +13,7 @@ use DateTime;
 class FileNameManager
 {
 
+    const XML_EXTENSION = ".xml";
     const CSV_EXTENSION = ".csv";
     const ZIP_EXTENSION = ".zip";
     const PDF_EXTENSION = ".pdf";
@@ -63,6 +65,22 @@ class FileNameManager
     public function mergedProfilsZipFileName(Session $session): string
     {
         return "tous_profils_session_" . $this->formatDate($session->date) . self::ZIP_EXTENSION;
+    }
+
+    public function correcteurXmlFileName(Correcteur $correcteur): string
+    {
+        // TODO mettre le vrai nom du correcteur, mais ça doit être un nom de fichier valide
+        return "export_correcteur" . self::XML_EXTENSION;
+    }
+
+    /**
+     * @param ReponseCandidat[] $reponseCandidats
+     * @return string
+     */
+    public function reponsesCsvFileName(array $reponseCandidats): string
+    {
+        // TODO prendre en compte reponseCandidats ? Pas forcément
+        return "reponses_candidats" . self::CSV_EXTENSION;
     }
 
 

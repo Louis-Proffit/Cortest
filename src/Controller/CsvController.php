@@ -15,8 +15,11 @@ use App\Core\Reponses\DifferentSessionException;
 use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Core\SessionCorrecteurMatcher;
+use App\Entity\Correcteur;
+use App\Entity\Etalonnage;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,12 +33,14 @@ class CsvController extends AbstractController
         ReponsesCandidatStorage $reponsesCandidatStorage,
         ExportReponsesCandidat  $exportReponsesCandidat,
         CsvManager              $csvManager,
+        FileNameManager         $fileNameManager
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
 
         $data = $exportReponsesCandidat->export($reponsesCandidats);
-        $fileName = "reponses_candidat.csv";
+
+        $fileName = $fileNameManager->reponsesCsvFileName($reponsesCandidats);
 
         return $csvManager->export($data, $fileName);
     }
@@ -46,24 +51,28 @@ class CsvController extends AbstractController
      */
     #[Route("/scores/{correcteur_id}", name: "scores")]
     public function scores(
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        CheckSingleSession      $checkSingleSession,
-        CorrecteurRepository    $correcteur_repository,
-        CorrecteurManager       $correcteur_manager,
-        ExportScores            $csv_score_manager,
-        FileNameManager         $fileNameManager,
-        CsvManager              $csvManager,
-        int                     $correcteur_id
+        SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
+        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        CheckSingleSession                           $checkSingleSession,
+        CorrecteurManager                            $correcteurManager,
+        ExportScores                                 $exportScores,
+        FileNameManager                              $fileNameManager,
+        CsvManager                                   $csvManager,
+        #[MapEntity(id: "correcteur_id")] Correcteur $correcteur
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
+
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $correcteur = $correcteur_repository->find($correcteur_id);
+        if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
+            $this->addFlash("danger", "La session et le correcteur sont incompatibles (pas le même concours).");
+            return $this->redirectToRoute("home");
+        }
 
-        $scores = $correcteur_manager->corriger($correcteur, $reponsesCandidats);
+        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
 
-        $data = $csv_score_manager->export(profil: $correcteur->profil, scores: $scores, reponses: $reponsesCandidats);
+        $data = $exportScores->export(profil: $correcteur->profil, scores: $scores, reponses: $reponsesCandidats);
 
         $file_name = $fileNameManager->sessionScoreCsvFileName($session);
 
@@ -76,32 +85,26 @@ class CsvController extends AbstractController
      */
     #[Route("/profils/{correcteur_id}/{etalonnage_id}", name: "profils")]
     public function profils(
-        ReponsesCandidatStorage     $reponsesCandidatStorage,
-        CheckSingleSession          $checkSingleSession,
-        CorrecteurManager           $correcteurManager,
-        EtalonnageManager           $etalonnageManager,
-        EtalonnageRepository        $etalonnageRepository,
-        CorrecteurRepository        $correcteurRepository,
-        ExportProfils               $exportProfils,
-        FileNameManager             $fileNameManager,
-        CsvManager                  $csvManager,
-        SessionCorrecteurMatcher    $sessionCorrecteurMatcher,
-        CorrecteurEtalonnageMatcher $correcteurEtalonnageMatcher,
-        int                         $correcteur_id,
-        int                         $etalonnage_id,
+        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        CheckSingleSession                           $checkSingleSession,
+        CorrecteurManager                            $correcteurManager,
+        EtalonnageManager                            $etalonnageManager,
+        ExportProfils                                $exportProfils,
+        FileNameManager                              $fileNameManager,
+        CsvManager                                   $csvManager,
+        SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
+        CorrecteurEtalonnageMatcher                  $correcteurEtalonnageMatcher,
+        #[MapEntity(id: "correcteur_id")] Correcteur $correcteur,
+        #[MapEntity(id: "etalonnage_id")] Etalonnage $etalonnage
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $correcteur = $correcteurRepository->find($correcteur_id);
-
         if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
             $this->addFlash("danger", "La session et le correcteur sont incompatibles");
             return $this->redirectToRoute("home");
         }
-
-        $etalonnage = $etalonnageRepository->find($etalonnage_id);
 
         if (!$correcteurEtalonnageMatcher->match($correcteur, $etalonnage)) {
             $this->addFlash("danger", "Le correcteur et l'étalonnage choisis sont incompatibles");
@@ -110,7 +113,7 @@ class CsvController extends AbstractController
 
         $scores = $correcteurManager->corriger(
             correcteur: $correcteur,
-            reponses_candidat: $reponsesCandidats
+            reponseCandidats: $reponsesCandidats
         );
 
         $profils = $etalonnageManager->etalonner(

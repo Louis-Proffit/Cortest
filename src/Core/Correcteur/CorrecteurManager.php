@@ -13,17 +13,17 @@ class CorrecteurManager
 
 
     public function __construct(
-        private readonly CortestExpressionLanguage $cortest_expression_language
+        private readonly CortestExpressionLanguage $cortestExpressionLanguage
     )
     {
     }
 
     /**
      * @param Correcteur $correcteur
-     * @param ReponseCandidat[] $reponses_candidat
+     * @param ReponseCandidat[] $reponseCandidats
      * @return array
      */
-    public function corriger(Correcteur $correcteur, array $reponses_candidat): array
+    public function corriger(Correcteur $correcteur, array $reponseCandidats): array
     {
         $corrige = [];
 
@@ -39,16 +39,16 @@ class CorrecteurManager
             array_map(fn(EchelleCorrecteur $e) => $e->expression, $echelles)
         );
 
-        foreach ($reponses_candidat as $reponse_candidat) {
+        foreach ($reponseCandidats as $reponseCandidat) {
 
-            $cortest_expression_environment = new CortestEvaluationEnvironment(
-                reponses: $reponse_candidat->reponses,
+            $cortestEvaluationEnvironment = new CortestEvaluationEnvironment(
+                reponses: $reponseCandidat->reponses,
                 types: $types,
                 expressions: $expressions,
-                cortest_expression_language: $this->cortest_expression_language);
+                cortest_expression_language: $this->cortestExpressionLanguage);
 
 
-            $corrige[$reponse_candidat->id] = $cortest_expression_environment->compute_scores();
+            $corrige[$reponseCandidat->id] = $cortestEvaluationEnvironment->compute_scores();
         }
 
         return $corrige;

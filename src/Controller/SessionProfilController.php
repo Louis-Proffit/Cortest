@@ -10,14 +10,14 @@ use App\Core\Reponses\DifferentSessionException;
 use App\Core\Reponses\NoReponsesCandidatException;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Core\SessionCorrecteurMatcher;
+use App\Entity\Correcteur;
+use App\Entity\Etalonnage;
+use App\Entity\Session;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
 use App\Form\EtalonnageChoiceType;
-use App\Repository\CorrecteurRepository;
-use App\Repository\EtalonnageRepository;
-use App\Repository\SessionRepository;
-use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,23 +27,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionProfilController extends AbstractController
 {
 
-
     /**
      * Présélectionne toutes les réponses d'une session et redirige vers le formulaire correspondant
-     * @param SessionRepository $sessionRepository
      * @param ReponsesCandidatStorage $reponsesCandidatStorage
-     * @param int $session_id
+     * @param Session $session
      * @return Response
      */
     #[Route("/form/session/{session_id}", name: "form_session")]
     public function formSession(
-        SessionRepository       $sessionRepository,
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        int                     $session_id,
+        ReponsesCandidatStorage                $reponsesCandidatStorage,
+        #[MapEntity(id: "session_id")] Session $session
     ): Response
     {
-        $session = $sessionRepository->find($session_id);
-
         $reponsesCandidatStorage->setFromSession($session);
 
         return $this->redirectToRoute("calcul_profil_form");
@@ -88,26 +83,14 @@ class SessionProfilController extends AbstractController
 
     #[Route("/form/score/session/{session_id}/{correcteur_id}", name: "form_score_session")]
     public function formScoreSession(
-        SessionRepository       $sessionRepository,
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        LoggerInterface         $logger,
-        int                     $session_id,
-        int                     $correcteur_id,
+        ReponsesCandidatStorage                $reponsesCandidatStorage,
+        #[MapEntity(id: "session_id")] Session $session,
+        int                                    $correcteur_id
     ): Response
     {
-        $session = $sessionRepository->find($session_id);
+        $reponsesCandidatStorage->setFromSession($session);
 
-        if ($session != null) {
-            $reponsesCandidatStorage->setFromSession($session);
-
-            return $this->redirectToRoute("calcul_profil_form_score", ["correcteur_id" => $correcteur_id]);
-        } else {
-            $this->addFlash("danger", "La session n'existe pas, ou a été supprimée");
-
-            $logger->error("Ajout des réponses à partir d'une session qui n'existe pas : " . $session_id);
-
-            return $this->redirectToRoute("home");
-        }
+        return $this->redirectToRoute("calcul_profil_form_score", ["correcteur_id" => $correcteur_id]);
     }
 
     /**
@@ -116,17 +99,15 @@ class SessionProfilController extends AbstractController
      */
     #[Route('/form/score/{correcteur_id}', name: "form_score")]
     public function sessionProfilForm(
-        ReponsesCandidatStorage  $reponsesCandidatStorage,
-        CheckSingleSession       $checkSingleSession,
-        SessionCorrecteurMatcher $sessionCorrecteurMatcher,
-        CorrecteurRepository     $correcteurRepository,
-        Request                  $request,
-        int                      $correcteur_id): Response
+        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        CheckSingleSession                           $checkSingleSession,
+        SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
+        Request                                      $request,
+        #[MapEntity(id: "correcteur_id")] Correcteur $correcteur
+    ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
-
-        $correcteur = $correcteurRepository->find($correcteur_id);
 
         if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
             $this->addFlash("danger", "La session et le correcteur sont incompatibles");
@@ -154,7 +135,7 @@ class SessionProfilController extends AbstractController
             return $this->redirectToRoute(
                 "calcul_profil_index",
                 [
-                    "correcteur_id" => $correcteur_id,
+                    "correcteur_id" => $correcteur->id,
                     "etalonnage_id" => $etalonnage->id,
                 ]
             );
@@ -171,29 +152,23 @@ class SessionProfilController extends AbstractController
      */
     #[Route("/index/{correcteur_id}/{etalonnage_id}", name: "index")]
     public function index(
-        ReponsesCandidatStorage     $reponsesCandidatStorage,
-        CheckSingleSession          $checkSingleSession,
-        CorrecteurManager           $correcteur_manager,
-        EtalonnageManager           $etalonnage_manager,
-        EtalonnageRepository        $etalonnageRepository,
-        CorrecteurRepository        $correcteurRepository,
-        SessionCorrecteurMatcher    $sessionCorrecteurMatcher,
-        CorrecteurEtalonnageMatcher $correcteurEtalonnageMatcher,
-        int                         $correcteur_id,
-        int                         $etalonnage_id,
+        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        CheckSingleSession                           $checkSingleSession,
+        CorrecteurManager                            $correcteur_manager,
+        EtalonnageManager                            $etalonnage_manager,
+        SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
+        CorrecteurEtalonnageMatcher                  $correcteurEtalonnageMatcher,
+        #[MapEntity(id: "correcteur_id")] Correcteur $correcteur,
+        #[MapEntity(id: "etalonnage_id")] Etalonnage $etalonnage
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $correcteur = $correcteurRepository->find($correcteur_id);
-
         if (!$sessionCorrecteurMatcher->match($session, $correcteur)) {
             $this->addFlash("danger", "La session et le correcteur sont incompatibles");
             return $this->redirectToRoute("home");
         }
-
-        $etalonnage = $etalonnageRepository->find($etalonnage_id);
 
         if (!$correcteurEtalonnageMatcher->match($correcteur, $etalonnage)) {
             $this->addFlash("danger", "Le correcteur et l'étalonnage choisis sont incompatibles");
@@ -202,7 +177,7 @@ class SessionProfilController extends AbstractController
 
         $scores = $correcteur_manager->corriger(
             correcteur: $correcteur,
-            reponses_candidat: $reponsesCandidats
+            reponseCandidats: $reponsesCandidats
         );
 
         $profils = $etalonnage_manager->etalonner(

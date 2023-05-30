@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Recherche;
+namespace App\Core\Reponses;
 
 use App\Form\Data\RechercheFiltre;
 use Symfony\Component\HttpFoundation\RequestStack;

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Constraint\CortestPassword;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -12,6 +13,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity("username", message: "Ce nom d'utilisateur existe déjà.")]
 class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
@@ -19,9 +21,7 @@ class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLE_PSYCHOLOGUE = "ROLE_PSYCHOLOGUE";
     const ROLE_CORRECTEUR = "ROLE_CORRECTEUR";
 
-    const ROLES = [
-        self::ROLE_ADMINISTRATEUR, self::ROLE_PSYCHOLOGUE, self::ROLE_CORRECTEUR
-    ];
+    const ROLES = [self::ROLE_ADMINISTRATEUR, self::ROLE_PSYCHOLOGUE, self::ROLE_CORRECTEUR];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,11 +29,11 @@ class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
     public int $id;
 
     #[NotBlank]
-    #[Length(max: 100 )]
+    #[Length(max: 100)]
     #[ORM\Column(length: 100, unique: true)]
     public string $username;
 
-    #[CortestPassword(min:5)]
+    #[CortestPassword(min: 5)]
     #[ORM\Column]
     public string $password;
 

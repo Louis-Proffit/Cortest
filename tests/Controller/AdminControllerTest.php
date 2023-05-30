@@ -27,7 +27,6 @@ class AdminControllerTest extends WebTestCase
     }
 
     /**
-     * TODO ajouter des configurations de modification pour différents utilisateurs
      * @return void
      */
     public function testModifier(): void

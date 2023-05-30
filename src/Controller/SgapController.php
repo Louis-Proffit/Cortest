@@ -6,6 +6,7 @@ use App\Entity\Sgap;
 use App\Form\SgapType;
 use App\Repository\SgapRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,15 +56,12 @@ class SgapController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        SgapRepository         $sgapRepository,
         EntityManagerInterface $entityManager,
         Request                $request,
-        int                    $id
+        Sgap                   $sgap
     ): Response
     {
-        $item = $sgapRepository->find($id);
-
-        $form = $this->createForm(SgapType::class, $item);
+        $form = $this->createForm(SgapType::class, $sgap);
 
         $form->handleRequest($request);
 
@@ -79,13 +77,12 @@ class SgapController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        SgapRepository         $sgapRepository,
+        LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
-        int                    $id): RedirectResponse
+        Sgap                   $sgap): RedirectResponse
     {
-        $item = $sgapRepository->find($id);
-
-        $entityManager->remove($item);
+        $logger->info("Suppression du sgap : " . $sgap->nom);
+        $entityManager->remove($sgap);
         $entityManager->flush();
 
         $this->addFlash("success", "Suppression du SGAP enregistrée");

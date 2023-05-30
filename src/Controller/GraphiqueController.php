@@ -21,6 +21,8 @@ use App\Repository\SubtestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,10 +34,10 @@ class GraphiqueController extends AbstractController
 
     #[Route("/index", name: 'index')]
     public function index(
-        GraphiqueRepository $graphique_repository
+        GraphiqueRepository $graphiqueRepository
     ): Response
     {
-        $graphiques = $graphique_repository->findAll();
+        $graphiques = $graphiqueRepository->findAll();
 
         return $this->render('graphique/index.html.twig',
             ["graphiques" => $graphiques]);
@@ -43,22 +45,22 @@ class GraphiqueController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
-        ProfilRepository       $profil_repository,
-        RendererRepository     $renderer_repository,
+        EntityManagerInterface $entityManager,
+        ProfilRepository       $profilRepository,
+        RendererRepository     $rendererRepository,
         Request                $request
     ): Response
     {
-        $profils = $profil_repository->findAll();
+        $profils = $profilRepository->findAll();
 
         if (empty($profils)) {
-            $this->addFlash("warning", "Pas de profils disponibles, créez en un");
+            $this->addFlash("warning", "Pas de profils disponibles, veuillez en créez un");
             return $this->redirectToRoute("profil_index");
         }
 
         $creer_graphique = new GraphiqueCreer(
             nom: "",
-            renderer_index: $renderer_repository->sampleIndex(),
+            renderer_index: $rendererRepository->sampleIndex(),
             profil: $profils[0]
         );
 
@@ -69,7 +71,7 @@ class GraphiqueController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $profil = $creer_graphique->profil;
-            $renderer = $renderer_repository->fromIndex($creer_graphique->renderer_index);
+            $renderer = $rendererRepository->fromIndex($creer_graphique->renderer_index);
 
             $graphique = new Graphique(
                 id: 0,
@@ -83,8 +85,8 @@ class GraphiqueController extends AbstractController
 
             Graphique::initializeEchelles($graphique, $renderer);
 
-            $entity_manager->persist($graphique);
-            $entity_manager->flush();
+            $entityManager->persist($graphique);
+            $entityManager->flush();
 
 
             return $this->redirectToRoute("graphique_modifier", ["id" => $graphique->id]);
@@ -95,13 +97,11 @@ class GraphiqueController extends AbstractController
 
     #[Route("/consulter/{id}", name: 'consulter')]
     public function consulter(
-        GraphiqueRepository $graphique_repository,
-        RendererRepository  $renderer_repository,
-        int                 $id
+        RendererRepository $rendererRepository,
+        Graphique          $graphique
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
-        $renderer = $renderer_repository->fromIndex($graphique->renderer_index);
+        $renderer = $rendererRepository->fromIndex($graphique->renderer_index);
 
         return $this->render("graphique/graphique.html.twig", ["graphique" => $graphique,
             "renderer" => $renderer,
@@ -114,15 +114,13 @@ class GraphiqueController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        GraphiqueRepository $graphique_repository,
-        RendererRepository  $renderer_repository,
-        ManagerRegistry     $doctrine,
-        Request             $request,
-        int                 $id,
+        RendererRepository $rendererRepository,
+        ManagerRegistry    $doctrine,
+        Request            $request,
+        Graphique          $graphique
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
-        $renderer = $renderer_repository->fromIndex($graphique->renderer_index);
+        $renderer = $rendererRepository->fromIndex($graphique->renderer_index);
 
         $form = $this->createForm(GraphiqueType::class, $graphique, [GraphiqueType::OPTION_RENDERER => $renderer]);
 
@@ -141,18 +139,10 @@ class GraphiqueController extends AbstractController
     #[Route("/creer-subtest/{id}", name: "creer_subtest")]
     public function ajouterSubtest(
         Request                $request,
-        GraphiqueRepository    $graphique_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id,
+        EntityManagerInterface $entityManager,
+        Graphique              $graphique
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
-
-        if ($graphique == null) {
-            $this->addFlash("warning", "Le graphique n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
-
         $subtest = new Subtest(
             0,
             "",
@@ -167,8 +157,8 @@ class GraphiqueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $entity_manager->persist($subtest);
-            $entity_manager->flush();
+            $entityManager->persist($subtest);
+            $entityManager->flush();
 
             return $this->redirectToRoute("graphique_consulter_subtest",
                 ["id_subtest" => $subtest->id]);
@@ -183,28 +173,18 @@ class GraphiqueController extends AbstractController
 
     #[Route("/modifier-nom-subtest/{id}/{idSubtest}", name: "modifier_nom_subtest")]
     public function modifierNomSubtest(
-        Request                $request,
-        GraphiqueRepository    $graphique_repository,
-        SubtestRepository      $subtestRepository,
-        EntityManagerInterface $entity_manager,
-        int                    $id,
-        int                    $idSubtest,
+        Request                               $request,
+        EntityManagerInterface                $entityManager,
+        #[MapEntity(id: "idSubtest")] Subtest $subtest
     ): Response
     {
-        $subtest = $subtestRepository->find($idSubtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
-
         $form = $this->createForm(SubtestNomType::class, $subtest);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $entity_manager->persist($subtest);
-            $entity_manager->flush();
+            $entityManager->persist($subtest);
+            $entityManager->flush();
 
             return $this->redirectToRoute("graphique_consulter_subtest",
                 ["id_subtest" => $subtest->id]);
@@ -219,38 +199,27 @@ class GraphiqueController extends AbstractController
 
     #[Route("/supprimer-subtest/{id_subtest}", name: "supprimer_subtest")]
     public function supprimerSubtest(
-        EntityManagerInterface $entity_manager,
-        SubtestRepository      $subtest_repository,
-        int                    $id_subtest,
+        LoggerInterface                        $logger,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
+        $graphiqueId = $subtest->graphique->id;
 
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
+        $logger->info("Suppression du subtest " . $subtest->id);
+        $entityManager->remove($subtest);
+        $entityManager->flush();
 
-        $graphique_id = $subtest->graphique->id;
-        $entity_manager->remove($subtest);
-        $entity_manager->flush();
+        $this->addFlash("success", "Subtest supprimé");
 
-        return $this->redirectToRoute("graphique_consulter", ["id" => $graphique_id]);
+        return $this->redirectToRoute("graphique_consulter", ["id" => $graphiqueId]);
     }
 
     #[Route("/consulter-subtest/{id_subtest}", name: "consulter_subtest")]
     public function consulterSubtest(
-        SubtestRepository $subtest_repository,
-        int               $id_subtest,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
-
         if ($subtest->type == Subtest::TYPE_SUBTEST_BR_MR) {
 
             return $this->render("graphique/consulter_subtest_br_mr.html.twig",
@@ -264,18 +233,11 @@ class GraphiqueController extends AbstractController
 
     #[Route("/ajouter-echelle-subtest/{id_subtest}", name: "subtest_ajouter_echelle")]
     public function modifierSubtest(
-        Request                $request,
-        SubtestRepository      $subtest_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id_subtest,
+        Request                                $request,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
 
         $graphique = $subtest->graphique;
 
@@ -306,10 +268,10 @@ class GraphiqueController extends AbstractController
                     $echelle_subtest_br_mr->echelle_mr->echelle->id,
                 );
 
-                $entity_manager->flush();
+                $entityManager->flush();
 
                 return $this->redirectToRoute("graphique_consulter_subtest",
-                    ["id_subtest" => $id_subtest]);
+                    ["id_subtest" => $subtest->id]);
             }
         } else {
             $echelle_subtest_simple = new EchelleGraphiqueChoice($graphique->echelles[0]);
@@ -325,10 +287,10 @@ class GraphiqueController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $subtest->echelles_core[] = array($echelle_subtest_simple->echelle->id, array());
 
-                $entity_manager->flush();
+                $entityManager->flush();
 
                 return $this->redirectToRoute("graphique_consulter_subtest",
-                    ["id_subtest" => $id_subtest]);
+                    ["id_subtest" => $subtest->id]);
             }
         }
 
@@ -341,19 +303,11 @@ class GraphiqueController extends AbstractController
 
     #[Route("/supprimer-composite/{id_subtest}/{id_composite}", name: "subtest_supprimer_composite")]
     public function supprimerComposite(
-        EntityManagerInterface $entity_manager,
-        SubtestRepository      $subtest_repository,
-        int                    $id_subtest,
-        int                    $id_composite,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest,
+        int                                    $id_composite,
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
-
         $subtest->echelles_core = array_filter(
             $subtest->echelles_core,
             function (array $id_composite_et_ids_simples) use ($id_composite) {
@@ -362,39 +316,32 @@ class GraphiqueController extends AbstractController
             }
         );
 
-        $entity_manager->flush();
+        $entityManager->flush();
 
-        return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $id_subtest]);
+        return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $subtest->id]);
     }
 
     #[Route("/ajouter-simple/{id_subtest}/{id_composite}", name: "ajouter_simple")]
     public function ajouterSimple(
-        Request                $request,
-        SubtestRepository      $subtest_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id_subtest,
-        int                    $id_composite,
+        Request                                $request,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest,
+        int                                    $id_composite,
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
 
         if (empty($subtest->graphique->echellesSimples())) {
             $this->addFlash("warning", "Le graphique n'a pas d'échelles simples");
             return $this->redirectToRoute("graphique_consulter", ["id" => $subtest->graphique->id]);
         }
 
-        $echelle_graphique_choice = new EchelleGraphiqueChoice(
+        $echelleGraphiqueChoice = new EchelleGraphiqueChoice(
             $subtest->graphique->echellesSimples()[0]
         );
 
         $form = $this->createForm(
             EchelleGraphiqueChoiceType::class,
-            $echelle_graphique_choice,
+            $echelleGraphiqueChoice,
             options: ["echelles" => $subtest->graphique->echellesSimples()]
         );
 
@@ -402,19 +349,19 @@ class GraphiqueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            /** @var array $echelles_composites */
-            foreach ($subtest->echelles_core as &$echelles_composites) {
-                if (count($echelles_composites) == 2 and $echelles_composites[0] == $id_composite) {
-                    $echelles_composites[1][] = $echelle_graphique_choice->echelle->id;
+            /** @var array $echellesComposites */
+            foreach ($subtest->echelles_core as &$echellesComposites) {
+                if (count($echellesComposites) == 2 and $echellesComposites[0] == $id_composite) {
+                    $echellesComposites[1][] = $echelleGraphiqueChoice->echelle->id;
                     break;
                 }
             }
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
             $this->addFlash("info", "Echelle ajoutée avec succès");
             return $this->redirectToRoute("graphique_consulter_subtest",
-                ["id_subtest" => $id_subtest]);
+                ["id_subtest" => $subtest->id]);
         }
 
         return $this->render("graphique/subtest_form.twig", [
@@ -426,19 +373,11 @@ class GraphiqueController extends AbstractController
 
     #[Route("/ajouter-footer/{id_subtest}", name: "ajouter_footer")]
     public function ajouterFooter(
-        Request                $request,
-        SubtestRepository      $subtest_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id_subtest,
+        Request                                $request,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
-
         $graphique = $subtest->graphique;
         if ($graphique->echelles->isEmpty()) {
             $this->addFlash("warning", "Pas d'échelles dans le graphique");
@@ -461,9 +400,9 @@ class GraphiqueController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $subtest->echelles_footer[] = array($echelle_subtest_footer->echelle->id, $echelle_subtest_footer->type);
-            $entity_manager->flush();
+            $entityManager->flush();
 
-            return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $id_subtest]);
+            return $this->redirectToRoute("graphique_consulter_subtest", ["id_subtest" => $subtest->id]);
         }
 
         return $this->render('graphique/subtest_form.twig', [
@@ -475,41 +414,36 @@ class GraphiqueController extends AbstractController
 
     #[Route("/supprimer-footer/{id_subtest}/{id_footer}", name: "supprimer_footer")]
     public function supprimerFooter(
-        EntityManagerInterface $entity_manager,
-        SubtestRepository      $subtest_repository,
-        int                    $id_subtest,
-        int                    $id_footer,
+        EntityManagerInterface                 $entityManager,
+        #[MapEntity(id: "id_subtest")] Subtest $subtest,
+        int                                    $id_footer,
     ): Response
     {
-        $subtest = $subtest_repository->find($id_subtest);
-
-        if ($subtest == null) {
-            $this->addFlash("warning", "Le subtest n'existe pas");
-            return $this->redirectToRoute("graphique_index");
-        }
 
         $subtest->echelles_footer = array_filter(
             $subtest->echelles_footer,
             fn(array $echelle_id_and_type) => $echelle_id_and_type[0] != $id_footer
         );
 
-        $entity_manager->flush();
+        $entityManager->flush();
 
         return $this->redirectToRoute("graphique_consulter_subtest",
-            ["id_subtest" => $id_subtest]);
+            ["id_subtest" => $subtest->id]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        EntityManagerInterface $entity_manager,
-        GraphiqueRepository    $graphique_repository,
-        int                    $id,
+        LoggerInterface        $logger,
+        EntityManagerInterface $entityManager,
+        Graphique              $graphique
     ): Response
     {
-        $graphique = $graphique_repository->find($id);
+        $logger->info("Suppression du graphique " . $graphique->id);
 
-        $entity_manager->remove($graphique);
-        $entity_manager->flush();
+        $entityManager->remove($graphique);
+        $entityManager->flush();
+
+        $this->addFlash("success", "Suppression du graphique enregistrée");
 
         return $this->redirectToRoute("graphique_index");
     }

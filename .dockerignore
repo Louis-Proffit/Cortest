@@ -10,3 +10,12 @@ composer.lock
 package-lock.json
 .env.local
 .env.*.local
+apigen.neon
+.phpunit.result.cache
+.gitignore
+docker-compose.yml
+Dockerfile
+phpunit.xml.dist
+README.md
+symfony.lock
+webpack.config.js

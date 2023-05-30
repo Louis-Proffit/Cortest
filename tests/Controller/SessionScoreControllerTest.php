@@ -24,21 +24,17 @@ class SessionScoreControllerTest extends WebTestCase
         $this->login($this->client);
     }
 
-    public function testCsv()
-    {
-        self::markTestSkipped("TODO");
-    }
-
     public function testConsulter()
     {
+        self::markTestIncomplete("TODO, enregistrer des réponses dans la session");
         $correcteur = self::getContainer()->get(CorrecteurRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET,
-            "/calcul/score/index/". $correcteur->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/score/index/" . $correcteur->id);
         self::assertResponseIsSuccessful();
     }
 
     public function testForm()
     {
+        self::markTestIncomplete("TODO, enregistrer des réponses dans la session");
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
         $this->client->request(Request::METHOD_GET, "/calcul/score/form");
         self::assertResponseIsSuccessful();

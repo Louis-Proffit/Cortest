@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Reponses\FiltreSessionStorage;
+use App\Core\Reponses\ReponsesCandidatSessionStorage;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\RechercheFiltre;
@@ -9,8 +11,6 @@ use App\Form\Data\RechercheReponsesCandidat;
 use App\Form\Data\ReponseCandidatChecked;
 use App\Form\RechercheFiltreType;
 use App\Form\RechercheReponsesCandidatType;
-use App\Recherche\FiltreSessionStorage;
-use App\Recherche\ReponsesCandidatSessionStorage;
 use App\Repository\ReponseCandidatRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route("/recherche", name: "recherche_")]
 class RechercheController extends AbstractController
 {
-
     const LOWEST_TIME = "@1344988800";
 
     #[Route("/vider", name: "vider")]
@@ -34,11 +33,19 @@ class RechercheController extends AbstractController
         return $this->redirectToRoute("recherche_index");
     }
 
+    /**
+     * TODO ne pas passer par sessionStorage, mais par storage directement (encapsulation correcte)
+     * @param ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage
+     * @param int $reponse_id
+     * @return RedirectResponse
+     */
     #[Route("/deselectionner/{reponse_id}", "deselectionner")]
-    public function removeReponseCandidat(ReponsesCandidatSessionStorage $reponses_candidat_session_storage, int $reponse_id): RedirectResponse
+    public function removeReponseCandidat(
+        ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
+        int                            $reponse_id): RedirectResponse
     {
-        $cached_reposes = $reponses_candidat_session_storage->get();
-        $reponses_candidat_session_storage->set(array_diff($cached_reposes, array($reponse_id)));
+        $cached_reposes = $reponsesCandidatSessionStorage->get();
+        $reponsesCandidatSessionStorage->set(array_diff($cached_reposes, array($reponse_id)));
         $this->addFlash("success", "Le candidat a été retiré.");
         return $this->redirectToRoute("recherche_index");
     }

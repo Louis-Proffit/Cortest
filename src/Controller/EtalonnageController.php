@@ -16,6 +16,7 @@ use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,10 +28,10 @@ class EtalonnageController extends AbstractController
 
     #[Route("/index", name: 'index')]
     public function index(
-        EtalonnageRepository $etalonnage_repository
+        EtalonnageRepository $etalonnageRepository
     ): Response
     {
-        $etalonnages = $etalonnage_repository->findAll();
+        $etalonnages = $etalonnageRepository->findAll();
 
         return $this->render('etalonnage/index.html.twig',
             ["etalonnages" => $etalonnages]);
@@ -38,11 +39,9 @@ class EtalonnageController extends AbstractController
 
     #[Route("/consulter/{id}", name: 'consulter')]
     public function consulter(
-        EtalonnageRepository $etalonnage_repository,
-        int                  $id
+        Etalonnage $etalonnage
     ): Response
     {
-        $etalonnage = $etalonnage_repository->find($id);
         return $this->render("etalonnage/etalonnage.html.twig", ["etalonnage" => $etalonnage]);
     }
 
@@ -55,12 +54,12 @@ class EtalonnageController extends AbstractController
 
     #[Route("/creer/simple", name: "creer_simple")]
     public function creerSimple(
-        EntityManagerInterface $entity_manager,
-        ProfilRepository       $profil_repository,
+        EntityManagerInterface $entityManager,
+        ProfilRepository       $profilRepository,
         Request                $request
     ): Response
     {
-        $profils = $profil_repository->findAll();
+        $profils = $profilRepository->findAll();
 
         if (empty($profils)) {
             $this->addFlash("warning", "Pas de profils disponibles, créez en un");
@@ -98,8 +97,8 @@ class EtalonnageController extends AbstractController
                 ));
             }
 
-            $entity_manager->persist($etalonnage);
-            $entity_manager->flush();
+            $entityManager->persist($etalonnage);
+            $entityManager->flush();
 
 
             return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
@@ -110,12 +109,12 @@ class EtalonnageController extends AbstractController
 
     #[Route("/creer/gaussien", name: "creer_gaussien")]
     public function creerGaussien(
-        EntityManagerInterface $entity_manager,
-        ProfilRepository       $profil_repository,
+        EntityManagerInterface $entityManager,
+        ProfilRepository       $profilRepository,
         Request                $request
     ): Response
     {
-        $profils = $profil_repository->findAll();
+        $profils = $profilRepository->findAll();
 
         if (empty($profils)) {
             $this->addFlash("warning", "Pas de profils disponibles, créez en un");
@@ -153,8 +152,8 @@ class EtalonnageController extends AbstractController
                 ));
             }
 
-            $entity_manager->persist($etalonnage);
-            $entity_manager->flush();
+            $entityManager->persist($etalonnage);
+            $entityManager->flush();
 
 
             return $this->redirectToRoute("etalonnage_ajout_echelles_gaussiennes", ["id" => $etalonnage->id]);
@@ -165,19 +164,16 @@ class EtalonnageController extends AbstractController
 
     #[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
     public function ajoutEchellesGaussiennes(
-        EtalonnageRepository $etalonnage_repository,
-        EntityManagerInterface $entity_manager,
-        EtalonnageManager $etalonnageManager,
-        Request              $request,
-        int                  $id,
+        EntityManagerInterface $entityManager,
+        EtalonnageManager      $etalonnageManager,
+        Request                $request,
+        Etalonnage             $etalonnage
     ): Response
     {
-        $etalonnage = $etalonnage_repository->find($id);
-
-
         $etalonnageGaussienCreer = new EtalonnageGaussienCreer(array());
-        foreach ($etalonnage->echelles as $echelle){
-            $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]=new EchelleEtalonnageGaussienCreer($echelle, 0, 1);
+
+        foreach ($etalonnage->echelles as $echelle) {
+            $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php] = new EchelleEtalonnageGaussienCreer($echelle, 0, 1);
         }
 
         $form = $this->createForm(EtalonnageGaussienType::class, $etalonnageGaussienCreer, ['bounds_number' => $etalonnage->nombre_classes]);
@@ -185,15 +181,15 @@ class EtalonnageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
-            foreach ($etalonnage->echelles as $echelle){
+            foreach ($etalonnage->echelles as $echelle) {
                 $echelle->bounds = $etalonnageManager->calculateBounds(
                     $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]->mean,
                     $etalonnageGaussienCreer->echelleEtalonnageGaussienCreer[$echelle->echelle->nom_php]->stdDev,
                     $etalonnage->nombre_classes - 1,
                 );
             }
-            $entity_manager->persist($etalonnage);
-            $entity_manager->flush();
+            $entityManager->persist($etalonnage);
+            $entityManager->flush();
 
             return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
         }
@@ -203,21 +199,18 @@ class EtalonnageController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        EtalonnageRepository $etalonnage_repository,
-        ManagerRegistry      $doctrine,
-        Request              $request,
-        int                  $id,
+        EntityManagerInterface $entityManager,
+        Request                $request,
+        Etalonnage             $etalonnage
     ): Response
     {
-        $etalonnage = $etalonnage_repository->find($id);
-
         $form = $this->createForm(EtalonnageType::class, $etalonnage);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $doctrine->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute("etalonnage_consulter", ["id" => $etalonnage->id]);
 
@@ -228,21 +221,17 @@ class EtalonnageController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        EntityManagerInterface $entity_manager,
-        EtalonnageRepository   $etalonnage_repository,
-        int                    $id,
+        LoggerInterface        $logger,
+        EntityManagerInterface $entityManager,
+        Etalonnage             $etalonnage
     ): Response
     {
-        $etalonnage = $etalonnage_repository->find($id);
+        $logger->info("Suppression de l'étalonnage " . $etalonnage->id);
 
-        if ($etalonnage != null) {
-            $entity_manager->remove($etalonnage);
+        $entityManager->remove($etalonnage);
+        $entityManager->flush();
 
-            foreach ($etalonnage->echelles as $echelle) {
-                $entity_manager->remove($echelle);
-            }
-            $entity_manager->flush();
-        }
+        $this->addFlash("success", "Etalonnage supprimé");
 
         return $this->redirectToRoute("etalonnage_index");
     }

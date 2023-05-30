@@ -22,7 +22,7 @@ class SessionRepository extends ServiceEntityRepository
         parent::__construct($registry, Session::class);
     }
 
-    public function get_next_numero_ordre(int $year): int
+    public function getNextNumeroOrdre(int $year): int
     {
         $date_min = DateTime::createFromFormat("Y", $year);
         $date_max = DateTime::createFromFormat("Y", $year + 1);

@@ -3,6 +3,8 @@
 namespace App\Core\Files\Pdf;
 
 use App\Core\Files\FileNameManager;
+use App\Core\Files\Pdf\Compiler\LatexCompiler;
+use App\Core\Files\Pdf\Compiler\PdflatexLatexCompiler;
 use App\Core\Renderer\RendererRepository;
 use App\Entity\Correcteur;
 use App\Entity\EchelleGraphique;
@@ -31,21 +33,30 @@ class PdfManager
     const LOG_EXTENSION = ".log";
     const PDF_EXTENSION = ".pdf";
 
-    private string $tmp_dir;
+    private string $tmpDir;
 
+    /**
+     * @param Environment $twig
+     * @param LoggerInterface $logger
+     * @param RendererRepository $rendererRepository
+     * @param FileNameManager $fileNameManager
+     * @param LatexCompiler $latexCompiler
+     * @param string $pdfMergeExecutable
+     * @param int $compilationTimeLimitSeconds
+     * @see PdflatexLatexCompiler
+     */
     public function __construct(
         private readonly Environment        $twig,
         private readonly LoggerInterface    $logger,
-        private readonly RendererRepository $renderer_repository,
+        private readonly RendererRepository $rendererRepository,
         private readonly FileNameManager    $fileNameManager, // TODO export that dependency out of the file
-        private readonly string             $latexCompilerExecutable = "pdflatex",
-        private readonly string             $latexCommandLineOptions = "-interaction=nonstopmode -file-line-error",
+        private readonly LatexCompiler      $latexCompiler, // Correct compiler autowired in configuration
         private readonly string             $pdfMergeExecutable = "pdfunite",
         int                                 $compilationTimeLimitSeconds = 300,
     )
     {
-        $this->tmp_dir = sys_get_temp_dir();
-        $this->logger->debug("Tmp dir : " . $this->tmp_dir);
+        $this->tmpDir = realpath(sys_get_temp_dir());
+        $this->logger->debug("Tmp dir : " . $this->tmpDir);
 
         // Autorise un temps de compilation supérieur
         set_time_limit($compilationTimeLimitSeconds);
@@ -60,18 +71,18 @@ class PdfManager
         array           $profil,
     ): string
     {
-        $renderer = $this->renderer_repository->fromIndex($graphique->renderer_index);
+        $renderer = $this->rendererRepository->fromIndex($graphique->renderer_index);
 
         $optionsEchelle = [];
-        $score_for_id = array();
-        $profil_for_id = array();
+        $idToScore = array();
+        $idToProfil = array();
 
         /** @var EchelleGraphique $echelleGraphique */
         foreach ($graphique->echelles as $echelleGraphique) {
             $optionsEchelle[$echelleGraphique->id] = $echelleGraphique->options;
 
-            $score_for_id[$echelleGraphique->id] = $score[$echelleGraphique->echelle->nom_php];
-            $profil_for_id[$echelleGraphique->id] = $profil[$echelleGraphique->echelle->nom_php];
+            $idToScore[$echelleGraphique->id] = $score[$echelleGraphique->echelle->nom_php];
+            $idToProfil[$echelleGraphique->id] = $profil[$echelleGraphique->echelle->nom_php];
 
         }
         return $renderer->render(
@@ -80,37 +91,31 @@ class PdfManager
             correcteur: $correcteur,
             etalonnage: $etalonnage,
             graphique: $graphique,
-            score: $score_for_id,
-            profil: $profil_for_id,
+            score: $idToScore,
+            profil: $idToProfil,
             options: $graphique->options,
             optionsEchelle: $optionsEchelle
         );
     }
 
-    private function getWorkingDirPath(): string
+    private
+    function getWorkingDirPath(): string
     {
-        return $this->tmp_dir . DIRECTORY_SEPARATOR . time();
+        return $this->tmpDir . DIRECTORY_SEPARATOR . time();
     }
 
-    private function prepareOutputDir(): string|false
+    private
+    function prepareOutputDir(): string|false
     {
-        if (!is_dir($this->tmp_dir)) {
-            mkdir($this->tmp_dir);
+        if (!is_dir($this->tmpDir)) {
+            mkdir($this->tmpDir);
         }
 
         $workingDirectoryPath = $this->getWorkingDirPath();
 
         $this->logger->debug("Working directory : " . $workingDirectoryPath);
 
-        if (mkdir($workingDirectoryPath)) {
-
-            return $workingDirectoryPath;
-
-        } else {
-
-            return false;
-
-        }
+        return mkdir($workingDirectoryPath) ? $workingDirectoryPath : false;
     }
 
     /**
@@ -118,29 +123,26 @@ class PdfManager
      * @param string $output output to produce
      * @return string the runnable command
      */
-    private function buildMergePdfCommand(array $toMerge, string $output): string
+    private
+    function buildMergePdfCommand(array $toMerge, string $output): string
     {
         $quotedFileNames = array_map(fn(string $name) => "\"" . $name . "\"", $toMerge);
         return $this->pdfMergeExecutable . " " . implode(" ", $quotedFileNames) . " \"" . $output . "\"";
-    }
-
-    private function buildCompileTexToPdfCommand(string $outputDirectory, string $texFileName): string
-    {
-        return $this->latexCompilerExecutable . " " . $this->latexCommandLineOptions . " --output-directory=\"" . $outputDirectory . "\" \"" . $texFileName . "\"";
     }
 
 
     /**
      * @throws LatexCompilationFailedException
      */
-    private function producePdfAndGetPath(Graphique       $graphique,
-                                          ReponseCandidat $reponseCandidat,
-                                          Correcteur      $correcteur,
-                                          Etalonnage      $etalonnage,
-                                          array           $score,
-                                          array           $profil,
-                                          string          $outputDirectoryPath,
-                                          string          $fileNameWithoutExtension): string
+    private
+    function producePdfAndGetPath(Graphique       $graphique,
+                                  ReponseCandidat $reponseCandidat,
+                                  Correcteur      $correcteur,
+                                  Etalonnage      $etalonnage,
+                                  array           $score,
+                                  array           $profil,
+                                  string          $outputDirectoryPath,
+                                  string          $fileNameWithoutExtension): string
     {
         $content = $this->getFeuilleProfilContent(
             graphique: $graphique,
@@ -161,7 +163,8 @@ class PdfManager
 
         $this->logger->debug("Wrote to file " . $texFilePath);
 
-        $command = $this->buildCompileTexToPdfCommand($outputDirectoryPath, $texFilePath);
+        $command = $this->latexCompiler->buildCommandLine($outputDirectoryPath, $texFilePath);
+
         $this->logger->debug("Executing command : " . $command);
         exec($command);
 
@@ -240,7 +243,8 @@ class PdfManager
      * @return BinaryFileResponse|false
      * @throws LatexCompilationFailedException
      */
-    public function createZipFile(
+    public
+    function createZipFile(
         Session    $session,
         Correcteur $correcteur,
         Etalonnage $etalonnage,
@@ -295,7 +299,8 @@ class PdfManager
      * @return BinaryFileResponse|false
      * @throws LatexCompilationFailedException
      */
-    public function createPdfMergedFile(
+    public
+    function createPdfMergedFile(
         Session    $session,
         Correcteur $correcteur,
         Etalonnage $etalonnage,

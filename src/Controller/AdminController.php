@@ -7,51 +7,72 @@ use App\Form\CortestUserType;
 use App\Form\CreerCortestUserType;
 use App\Form\MotDePasseCortestUserType;
 use App\Repository\UserRepository;
+use App\Security\CheckAdministrateurCount;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
+/**
+ * Opérations accessibles pour un administrateur.
+ */
 #[Route("/admin", name: "admin_")]
 class AdminController extends AbstractController
 {
 
+    /**
+     * Page d'accueil de l'administrateur, incluant la liste des utilisateurs
+     * @param UserRepository $userRepository
+     * @return Response
+     */
     #[Route("/index", name: "index")]
     public function index(
-        UserRepository $user_repository,
+        UserRepository $userRepository,
     ): Response
     {
-        $items = $user_repository->findAll();
+        $items = $userRepository->findAll();
 
         return $this->render("admin/index.html.twig", ["users" => $items]);
     }
 
+    /**
+     * Formulaire pour la création d'un utilisateur
+     * @param LoggerInterface $logger
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface      $entity_manager,
-        UserPasswordHasherInterface $user_password_hasher,
+        LoggerInterface             $logger,
+        EntityManagerInterface      $entityManager,
+        UserPasswordHasherInterface $userPasswordHasher,
         Request                     $request
     ): RedirectResponse|Response
     {
-        $user = new CortestUser(
-            id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR
-        );
+        $user = new CortestUser(id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR);
 
         $form = $this->createForm(CreerCortestUserType::class, $user);
 
         $form->handleRequest($request);
+
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $user->password = $user_password_hasher->hashPassword(
+            $user->password = $userPasswordHasher->hashPassword(
                 $user,
                 $user->password
             );
 
-            $entity_manager->persist($user);
-            $entity_manager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $logger->info("Création d'un utilisateur : id=" . $user->id);
             $this->addFlash("info", "Création enregistrée");
 
             return $this->redirectToRoute("admin_index");
@@ -61,29 +82,34 @@ class AdminController extends AbstractController
         return $this->render("admin/creer.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * Formulaire lour la modification du mot de passe d'un utilisateur
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param Request $request
+     * @param CortestUser $user
+     * @return Response
+     */
     #[Route("/modifier-mdp/{id}", name: "modifier_mdp")]
     public function modifierMotDePasse(
-        UserRepository              $user_repository,
-        EntityManagerInterface      $entity_manager,
-        UserPasswordHasherInterface $user_password_hasher,
+        EntityManagerInterface      $entityManager,
+        UserPasswordHasherInterface $userPasswordHasher,
         Request                     $request,
-        int                         $id
+        CortestUser                 $user // Mapped from $id
     ): Response
     {
-        $item = $user_repository->find($id);
-
-        $form = $this->createForm(MotDePasseCortestUserType::class, $item);
+        $form = $this->createForm(MotDePasseCortestUserType::class, $user);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $item->password = $user_password_hasher->hashPassword(
-                $item,
-                $item->password
+            $user->password = $userPasswordHasher->hashPassword(
+                $user,
+                $user->password
             );
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute("admin_index");
         }
@@ -91,31 +117,37 @@ class AdminController extends AbstractController
         return $this->render("admin/modifier_mdp.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * Formulaire pour modifier un utilisateur, à l'exception du mot de passe
+     * @param EntityManagerInterface $entityManager
+     * @param Request $request
+     * @param CheckAdministrateurCount $checkAdministrateurCount
+     * @param CortestUser $user
+     * @return Response
+     * @see CortestUserType
+     */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        UserRepository         $user_repository,
-        EntityManagerInterface $entity_manager,
-        Request                $request,
-        int                    $id
+        EntityManagerInterface   $entityManager,
+        Request                  $request,
+        CheckAdministrateurCount $checkAdministrateurCount,
+        CortestUser              $user // Mapped by id
     ): Response
     {
-        $item = $user_repository->find($id);
 
-        $form = $this->createForm(CortestUserType::class, $item);
+        $form = $this->createForm(CortestUserType::class, $user);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            if ($item->role !== CortestUser::ROLE_ADMINISTRATEUR) {
+            if ($user->role !== CortestUser::ROLE_ADMINISTRATEUR) {
 
-                $administrateurs = $user_repository->findBy(["role" => CortestUser::ROLE_ADMINISTRATEUR]);
-
-                if (count($administrateurs) >= 1) {
-
-                    $entity_manager->flush();
-
+                if ($checkAdministrateurCount->atLeastOneAdministrateur()) {
+                    $entityManager->flush();
                     return $this->redirectToRoute("admin_index");
+                } else {
+                    $this->addFlash("danger", "Opération impossible, il ne resterait plus d'administrateur");
                 }
             }
         }
@@ -123,19 +155,32 @@ class AdminController extends AbstractController
         return $this->render("admin/modifier.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * Supprimer un utilisateur.
+     * Vérifie que l'utilisateur supprimé n'est pas l'actuel, ou que si c'est l'actuel, il reste au moins un autre administrateur.
+     * @param EntityManagerInterface $entityManager
+     * @param CheckAdministrateurCount $checkAdministrateurCount
+     * @param CortestUser $currentUser
+     * @param CortestUser $user
+     * @return RedirectResponse
+     */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        UserRepository         $user_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id): RedirectResponse
+        EntityManagerInterface     $entityManager,
+        CheckAdministrateurCount   $checkAdministrateurCount,
+        #[CurrentUser] CortestUser $currentUser,
+        CortestUser                $user): RedirectResponse
     {
-        $item = $user_repository->find($id);
-        // TODO don't remove last
 
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+        if ($currentUser->id !== $user->id || $checkAdministrateurCount->atLeastTwoAdministrateurs()) {
 
-        $this->addFlash("info", "Suppression enregistrée");
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+            $this->addFlash("info", "Suppression enregistrée");
+        } else {
+            $this->addFlash("warning", "Impossible de supprimer le dernier administrateur.");
+        }
 
         return $this->redirectToRoute("admin_index");
     }

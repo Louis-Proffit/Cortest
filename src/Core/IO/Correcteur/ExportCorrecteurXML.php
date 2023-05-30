@@ -4,6 +4,7 @@ namespace App\Core\IO\Correcteur;
 
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
+use DOMDocument;
 use SimpleXMLElement;
 
 class ExportCorrecteurXML
@@ -23,7 +24,17 @@ class ExportCorrecteurXML
             $echelleXml->addChild(ImportCorrecteurXML::ECHELLE_EXPRESSION_KEY, $echelle->expression);
         }
 
-        return $xml->asXML();
+
+        return $this->prettify($xml);
+    }
+
+    private function prettify(SimpleXMLElement $xml): string
+    {
+        $domxml = new DOMDocument();
+        $domxml->preserveWhiteSpace = false;
+        $domxml->formatOutput = true;
+        $domxml->loadXML($xml->asXML());
+        return $domxml->saveXML();
     }
 
 }

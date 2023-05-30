@@ -20,33 +20,49 @@ use Symfony\Component\Routing\Annotation\Route;
 class ConcoursController extends AbstractController
 {
 
+    /**
+     * Consulter la liste des concours
+     * @param ConcoursRepository $concoursRepository
+     * @param GrilleRepository $grilleRepository
+     * @return Response
+     */
     #[Route("/index", name: "index")]
     public function index(
-        ConcoursRepository $concours_repository,
-        GrilleRepository   $grille_repository,
+        ConcoursRepository $concoursRepository,
+        GrilleRepository   $grilleRepository,
     ): Response
     {
-        $items = $concours_repository->findAll();
+        $items = $concoursRepository->findAll();
 
-        $grilles = $grille_repository->indexToInstance();
+        $grilles = $grilleRepository->indexToInstance();
 
         return $this->render("concours/index.html.twig", ["items" => $items, "grilles" => $grilles]);
     }
 
+    /**
+     * Consulter un concours
+     * @param GrilleRepository $grilleRepository
+     * @param Concours $concours
+     * @return Response
+     */
     #[Route("/consulter/{id}", name: "consulter")]
     public function consulter(
-        ConcoursRepository $concours_repository,
-        GrilleRepository   $grille_repository,
-        int                $id
+        GrilleRepository $grilleRepository,
+        Concours         $concours,
     ): Response
     {
-        $concours = $concours_repository->find($id);
-
-        $grille = $grille_repository->getFromIndex($concours->index_grille);
+        $grille = $grilleRepository->getFromIndex($concours->index_grille);
 
         return $this->render("concours/concours.html.twig", ["concours" => $concours, "grille" => $grille]);
     }
 
+    /**
+     * Formulaire de création d'un concours
+     * @param EntityManagerInterface $entity_manager
+     * @param GrilleRepository $grille_repository
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
     #[Route("/creer", name: "creer")]
     public function creer(
         EntityManagerInterface $entity_manager,
@@ -79,40 +95,47 @@ class ConcoursController extends AbstractController
         return $this->render("concours/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * Formulaire de modification d'un concours
+     * @param EntityManagerInterface $entityManager
+     * @param Request $request
+     * @param Concours $concours
+     * @return Response
+     */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        ConcoursRepository     $concours_repository,
-        EntityManagerInterface $entity_manager,
+        EntityManagerInterface $entityManager,
         Request                $request,
-        int                    $id
+        Concours               $concours,
     ): Response
     {
-        $item = $concours_repository->find($id);
-
-        $form = $this->createForm(ConcoursType::class, $item);
+        $form = $this->createForm(ConcoursType::class, $concours);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
-            return $this->redirectToRoute("concours_consulter", ["id" => $id]);
+            return $this->redirectToRoute("concours_consulter", ["id" => $concours->id]);
         }
 
         return $this->render("concours/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * Supprime un concours
+     * @param EntityManagerInterface $entityManager
+     * @param Concours $concours
+     * @return RedirectResponse
+     */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ConcoursRepository     $concours_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id): RedirectResponse
+        EntityManagerInterface $entityManager,
+        Concours               $concours): RedirectResponse
     {
-        $item = $concours_repository->find($id);
-
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+        $entityManager->remove($concours);
+        $entityManager->flush();
 
         $this->addFlash("success", "Suppression du concours enregistrée.");
 

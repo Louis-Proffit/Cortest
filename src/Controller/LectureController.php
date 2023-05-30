@@ -6,6 +6,7 @@ use App\Core\Files\CsvManager;
 use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
 use App\Core\IO\ReponseCandidat\ImportReponsesCandidatException;
 use App\Entity\ReponseCandidat;
+use App\Entity\Session;
 use App\Form\Data\ParametresLectureCsv;
 use App\Form\Data\ParametresLectureJSON;
 use App\Form\Data\ParametresLectureOptique;
@@ -47,13 +48,13 @@ class LectureController extends AbstractController
         $session = $session_repository->findOneBy([]);
 
         if ($session == null) {
-            $this->addFlash("warning", "Pas de séance, en créer une");
+            $this->addFlash("warning", "Pas de séance, veuilez en créer une");
             return $this->redirectToRoute("session_creer");
         }
 
         $niveau_scolaire = $niveau_scolaire_repository->findOneBy([]);
         if ($niveau_scolaire == null) {
-            $this->addFlash("warning", "Pas de niveau scolaire, en créer un");
+            $this->addFlash("warning", "Pas de niveau scolaire, veuillez en créer un");
             return $this->redirectToRoute("niveau_scolaire_creer");
         }
 
@@ -165,10 +166,8 @@ class LectureController extends AbstractController
 
             $rawReponsesCandidats = $csvManager->import($uploadSessionBase->contents->getPathname());
 
-            try{
+            try {
                 $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
-
-                dump($reponsesCandidats); // TODO remove ?
 
                 foreach ($reponsesCandidats as $reponseCandidat) {
                     $manager->persist($reponseCandidat);
@@ -188,24 +187,9 @@ class LectureController extends AbstractController
         ]);
     }
 
-    /**
-     * TODO reutiliser cette fonction pour permettre la vérification du fichier
-     * @param array $header
-     * @return string|null
-     */
-    public function checkHeader(array $header): string|null
-    {
-        return null;
-    }
-
     #[Route("/scanner", name: "scanner")]
-    public function scanner(ManagerRegistry          $doctrine,
-                            NiveauScolaireRepository $niveauScolaireRepository,
-                            Request                  $request): Response
+    public function scanner(Request $request): Response
     {
-
-        $manager = $doctrine->getManager();
-
         $uploadSessionBase = new ParametresLectureOptique();
         $form = $this->createForm(ParametresLectureOptiqueType::class, $uploadSessionBase);
 
@@ -223,15 +207,9 @@ class LectureController extends AbstractController
     }
 
     #[Route("/optique/{id}", name: "optique")]
-    public function scannerid(ManagerRegistry          $doctrine,
-                              NiveauScolaireRepository $niveauScolaireRepository,
-                              SessionRepository        $session_repository,
-                              Request                  $request,
-                              int                      $id): Response
+    public function scannerid(NiveauScolaireRepository $niveauScolaireRepository,
+                              Session                  $session): Response
     {
-
-        $manager = $doctrine->getManager();
-        $session = $session_repository->find($id);
         return $this->render("lecture/from_scanner.html.twig",
             ["form" => null,
                 "session" => $session,
@@ -243,26 +221,25 @@ class LectureController extends AbstractController
 
     #[Route("/scanner/save", name: 'saveFromScanner')]
     public function saveFromScanner(Request                   $request,
-                                    EntityManagerInterface    $entity_manager,
-                                    SessionRepository         $session_repository,
-                                    NiveauScolaireRepository  $niveau_scolaire_repository,
-                                    ReponseCandidatRepository $reponse_candidat_repository
+                                    EntityManagerInterface    $entityManager,
+                                    SessionRepository         $sessionRepository,
+                                    NiveauScolaireRepository  $niveauScolaireRepository,
+                                    ReponseCandidatRepository $reponseCandidatRepository
     ): Response
     {
 
         $data = json_decode($request->request->get("data"), true);
 
-
         foreach ($data as $i => $ligne) {
-            if (count($reponse_candidat_repository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
+            if (count($reponseCandidatRepository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
                 $rep = new ReponseCandidat(
                     id: 0,
-                    session: $session_repository->find($request->request->get('session')),
+                    session: $sessionRepository->find($request->request->get('session')),
                     reponses: $ligne['qcm'],
                     nom: $ligne['nom'],
                     prenom: $ligne['prenom'],
                     nom_jeune_fille: $ligne['nom_jeune_fille'],
-                    niveau_scolaire: $niveau_scolaire_repository->find($ligne['niveau_scolaire']),
+                    niveau_scolaire: $niveauScolaireRepository->find($ligne['niveau_scolaire']),
                     date_de_naissance: new DateTime($ligne['date_naissance']),
                     sexe: $ligne['sexe'],
                     reserve: $ligne['reserve'],
@@ -272,14 +249,12 @@ class LectureController extends AbstractController
                     eirs: $ligne['concours'],
                     raw: null
                 );
-                $entity_manager->persist($rep);
-                $entity_manager->flush();
+                $entityManager->persist($rep);
+                $entityManager->flush();
             }
 
         }
 
-
         return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
     }
-
 }

@@ -21,7 +21,7 @@ security:
             form_login:
                 login_path: login
                 check_path: login
-            access_denied_handler: App\CortestAccessDeniedListener
+            access_denied_handler: App\Security\CortestAccessDeniedListener
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used

@@ -6,6 +6,7 @@ use App\Entity\Echelle;
 use App\Form\EchelleType;
 use App\Repository\EchelleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,20 +17,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class EchelleController extends AbstractController
 {
 
-
     #[Route("/index", name: "index")]
     public function index(
-        EchelleRepository $echelle_repository
+        EchelleRepository $echelleRepository
     ): Response
     {
-        $items = $echelle_repository->findAll();
+        $items = $echelleRepository->findAll();
 
         return $this->render("echelle/index.html.twig", ["items" => $items]);
     }
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
+        EntityManagerInterface $entityManager,
         Request                $request
     ): RedirectResponse|Response
     {
@@ -44,8 +44,8 @@ class EchelleController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($item);
-            $entity_manager->flush();
+            $entityManager->persist($item);
+            $entityManager->flush();
 
             return $this->redirectToRoute("echelle_index");
 
@@ -56,21 +56,18 @@ class EchelleController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        EchelleRepository      $echelle_repository,
-        EntityManagerInterface $entity_manager,
+        EntityManagerInterface $entityManager,
         Request                $request,
-        int                    $id
+        Echelle                $echelle
     ): Response
     {
-        $item = $echelle_repository->find($id);
-
-        $form = $this->createForm(EchelleType::class, $item);
+        $form = $this->createForm(EchelleType::class, $echelle);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute("echelle_index");
         }
@@ -80,14 +77,17 @@ class EchelleController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        EchelleRepository      $echelle_repository,
-        EntityManagerInterface $entity_manager,
-        int                    $id): RedirectResponse
+        LoggerInterface        $logger,
+        EntityManagerInterface $entityManager,
+        Echelle                $echelle): RedirectResponse
     {
-        $item = $echelle_repository->find($id);
+        $entityManager->remove($echelle);
 
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+        $this->addFlash("success", "Echelle supprimée");
+        $logger->info("Echelle supprimée : " . $echelle->id);
+
+
+        $entityManager->flush();
 
         return $this->redirectToRoute("echelle_index");
     }

@@ -26,10 +26,15 @@ final class LatexCompilationFailedExceptionEventListener extends AbstractControl
     {
         $throwable = $event->getThrowable();
         if ($throwable instanceof LatexCompilationFailedException) {
-            $logContent = file_get_contents($throwable->logFilePath);
-
             $this->logger->critical("Echec de compilation latex récupérée après l'erreur suivante : " . $throwable);
-            $this->logger->critical("Contenu du log de compilation : " . $logContent);
+
+            if($throwable->logFilePath != null) {
+                $logContent = file_get_contents($throwable->logFilePath);
+                $this->logger->critical("Contenu du log de compilation : " . $logContent);
+            } else {
+                $logContent = "Pas de log pour la compilation";
+                $this->logger->critical("Pas de fichier de log produit");
+            }
 
             $event->setResponse($this->render("renderer/echec_compilation.html.twig", ["exception" => $throwable, "log" => $logContent]));
         }

@@ -10,9 +10,9 @@ class CheckSingleSession
     /**
      * Détermine si toutes les réponses appartiennent à la même session.
      * @param ReponseCandidat[] $reponsesCandidats
-     * @return Session|false
-     * @throws NoReponsesCandidatException
+     * @return Session
      * @throws DifferentSessionException
+     * @throws NoReponsesCandidatException
      */
     public function findCommonSession(array $reponsesCandidats): Session
     {

@@ -16,13 +16,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class NiveauScolaireController extends AbstractController
 {
 
-
     #[Route("/index", name: "index")]
     public function index(
-        NiveauScolaireRepository $niveau_scolaire_repository
+        NiveauScolaireRepository $niveauScolaireRepository
     ): Response
     {
-        $items = $niveau_scolaire_repository->findAll();
+        $items = $niveauScolaireRepository->findAll();
 
         return $this->render("niveau_scolaire/index.html.twig", ["items" => $items]);
     }

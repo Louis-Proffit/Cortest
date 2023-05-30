@@ -12,11 +12,9 @@ class GrilleController extends AbstractController
 {
 
     #[Route("/index", name: "index")]
-    public function index(
-        GrilleRepository $grille_repository
-    ): Response
+    public function index(GrilleRepository $grilleRepository): Response
     {
-        $grilles = $grille_repository->all();
+        $grilles = $grilleRepository->all();
 
         return $this->render("grille/index.html.twig", ["grilles" => $grilles]);
     }

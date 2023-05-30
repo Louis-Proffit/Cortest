@@ -9,12 +9,20 @@ use App\Repository\EchelleGraphiqueRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
+/**
+ * Fonctions Cortest ajoutées à twig, essentiellement pour le formating de certaines données
+ * @see self::formatSexe()
+ * @see self::formatSubtestType()
+ * @see self::formatEchelleGraphiqueNom()
+ * @see self::formatEchelleGraphiqueNomAffiche()
+ * @see self::formatFooterType()
+ */
 class CortestExtension extends AbstractExtension
 {
 
 
     public function __construct(
-        private readonly EchelleGraphiqueRepository $echelle_graphique_repository
+        private readonly EchelleGraphiqueRepository $echelleGraphiqueRepository
     )
     {
     }
@@ -32,12 +40,12 @@ class CortestExtension extends AbstractExtension
 
     public function formatEchelleGraphiqueNom(int $echelle_graphique_id): string
     {
-        return $this->echelle_graphique_repository->find($echelle_graphique_id)->echelle->nom;
+        return $this->echelleGraphiqueRepository->find($echelle_graphique_id)->echelle->nom;
     }
 
     public function formatEchelleGraphiqueNomAffiche(int $echelle_graphique_id): string
     {
-        return $this->echelle_graphique_repository->find($echelle_graphique_id)->options[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP];
+        return $this->echelleGraphiqueRepository->find($echelle_graphique_id)->options[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP];
     }
 
     public function formatFooterType(int $footer_type): string

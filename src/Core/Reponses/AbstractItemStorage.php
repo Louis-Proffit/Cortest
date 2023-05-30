@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Recherche;
+namespace App\Core\Reponses;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 

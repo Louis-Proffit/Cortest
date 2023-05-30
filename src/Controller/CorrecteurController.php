@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
+use App\Core\Files\FileNameManager;
+use App\Core\Files\FileUtils;
 use App\Core\IO\Correcteur\ExportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandlerAddFlash;
@@ -19,26 +21,28 @@ use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route("/correcteur", name: "correcteur_")]
 class CorrecteurController extends AbstractController
 {
     #[Route("/index", name: 'index')]
     public function index(
-        CorrecteurRepository $correcteur_repository,
-        GrilleRepository     $grille_repository
+        CorrecteurRepository $correcteurRepository,
+        GrilleRepository     $grilleRepository
     ): Response
     {
-        $correcteurs = $correcteur_repository->findAll();
+        $correcteurs = $correcteurRepository->findAll();
 
-        $grilles = $grille_repository->indexToInstance();
+        $grilles = $grilleRepository->indexToInstance();
 
         return $this->render('correcteur/index.html.twig',
             ["correcteurs" => $correcteurs, "grilles" => $grilles]);
@@ -46,19 +50,19 @@ class CorrecteurController extends AbstractController
 
     #[Route("/consulter/{id}", name: 'consulter')]
     public function consulter(
-        CorrecteurRepository $correcteur_repository,
-        GrilleRepository     $grille_repository,
-        int                  $id
+        GrilleRepository $grilleRepository,
+        Correcteur       $correcteur
     ): Response
     {
-        $correcteur = $correcteur_repository->find($id);
-        $grille = $grille_repository->getFromIndex($correcteur->concours->index_grille);
+        $grille = $grilleRepository->getFromIndex($correcteur->concours->index_grille);
+
         return $this->render("correcteur/correcteur.html.twig",
             ["correcteur" => $correcteur, "grille" => $grille]);
     }
 
     #[Route("/importer", name: "importer")]
     public function importer(
+        ValidatorInterface     $validator,
         EntityManagerInterface $entityManager,
         Session                $session,
         ImportCorrecteurXML    $importCorrecteurXML,
@@ -77,12 +81,22 @@ class CorrecteurController extends AbstractController
             $correcteur = $importCorrecteurXML->load(new ImportCorrecteurXMLErrorHandlerAddFlash($session), $file->getContent());
 
             if ($correcteur) {
-                $entityManager->persist($correcteur);
-                $entityManager->flush();
 
-                $this->addFlash("success", "Correcteur importé");
+                $errors = $validator->validate($correcteur);
 
-                return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
+                if(count($errors) == 0) {
+                    $entityManager->persist($correcteur);
+                    $entityManager->flush();
+
+                    $this->addFlash("success", "Correcteur importé");
+
+                    return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
+                } else {
+                    /** @var ConstraintViolationInterface $error */
+                    foreach ($errors as $error) {
+                        $this->addFlash("danger", $error->getMessage());
+                    }
+                }
             }
         }
 
@@ -91,31 +105,32 @@ class CorrecteurController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
-        ConcoursRepository     $concours_repository,
-        ProfilRepository       $profil_repository,
+        EntityManagerInterface $entityManager,
+        ConcoursRepository     $concoursRepository,
+        ProfilRepository       $profilRepository,
         Request                $request
     ): Response
     {
-        $profils = $profil_repository->findAll();
+        $profils = $profilRepository->findAll();
 
         if (empty($profils)) {
             $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un.");
             return $this->redirectToRoute("profil_index");
         }
 
-        $all_concours = $concours_repository->findAll();
+        $allConcours = $concoursRepository->findAll();
 
-        if (empty($all_concours)) {
+        if (empty($allConcours)) {
             $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
             return $this->redirectToRoute("concours_index");
         }
 
         $correcteurCreer = new CorrecteurCreer(
             profil: $profils[0],
-            concours: $all_concours[0],
+            concours: $allConcours[0],
             nom: ""
         );
+
         $form = $this->createForm(CorrecteurCreerType::class, $correcteurCreer);
 
         $form->handleRequest($request);
@@ -138,6 +153,7 @@ class CorrecteurController extends AbstractController
                 $echelleCorrecteur = new EchelleCorrecteur(
                     id: 0, expression: "0", echelle: $echelle, correcteur: $correcteur
                 );
+
                 $echelleCorrecteur->echelle = $echelle;
                 $echelleCorrecteur->id = 0;
                 $echelleCorrecteur->expression = "0";
@@ -145,8 +161,8 @@ class CorrecteurController extends AbstractController
                 $correcteur->echelles->add($echelleCorrecteur);
             }
 
-            $entity_manager->persist($correcteur);
-            $entity_manager->flush();
+            $entityManager->persist($correcteur);
+            $entityManager->flush();
 
             return $this->redirectToRoute("correcteur_modifier", ["id" => $correcteur->id]);
         }
@@ -157,15 +173,11 @@ class CorrecteurController extends AbstractController
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
         ManagerRegistry           $doctrine,
-        CorrecteurRepository      $correcteur_repository,
-        CortestExpressionLanguage $cortest_expression_language,
+        CortestExpressionLanguage $cortestExpressionLanguage,
         Request                   $request,
-        int                       $id,
+        Correcteur                $correcteur
     ): Response
     {
-
-        $correcteur = $correcteur_repository->find($id);
-
         $form = $this->createForm(CorrecteurType::class, $correcteur);
 
         $form->handleRequest($request);
@@ -174,11 +186,11 @@ class CorrecteurController extends AbstractController
 
             $doctrine->getManager()->flush();
 
-            return $this->redirectToRoute("correcteur_consulter", ["id" => $id]);
+            return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
 
         }
 
-        $fonctions = $cortest_expression_language->getCortestFunctions();
+        $fonctions = $cortestExpressionLanguage->getCortestFunctions();
 
         return $this->render("correcteur/modifier.html.twig",
             ["form" => $form->createView(), "fonctions" => $fonctions]);
@@ -186,49 +198,43 @@ class CorrecteurController extends AbstractController
 
     #[Route("/exporter/{id}", name: "exporter")]
     public function exporter(
-        CorrecteurRepository $correcteurRepository,
-        ExportCorrecteurXML  $exportCorrecteurXML,
-        int                  $id,
+        ExportCorrecteurXML $exportCorrecteurXML,
+        FileNameManager     $fileNameManager,
+        Correcteur          $correcteur
     ): Response
     {
-        $correcteur = $correcteurRepository->find($id);
-
         $xml = $exportCorrecteurXML->export($correcteur);
+
         if (!$xml) {
+
             $this->addFlash("danger", "Erreur lors de l'export");
-            return $this->redirectToRoute("correcteur_consulter", ["id" => $id]);
+            return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
+
         } else {
 
             $response = new Response($xml);
 
-            $disposition = HeaderUtils::makeDisposition(
-                HeaderUtils::DISPOSITION_ATTACHMENT,
-                'correcteur.xml'
-            );
+            $fileName = $fileNameManager->correcteurXmlFileName($correcteur);
 
-            $response->headers->set("Content-Disposition", $disposition);
+            FileUtils::setFileResponseFileName($response, $fileName);
+
             return $response;
         }
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        EntityManagerInterface $entity_manager,
-        CorrecteurRepository   $correcteur_repository,
-        int                    $id,
+        LoggerInterface        $logger,
+        EntityManagerInterface $entityManager,
+        Correcteur             $correcteur
     ): Response
     {
-        $correcteur = $correcteur_repository->find($id);
+        $entityManager->remove($correcteur);
 
-        if ($correcteur != null) {
-            $entity_manager->remove($correcteur);
+        $this->addFlash("success", "Correcteur supprimé");
+        $logger->info("Suppression du correcteur " . $correcteur->id);
 
-            foreach ($correcteur->echelles as $echelle) {
-                $entity_manager->remove($echelle);
-            }
-
-            $entity_manager->flush();
-        }
+        $entityManager->flush();
 
         return $this->redirectToRoute("correcteur_index");
     }

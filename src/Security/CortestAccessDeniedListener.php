@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Security;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +12,7 @@ class CortestAccessDeniedListener extends AbstractController implements AccessDe
 {
     public function handle(Request $request, AccessDeniedException $accessDeniedException): ?Response
     {
-        $this->addFlash("error", "Accès refusé");
+        $this->addFlash("danger", "Accès refusé");
         return $this->redirectToRoute("login");
     }
 }
