@@ -17,5 +17,4 @@ docker-compose.yml
 Dockerfile
 phpunit.xml.dist
 README.md
-symfony.lock
 webpack.config.js
