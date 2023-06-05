@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\Pdf\LatexCompilationFailedException;
+use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\Files\Pdf\PdfManager;
 use App\Core\Reponses\CheckSingleSession;
 use App\Core\Reponses\DifferentSessionException;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Files\Pdf;
+namespace App\Core\Files\Pdf\Compiler;
 
 use App\Controller\Exception\LatexCompilationFailedExceptionEventListener;
 use App\Entity\ReponseCandidat;

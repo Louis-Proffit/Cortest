@@ -2,9 +2,12 @@
 
 namespace App\Core\Files\Pdf\Compiler;
 
+use Symfony\Component\Process\Process;
+
 interface LatexCompiler
 {
+    public function checkExists(): bool;
 
-    public function buildCommandLine(string $texInputFile, string $outputDirectoryPath): string;
+    public function compilerProcess(string $outputDirectoryPath, string $texInputFile): Process;
 
 }

@@ -3,8 +3,12 @@
 namespace App\Core\Files\Pdf;
 
 use App\Core\Files\FileNameManager;
+use App\Core\Files\Pdf\Compiler\Impl\PdflatexLatexCompiler;
+use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\Files\Pdf\Compiler\LatexCompiler;
-use App\Core\Files\Pdf\Compiler\PdflatexLatexCompiler;
+use App\Core\Files\Pdf\Compiler\LatexCompilerNotFoundException;
+use App\Core\Files\Pdf\Merger\PdfMerger;
+use App\Core\Files\Pdf\Merger\PdfMergerNotFoundException;
 use App\Core\Renderer\RendererRepository;
 use App\Entity\Correcteur;
 use App\Entity\EchelleGraphique;
@@ -41,8 +45,9 @@ class PdfManager
      * @param RendererRepository $rendererRepository
      * @param FileNameManager $fileNameManager
      * @param LatexCompiler $latexCompiler
-     * @param string $pdfMergeExecutable
+     * @param PdfMerger $pdfMerger
      * @param int $compilationTimeLimitSeconds
+     * @throws LatexCompilerNotFoundException|PdfMergerNotFoundException
      * @see PdflatexLatexCompiler
      */
     public function __construct(
@@ -50,13 +55,21 @@ class PdfManager
         private readonly LoggerInterface    $logger,
         private readonly RendererRepository $rendererRepository,
         private readonly FileNameManager    $fileNameManager, // TODO export that dependency out of the file
-        private readonly LatexCompiler      $latexCompiler, // Correct compiler autowired in configuration
-        private readonly string             $pdfMergeExecutable = "pdfunite",
+        private readonly LatexCompiler      $latexCompiler,
+        private readonly PdfMerger          $pdfMerger,
         int                                 $compilationTimeLimitSeconds = 300,
     )
     {
         $this->tmpDir = realpath(sys_get_temp_dir());
         $this->logger->debug("Tmp dir : " . $this->tmpDir);
+
+        if (!$this->latexCompiler->checkExists()) {
+            throw new LatexCompilerNotFoundException($this->latexCompiler);
+        }
+
+        if (!$this->pdfMerger->checkExists()) {
+            throw new PdfMergerNotFoundException($this->pdfMerger);
+        }
 
         // Autorise un temps de compilation supérieur
         set_time_limit($compilationTimeLimitSeconds);
@@ -118,18 +131,6 @@ class PdfManager
         return mkdir($workingDirectoryPath) ? $workingDirectoryPath : false;
     }
 
-    /**
-     * @param string[] $toMerge files to merge
-     * @param string $output output to produce
-     * @return string the runnable command
-     */
-    private
-    function buildMergePdfCommand(array $toMerge, string $output): string
-    {
-        $quotedFileNames = array_map(fn(string $name) => "\"" . $name . "\"", $toMerge);
-        return $this->pdfMergeExecutable . " " . implode(" ", $quotedFileNames) . " \"" . $output . "\"";
-    }
-
 
     /**
      * @throws LatexCompilationFailedException
@@ -163,21 +164,29 @@ class PdfManager
 
         $this->logger->debug("Wrote to file " . $texFilePath);
 
-        $command = $this->latexCompiler->buildCommandLine($outputDirectoryPath, $texFilePath);
+        $process = $this->latexCompiler->compilerProcess($outputDirectoryPath, $texFilePath);
 
-        $this->logger->debug("Executing command : " . $command);
-        exec($command);
+        $this->logger->info("Execution du process de compilation", ["process" => $process, "cl" => $process->getCommandLine()]);
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $this->logger->critical("Echec de la compilation", ["stdout" => $process->getErrorOutput()]);
+        }
 
         $filePath = $filePathWithoutExtension . self::PDF_EXTENSION;
 
         if (file_exists($filePath)) {
+            $this->logger->info("Compilation réussie", ["path" => $filePath]);
             return $filePath;
         } else {
             $logFilePath = $filePathWithoutExtension . self::LOG_EXTENSION;
 
             if (file_exists($logFilePath)) {
+                $this->logger->critical("Compilation échouée, fichier de log produit", ["log_path" => $logFilePath]);
                 throw new LatexCompilationFailedException($reponseCandidat, $logFilePath);
             } else {
+                $this->logger->critical("Compilation échouée, pas de fichier de log");
                 throw new LatexCompilationFailedException($reponseCandidat, null);
             }
         }
@@ -335,14 +344,18 @@ class PdfManager
 
             }
 
-            $command = $this->buildMergePdfCommand($pdfFilePaths, $mergedPdfFilePath);
+            $process = $this->pdfMerger->mergerProcess($pdfFilePaths, $mergedPdfFilePath);
+            $this->logger->info("Process de fusion des pdf", ["process" => $process, "cl" => $process->getCommandLine()]);
 
-            $this->logger->info("Merging pdf files with command : " . $command);
+            $process->run();
 
-            exec($command);
+            if (!$process->isSuccessful()) {
+                $this->logger->critical("Echec du process de fusion des pdf", ["stdout" => $process->getErrorOutput()]);
+            }
+
 
             if (!file_exists($mergedPdfFilePath)) {
-                $this->logger->error("Failed to produce merged pdf file");
+                $this->logger->error("Echec de la fusion des pdf");
                 return false;
             }
 
