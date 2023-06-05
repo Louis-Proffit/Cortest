@@ -16,7 +16,6 @@ services:
             - data:/var/lib/mysql
     phpmyadmin:
         image: phpmyadmin:latest
-        restart: always
         depends_on:
             - database
         ports:
@@ -26,15 +25,11 @@ services:
             PMA_PORT: 3306
             PMA_USER: mysql
             PMA_PASSWORD: mysql
-    composer:
-        image: composer/composer:latest
-        command: install
     web:
         build: .
         ports:
             - "8080:80"
         depends_on:
             - database
-            - composer
 volumes:
     data:

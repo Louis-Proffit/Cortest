@@ -21,7 +21,7 @@ RUN docker-php-ext-install pdo mysqli pdo_mysql zip intl;
 
 WORKDIR /var/www
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
