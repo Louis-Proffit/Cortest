@@ -41,7 +41,7 @@ class ImportReponsesCandidat
 
             /** @var QuestionConcours $question */
             foreach ($questions as $question) {
-                $reponseQuestionString = $rawReponse[ExportReponsesCandidat::questionColumnName($question->indice)];
+                $reponseQuestionString = $rawReponse[$question->abreviation];
                 $questionsReponses[$question->indice] = ExportReponsesCandidat::REPONSE_VALUE_TO_INDEX[$reponseQuestionString];
             }
 
@@ -103,7 +103,7 @@ class ImportReponsesCandidat
 
         /** @var QuestionConcours $question */
         foreach ($concours->questions as $question) {
-            $keys[] = ExportReponsesCandidat::questionColumnName($question->indice);
+            $keys[] = $question->abreviation;
         }
 
         return $keys;

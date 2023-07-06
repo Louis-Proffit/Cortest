@@ -58,15 +58,15 @@ class ConcoursController extends AbstractController
 
     /**
      * Formulaire de création d'un concours
-     * @param EntityManagerInterface $entity_manager
-     * @param GrilleRepository $grille_repository
+     * @param EntityManagerInterface $entityManager
+     * @param GrilleRepository $grilleRepository
      * @param Request $request
      * @return RedirectResponse|Response
      */
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
-        GrilleRepository       $grille_repository,
+        EntityManagerInterface $entityManager,
+        GrilleRepository       $grilleRepository,
         Request                $request
     ): RedirectResponse|Response
     {
@@ -84,10 +84,10 @@ class ConcoursController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            QuestionConcours::initQuestions($grille_repository, $concours);
+            QuestionConcours::initQuestions($grilleRepository, $concours);
 
-            $entity_manager->persist($concours);
-            $entity_manager->flush();
+            $entityManager->persist($concours);
+            $entityManager->flush();
 
             return $this->redirectToRoute("concours_index");
         }

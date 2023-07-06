@@ -187,10 +187,12 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
     {
         foreach ($indexes as $index) {
             $concours->questions->add(new QuestionConcours(
-                0,
-                $index,
-                $concours,
-                $type
+                id: 0,
+                indice: $index,
+                intitule: "Q" . $index,
+                abreviation: "Q" . $index,
+                concours: $concours,
+                type: $type
             ));
         }
     }
@@ -199,10 +201,12 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
     {
         foreach ($index_to_any as $index => $any) {
             $concours->questions->add(new QuestionConcours(
-                0,
-                $index,
-                $concours,
-                $type
+                id: 0,
+                indice: $index,
+                intitule: "Q" . $index,
+                abreviation: "Q" . $index,
+                concours: $concours,
+                type: $type
             ));
         }
     }

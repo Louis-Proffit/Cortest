@@ -40,6 +40,7 @@ class Concours
     #[ORM\Column]
     public string $version_batterie;
 
+    #[ORM\OrderBy(["indice" => "ASC"])]
     #[ORM\OneToMany(mappedBy: "concours", targetEntity: QuestionConcours::class, cascade: ["persist", "remove"])]
     public Collection $questions;
 

@@ -67,7 +67,7 @@ class ExportReponsesCandidat
                         $formattedResponse = self::REPONSE_INDEX_TO_VALUE[0];
                     }
 
-                    $toAdd[self::questionColumnName($question->indice)] = $formattedResponse;
+                    $toAdd[$question->abreviation] = $formattedResponse;
                 }
 
                 $data[] = $toAdd;
