@@ -23,3 +23,8 @@ yarn-error.log
 .composer.lock
 
 /docs
+
+certificate.crt
+certificate.key
+
+.idea

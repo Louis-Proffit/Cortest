@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-RUN a2enmod rewrite
+RUN a2enmod rewrite ssl
 
 RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     --mount=target=/var/cache/apt,type=cache,sharing=locked \
@@ -24,6 +24,8 @@ WORKDIR /var/www
 COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
+COPY certificate.crt /etc/apache2/ssl/ssl.crt
+COPY certificate.key /etc/apache2/ssl/ssl.key
 
 COPY . /var/www
 
