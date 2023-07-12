@@ -36,20 +36,24 @@ class BpmrComFixture extends AbstractBpmrFixture
         $this->echellesSimplesAptitudesCognitives($profil, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
 
         $profil->echelles->add(new Echelle(
-            0,
-            "EG",
-            self::EG,
-            Echelle::TYPE_ECHELLE_COMPOSITE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "EG",
+            nom_php: self::EG,
+            type: Echelle::TYPE_ECHELLE_COMPOSITE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
         $profil->echelles->add(new Echelle(
-            0,
-            "QR",
-            self::QR,
-            Echelle::TYPE_ECHELLE_COMPOSITE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "QR",
+            nom_php: self::QR,
+            type: Echelle::TYPE_ECHELLE_COMPOSITE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
     }
 
@@ -62,39 +66,47 @@ class BpmrComFixture extends AbstractBpmrFixture
         );
 
         $profil->echelles->add(new Echelle(
-            0,
-            "DS",
-            self::DS,
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "DS",
+            nom_php: self::DS,
+            type: Echelle::TYPE_ECHELLE_SIMPLE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
 
         $profil->echelles->add(new Echelle(
-            0,
-            "AT",
-            self::AT,
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "AT",
+            nom_php: self::AT,
+            type: Echelle::TYPE_ECHELLE_SIMPLE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
 
         $profil->echelles->add(new Echelle(
-            0,
-            "RC",
-            self::RC,
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "RC",
+            nom_php: self::RC,
+            type: Echelle::TYPE_ECHELLE_SIMPLE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
 
         $profil->echelles->add(new Echelle(
-            0,
-            "RCPOURCENT",
-            self::RCPOURCENT,
-            Echelle::TYPE_ECHELLE_SIMPLE,
-            new ArrayCollection(),
-            new ArrayCollection()
+            id: 0,
+            nom: "RCPOURCENT",
+            nom_php: self::RCPOURCENT,
+            type: Echelle::TYPE_ECHELLE_SIMPLE,
+            echelles_correcteur: new ArrayCollection(),
+            echelles_etalonnage: new ArrayCollection(),
+            echelles_graphiques: new ArrayCollection(),
+            profil: $profil
         ));
     }
 

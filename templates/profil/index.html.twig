@@ -16,7 +16,9 @@
         <thead>
         <tr>
             <th>Nom</th>
-            <th>Propriétes</th>
+            <th>Echelles</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -25,10 +27,12 @@
                 <td>{{ profil.nom }}</td>
                 <td>
                     {% for echelle in profil.echelles %}
-                        {{ echelle.nom }} ({{ echelle.nom_php }})
+                        {{ echelle.nom }}
                         {{ not loop.last ? ' - ' : '' }}
                     {% endfor %}
                 </td>
+                <td><a class="btn btn-primary" href="{{ path('profil_modifier', {"id":profil.id}) }}">Modifier</a></td>
+                <td><a class="btn btn-primary" href="{{ path('profil_supprimer', {"id":profil.id}) }}">Supprimer</a></td>
             </tr>
         {% endfor %}
         </tbody>

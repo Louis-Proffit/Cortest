@@ -3,16 +3,23 @@
 namespace App\Entity;
 
 use App\Constraint\PhpIdentifier;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[Entity]
+#[UniqueEntity(fields: self::FIELDS_UNIQUE_NOM_PHP, message: "Ce nom d'échelle php existe déjà pour ce profil", errorPath: "nom_php")]
+#[UniqueEntity(fields: self::FIELDS_UNIQUE_NOM, message: "Ce nom d'échelle existe déjà pour ce profil", errorPath: "nom")]
+#[ORM\UniqueConstraint(fields: self::FIELDS_UNIQUE_NOM_PHP)]
+#[ORM\UniqueConstraint(fields: self::FIELDS_UNIQUE_NOM)]
 class Echelle
 {
+    const FIELDS_UNIQUE_NOM_PHP = ["profil", "nom_php"];
+    const FIELDS_UNIQUE_NOM = ["profil", "nom"];
+
 
     const TYPE_ECHELLE_SIMPLE = "Echelle simple";
     const TYPE_ECHELLE_COMPOSITE = "Echelle composite";
@@ -54,12 +61,14 @@ class Echelle
     #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles_correcteur;
 
-
     #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
     public Collection $echelles_etalonnage;
 
     #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleGraphique::class, cascade: ["remove", "persist"])]
     public Collection $echelles_graphiques;
+
+    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "echelles")]
+    public Profil $profil;
 
     /**
      * @param int $id
@@ -68,8 +77,10 @@ class Echelle
      * @param string $type
      * @param Collection $echelles_correcteur
      * @param Collection $echelles_etalonnage
+     * @param Collection $echelles_graphiques
+     * @param Profil $profil
      */
-    public function __construct(int $id, string $nom, string $nom_php, string $type, Collection $echelles_correcteur = new ArrayCollection(), Collection $echelles_etalonnage = new ArrayCollection())
+    public function __construct(int $id, string $nom, string $nom_php, string $type, Collection $echelles_correcteur, Collection $echelles_etalonnage, Collection $echelles_graphiques, Profil $profil)
     {
         $this->id = $id;
         $this->nom = $nom;
@@ -77,6 +88,8 @@ class Echelle
         $this->type = $type;
         $this->echelles_correcteur = $echelles_correcteur;
         $this->echelles_etalonnage = $echelles_etalonnage;
+        $this->echelles_graphiques = $echelles_graphiques;
+        $this->profil = $profil;
     }
 
 

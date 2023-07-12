@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Echelle;
 use App\Entity\Profil;
+use App\Form\CreerProfilType;
 use App\Form\ProfilType;
 use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -42,10 +44,26 @@ class ProfilController extends AbstractController
             graphiques: new ArrayCollection()
         );
 
-        $form = $this->createForm(ProfilType::class, $item);
+        $form = $this->createForm(CreerProfilType::class, $item);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
+
+            for ($i = 0; $i < $form[CreerProfilType::ECHELLES_COUNT_KEY]->getData(); $i++) {
+                $echelle = new Echelle(
+                    id: 0,
+                    nom: "Echelle " . $i . " (A MODIFIER)",
+                    nom_php: "echelle_" . $i . "_a_modifier",
+                    type: Echelle::TYPE_ECHELLE_SIMPLE,
+                    echelles_correcteur: new ArrayCollection(),
+                    echelles_etalonnage: new ArrayCollection(),
+                    echelles_graphiques: new ArrayCollection(),
+                    profil: $item
+                );
+                $item->echelles->add($echelle);
+
+                $entityManager->persist($echelle);
+            }
 
             $entityManager->persist($item);
             $entityManager->flush();
@@ -55,6 +73,28 @@ class ProfilController extends AbstractController
         }
 
         return $this->render("profil/form_creer.html.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/modifier/{id}", name: "modifier")]
+    public function modifier(
+        EntityManagerInterface $entityManager,
+        Request                $request,
+        Profil                 $profil
+    ): RedirectResponse|Response
+    {
+
+        $form = $this->createForm(ProfilType::class, $profil);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute("profil_index");
+        }
+
+        return $this->render("profil/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

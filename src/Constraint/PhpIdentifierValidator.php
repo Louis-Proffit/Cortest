@@ -25,7 +25,7 @@ class PhpIdentifierValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, "string");
         }
 
-        if (!preg_match("/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/", $value)) {
+        if (!preg_match("/^[a-zA-Z_][a-zA-Z0-9_]*$/", $value)) {
             $this->context->addViolation(self::VIOLATION_MESSAGE);
         }
     }

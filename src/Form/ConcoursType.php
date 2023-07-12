@@ -12,12 +12,12 @@ class ConcoursType extends AbstractType
 {
 
     public function __construct(
-        private readonly CollectionToArrayTransformer $collection_to_array_mapper
+        private readonly CollectionToArrayTransformer $collectionToArrayTransformer
     )
     {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add("nom", TextType::class, ["label" => "Nom du concours"])
@@ -28,7 +28,7 @@ class ConcoursType extends AbstractType
                 "label" => false
             ]);
 
-        $builder->get("questions")->addModelTransformer($this->collection_to_array_mapper);
+        $builder->get("questions")->addModelTransformer($this->collectionToArrayTransformer);
     }
 
 }

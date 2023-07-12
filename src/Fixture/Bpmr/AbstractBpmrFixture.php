@@ -220,7 +220,9 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                 nom_php: $nom_php,
                 type: Echelle::TYPE_ECHELLE_SIMPLE,
                 echelles_correcteur: new ArrayCollection(),
-                echelles_etalonnage: new ArrayCollection()
+                echelles_etalonnage: new ArrayCollection(),
+                echelles_graphiques: new ArrayCollection(),
+                profil: $profil
             ));
         }
     }
@@ -235,7 +237,9 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                 nom_php: $nom_php_composite,
                 type: Echelle::TYPE_ECHELLE_COMPOSITE,
                 echelles_correcteur: new ArrayCollection(),
-                echelles_etalonnage: new ArrayCollection()
+                echelles_etalonnage: new ArrayCollection(),
+                echelles_graphiques: new ArrayCollection(),
+                profil: $profil
             ));
 
             foreach ($noms_php_simples as $nom_php_simple) {
@@ -245,7 +249,9 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                     nom_php: $nom_php_simple,
                     type: Echelle::TYPE_ECHELLE_SIMPLE,
                     echelles_correcteur: new ArrayCollection(),
-                    echelles_etalonnage: new ArrayCollection()
+                    echelles_etalonnage: new ArrayCollection(),
+                    echelles_graphiques: new ArrayCollection(),
+                    profil: $profil
                 ));
             }
         }

@@ -6,17 +6,12 @@
     <br>
     <p class="lead">Liste des échelles utilisables par l'application Cortest.</p>
     <br>
-    <div class="row row-cols-auto">
-        <div class="col">
-            <a class="btn btn-primary" href="{{ path("echelle_creer") }}">Créer</a>
-        </div>
-    </div>
-    <br>
     <table class="table">
         <thead>
         <tr>
             <th>Nom</th>
             <th>Nom php</th>
+            <th>Profil</th>
             <th>Type</th>
             <th>Modifier</th>
         </tr>
@@ -26,9 +21,11 @@
             <tr>
                 <td>{{ echelle.nom }}</td>
                 <td>{{ echelle.nom_php }}</td>
+                <td>{{ echelle.profil.nom }}</td>
                 <td>{{ echelle.type }}</td>
                 <td>
-                    <a class="btn btn-primary" href="{{ path("echelle_modifier", {"id":echelle.id}) }}">Modifier</a>
+                    <a class="btn btn-primary"
+                       href="{{ path("profil_modifier", {"id":echelle.profil.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% endfor %}
