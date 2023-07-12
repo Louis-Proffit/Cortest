@@ -9,9 +9,7 @@ use App\Core\Files\Pdf\Compiler\LatexCompiler;
 use App\Core\Files\Pdf\Compiler\LatexCompilerNotFoundException;
 use App\Core\Files\Pdf\Merger\PdfMerger;
 use App\Core\Files\Pdf\Merger\PdfMergerNotFoundException;
-use App\Core\Renderer\RendererRepository;
 use App\Entity\Correcteur;
-use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\Graphique;
 use App\Entity\ReponseCandidat;
@@ -19,7 +17,6 @@ use App\Entity\Session;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Twig\Environment;
 use ZipArchive;
 
 /**
@@ -40,24 +37,23 @@ class PdfManager
     private string $tmpDir;
 
     /**
-     * @param Environment $twig
+     * @param Renderer $renderer
      * @param LoggerInterface $logger
-     * @param RendererRepository $rendererRepository
      * @param FileNameManager $fileNameManager
      * @param LatexCompiler $latexCompiler
      * @param PdfMerger $pdfMerger
      * @param int $compilationTimeLimitSeconds
-     * @throws LatexCompilerNotFoundException|PdfMergerNotFoundException
+     * @throws LatexCompilerNotFoundException
+     * @throws PdfMergerNotFoundException
      * @see PdflatexLatexCompiler
      */
     public function __construct(
-        private readonly Environment        $twig,
-        private readonly LoggerInterface    $logger,
-        private readonly RendererRepository $rendererRepository,
-        private readonly FileNameManager    $fileNameManager, // TODO export that dependency out of the file
-        private readonly LatexCompiler      $latexCompiler,
-        private readonly PdfMerger          $pdfMerger,
-        int                                 $compilationTimeLimitSeconds = 300,
+        private readonly Renderer        $renderer,
+        private readonly LoggerInterface $logger,
+        private readonly FileNameManager $fileNameManager, // TODO export that dependency out of the file
+        private readonly LatexCompiler   $latexCompiler,
+        private readonly PdfMerger       $pdfMerger,
+        int                              $compilationTimeLimitSeconds = 300,
     )
     {
         $this->tmpDir = realpath(sys_get_temp_dir());
@@ -73,42 +69,6 @@ class PdfManager
 
         // Autorise un temps de compilation supérieur
         set_time_limit($compilationTimeLimitSeconds);
-    }
-
-    public function getFeuilleProfilContent(
-        Graphique       $graphique,
-        ReponseCandidat $reponse,
-        Correcteur      $correcteur,
-        Etalonnage      $etalonnage,
-        array           $score,
-        array           $profil,
-    ): string
-    {
-        $renderer = $this->rendererRepository->fromIndex($graphique->renderer_index);
-
-        $optionsEchelle = [];
-        $idToScore = array();
-        $idToProfil = array();
-
-        /** @var EchelleGraphique $echelleGraphique */
-        foreach ($graphique->echelles as $echelleGraphique) {
-            $optionsEchelle[$echelleGraphique->id] = $echelleGraphique->options;
-
-            $idToScore[$echelleGraphique->id] = $score[$echelleGraphique->echelle->nom_php];
-            $idToProfil[$echelleGraphique->id] = $profil[$echelleGraphique->echelle->nom_php];
-
-        }
-        return $renderer->render(
-            environment: $this->twig,
-            reponse: $reponse,
-            correcteur: $correcteur,
-            etalonnage: $etalonnage,
-            graphique: $graphique,
-            score: $idToScore,
-            profil: $idToProfil,
-            options: $graphique->options,
-            optionsEchelle: $optionsEchelle
-        );
     }
 
     private
@@ -145,11 +105,12 @@ class PdfManager
                                   string          $outputDirectoryPath,
                                   string          $fileNameWithoutExtension): string
     {
-        $content = $this->getFeuilleProfilContent(
+
+        $content = $this->renderer->getFeuilleProfilContent(
             graphique: $graphique,
-            reponse: $reponseCandidat,
-            correcteur: $correcteur,
+            reponseCandidat: $reponseCandidat,
             etalonnage: $etalonnage,
+            correcteur: $correcteur,
             score: $score,
             profil: $profil
         );

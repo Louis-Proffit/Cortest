@@ -64,7 +64,7 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             CorrecteurEtEtalonnageChoiceType::class,
             $parametresCalculProfil,
-            [CorrecteurEtEtalonnageChoiceType::OPTION_SESSION => $session]);
+            [CorrecteurEtEtalonnageChoiceType::OPTION_CONCOURS => $session->concours]);
 
         $form->handleRequest($request);
 

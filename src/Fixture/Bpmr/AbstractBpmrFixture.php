@@ -2,8 +2,6 @@
 
 namespace App\Fixture\Bpmr;
 
-use App\Core\Renderer\RendererRepository;
-use App\Core\Renderer\Values\RendererBatonnets;
 use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
@@ -38,8 +36,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         private readonly string $profil_nom,
         private readonly string $correcteur_nom,
         private readonly string $etalonnage_nom,
-        private readonly int    $etalonnage_nombre_classes,
-        private readonly string $graphique_nom,
+        private readonly int    $etalonnage_nombre_classes
     )
     {
     }
@@ -123,25 +120,6 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         }
 
         $manager->persist($etalonnage);
-
-        // GRAPHIQUE -------------------------------
-        $renderer_index = RendererRepository::INDEX_BATONNETS;
-        $renderer = new RendererBatonnets();
-        $graphique = new Graphique(
-            id: 0,
-            options: $renderer->initializeOptions(),
-            profil: $profil,
-            echelles: new ArrayCollection(),
-            nom: $this->graphique_nom,
-            renderer_index: $renderer_index,
-            subtests: new ArrayCollection()
-        );
-        $this->echellesGraphiques($profil, $graphique, $renderer);
-        $manager->persist($graphique);
-        $manager->flush();
-
-        $this->subtests($graphique);
-
         $manager->flush();
     }
 
@@ -316,36 +294,11 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             ));
         }
     }
-
-    protected function echellesGraphiques(Profil $profil, Graphique $graphique, RendererBatonnets $renderer): void
-    {
-        /** @var Echelle $echelle */
-        foreach ($profil->echelles as $echelle) {
-            $graphique->echelles->add(new EchelleGraphique(
-                id: 0,
-                options: $renderer->initializeEchelleOption($echelle),
-                echelle: $echelle,
-                graphique: $graphique
-            ));
-        }
-    }
-
     protected function findEchelleInProfil(Profil $profil, string $nom_php): Echelle|null
     {
         /** @var Echelle $echelle */
         foreach ($profil->echelles as $echelle) {
             if ($echelle->nom_php === $nom_php) {
-                return $echelle;
-            }
-        }
-        return null;
-    }
-
-    protected function findEchelleInGraphique(Graphique $graphique, string $nom_php): EchelleGraphique|null
-    {
-        /** @var EchelleGraphique $echelle */
-        foreach ($graphique->echelles as $echelle) {
-            if ($echelle->echelle->nom_php === $nom_php) {
                 return $echelle;
             }
         }
@@ -361,8 +314,6 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
     protected abstract function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur);
 
     protected abstract function correcteurPersonnalite(Profil $profil, Correcteur $correcteur);
-
-    protected abstract function subtests(Graphique $graphique);
 }
 
 

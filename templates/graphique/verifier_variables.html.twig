@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Variables utilisables</h1>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path('graphique_index') }}">Retour</a>
+        </div>
+    </div>
+    <br>
+    <dl class="row">
+        <dt class="col-3">Profil</dt>
+        <dd class="col-9">{{ correcteur.profil.nom }}</dd>
+        <dt class="col-3">Correcteur</dt>
+        <dd class="col-9">{{ correcteur.nom }}</dd>
+        <dt class="col-3">Etalonnage</dt>
+        <dd class="col-9">{{ etalonnage.nom }}</dd>
+    </dl>
+    <p class="lead">Liste des variables utilisables (Total : {{ keys|length }})</p>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        {% for key in keys %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>TODO</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

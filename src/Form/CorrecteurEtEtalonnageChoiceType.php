@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Concours;
 use App\Entity\Etalonnage;
+use App\Entity\Profil;
 use App\Entity\Session;
 use App\Form\Data\CorrecteurEtEtalonnagePair;
 use App\Repository\CorrecteurRepository;
@@ -14,17 +16,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CorrecteurEtEtalonnageChoiceType extends AbstractType
 {
-    const OPTION_SESSION = "session";
+    const OPTION_CONCOURS = "concours";
+    const OPTION_PROFIL = "profil";
 
     public function __construct(
-        private readonly CorrecteurRepository $correcteur_repository
+        private readonly CorrecteurRepository $correcteurRepository
     )
     {
     }
 
-    private function correcteurAndEtalonnageChoices(Session $session): array
+    private function correcteurAndEtalonnageChoices(Concours|null $concours, Profil|null $profil): array
     {
-        $correcteurs = $this->correcteur_repository->findBy(["concours" => $session->concours]);
+        if ($concours != null) {
+            $correcteurs = $this->correcteurRepository->findBy(["concours" => $concours]);
+        } else if ($profil != null) {
+            $correcteurs = $this->correcteurRepository->findBy(["profil" => $profil]);
+        } else {
+            $correcteurs = $this->correcteurRepository->findAll();
+        }
 
         $result = [];
         foreach ($correcteurs as $correcteur) {
@@ -45,18 +54,23 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
         return $result;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $concours = $options[self::OPTION_CONCOURS] ?? null;
+        $profil = $options[self::OPTION_PROFIL] ?? null;
+
         $builder->add("both", ChoiceType::class, [
-            "choices" => $this->correcteurAndEtalonnageChoices($options[self::OPTION_SESSION]),
+            "choices" => $this->correcteurAndEtalonnageChoices($concours, $profil),
             "label" => "Correcteur et étalonnage"
         ])->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->define(self::OPTION_SESSION);
-        $resolver->setAllowedTypes(self::OPTION_SESSION, Session::class);
+        $resolver->define(self::OPTION_CONCOURS);
+        $resolver->define(self::OPTION_PROFIL);
+        $resolver->setAllowedTypes(self::OPTION_CONCOURS, Concours::class);
+        $resolver->setAllowedTypes(self::OPTION_PROFIL, Profil::class);
     }
 
 }

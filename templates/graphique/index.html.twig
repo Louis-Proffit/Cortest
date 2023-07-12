@@ -7,9 +7,12 @@
     <br>
     <div class="lead">Liste des graphiques disponibles</div>
     <br>
-    <div class="row">
+    <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary" href="{{ path("graphique_creer") }}">Ajouter</a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary" href="{{ path("graphique_verifier_variables") }}">Vérifier les variables</a>
         </div>
     </div>
     <br>
@@ -18,7 +21,8 @@
         <tr>
             <th scope="col">Nom</th>
             <th scope="col">Profil</th>
-            <th scope="col">Consulter</th>
+            <th scope="col">Modifier</th>
+            <th scope="col">Tester</th>
         </tr>
         </thead>
         <tbody>
@@ -26,9 +30,8 @@
             <tr>
                 <td>{{ graphique.nom }}</td>
                 <td>{{ graphique.profil.nom }}</td>
-                <td>
-                    <a href="{{ path("graphique_consulter", {"id":graphique.id}) }}" class="btn btn-link">
-                        Consulter</a>
+                <td><a class="btn btn-primary" href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Modifier</a>
+                <td><a class="btn btn-primary" href="{{ path('graphique_tester', {"id":graphique.id}) }}">Tester</a>
                 </td>
             </tr>
         {% endfor %}
