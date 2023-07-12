@@ -2,15 +2,12 @@
 
 namespace App\Fixture\Bpmr;
 
-use App\Core\Renderer\Values\RendererBatonnets;
 use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
-use App\Entity\Graphique;
 use App\Entity\Profil;
 use App\Entity\QuestionConcours;
-use App\Entity\Subtest;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class BpmrOffFixture extends AbstractBpmrFixture
@@ -26,8 +23,7 @@ class BpmrOffFixture extends AbstractBpmrFixture
             self::PROFIL_NOM,
             self::CORRECTEUR_NOM,
             self::ETALONNAGE_NOM,
-            9,
-            self::GRAPHIQUE_NOM
+            9
         );
     }
 
@@ -240,83 +236,10 @@ class BpmrOffFixture extends AbstractBpmrFixture
         $this->correcteurRcPourcent($profil, $correcteur);
     }
 
-    private function subtestAptitudesCognitives(Graphique $graphique): Subtest
-    {
-        $echelles_bas_de_cadre = array(
-            array($this->findEchelleInGraphique($graphique,
-                self::EG)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
-            array($this->findEchelleInGraphique($graphique,
-                self::QR)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
-        );
-
-        $echelles_core = [];
-
-        foreach (self::APTITUDES_COGNITIVES_BR_TO_MR as $br => $mr) {
-            $echelle_br = $this->findEchelleInGraphique($graphique, $br);
-            $echelle_mr = $this->findEchelleInGraphique($graphique, $mr);
-            $echelles_core[] = array($echelle_br->id, $echelle_mr->id);
-        }
-
-        return new Subtest(
-            id: 0,
-            nom: "Aptitudes cognitives",
-            type: Subtest::TYPE_SUBTEST_BR_MR,
-            echelles_core: $echelles_core,
-            echelles_bas_de_cadre: $echelles_bas_de_cadre,
-            graphique: $graphique
-        );
-    }
-
-    private function subtestPersonnalite(Graphique $graphique): Subtest
-    {
-        $echelles_bas_de_cadre = array(
-            array($this->findEchelleInGraphique($graphique,
-                self::DS)->id, Subtest::TYPE_FOOTER_SCORE_AND_CLASSE),
-            array($this->findEchelleInGraphique($graphique, self::AT)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
-            array($this->findEchelleInGraphique($graphique, self::RC)->id, Subtest::TYPE_FOOTER_SCORE_ONLY),
-            array($this->findEchelleInGraphique($graphique, self::RCPOURCENT)->id, Subtest::TYPE_FOOTER_POURCENT),
-        );
-
-        $echelles_core = array();
-
-        foreach (self::PERSONNALITE_NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE as $nom_php_composite => $noms_php_simples) {
-
-            $echelle_composite_dependencies = array();
-            $echelle_composite = $this->findEchelleInGraphique($graphique, $nom_php_composite);
-
-            foreach ($noms_php_simples as $nom_php_simple) {
-                $echelle_simple = $this->findEchelleInGraphique($graphique, $nom_php_simple);
-                $echelle_composite_dependencies[] = $echelle_simple->id;
-            }
-
-            $echelles_core[] = array($echelle_composite->id, $echelle_composite_dependencies);
-        }
-
-        return new Subtest(
-            id: 0,
-            nom: "Personnalité",
-            type: Subtest::TYPE_SUBTEST_COMPOSITE,
-            echelles_core: $echelles_core,
-            echelles_bas_de_cadre: $echelles_bas_de_cadre,
-            graphique: $graphique
-        );
-    }
-
-
-    protected function subtests(Graphique $graphique): void
-    {
-        $graphique->options[RendererBatonnets::OPTION_TITRE_PHP] = "PROFIL BPMR-OFF";
-
-        $graphique->subtests->add($this->subtestAptitudesCognitives($graphique));
-        $graphique->subtests->add($this->subtestPersonnalite($graphique));
-    }
-
-
     const CONCOURS_NOM = "Concours BPMR - Officier";
     const PROFIL_NOM = "BPMR - Officier";
     const CORRECTEUR_NOM = "Correcteur par défaut BPMR - OFF";
     const ETALONNAGE_NOM = "Etalonnage de test BPMR - OFF";
-    const GRAPHIQUE_NOM = "Graphique par défaut BPMR - OFF";
 
     const INDEX_EXEMPLES = [1, 52, 53, 74, 75, 76, 92, 113, 129, 150];
 
