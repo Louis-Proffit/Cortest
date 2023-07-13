@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
+use App\Core\Files\FileUtils;
 use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\Files\Pdf\PdfManager;
 use App\Core\Files\Pdf\Renderer;
@@ -147,6 +148,14 @@ class GraphiqueController extends AbstractController
         }
 
         return $this->render("graphique/tester_form.twig", ["form" => $form->createView()]);
+    }
+
+    #[Route("/telecharger/{id}", name: "telecharger")]
+    public function telecharger(Graphique $graphique): Response
+    {
+        $response = new Response($graphique->content);
+        FileUtils::setFileResponseFileName($response, $graphique->nom . ".tex.twig");
+        return $response;
     }
 
     #[Route("/verifier-variables", name: "verifier_variables")]

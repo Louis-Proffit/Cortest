@@ -23,6 +23,7 @@
             <th scope="col">Profil</th>
             <th scope="col">Modifier</th>
             <th scope="col">Tester</th>
+            <th scope="col">Télécharger</th>
         </tr>
         </thead>
         <tbody>
@@ -32,6 +33,7 @@
                 <td>{{ graphique.profil.nom }}</td>
                 <td><a class="btn btn-primary" href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Modifier</a>
                 <td><a class="btn btn-primary" href="{{ path('graphique_tester', {"id":graphique.id}) }}">Tester</a>
+                <td><a class="btn btn-primary" href="{{ path('graphique_telecharger', {"id":graphique.id}) }}">Télécharger</a>
                 </td>
             </tr>
         {% endfor %}

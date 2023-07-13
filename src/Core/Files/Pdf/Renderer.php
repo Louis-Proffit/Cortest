@@ -36,8 +36,10 @@ class Renderer
     const KEY_REPONSE_SEXE = "reponse_sexe";
     const KEY_SESSION_DATE = "session_date";
     const KEY_SESSION_NUMERO_ORDRE = "session_numero_ordre";
-    const KEY_SESSION_NOM_CONCOURS = "concours_nom";
     const KEY_SESSION_SGAP_NOM = "session_sgap_nom";
+    const KEY_CONCOURS_NOM = "concours_nom";
+    const KEY_CONCOURS_TYPE = "concours_type";
+    const KEY_CONCOURS_VERSION_BATTERIE = "concours_version_batterie";
     const KEY_ETALONNAGE_NOMBRE_CLASSES = "etalonnage_nombre_classes";
     const KEY_PREFIX_SCORE = "score_";
     const KEY_PREFIX_PROFIL = "profil_";
@@ -111,8 +113,10 @@ class Renderer
             self::KEY_REPONSE_SEXE => $reponse->sexe,
             self::KEY_SESSION_DATE => $reponse->session->date,
             self::KEY_SESSION_NUMERO_ORDRE => $reponse->session->numero_ordre,
-            self::KEY_SESSION_NOM_CONCOURS => $reponse->session->concours->nom,
             self::KEY_SESSION_SGAP_NOM => $reponse->session->sgap->nom,
+            self::KEY_CONCOURS_NOM => $reponse->session->concours->nom,
+            self::KEY_CONCOURS_TYPE => $reponse->session->concours->type_concours,
+            self::KEY_CONCOURS_VERSION_BATTERIE => $reponse->session->concours->version_batterie,
             self::KEY_IMAGE_DIRECTORY => $this->imagesDirectory,
             self::KEY_GRAPHIQUE_NOW => $graphique->nom,
             self::KEY_PROFIL_NOM => $correcteur->profil->nom,
@@ -189,7 +193,7 @@ class Renderer
 
         /** @var QuestionConcours $question */
         foreach ($concours->questions as $question) {
-            $reponses[$question->indice] = 1;
+            $reponses[$question->indice] = 3;
         }
 
         return new ReponseCandidat(

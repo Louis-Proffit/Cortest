@@ -20,6 +20,7 @@ use Twig\TwigFilter;
 class CortestExtension extends AbstractExtension
 {
 
+    const FULL_EIRS_NAME = ['E' => 'Externe', 'I' => 'Interne', 'R' => 'Réservé', 'S' => 'Spécial'];
 
     public function __construct(
         private readonly EchelleGraphiqueRepository $echelleGraphiqueRepository
@@ -31,6 +32,7 @@ class CortestExtension extends AbstractExtension
     {
         return [
             new TwigFilter('sexe', [$this, 'formatSexe']),
+            new TwigFilter('eirs', [$this, 'formatEirs']),
             new TwigFilter("subtest_type", [$this, "formatSubtestType"]),
             new TwigFilter("footer_type", [$this, "formatFooterType"]),
             new TwigFilter("echelle_graphique_nom", [$this, "formatEchelleGraphiqueNom"]),
@@ -65,5 +67,10 @@ class CortestExtension extends AbstractExtension
         } else {
             return "Femme";
         }
+    }
+
+    public function formatEirs(string $eirs): string
+    {
+        return self::FULL_EIRS_NAME[$eirs];
     }
 }
