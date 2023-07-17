@@ -1,55 +1,54 @@
 {% extends 'base.html.twig' %}
 
 {% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('port') }}
+    {{ encore_entry_script_tags('grille_manager') }}
+    {{ encore_entry_script_tags('ag-grid') }}
 
-    <script src="{{ asset('js/jquerry.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.js') }}"></script>
-    <script src="{{ asset('js/ag-grid.js') }}"></script>
+    <script defer>
+        window.onload = function () {
+            const request = {
+                code_barre: {asked: true, expected: false, print: true},
+                nom: {asked: true, expected: false, print: true},
+                prenom: {asked: true, expected: false, print: true},
+                nom_jeune_fille: {asked: true, expected: false, print: true},
+                niveau_scolaire: {asked: true, expected: false, print: true},
+                date_naissance: {asked: true, expected: false, print: true},
+                sexe: {asked: true, expected: false, print: true},
+                concours: {asked: true, expected: false, print: true},
+                SGAP: {
+                    asked: true,
+                    expected: '{% if session.sgap.indice < 10 %}0{% endif %}{{ session.sgap.indice }}',
+                    print: true
+                },
+                date_examen: {asked: true, expected: false, print: true},
+                type_concours: {asked: true, expected: '{{ session.concours.type_concours }}', print: true},
+                batterie: {asked: true, expected: '{{ session.concours.version_batterie }}', print: true},
+                reserve: {asked: false, expected: false, print: true},
+                option_1: {asked: false, expected: false, print: true},
+                option_2: {asked: false, expected: false, print: true},
+            };
+            const questions = {};
+            {% for questionInfos in session.concours.questions %}
+            questions['{{ questionInfos.indice }}'] = '{{ questionInfos.type }}';
+            {% endfor %}
 
-    <script src="{{ asset('lecture-optique/port.js') }}"></script>
-    <script src="{{ asset('lecture-optique/grille_1.js') }}"></script>
-    <script src="{{ asset('lecture-optique/intervention_manuelle.js') }}"></script>
-
-    <script>
-
-
-        const request = {
-            code_barre: {asked: true, expected: false, print: true},
-            nom: {asked: true, expected: false, print: true},
-            prenom: {asked: true, expected: false, print: true},
-            nom_jeune_fille: {asked: true, expected: false, print: true},
-            niveau_scolaire: {asked: true, expected: false, print: true},
-            date_naissance: {asked: true, expected: false, print: true},
-            sexe: {asked: true, expected: false, print: true},
-            concours: {asked: true, expected: false, print: true},
-            SGAP: {asked: true, expected: '{% if session.sgap.indice < 10 %}0{% endif %}{{ session.sgap.indice }}', print: true},
-            date_examen: {asked: true, expected: false, print: true},
-            type_concours: {asked: true, expected: '{{ session.concours.type_concours }}', print: true},
-            batterie: {asked: true, expected: '{{ session.concours.version_batterie }}', print: true},
-            reserve: {asked: false, expected: false, print: true},
-            option_1: {asked: false, expected: false, print: true},
-            option_2: {asked: false, expected: false, print: true},
-        };
-        var questions = {};
-        {% for questionInfos in session.concours.questions %}
-            questions['{{questionInfos.indice}}'] = '{{questionInfos.type}}';
-        {% endfor %}
-
-            var choice = [];
-        {% for niveau in niveaux %}
-            choice.push({read: '{{niveau.indice}}', print: '{{niveau.nom}}', store:  {{niveau.id}} });
-        {% endfor %}
+            const choice = [];
+            {% for niveau in niveaux %}
+            choice.push({read: '{{ niveau.indice }}', print: '{{ niveau.nom }}', store:  {{ niveau.id }} });
+            {% endfor %}
 
 
-            var gm = new GrilleManager(request, questions, choice);
-            var agOptions = gm.getGridConfig();
-            // setup the grid after the page has finished loading
+            window.gm = new window.GrilleManager(request, questions, choice);
+            const agOptions = gm.getGridConfig();
+            // set up the grid after the page has finished loading
             document.addEventListener('DOMContentLoaded', () => {
                 const gridDiv = document.querySelector('#myGrid');
-                ag = new agGrid.Grid(gridDiv, agOptions);
+                window.ag = new window.Grid(gridDiv, agOptions);
             });
 
-            var lunch = function () {
+            window.lunch = function () {
                 $("#btn-fid").removeAttr("disabled");
                 $("#btn-qcm").removeAttr("disabled");
             };
@@ -61,16 +60,13 @@
                 $("#spinner-fid").hide();
                 $("#spinner-qcm").hide();
                 console.log('ready');
-                
-                
-
 
 
                 /*gm.FIDs = [];
                  gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];*/
             });
 
-            var testFID = {
+            window.testFID = {
                 code_barre: "125273",
                 nom: "COLLARD",
                 prenom: 'Julien',
@@ -89,17 +85,12 @@
             };
 
 
-            var testQCM = {code_barre: "5667", qcm: ['A','B','C']};
-            
-            var debugPort = false;
-            
-            var test = true;
-            
-            
+            window.testQCM = {code_barre: "5667", qcm: ['A', 'B', 'C']};
 
+            window.debugPort = false;
 
-
-
+            window.test = true;
+        }
     </script>
 {% endblock %}
 
@@ -112,26 +103,26 @@
     <table class="table">
 
         <tbody>
-            <tr>
-                <td>Date
-                <td><em>{{ session.date |date("m/d/Y") }}</em></td>
-            </tr>
-            <tr>
-                <td>Concours
-                <td><em>{{ session.concours.nom }}</em></td>
-            </tr>
-            <tr>
-                <td>Type concours
-                <td><em>{{ session.concours.type_concours }}</em></td>
-            </tr>
-            <tr>
-                <td>Batterie
-                <td><em>{{ session.concours.version_batterie }}</em></td>
-            </tr>
-            <tr>
-                <td>SGAP
-                <td><em>{{ session.sgap.nom }}</em></td>
-            </tr>
+        <tr>
+            <td>Date
+            <td><em>{{ session.date |date("m/d/Y") }}</em></td>
+        </tr>
+        <tr>
+            <td>Concours
+            <td><em>{{ session.concours.nom }}</em></td>
+        </tr>
+        <tr>
+            <td>Type concours
+            <td><em>{{ session.concours.type_concours }}</em></td>
+        </tr>
+        <tr>
+            <td>Batterie
+            <td><em>{{ session.concours.version_batterie }}</em></td>
+        </tr>
+        <tr>
+            <td>SGAP
+            <td><em>{{ session.sgap.nom }}</em></td>
+        </tr>
         </tbody>
     </table>
 
@@ -181,8 +172,6 @@
                 <div class="card card-body">
 
                     <div id="myGrid" style="height: 200px;" class="ag-theme-alpine"></div>
-
-
                 </div>
             </div>
         </div>
@@ -213,7 +202,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">4. Appairer</h5>
-            <p class="card-text">Si le nombres de pages lues et appairées ne correspond pas, veuillez procéder à un
+            <p class="card-text">Si le nombre de pages lues et appairées ne correspond pas, veuillez procéder à un
                 appairage manuel.</p>
             <div class='row'>
                 <div class='col-3'>
@@ -222,7 +211,7 @@
                     </button>
                 </div>
                 <div class='col-3'>
-                    <p class="card-text">Pages appairées : <strong id='nb-appaires'>0</strong></strong></p>
+                    <p class="card-text">Pages appairées : <strong id='nb-appaires'>0</strong></p>
                 </div>
                 <div class='col-2'>
                     <p class="card-text">Pages lues : <strong id='nb-lues'>0</strong></p>
@@ -254,7 +243,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong
-                            class='code-barre'></strong></h1>
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -294,7 +283,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle du QCM : <strong
-                            class='code-barre'></strong></h1>
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -336,7 +325,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Une erreur est survenue à la lecture du <strong>code barre</strong></p>
-                    <p><em>Vous pouvez essayez de cliquer sur la zone de saisie puis de scanner le code barre avec la
+                    <p><em>Vous pouvez essayer de cliquer sur la zone de saisie puis de scanner le code barre avec la
                             scanette. Si cela fonctionne, cliquer ensuite sur "Corriger".</em></p>
                     <form>
                         <div class="row mb-3">
@@ -418,7 +407,9 @@
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Enregistrement avec succès</h1>
                 </div>
                 <div class="modal-body">
-                    <p>Les tests corrigés ont bien été enregistrés !</p><a href="/session/consulter/{{ session.id }}" class="btn btn-success valider" >Fin de la correction</a>
+                    <p>Les tests corrigés ont bien été enregistrés !</p><a href="/session/consulter/{{ session.id }}"
+                                                                           class="btn btn-success valider">Fin de la
+                        correction</a>
                 </div>
             </div>
         </div>

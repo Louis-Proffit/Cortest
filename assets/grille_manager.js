@@ -10,7 +10,8 @@ class GrilleManager {
         nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+[\s]*$/},
         prenom: {name: 'Prénom', type: 'string', length: 11, regex: /^[A-Z]+[\s]*$/},
         nom_jeune_fille: {name: 'Nom de jeune fille', type: 'string', length: 12, regex: /^[A-Z]*[\s]*$/},
-        niveau_scolaire: {name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
+        niveau_scolaire: {
+            name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
                 {read: '1', print: 'CEP', store: 'CEP'},
                 {read: '2', print: 'CAP-BEP-BEPC', store: 'CAP-BEP-BEPC'},
                 {read: '3', print: 'niveau BAC', store: 'niveau BAC'},
@@ -19,18 +20,23 @@ class GrilleManager {
                 {read: '6', print: 'BAC+2', store: 'BAC+2'},
                 {read: '7', print: 'license ou maitrise', store: 'license ou maitrise'},
                 {read: '8', print: 'ingénieur ou troisème cycle', store: 'ingénieur ou troisème cycle'},
-            ]},
+            ]
+        },
         date_naissance: {name: 'Date de naissance', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
-        sexe: {name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
+        sexe: {
+            name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
                 {read: '1', print: 'M', store: 1},
                 {read: '2', print: 'F', store: 2},
-            ]},
-        concours: {name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
+            ]
+        },
+        concours: {
+            name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
                 {read: 'E', print: 'E', store: 'E'},
                 {read: 'I', print: 'I', store: 'I'},
                 {read: 'R', print: 'R', store: 'R'},
                 {read: 'S', print: 'S', store: 'S'},
-            ]},
+            ]
+        },
         SGAP: {name: 'SGAP', type: 'number', length: 2, regex: /^[0-9]{2}$/},
         date_examen: {name: 'Date d\'examen', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
         type_concours: {name: 'Type concours', type: 'number', length: 2, regex: /^[0-9]{2}$/},
@@ -57,7 +63,8 @@ class GrilleManager {
             nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+[\s]*$/},
             prenom: {name: 'Prénom', type: 'string', length: 11, regex: /^[A-Z]+[\s]*$/},
             nom_jeune_fille: {name: 'Nom de jeune fille', type: 'string', length: 12, regex: /^[A-Z]*[\s]*$/},
-            niveau_scolaire: {name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
+            niveau_scolaire: {
+                name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
                     {read: '1', print: 'CEP', store: 'CEP'},
                     {read: '2', print: 'CAP-BEP-BEPC', store: 'CAP-BEP-BEPC'},
                     {read: '3', print: 'niveau BAC', store: 'niveau BAC'},
@@ -66,18 +73,23 @@ class GrilleManager {
                     {read: '6', print: 'BAC+2', store: 'BAC+2'},
                     {read: '7', print: 'license ou maitrise', store: 'license ou maitrise'},
                     {read: '8', print: 'ingénieur ou troisème cycle', store: 'ingénieur ou troisème cycle'},
-                ]},
+                ]
+            },
             date_naissance: {name: 'Date de naissance', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
-            sexe: {name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
+            sexe: {
+                name: 'Sexe', type: 'choice', length: 1, regex: /^[1-2]$/, choice: [
                     {read: '1', print: 'M', store: 1},
                     {read: '2', print: 'F', store: 2},
-                ]},
-            concours: {name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
+                ]
+            },
+            concours: {
+                name: 'Concours', type: 'choice', length: 1, regex: /^[EIRS]$/, choice: [
                     {read: 'E', print: 'E', store: 'E'},
                     {read: 'I', print: 'I', store: 'I'},
                     {read: 'R', print: 'R', store: 'R'},
                     {read: 'S', print: 'S', store: 'S'},
-                ]},
+                ]
+            },
             SGAP: {name: 'SGAP', type: 'number', length: 2, regex: /^[0-9]{2}$/},
             date_examen: {name: 'Date d\'examen', type: 'date', length: 6, regex: /[0-3][0-9][0-1][0-9]{3}/},
             type_concours: {name: 'Type concours', type: 'number', length: 2, regex: /^[0-9]{2}$/},
@@ -113,7 +125,12 @@ class GrilleManager {
                         for (var i in ligne.choice) {
                             options.push(ligne.choice[i].store);
                         }
-                        columnDefs.push({field: field, headerName: ligne.name, cellEditor: 'agSelectCellEditor', cellEditorParams: {values: options}});
+                        columnDefs.push({
+                            field: field,
+                            headerName: ligne.name,
+                            cellEditor: 'agSelectCellEditor',
+                            cellEditorParams: {values: options}
+                        });
                         break;
                     default:
                         columnDefs.push({field: field, headerName: ligne.name});
@@ -138,7 +155,7 @@ class GrilleManager {
             },
         };
         this.gridOptions = gridOptions;
-        //console.log(gridOptions);
+
         return gridOptions;
     }
 
@@ -240,9 +257,10 @@ class GrilleManager {
                         if (fid[field] !== requestField.expected) {
                             //si ce n'est pas celle fournie
                             forms.push(formConfirm(field, ligne.name, fid[field], requestField.expected,
-                                    function () {
-                                        fid[field] = my.request[field].expected;
-                                    }, function () {}));
+                                function () {
+                                    fid[field] = my.request[field].expected;
+                                }, function () {
+                                }));
                         }
                     }
                 } else {
@@ -250,9 +268,10 @@ class GrilleManager {
 
                     if (requestField.expected !== false) {
                         forms.push(formConfirm(field, ligne.name, fid[field], requestField.expected,
-                                function () {
-                                    fid[field] = my.request[field].expected;
-                                }, function () {}));
+                            function () {
+                                fid[field] = my.request[field].expected;
+                            }, function () {
+                            }));
                     } else {
 
                         if (ligne.type === 'choice') {
@@ -325,10 +344,9 @@ class GrilleManager {
                     qcm[i] = corresp[qcm[i]];
                 } else {
                     if (qcm[i] === '@') {
-                        if(questions[i] == "Score") {
+                        if (questions[i] == "Score") {
                             toCorrect.push({numero: i, blanck: true, unknown: false});
-                        }
-                        else {
+                        } else {
                             qcm[i] = blanck;
                         }
                     } else {
@@ -543,10 +561,12 @@ class GrilleManager {
     manualLink() {
         var nbPagesAAppairer = this.FIDs.length + this.QCMs.length - 2 * this.codesAppaires.length;
         if (nbPagesAAppairer % 2 === 1) {
-            tellFatalError("Le nombre de pages à appairer n'est pas paire, veuillez poursuivre la correction", "Continuer", function () {});
+            tellFatalError("Le nombre de pages à appairer n'est pas paire, veuillez poursuivre la correction", "Continuer", function () {
+            });
         } else {
             if (nbPagesAAppairer === 0) {
-                tellFatalError("Aucune page à appairer manuellement.", "Continuer", function () {});
+                tellFatalError("Aucune page à appairer manuellement.", "Continuer", function () {
+                });
             } else {
                 var FIDsDispo = [];
                 var QCMsDispo = [];
@@ -569,7 +589,8 @@ class GrilleManager {
                             $("#nb-appaires").text(parseInt($("#nb-appaires").text()) + 2);
                         }
                     }
-                }, function () {});
+                }, function () {
+                });
             }
 
         }
@@ -594,3 +615,5 @@ class GrilleManager {
         });
     }
 }
+
+global.GrilleManager = GrilleManager

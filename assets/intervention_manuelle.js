@@ -1,8 +1,8 @@
 /* 
- * Page qui gère les interventions utilisteur pour la correction manuelle de certaines choses
+ * Page qui gère les interventions utilisateur pour la correction manuelle de certaines choses
  */
 
-function tellFatalError(message, button, next) {
+global.tellFatalError = function (message, button, next) {
     $('#manual-fatal .message').text(message);
     $('#manual-fatal .button').text(button);
     $("#manual-fatal").modal("show");
@@ -13,7 +13,6 @@ function tellFatalError(message, button, next) {
 }
 
 
-
 /*ouvre la modale de correction manuelle d'une fid
  * 
  * code_barre
@@ -21,7 +20,7 @@ function tellFatalError(message, button, next) {
  * valider -> callback si click sur valider
  * annuler -> callback si clic sur annuler
  */
-function askFID(code_barre, forms, valider, annuler) {
+global.askFID = function (code_barre, forms, valider, annuler) {
     $('#manual-FID form').empty();
     $('#manual-FID .code-barre').text(code_barre);
     for (var i in forms) {
@@ -51,7 +50,7 @@ function askFID(code_barre, forms, valider, annuler) {
  * left_void -> callback si l'utilisateur coche 'case laissée vide par le candidat'
  * unknown -> callback si l'utilisateur coche 'impssible de dire c'est quelle case'
  */
-function formInput(field, field_name, value, type, valid, left_void, unknown) {
+global.formInput = function (field, field_name, value, type, valid, left_void, unknown) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><input type='" + type + "' class='form-control res' value='" + value + "'></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
@@ -82,7 +81,7 @@ function formInput(field, field_name, value, type, valid, left_void, unknown) {
     };
 }
 
-function formDate(field, field_name, value, valid) {
+global.formDate = function (field, field_name, value, valid) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><input type='date' class='form-control res' value='" + value + "'></div>";
     return {
@@ -106,7 +105,7 @@ function formDate(field, field_name, value, valid) {
  * correct -> callback si l'utilisateur veut corriger l'erreur
  * ignore -> callback si l'utilisateur veut laisser le champs tel quel
  */
-function formConfirm(field, field_name, value, expected, correct, ignore) {
+global.formConfirm = function (field, field_name, value, expected, correct, ignore) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><span>Reseigné : <strong>" + value + "</strong>  /   Attendu : <strong>" + expected + "</strong></span></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
@@ -145,7 +144,7 @@ function formConfirm(field, field_name, value, expected, correct, ignore) {
  * left_void -> callback si l'utilisateur coche 'case laissée vide par le candidat'
  * unknown -> callback si l'utilisateur coche 'impssible de dire c'est quelle case'
  */
-function formSelect(field, field_name, choice, valid, left_void, unknown) {
+global.formSelect = function (field, field_name, choice, valid, left_void, unknown) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><select class='form-select'>";
     for (var key in choice) {
@@ -183,7 +182,7 @@ function formSelect(field, field_name, choice, valid, left_void, unknown) {
 
 
 //si la FID a déjà été lue, on demande si relecture
-function askAlready(code_barre, valider, annuler) {
+global.askAlready = function (code_barre, valider, annuler) {
     $('#manual-already .code').text(code_barre);
     $("#manual-already").modal("show");
     $("#manual-already .valider").off();
@@ -199,7 +198,7 @@ function askAlready(code_barre, valider, annuler) {
 
 
 //ligne de form de QCM
-function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
+global.makeHTMLQCM = function (question, blanck, unknown, initial_blank, inital_unknown) {
     return "<div class='row mt-3 mb-3 qcm-" + question + "'>\n\
 <div class='col-2'>\n\
 <strong>" + (question + 1).toString() + "</strong>\n\
@@ -235,7 +234,7 @@ function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
                         </div>";
 }
 
-function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
+global.askQCM = function (code_barre, questions, valider, annuler, blanck, unknown) {
     console.log(questions);
     $('#manual-QCM form').empty();
     $('#manual-QCM .code-barre').text(code_barre);
@@ -262,7 +261,7 @@ function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
 }
 
 //si la FID a déjà été lue, on demande si relecture
-function askCodeBarre(propal, valider, manual, ignorer) {
+global.askCodeBarre = function (propal, valider, manual, ignorer) {
     $('#manual-code-barre .scanette').val("");
     $('#manual-code-barre .propal').text(propal);
     $("#manual-code-barre").modal("show");
@@ -281,7 +280,7 @@ function askCodeBarre(propal, valider, manual, ignorer) {
     });
 }
 
-function makeHTMLLink(FIDs, QCMs, i) {
+global.makeHTMLLink = function (FIDs, QCMs, i) {
     var r = "<div class='row mb-3'><div class='col-6'><select class='form-select fid-" + i + "'>";
     for (var j in FIDs) {
         r += "<option value='" + FIDs[j].code_barre + "'>" + FIDs[j].code_barre + " - " + FIDs[j].nom + "</option>";
@@ -295,7 +294,7 @@ function makeHTMLLink(FIDs, QCMs, i) {
 }
 
 
-function askManualLink(nb, FIDs, QCMs, valider, annuler) {
+global.askManualLink = function (nb, FIDs, QCMs, valider, annuler) {
     $('#manual-link .nb-a-appaires').text(nb);
     $('#manual-link form').empty();
     for (var i = 0; i < (nb / 2); i++) {
@@ -307,7 +306,7 @@ function askManualLink(nb, FIDs, QCMs, valider, annuler) {
     $("#manual-link .valider").click(function () {
         var rep = [];
         for (var i = 0; i < (nb / 2); i++) {
-            rep[i] = {fid: $("#manual-link .fid-"+i).val(), qcm: $("#manual-link .qcm-"+i).val()};
+            rep[i] = {fid: $("#manual-link .fid-" + i).val(), qcm: $("#manual-link .qcm-" + i).val()};
         }
         return valider(rep);
     });

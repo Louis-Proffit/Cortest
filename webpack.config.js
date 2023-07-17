@@ -20,8 +20,12 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.scss) if your JavaScript imports CSS.
      */
+    .addEntry('ag-grid', './assets/ag-grid.js')
     .addEntry('app', './assets/app.js')
-    .addEntry('scanner-csv', './assets/scanner-csv.js')
+    .addEntry('grille_manager', './assets/grille_manager.js')
+    .addEntry('intervention_manuelle', './assets/intervention_manuelle.js')
+    .addEntry('port', './assets/port.js')
+    .addEntry('serial', './assets/serial.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()

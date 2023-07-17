@@ -5,23 +5,16 @@
     <h1>Correction par lecture optique</h1>
     <br>
     {{ form_start(form) }}
-    <div class="row align-items-center">
-        <div class="col-md-auto">
-            <a class="btn btn-primary" href="{{ path("session_creer") }}">Créer</a>
-        </div>
-        <div class="col">
+    <div class="row row-cols-auto align-items-center">
+        <div class="col mb-3">
             {{ form_row(form.session) }}
         </div>
-        <div class="offset-1 col mt-3">
-            {{ form_end(form) }}
+        <div class="col">
+            <a class="btn btn-secondary" href="{{ path("session_creer") }}">Créer</a>
         </div>
     </div>
-    <div>
-        <div class='col-5'>
-        
-        </div>
-    </div>
-
+    {{ form_row(form.submit) }}
+    {{ form_end(form) }}
     <br>
 {% endblock %}
 

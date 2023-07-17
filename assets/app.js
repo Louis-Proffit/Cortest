@@ -9,12 +9,9 @@
 import './styles/app.scss';
 import * as mdb from 'mdb-ui-kit';
 import * as bootstrap from 'bootstrap';
+import $ from 'jquery';
 
 window.mdb = mdb;
 window.bs = bootstrap;
-
-const $ = require('jquery');
-
-// create global $ and jQuery variables
-global.$ = global.jQuery = $;
+global.$ = $
 
