@@ -69,8 +69,8 @@
         \begin{tabular}{ | m{3cm} m{4.73cm} m{3.8cm} m{6.2cm} | }
             \hline
             \hfill Nom de naissance:  & {{ reponse_nom }}                             & \hfill Type du concours:        & {{ concours_nom }} -- {{ reponse_eirs|eirs }}         \\
-            \hfill Prénom:            & {{ reponse_prenom }}                          & \hfill Version Batterie:        & {{ concours_version_batterie }}  -- {{ concours_type }} \\
-            \hfill Nom d'usage:       & Sans objet                                    & \hfill Date d'examen:           & {{ session_date|date('d/m/y') }}                      \\
+            \hfill Prénom:            & {{ reponse_nom }}                          & \hfill Version Batterie:        & {{ concours_version_batterie }}  -- {{ concours_type }} \\
+            \hfill Nom d'usage:       & Sans objet                                    & \hfill Date d'examen:           & {{ session_date|date('m/d/y') }}                      \\
             \hfill Sexe:              & {{ reponse_sexe|sexe }}                       & \hfill SGAMI/SGAP:              & {{ session_sgap_nom }}                                \\
             \hfill Date de naissance: & {{ reponse_date_de_naissance|date('d/m/y') }} & \hfill Numéro d'identification: & 1                                   \\
             \hfill Niveau scolaire:   & {{ reponse_niveau_scolaire_nom }}             &                                 &                                                       \\
@@ -91,9 +91,8 @@
                 \rule{0pt}{2.7ex} \centering I  & \centering II  & \centering III  & \centering IV  & \centering V  & \centering VI  & \centering VII  & \centering VIII  & \centering IX
             \end{tabularx}
             \\
-            VT & \fbox{ {{ score_vt_br }} } & \fbox{ {{ score_vt_mr }} } & \printChartResult{ {{ profil_vt_br }} }{0}{ 9 } \\
+            VT & \fbox{ {{ score_vt_br }} } & \fbox{ {{ score_vt_br }} } & \printChartResult{ {{ profil_vt_br }} }{0}{ 9 } \\
             SP & \fbox{ {{ score_sp_br }} } & \fbox{ {{ score_sp_mr }} } & \printChartResult{ {{ profil_sp_br }} }{0}{ 9 } \\
-            Rais & \fbox{ {{ score_rais_br }} } & \fbox{ {{ score_rais_mr }} } & \printChartResult{ {{ profil_rais_br }} }{0}{ 9 } \\
             CV & \fbox{ {{ score_cv_br }} } & \fbox{ {{ score_cv_mr }} } & \printChartResult{ {{ profil_cv_br }} }{0}{ 9 } \\
             SL & \fbox{ {{score_sl_br}} } & \fbox{ {{ score_sl_mr }} } & \printChartResult{ {{ profil_sl_br }} }{0}{ 9 } \\
             DIC & \fbox{ {{score_dic_br}} } & \fbox{ {{ score_dic_mr }} } & \printChartResult{ {{ profil_dic_br }} }{0}{ 9 } \\
@@ -103,8 +102,8 @@
                 \centering
                 \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c c   }
                     \rule{0pt}{2.8ex}
-                    & \hfill \textbf{ EG } & \small{\textit{ score }} \fbox{ {{ score_eg }} } & \small{\textit{classe}} \fbox{ {{ profil_eg }} }
-                    & \vline  \hfill \textbf{ QR } & \small{\textit{ score }} \fbox{ {{ score_qr }} } & \small{\textit{classe}} \fbox{ {{ profil_qr }} }
+                    & \hfill \textbf{ EG } & \small{\textit{ score }} \fbox{ {{ score_eg|number_format(0) }} } & \small{\textit{classe}} \fbox{ {{ profil_eg }} }
+                    & \vline  \hfill \textbf{ QR } & \small{\textit{ score }} \fbox{ {{ score_qr|number_format(0) }} } & \small{\textit{classe}} \fbox{ {{ profil_qr }} }
                     \\[1mm]
                 \end{tabular}
             }

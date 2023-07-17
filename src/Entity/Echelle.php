@@ -64,8 +64,6 @@ class Echelle
     #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
     public Collection $echelles_etalonnage;
 
-    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleGraphique::class, cascade: ["remove", "persist"])]
-    public Collection $echelles_graphiques;
 
     #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "echelles")]
     public Profil $profil;

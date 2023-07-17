@@ -39,9 +39,9 @@ class ParametresLectureOptiqueType extends AbstractType
         return $result;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        
+
         $builder
             ->add("session",
                 ChoiceType::class,
@@ -50,7 +50,7 @@ class ParametresLectureOptiqueType extends AbstractType
                     'choices' => $this->sessionChoices()
                 ]
             )
-            ->add("Corriger", SubmitType::class);
+            ->add("submit", SubmitType::class, ["label" => "Corriger"]);
     }
-        
+
 }
