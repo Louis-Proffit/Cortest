@@ -24,6 +24,7 @@
             <th scope="col">Modifier</th>
             <th scope="col">Tester</th>
             <th scope="col">Télécharger</th>
+            <th scope="col">Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -34,6 +35,7 @@
                 <td><a class="btn btn-primary" href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Modifier</a>
                 <td><a class="btn btn-primary" href="{{ path('graphique_tester', {"id":graphique.id}) }}">Tester</a>
                 <td><a class="btn btn-primary" href="{{ path('graphique_telecharger', {"id":graphique.id}) }}">Télécharger</a>
+                <td><a class="btn btn-danger" href="{{ path('graphique_supprimer', {"id":graphique.id}) }}">Supprimer</a>
                 </td>
             </tr>
         {% endfor %}
