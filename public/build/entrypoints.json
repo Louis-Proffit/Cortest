@@ -1,10 +1,11 @@
 {
   "entrypoints": {
-    "ag-grid": {
+    "from_scanner": {
       "js": [
         "/build/runtime.9a71ee5d.js",
-        "/build/839.f8e3d61d.js",
-        "/build/ag-grid.793846fc.js"
+        "/build/755.f89a447f.js",
+        "/build/682.48d168dd.js",
+        "/build/from_scanner.221f4098.js"
       ]
     },
     "app": {
@@ -17,42 +18,6 @@
       "css": [
         "/build/798.02d6dfd9.css",
         "/build/app.ce57ef28.css"
-      ]
-    },
-    "grille_manager": {
-      "js": [
-        "/build/runtime.9a71ee5d.js",
-        "/build/317.a07ce95c.js",
-        "/build/755.f89a447f.js",
-        "/build/803.074696ac.js",
-        "/build/59.befbc098.js",
-        "/build/grille_manager.201fef13.js"
-      ]
-    },
-    "intervention_manuelle": {
-      "js": [
-        "/build/runtime.9a71ee5d.js",
-        "/build/317.a07ce95c.js",
-        "/build/755.f89a447f.js",
-        "/build/intervention_manuelle.9fe50efd.js"
-      ]
-    },
-    "port": {
-      "js": [
-        "/build/runtime.9a71ee5d.js",
-        "/build/317.a07ce95c.js",
-        "/build/803.074696ac.js",
-        "/build/312.b8ecc028.js",
-        "/build/port.22083ea4.js"
-      ]
-    },
-    "serial": {
-      "js": [
-        "/build/runtime.9a71ee5d.js",
-        "/build/317.a07ce95c.js",
-        "/build/803.074696ac.js",
-        "/build/643.ec339eb5.js",
-        "/build/serial.f04535fd.js"
       ]
     }
   }

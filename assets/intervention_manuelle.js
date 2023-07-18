@@ -2,7 +2,7 @@
  * Page qui gère les interventions utilisateur pour la correction manuelle de certaines choses
  */
 
-global.tellFatalError = function (message, button, next) {
+export function tellFatalError(message, button, next) {
     $('#manual-fatal .message').text(message);
     $('#manual-fatal .button').text(button);
     $("#manual-fatal").modal("show");
@@ -20,7 +20,7 @@ global.tellFatalError = function (message, button, next) {
  * valider -> callback si click sur valider
  * annuler -> callback si clic sur annuler
  */
-global.askFID = function (code_barre, forms, valider, annuler) {
+export function askFID(code_barre, forms, valider, annuler) {
     $('#manual-FID form').empty();
     $('#manual-FID .code-barre').text(code_barre);
     for (var i in forms) {
@@ -50,7 +50,7 @@ global.askFID = function (code_barre, forms, valider, annuler) {
  * left_void -> callback si l'utilisateur coche 'case laissée vide par le candidat'
  * unknown -> callback si l'utilisateur coche 'impssible de dire c'est quelle case'
  */
-global.formInput = function (field, field_name, value, type, valid, left_void, unknown) {
+export function formInput(field, field_name, value, type, valid, left_void, unknown) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><input type='" + type + "' class='form-control res' value='" + value + "'></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
@@ -81,7 +81,7 @@ global.formInput = function (field, field_name, value, type, valid, left_void, u
     };
 }
 
-global.formDate = function (field, field_name, value, valid) {
+export function formDate(field, field_name, value, valid) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><input type='date' class='form-control res' value='" + value + "'></div>";
     return {
@@ -105,7 +105,7 @@ global.formDate = function (field, field_name, value, valid) {
  * correct -> callback si l'utilisateur veut corriger l'erreur
  * ignore -> callback si l'utilisateur veut laisser le champs tel quel
  */
-global.formConfirm = function (field, field_name, value, expected, correct, ignore) {
+export function formConfirm(field, field_name, value, expected, correct, ignore) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><span>Reseigné : <strong>" + value + "</strong>  /   Attendu : <strong>" + expected + "</strong></span></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
@@ -144,7 +144,7 @@ global.formConfirm = function (field, field_name, value, expected, correct, igno
  * left_void -> callback si l'utilisateur coche 'case laissée vide par le candidat'
  * unknown -> callback si l'utilisateur coche 'impssible de dire c'est quelle case'
  */
-global.formSelect = function (field, field_name, choice, valid, left_void, unknown) {
+export function formSelect(field, field_name, choice, valid, left_void, unknown) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
 <div class='col-4'><select class='form-select'>";
     for (var key in choice) {
@@ -182,7 +182,7 @@ global.formSelect = function (field, field_name, choice, valid, left_void, unkno
 
 
 //si la FID a déjà été lue, on demande si relecture
-global.askAlready = function (code_barre, valider, annuler) {
+export function askAlready(code_barre, valider, annuler) {
     $('#manual-already .code').text(code_barre);
     $("#manual-already").modal("show");
     $("#manual-already .valider").off();
@@ -198,7 +198,7 @@ global.askAlready = function (code_barre, valider, annuler) {
 
 
 //ligne de form de QCM
-global.makeHTMLQCM = function (question, blanck, unknown, initial_blank, inital_unknown) {
+export function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
     return "<div class='row mt-3 mb-3 qcm-" + question + "'>\n\
 <div class='col-2'>\n\
 <strong>" + (question + 1).toString() + "</strong>\n\
@@ -234,7 +234,7 @@ global.makeHTMLQCM = function (question, blanck, unknown, initial_blank, inital_
                         </div>";
 }
 
-global.askQCM = function (code_barre, questions, valider, annuler, blanck, unknown) {
+export function askQCM(code_barre, questions, valider, annuler, blanck, unknown) {
     console.log(questions);
     $('#manual-QCM form').empty();
     $('#manual-QCM .code-barre').text(code_barre);
@@ -261,7 +261,7 @@ global.askQCM = function (code_barre, questions, valider, annuler, blanck, unkno
 }
 
 //si la FID a déjà été lue, on demande si relecture
-global.askCodeBarre = function (propal, valider, manual, ignorer) {
+export function askCodeBarre(propal, valider, manual, ignorer) {
     $('#manual-code-barre .scanette').val("");
     $('#manual-code-barre .propal').text(propal);
     $("#manual-code-barre").modal("show");
@@ -280,7 +280,7 @@ global.askCodeBarre = function (propal, valider, manual, ignorer) {
     });
 }
 
-global.makeHTMLLink = function (FIDs, QCMs, i) {
+export function makeHTMLLink(FIDs, QCMs, i) {
     var r = "<div class='row mb-3'><div class='col-6'><select class='form-select fid-" + i + "'>";
     for (var j in FIDs) {
         r += "<option value='" + FIDs[j].code_barre + "'>" + FIDs[j].code_barre + " - " + FIDs[j].nom + "</option>";
@@ -294,7 +294,7 @@ global.makeHTMLLink = function (FIDs, QCMs, i) {
 }
 
 
-global.askManualLink = function (nb, FIDs, QCMs, valider, annuler) {
+export function askManualLink(nb, FIDs, QCMs, valider, annuler) {
     $('#manual-link .nb-a-appaires').text(nb);
     $('#manual-link form').empty();
     for (var i = 0; i < (nb / 2); i++) {

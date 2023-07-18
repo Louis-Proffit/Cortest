@@ -2,7 +2,7 @@
  * Lecture de la grille du cahier des charges
  */
 
-class GrilleManager {
+export class GrilleManager {
 
 //représente une feuille FID et comment elle doit être lue
     static contentFID = {
@@ -615,5 +615,3 @@ class GrilleManager {
         });
     }
 }
-
-global.GrilleManager = GrilleManager

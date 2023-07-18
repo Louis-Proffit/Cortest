@@ -2,9 +2,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('port') }}
-    {{ encore_entry_script_tags('grille_manager') }}
-    {{ encore_entry_script_tags('ag-grid') }}
+    {{ encore_entry_script_tags('from_scanner') }}
 
     <script defer>
         window.onload = function () {
@@ -88,8 +86,6 @@
             window.testQCM = {code_barre: "5667", qcm: ['A', 'B', 'C']};
 
             window.debugPort = false;
-
-            window.test = true;
         }
     </script>
 {% endblock %}

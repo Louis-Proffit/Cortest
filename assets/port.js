@@ -5,12 +5,13 @@
 let port = null;
 const BAUD_RATE = 19200
 
-global.connect = async function (callback) {
+export async function connect(callback) {
+
+    console.log(debugPort)
 
     if (debugPort) {
         return callback();
     } else {
-
 
         port = await navigator.serial.requestPort();
         await port.open({baudRate: BAUD_RATE});
@@ -22,7 +23,7 @@ global.connect = async function (callback) {
 
 }
 
-global.tryConnexion = async function (toDo) {
+export async function tryConnexion(toDo) {
     const test = await get('V');
     if (test.match(/\x01\x02.*r\n\x03\x04/) !== null) {
         toDo();
@@ -32,7 +33,7 @@ global.tryConnexion = async function (toDo) {
 //stocke les réponses du lecteur
 let answer_cache = "";
 
-global.read = async function () {
+export async function read() {
     //une fois lancée, la fonction écoute en permanence le port et écrit sur le cache de réponse
     const reader = port.readable.getReader();
     while (true) {
@@ -45,7 +46,7 @@ global.read = async function () {
     }
 }
 
-global.tell = async function (commande) {
+export async function tell(commande) {
 
     if (debugPort) {
 
@@ -65,11 +66,11 @@ global.tell = async function (commande) {
 
 }
 
-global.timeout = function (ms) {
+export function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-global.get = async function (commande) {
+export async function get(commande) {
 
     //pour le debug :
     //debugPort
