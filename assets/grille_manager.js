@@ -460,7 +460,6 @@ export class GrilleManager {
             }
 
         } else {
-            console.log("on lit la fid");
             var expl = match[1];
             return this.readFID(expl);
         }
@@ -470,8 +469,6 @@ export class GrilleManager {
         $("#spinner-qcm").show();
         await timeout(10);
         var rep = await get('L');
-        console.log('on a reçu : ');
-        console.log(rep);
 
         const bac_vide = "\x1506\r\n\x03";
 
@@ -480,7 +477,6 @@ export class GrilleManager {
             //on revoie une commande L pour baisser le bac
             tell('L')
             //fin de lecture
-            console.log("Fin de lecture");
             $("#spinner-qcm").hide();
             return true;
         }
