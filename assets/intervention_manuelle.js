@@ -1,5 +1,5 @@
 /* 
- * Page qui gère les interventions utilisateur pour la correction manuelle de certaines choses
+ * Scripts qui gèrent les interventions utilisateur pour la correction manuelle de certains champs
  */
 
 export function tellFatalError(message, button, next) {
@@ -30,7 +30,7 @@ export function askFID(code_barre, forms, valider, annuler) {
     $("#manual-FID").modal("show");
     $("#manual-FID .valider").off();
     $("#manual-FID .annuler").off();
-    //vlaidation du formulaire
+    //validation du formulaire
     $("#manual-FID .valider").click(function () {
         valider();
     });
@@ -267,7 +267,7 @@ export function askCodeBarre(propal, valider, manual, ignorer) {
     $("#manual-code-barre").modal("show");
     $("#manual-code-barre .valider").off();
     $("#manual-code-barre .ignorer").off();
-    //vlaidation du formulaire
+    //validation du formulaire
     $("#manual-code-barre .valider").click(function () {
         var rep = $("#manual-code-barre .scanette").val();
         return valider(rep);
