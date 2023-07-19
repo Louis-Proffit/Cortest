@@ -169,7 +169,6 @@ export class GrilleManager {
         }
         $("#nb-fid-lues").text(parseInt(this.FIDs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
-        console.log("on a enregistré");
     }
 
     hasFID(code_barre) {
@@ -183,7 +182,6 @@ export class GrilleManager {
 
     removeFID(code_barre) {
 //supprime une fid de la liste des fids traités
-        console.log("on supprime : " + code_barre);
         this.FIDs = this.FIDs.splice(this.FIDs.findIndex((e) => e.code_barre === code_barre), 1);
         $("#nb-fid-lues").text(parseInt($("#nb-fid-lues").text()) - 1);
         this.gridOptions.api.setRowData(this.FIDs);
@@ -207,12 +205,10 @@ export class GrilleManager {
         }
         $("#nb-qcm-lues").text(parseInt(this.QCMs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
-        console.log("on a enregistré");
     }
 
     removeQCM(code_barre) {
 //supprime une fid de la liste des fids traités
-        console.log("on supprime");
         this.QCMs = this.QCMs.splice(this.QCMs.findIndex((e) => e.code_barre === code_barre), 1);
         $("#nb-qcm-lues").text(parseInt($("#nb-qcm-lues").text()) - 1);
     }
@@ -308,7 +304,6 @@ export class GrilleManager {
         //la lecture est terminée, on demande les corrections nécessaires
         if (forms.length > 0) {
             tell('S');
-            console.log('erreurs détéctées');
             var my = this;
             askFID(fid.code_barre, forms, function () {
                 for (var i in forms) {
@@ -316,7 +311,6 @@ export class GrilleManager {
                     field = line.field;
                     line.action();
                 }
-                console.log('on va enregistrer');
                 my.storeFID(fid);
                 my.readFIDs();
             }, function () {
@@ -324,7 +318,6 @@ export class GrilleManager {
             });
         } else {
             tell('G');
-            console.log('on va enregistrer')
             this.storeFID(fid);
             this.readFIDs();
         }
@@ -359,25 +352,17 @@ export class GrilleManager {
         }
         if (toCorrect.length > 0) {
             await tell('S');
-            console.log('erreurs détectés :');
-            console.log(toCorrect);
             var my = this;
             askQCM(code_barre, toCorrect, function (rep) {
                 for (var j in rep) {
                     qcm[rep[j].question] = rep[j].response;
                 }
-                console.log(rep);
-                console.log('on va enregistrer : ');
-                console.log(qcm);
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
                 my.readQCMs();
             }, function () {
                 my.readQCMs();
             }, blanck, unknown);
         } else {
-            console.log("pas de soucis");
-            console.log('on va enregistrer :');
-            console.log(qcm);
             await tell('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
             this.readQCMs();
@@ -426,23 +411,17 @@ export class GrilleManager {
         $("#spinner-fid").show();
         await timeout(10);
         var rep = await get('L');
-        console.log('on commence une lecture dune FID');
-        console.log('on a reçu : ');
-        console.log(rep);
-        //var rep = "\x01\x0222????? ????????COLLARD        JULIEN                 81012011E1327012313021               090\r\n\x03\x04";
         const bac_vide = "\x1506\r\n\x03";
         if (rep.includes(bac_vide)) {
             //on n'a plus de page à lire
             //on revoie une commande L pour baisser le bac
             tell('L')
             //fin de lecture
-            console.log("Fin de lecture");
             $("#spinner-fid").hide();
             return true;
         }
 
         //si il y a effectivement une page à lire
-        //var rep = "\x15  00003 Erreur type de feuille\x15  00003 Erreur type de feuille\r\n\x03\x01\x023250011018500110TEST TPPTLS    T PPTSA                70506942 150401??99003     1007      090\r\n\x03\x04";
         for (var i in GrilleManager.codesErreurs) {
             var erreur = GrilleManager.codesErreurs[i];
             var my = this;
@@ -475,7 +454,6 @@ export class GrilleManager {
             } else {
                 var my = this;
                 await tell('S');
-                console.log("impossible de lire");
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readFIDs();
                 });
@@ -491,10 +469,6 @@ export class GrilleManager {
     async readQCMs() {
         $("#spinner-qcm").show();
         await timeout(10);
-        console.log('on commence une lecture de QCM');
-        console.log('avant tout, gm.QCMs = ');
-        console.log(this.QCMs);
-        console.log("on demande L au lecteur");
         var rep = await get('L');
         console.log('on a reçu : ');
         console.log(rep);
@@ -512,7 +486,6 @@ export class GrilleManager {
         }
 
         //si il y a effectivement une page à lire
-        //var rep = "\x15  00003 Erreur type de feuille\x15  00003 Erreur type de feuille\r\n\x03\x01\x023250011018500110TEST TPPTLS    T PPTSA                70506942 150401??99003     1007      090\r\n\x03\x04";
         for (var i in GrilleManager.codesErreurs) {
             var erreur = GrilleManager.codesErreurs[i];
             var my = this;
@@ -545,13 +518,11 @@ export class GrilleManager {
             } else {
                 var my = this;
                 await tell('S');
-                console.log("impossible de lire");
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readQCMs();
                 });
             }
         } else {
-            console.log("on lit le qcm");
             var expl = match[1];
             this.readQCM(expl);
         }
@@ -598,19 +569,13 @@ export class GrilleManager {
     }
 
     save(session) {
-        console.log("Etat du gm avant enregistrement :");
-        console.log(this);
         var rep = {};
         for (var i in this.codesAppaires) {
             var code = this.codesAppaires[i]
             rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
             rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].reponses;
         }
-        console.log("Envoie de la requête :");
-        console.log(JSON.stringify(rep));
         $.post('/lecture/scanner/save', {data: JSON.stringify(rep), session: session}, function (rep) {
-            console.log("réponse du serveur :");
-            console.log(rep);
             $("#manual-end").modal("show");
         });
     }
