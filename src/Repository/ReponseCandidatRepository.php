@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ReponseCandidat;
-use App\Form\Data\RechercheFiltre;
+use App\Form\Data\RechercheParameters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,16 +17,17 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ReponseCandidatRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ReponseCandidat::class);
     }
 
     /**
-     * @param RechercheFiltre $recherche_filtre
+     * @param RechercheParameters $rechercheParameters
      * @return ReponseCandidat[]
      */
-    public function filtrer(RechercheFiltre $recherche_filtre
+    public function findAllFromParameters(RechercheParameters $rechercheParameters
     ): array
     {
         $query_builder = $this->createQueryBuilder("r");
@@ -34,19 +35,21 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->where("r.nom LIKE :nom")
             ->andWhere("r.prenom LIKE :prenom")
             ->andWhere("r.date_de_naissance BETWEEN :date_de_naissance_min AND :date_de_naissance_max")
-            ->setParameter("nom", "%" . $recherche_filtre->filtre_nom . "%")
-            ->setParameter("prenom", "%" . $recherche_filtre->filtre_prenom . "%")
-            ->setParameter("date_de_naissance_min", $recherche_filtre->filtre_date_de_naissance_min)
-            ->setParameter("date_de_naissance_max", $recherche_filtre->filtre_date_de_naissance_max);
+            ->setFirstResult(RechercheParameters::PAGE_SIZE * $rechercheParameters->page)
+            ->setMaxResults(RechercheParameters::PAGE_SIZE)
+            ->setParameter("nom", "%" . $rechercheParameters->filtreNom . "%")
+            ->setParameter("prenom", "%" . $rechercheParameters->filtrePrenom . "%")
+            ->setParameter("date_de_naissance_min", $rechercheParameters->filtreDateDeNaissanceMin)
+            ->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);
 
-        if ($recherche_filtre->session != null) {
+        if ($rechercheParameters->session != null) {
             $query_builder->andWhere("r.session = :session")
-                ->setParameter("session", $recherche_filtre->session);
+                ->setParameter("session", $rechercheParameters->session);
         }
 
-        if ($recherche_filtre->niveau_scolaire != null) {
+        if ($rechercheParameters->niveauScolaire != null) {
             $query_builder->andWhere("r.niveau_scolaire = :niveau_scolaire")
-                ->setParameter("niveau_scolaire", $recherche_filtre->niveau_scolaire);
+                ->setParameter("niveau_scolaire", $rechercheParameters->niveauScolaire);
         }
 
         return $query

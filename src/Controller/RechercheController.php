@@ -6,15 +6,15 @@ use App\Core\Reponses\FiltreSessionStorage;
 use App\Core\Reponses\ReponsesCandidatSessionStorage;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
-use App\Form\Data\RechercheFiltre;
-use App\Form\Data\RechercheReponsesCandidat;
+use App\Form\Data\RechercheParameters;
 use App\Form\Data\ReponseCandidatChecked;
-use App\Form\RechercheFiltreType;
-use App\Form\RechercheReponsesCandidatType;
+use App\Form\RechercheParametersType;
 use App\Repository\ReponseCandidatRepository;
 use DateTime;
+use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,65 +52,117 @@ class RechercheController extends AbstractController
 
     #[Route("/index", name: "index")]
     public function index(
-        ReponsesCandidatSessionStorage $reponses_candidat_session_storage,
-        FiltreSessionStorage           $filtre_session_storage,
+        LoggerInterface                $logger,
+        ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
         Request                        $request,
-        ReponseCandidatRepository      $reponse_candidat_repository
-    ): BinaryFileResponse|RedirectResponse|Response
+        ReponseCandidatRepository      $reponseCandidatRepository
+    ): Response
     {
-        $filtre = $filtre_session_storage->getOrSetDefault(new RechercheFiltre(filtre_prenom: "",
-            filtre_nom: "",
-            filtre_date_de_naissance_min: new DateTime(self::LOWEST_TIME),
-            filtre_date_de_naissance_max: new DateTime("now"),
-            niveau_scolaire: null,
-            session: null
-        ));
+        $request->get("page");
 
-        $cached_reponses_ids = $reponses_candidat_session_storage->getOrSetDefault(array());
-        $cached_reponses = $reponse_candidat_repository->findAllByIds($cached_reponses_ids);
+        $reponsesCount = $reponseCandidatRepository->count([]);
+        $pageCount = (int)ceil($reponsesCount / RechercheParameters::PAGE_SIZE);
 
-        $reponse_candidats_checked = array_map(
-            function (ReponseCandidat $reponse_candidat) use ($cached_reponses_ids) {
-                return new ReponseCandidatChecked($reponse_candidat,
-                    in_array($reponse_candidat->id, $cached_reponses_ids));
-            },
-            $reponse_candidat_repository->filtrer($filtre)
+        $parameters = new RechercheParameters(
+            filtrePrenom: "",
+            filtreNom: "",
+            page: 0,
+            filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
+            filtreDateDeNaissanceMax: new DateTime("now"),
+            niveauScolaire: null,
+            session: null,
+            checkedReponsesCandidat: []
         );
 
-        $recherche_reponses_candidat = new RechercheReponsesCandidat(reponses_candidat: $reponse_candidats_checked);
-        $form_reponses = $this->createForm(RechercheReponsesCandidatType::class, $recherche_reponses_candidat);
-        $formFiltre = $this->createForm(RechercheFiltreType::class, $filtre);
+        $cachedReponsesIds = $reponsesCandidatSessionStorage->getOrSetDefault(array());
+        $selectionnees = $reponseCandidatRepository->findAllByIds($cachedReponsesIds);
 
-        $form_reponses->handleRequest($request);
-        if ($form_reponses->isSubmitted() and $form_reponses->isValid()) {
+        $form = $this->createForm(RechercheParametersType::class, $parameters, [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
 
-            /** @var int[] $to_add */
-            $initial = $reponses_candidat_session_storage->get();
+        $form->handleRequest($request);
 
-            foreach ($recherche_reponses_candidat->reponses_candidat as $reponse_candidat_checked) {
+        if ($form->isSubmitted() and $form->isValid()) {
 
-                if ($reponse_candidat_checked->checked) {
-                    $initial[] = $reponse_candidat_checked->reponse_candidat->id;
+            for ($page = 0; $page < $pageCount; $page++) {
+
+                /** @var ClickableInterface $submitPage */
+                $submitPage = $form->get(RechercheParametersType::SUBMIT_PAGE_PREFIX_KEY . $page);
+
+                if ($submitPage->isClicked()) {
+                    $logger->debug("Choix de la page " . $page);
+                    $parameters->page = $page;
+
+                    $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
+
+                    $checkedReponsesCandidat = array_map(
+                        function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
+                            return new ReponseCandidatChecked($reponseCandidat,
+                                in_array($reponseCandidat->id, $cachedReponsesIds));
+                        },
+                        $reponsesAtPage
+                    );
+
+                    $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
+                    $form = $this->createForm(RechercheParametersType::class, $form->getData(), [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
+
+                    return $this->render("recherche/index.html.twig", [
+                        "selectionnes" => $selectionnees,
+                        "form" => $form->createView()
+                    ]);
                 }
             }
 
-            $reponses_candidat_session_storage->set($initial);
+            /** @var ClickableInterface $submitSelectionner */
+            $submitSelectionner = $form->get(RechercheParametersType::SUBMIT_SELECTIONNER_KEY);
+
+            if ($submitSelectionner->isClicked()) {
+
+                throw new Exception();
+
+            }
+
+            /** @var ClickableInterface $submitFiltrer */
+            $submitFiltrer = $form->get(RechercheParametersType::SUBMIT_FILTRER_KEY);
+
+            if ($submitFiltrer->isClicked()) {
+                $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
+
+                $checkedReponsesCandidat = array_map(
+                    function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
+                        return new ReponseCandidatChecked($reponseCandidat,
+                            in_array($reponseCandidat->id, $cachedReponsesIds));
+                    },
+                    $reponsesAtPage
+                );
+
+                $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
+
+                return $this->render("recherche/index.html.twig", [
+                    "selectionnes" => $selectionnees,
+                    "form" => $form->createView()
+                ]);
+            }
 
             return $this->redirectToRoute("recherche_index");
         }
 
-        $formFiltre->handleRequest($request);
-        if ($formFiltre->isSubmitted() and $formFiltre->isValid()) {
+        $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
 
-            $filtre_session_storage->set($filtre);
+        $checkedReponsesCandidat = array_map(
+            function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
+                return new ReponseCandidatChecked($reponseCandidat,
+                    in_array($reponseCandidat->id, $cachedReponsesIds));
+            },
+            $reponsesAtPage
+        );
 
-            return $this->redirectToRoute("recherche_index");
-        }
+        $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
+        $form->setData($parameters);
 
-        return $this->render("recherche/index.html.twig",
-            ["selectionnes" => $cached_reponses,
-                "form_filtre" => $formFiltre->createView(),
-                "form_reponses" => $form_reponses->createView()]);
+        return $this->render("recherche/index.html.twig", [
+            "selectionnes" => $selectionnees,
+            "form" => $form->createView()
+        ]);
     }
 
 }

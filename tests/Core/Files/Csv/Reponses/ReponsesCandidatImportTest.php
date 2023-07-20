@@ -7,6 +7,7 @@ use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
 use App\Entity\ReponseCandidat;
 use App\Repository\SessionRepository;
 use ArrayIterator;
+use Exception;
 use MultipleIterator;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -14,7 +15,7 @@ class ReponsesCandidatImportTest extends KernelTestCase
 {
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testImportExport()
     {
