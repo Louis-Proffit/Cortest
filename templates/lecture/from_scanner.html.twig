@@ -27,6 +27,7 @@
                 option_1: {asked: false, expected: false, print: true},
                 option_2: {asked: false, expected: false, print: true},
             };
+
             const questions = {};
             {% for questionInfos in session.concours.questions %}
             questions['{{ questionInfos.indice }}'] = '{{ questionInfos.type }}';
@@ -37,8 +38,8 @@
             choice.push({read: '{{ niveau.indice }}', print: '{{ niveau.nom }}', store:  {{ niveau.id }} });
             {% endfor %}
 
-
-            window.gm = new window.GrilleManager(request, questions, choice);
+            window.port = new window.CortestPromptPort()
+            window.gm = new window.GrilleManager(window.port, request, questions, choice);
             const agOptions = gm.getGridConfig();
             // set up the grid after the page has finished loading
             document.addEventListener('DOMContentLoaded', () => {
@@ -59,7 +60,8 @@
                 $("#spinner-qcm").hide();
                 console.log('ready');
 
-            window.debugPort = false;
+                window.debugPort = false;
+            })
         }
     </script>
 {% endblock %}
@@ -100,14 +102,14 @@
         <div class="card-body">
             <h5 class="card-title">1. Connection à l'appareil</h5>
             <p class="card-text">Le lecteur doit être connecté à l'ordinateur avant de lancer l'opération.</p>
-            <button class="btn btn-primary" onclick="connect(function () {
+            <button class="btn btn-primary" onclick="port.connect(function () {
                         $('#btn-test-connexion').removeAttr('disabled');
                         $('#btn-fid').removeAttr('disabled');
                         $('#btn-qcm').removeAttr('disabled');
                     })">
                 Sélectionner le lecteur optique
             </button>
-            <button id='btn-test-connexion' class="btn btn-primary" onclick="tryConnexion(lunch)">
+            <button id='btn-test-connexion' class="btn btn-primary" onclick="window.port.tryConnect(lunch)">
                 Vérifier la connexion
             </button>
         </div>
@@ -119,7 +121,7 @@
             <p class="card-text">Placez les pages d'identification et lancez la procédure</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button id='btn-fid' class="btn btn-primary" onclick="gm.readFIDs()" disabled>
+                    <button id='btn-fid' class="btn btn-primary" onclick="window.gm.readFIDs()" disabled>
                         Lire les FID
                     </button>
                 </div>
@@ -153,7 +155,7 @@
             <p class="card-text">Placez les pages de réponse au QCM et lancez la procédure</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button id='btn-qcm' class="btn btn-primary" onclick="gm.readQCMs()" disabled>
+                    <button id='btn-qcm' class="btn btn-primary" onclick="window.gm.readQCMs()" disabled>
                         Lire les QCMs
                     </button>
                 </div>
@@ -176,7 +178,7 @@
                 appairage manuel.</p>
             <div class='row'>
                 <div class='col-3'>
-                    <button class="btn btn-primary" onclick="gm.manualLink()">
+                    <button class="btn btn-primary" onclick="window.gm.manualLink()">
                         Appairer manuellement
                     </button>
                 </div>
@@ -197,7 +199,7 @@
                 enregistrer cette correction</p>
             <div class='row'>
                 <div class='col-2'>
-                    <button class="btn btn-success" onclick="gm.save({{ session.id }})">
+                    <button class="btn btn-success" onclick="window.gm.save({{ session.id }})">
                         Enregistrer
                     </button>
                 </div>

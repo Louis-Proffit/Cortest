@@ -46,9 +46,17 @@ export class GrilleManager {
         option_2: {name: 'Option 2', type: 'number', length: 6, regex: /^[0-9]{6}$/},
     };
 
-    constructor(request, questions, niveauxScolaires) {
 
-        /* request décrit ce qui est attendu pour cette session
+    /**
+     *
+     * @param {CortestPort} port
+     * @param request
+     * @param questions
+     * @param niveauxScolaires
+     */
+    constructor(port, request, questions, niveauxScolaires) {
+
+        /* Request décrit ce qui est attendu pour cette session
          * elle doit être de la forme
          * 
          * request = {
@@ -58,6 +66,7 @@ export class GrilleManager {
          }
          */
 
+        this.port = port
         this.contentFID = {
             code_barre: {name: 'Code barre', type: 'number', length: 8, regex: /^.{8}$/},
             nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+[\s]*$/},
@@ -112,17 +121,17 @@ export class GrilleManager {
 
     getGridConfig() {
 //renvoie la configuration pour le tableau AG-GRID
-        var columnDefs = [];
-        for (var field in this.contentFID) {
-            var ligne = this.contentFID[field];
+        const columnDefs = [];
+        for (let field in this.contentFID) {
+            const ligne = this.contentFID[field];
             if (this.request[field].print) {
                 switch (ligne.type) {
                     case 'date':
                         columnDefs.push({field: field, headerName: ligne.name, type: 'dateColumn'});
                         break;
                     case 'choice':
-                        var options = [];
-                        for (var i in ligne.choice) {
+                        const options = [];
+                        for (let i in ligne.choice) {
                             options.push(ligne.choice[i].store);
                         }
                         columnDefs.push({
@@ -138,7 +147,7 @@ export class GrilleManager {
             }
         }
 
-        var gridOptions = {
+        const gridOptions = {
             columnDefs: columnDefs,
             rowData: this.FIDs,
             defaultColDef: {
@@ -214,28 +223,28 @@ export class GrilleManager {
     }
 
     async correctFID(fid) {
-        var forms = [];
+        const forms = [];
         const blanck = '_';
         const unknown = '?';
         const not_asked = 'not_asked';
         const siecleCorrection = 20;
         const anneeCorrection = 23;
         for (var field in this.contentFID) {
-            var ligne = this.contentFID[field];
-            var requestField = this.request[field];
+            const ligne = this.contentFID[field];
+            const requestField = this.request[field];
             if (requestField.asked) {
                 //si le champs est demandé
                 if (fid[field].match(ligne.regex)) {
                     //si la lecture est coérente
                     if (ligne.type === 'choice') {
-                        for (var i in ligne.choice) {
+                        for (let i in ligne.choice) {
                             if (ligne.choice[i].read === fid[field]) {
                                 fid[field] = ligne.choice[i].store;
                             }
                         }
                     }
                     if (ligne.type === 'date') {
-                        var read = fid[field];
+                        const read = fid[field];
                         if (field === "date_naissance") {
                             if (parseInt(read[4] + read[5]) > anneeCorrection) {
                                 fid[field] = (siecleCorrection - 1).toString() + read[4] + read[5] + '-' + read[2] + read[3] + '-' + read[0] + read[1];
@@ -303,11 +312,11 @@ export class GrilleManager {
         }
         //la lecture est terminée, on demande les corrections nécessaires
         if (forms.length > 0) {
-            tell('S');
+            await this.port.write('S');
             var my = this;
             askFID(fid.code_barre, forms, function () {
-                for (var i in forms) {
-                    var line = forms[i];
+                for (let i in forms) {
+                    const line = forms[i];
                     field = line.field;
                     line.action();
                 }
@@ -317,7 +326,7 @@ export class GrilleManager {
                 my.readFIDs();
             });
         } else {
-            tell('G');
+            this.port.write('G');
             this.storeFID(fid);
             this.readFIDs();
         }
@@ -330,7 +339,7 @@ export class GrilleManager {
         const unknown = 0;
         const notasked = 0;
         const corresp = {'A': 1, 'B': 2, 'D': 3, 'H': 4, 'P': 5};
-        var toCorrect = [];
+        const toCorrect = [];
         for (let i = 0; i < this.nbQuestions; i++) {
             if ((i + 1).toString() in this.questions) {
                 if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
@@ -351,10 +360,10 @@ export class GrilleManager {
             }
         }
         if (toCorrect.length > 0) {
-            await tell('S');
-            var my = this;
+            await this.port.write('S');
+            const my = this;
             askQCM(code_barre, toCorrect, function (rep) {
-                for (var j in rep) {
+                for (let j in rep) {
                     qcm[rep[j].question] = rep[j].response;
                 }
                 my.storeQCM({code_barre: code_barre, reponses: qcm});
@@ -363,7 +372,7 @@ export class GrilleManager {
                 my.readQCMs();
             }, blanck, unknown);
         } else {
-            await tell('G');
+            await this.port.write('G');
             this.storeQCM({code_barre: code_barre, reponses: qcm});
             this.readQCMs();
         }
@@ -371,16 +380,16 @@ export class GrilleManager {
     }
 
     readFID(text) {
-        var fid = {};
-        var cursor = 0;
-        for (var field in this.contentFID) {
-            var ligne = this.contentFID[field];
-            var step = ligne.length;
+        const fid = {};
+        let cursor = 0;
+        for (let field in this.contentFID) {
+            const ligne = this.contentFID[field];
+            const step = ligne.length;
             fid[field] = text.slice(cursor, cursor + step);
             cursor += step;
         }
         if (this.hasFID(fid.code_barre)) {
-            tell('G');
+            this.port.write('G');
             this.readFIDs();
         } else {
             this.correctFID(fid);
@@ -389,12 +398,12 @@ export class GrilleManager {
     }
 
     readQCM(text) {
-        var qcm = [];
+        const qcm = [];
         for (let i = 0; i < this.nbQuestions; i++) {
             qcm[i] = text[8 + i];
         }
         if (this.hasQCM(text.slice(0, 8))) {
-            tell('G');
+            this.port.write('G');
             this.readQCMs();
         } else {
             this.correctQCM(text.slice(0, 8), qcm);
@@ -410,23 +419,23 @@ export class GrilleManager {
     async readFIDs() {
         $("#spinner-fid").show();
         await timeout(10);
-        var rep = await get('L');
+        const rep = await this.port.exchange('L');
         const bac_vide = "\x1506\r\n\x03";
         if (rep.includes(bac_vide)) {
             //on n'a plus de page à lire
             //on revoie une commande L pour baisser le bac
-            tell('L')
+            await this.port.write('L')
             //fin de lecture
             $("#spinner-fid").hide();
             return true;
         }
 
         //si il y a effectivement une page à lire
-        for (var i in GrilleManager.codesErreurs) {
-            var erreur = GrilleManager.codesErreurs[i];
+        for (let i in GrilleManager.codesErreurs) {
+            const erreur = GrilleManager.codesErreurs[i];
             var my = this;
             if (rep.includes(erreur.sequence)) {
-                await tell('S');
+                await this.port.write('S');
                 return tellFatalError(erreur.message, "Lire la page suivante", async function () {
                     return my.readFIDs();
                 });
@@ -439,10 +448,10 @@ export class GrilleManager {
             var regex = /\x01\x02.{8}.{8}(.{75})[0-9]{3}\r\n\x03\x04/;
             var match = rep.match(regex);
             if (match !== null) {
-                var suite = match[1];
-                var propal = "1000000" + this.noCodeBarreFID.toString();
+                const suite = match[1];
+                const propal = "1000000" + this.noCodeBarreFID.toString();
                 var my = this;
-                await tell('S');
+                await this.port.write('S');
                 askCodeBarre(propal, function (r) {
                     return my.readFID(r + suite);
                 }, function () {
@@ -453,14 +462,14 @@ export class GrilleManager {
                 });
             } else {
                 var my = this;
-                await tell('S');
+                await this.port.write('S');
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readFIDs();
                 });
             }
 
         } else {
-            var expl = match[1];
+            const expl = match[1];
             return this.readFID(expl);
         }
     }
@@ -468,25 +477,25 @@ export class GrilleManager {
     async readQCMs() {
         $("#spinner-qcm").show();
         await timeout(10);
-        var rep = await get('L');
+        const rep = await this.port.exchange('L');
 
         const bac_vide = "\x1506\r\n\x03";
 
         if (rep.includes(bac_vide)) {
             //on n'a plus de page à lire
             //on revoie une commande L pour baisser le bac
-            tell('L')
+            await this.port.write('L')
             //fin de lecture
             $("#spinner-qcm").hide();
             return true;
         }
 
         //si il y a effectivement une page à lire
-        for (var i in GrilleManager.codesErreurs) {
-            var erreur = GrilleManager.codesErreurs[i];
+        for (let i in GrilleManager.codesErreurs) {
+            const erreur = GrilleManager.codesErreurs[i];
             var my = this;
             if (rep.includes(erreur.sequence)) {
-                await tell('S');
+                await this.port.write('S');
                 return tellFatalError(erreur.message, "Lire la page suivante", async function () {
                     return my.readQCMs();
                 });
@@ -499,10 +508,10 @@ export class GrilleManager {
             var regex = /\x01\x02.{8}.{8}(.{640})[0-9]{3}\r\n\x03\x04/;
             var match = rep.match(regex);
             if (match !== null) {
-                var suite = match[1];
-                var propal = "2000000" + this.noCodeBarreQCM.toString();
+                const suite = match[1];
+                const propal = "2000000" + this.noCodeBarreQCM.toString();
                 var my = this;
-                await tell('S');
+                await this.port.write('S');
                 askCodeBarre(propal, function (r) {
                     return my.readQCM(r + suite);
                 }, function () {
@@ -513,20 +522,20 @@ export class GrilleManager {
                 });
             } else {
                 var my = this;
-                await tell('S');
+                await this.port.write('S');
                 return tellFatalError("Réponse reçue : " + rep, "Lire la page suivante", async function () {
                     my.readQCMs();
                 });
             }
         } else {
-            var expl = match[1];
+            const expl = match[1];
             this.readQCM(expl);
         }
 
     }
 
     manualLink() {
-        var nbPagesAAppairer = this.FIDs.length + this.QCMs.length - 2 * this.codesAppaires.length;
+        const nbPagesAAppairer = this.FIDs.length + this.QCMs.length - 2 * this.codesAppaires.length;
         if (nbPagesAAppairer % 2 === 1) {
             tellFatalError("Le nombre de pages à appairer n'est pas paire, veuillez poursuivre la correction", "Continuer", function () {
             });
@@ -535,8 +544,8 @@ export class GrilleManager {
                 tellFatalError("Aucune page à appairer manuellement.", "Continuer", function () {
                 });
             } else {
-                var FIDsDispo = [];
-                var QCMsDispo = [];
+                const FIDsDispo = [];
+                const QCMsDispo = [];
                 for (var i in this.FIDs) {
                     if (!this.codesAppaires.includes(this.FIDs[i].code_barre)) {
                         FIDsDispo.push({code_barre: this.FIDs[i].code_barre, nom: this.FIDs[i].nom});
@@ -547,9 +556,9 @@ export class GrilleManager {
                         QCMsDispo.push({code_barre: this.QCMs[i].code_barre});
                     }
                 }
-                var my = this;
+                const my = this;
                 askManualLink(nbPagesAAppairer, FIDsDispo, QCMsDispo, function (rep) {
-                    for (var i in rep) {
+                    for (let i in rep) {
                         if (!(my.codesAppaires.includes(rep[i].fid) || my.codesAppaires.includes(rep[i].qcm))) {
                             my.getQCM(rep[i].qcm).code_barre = rep[i].fid;
                             my.codesAppaires.push(rep[i].fid);
@@ -565,9 +574,9 @@ export class GrilleManager {
     }
 
     save(session) {
-        var rep = {};
-        for (var i in this.codesAppaires) {
-            var code = this.codesAppaires[i]
+        const rep = {};
+        for (let i in this.codesAppaires) {
+            const code = this.codesAppaires[i];
             rep[code] = this.FIDs[this.FIDs.findIndex((e) => e.code_barre === code)];
             rep[code].qcm = this.QCMs[this.QCMs.findIndex((e) => e.code_barre === code)].reponses;
         }

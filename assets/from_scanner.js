@@ -16,7 +16,7 @@ import {
     makeHTMLLink
 } from "./intervention_manuelle"
 
-import {get, read, tell, connect, timeout, tryConnexion} from "./port"
+import {CortestSerialPort, CortestPromptPort, timeout} from "./port"
 
 global.$ = $
 global.Grid = Grid
@@ -33,9 +33,6 @@ global.formSelect = formSelect
 global.formConfirm = formConfirm
 global.makeHTMLQCM = makeHTMLQCM
 global.makeHTMLLink = makeHTMLLink
-global.get = get
-global.read = read
-global.tell = tell
-global.connect = connect
+global.CortestSerialPort = CortestSerialPort
+global.CortestPromptPort = CortestPromptPort
 global.timeout = timeout
-global.tryConnexion = tryConnexion
