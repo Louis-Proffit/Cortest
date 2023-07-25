@@ -8,6 +8,7 @@ use App\Entity\Subtest;
 use App\Repository\EchelleGraphiqueRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Fonctions Cortest ajoutées à twig, essentiellement pour le formating de certaines données
@@ -22,42 +23,32 @@ class CortestExtension extends AbstractExtension
 
     const FULL_EIRS_NAME = ['E' => 'Externe', 'I' => 'Interne', 'R' => 'Réservé', 'S' => 'Spécial'];
 
-    public function __construct(
-        private readonly EchelleGraphiqueRepository $echelleGraphiqueRepository
-    )
-    {
-    }
-
     public function getFilters(): array
     {
         return [
             new TwigFilter('sexe', [$this, 'formatSexe']),
             new TwigFilter('eirs', [$this, 'formatEirs']),
-            new TwigFilter("subtest_type", [$this, "formatSubtestType"]),
-            new TwigFilter("footer_type", [$this, "formatFooterType"]),
-            new TwigFilter("echelle_graphique_nom", [$this, "formatEchelleGraphiqueNom"]),
-            new TwigFilter("echelle_graphique_nom_affiche", [$this, "formatEchelleGraphiqueNomAffiche"])
         ];
     }
 
-    public function formatEchelleGraphiqueNom(int $echelle_graphique_id): string
+    public function getFunctions(): array
     {
-        return $this->echelleGraphiqueRepository->find($echelle_graphique_id)->echelle->nom;
+        return [
+            new TwigFunction("properties_starting_with", [$this, "propertiesStartingWith"])
+        ];
     }
 
-    public function formatEchelleGraphiqueNomAffiche(int $echelle_graphique_id): string
+    public function propertiesStartingWith($object, $prefix): array
     {
-        return $this->echelleGraphiqueRepository->find($echelle_graphique_id)->options[EchelleGraphique::OPTION_NOM_AFFICHAGE_PHP];
-    }
+        $array = (array)$object;
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (str_starts_with($key, $prefix)) {
+                $result[$key] = $value;
+            }
+        }
 
-    public function formatFooterType(int $footer_type): string
-    {
-        return array_flip(Subtest::TYPES_FOOTER_CHOICES)[$footer_type];
-    }
-
-    public function formatSubtestType(int $subtest_index): string
-    {
-        return array_flip(Subtest::TYPES_SUBTEST_CHOICES)[$subtest_index];
+        return $result;
     }
 
     public function formatSexe(int $sexe_index): string

@@ -2,9 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\ReponseCandidatController;
 use App\Repository\ReponseCandidatRepository;
-use PHPUnit\Framework\TestCase;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +22,7 @@ class ReponseCandidatControllerTest extends WebTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testSupprimer()
     {

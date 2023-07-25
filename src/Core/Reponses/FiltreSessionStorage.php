@@ -2,15 +2,15 @@
 
 namespace App\Core\Reponses;
 
-use App\Form\Data\RechercheFiltre;
+use App\Form\Data\RechercheParameters;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @extends AbstractItemStorage<RechercheFiltre>
  *
- * @method RechercheFiltre get()
- * @method RechercheFiltre getOrSetDefault(RechercheFiltre $default)
- * @method set(RechercheFiltre $item)
+ * @method RechercheParameters get()
+ * @method RechercheParameters getOrSetDefault(RechercheParameters $default)
+ * @method set(RechercheParameters $item)
  */
 class FiltreSessionStorage extends AbstractItemStorage
 {
