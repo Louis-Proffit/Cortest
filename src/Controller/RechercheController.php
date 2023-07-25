@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function PHPUnit\Framework\throwException;
 
 #[Route("/recherche", name: "recherche_")]
 class RechercheController extends AbstractController
@@ -52,13 +53,14 @@ class RechercheController extends AbstractController
 
     #[Route("/index", name: "index")]
     public function index(
-        LoggerInterface                $logger,
         ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
-        Request                        $request,
-        ReponseCandidatRepository      $reponseCandidatRepository
+        ReponseCandidatRepository      $reponseCandidatRepository,
+        LoggerInterface                $logger,
+        Request                        $request
     ): Response
     {
-        $request->get("page");
+        $page = (int)$request->get("page");
+        $cachedReponsesIds = $reponsesCandidatSessionStorage->getOrSetDefault(array());
 
         $reponsesCount = $reponseCandidatRepository->count([]);
         $pageCount = (int)ceil($reponsesCount / RechercheParameters::PAGE_SIZE);
@@ -66,7 +68,7 @@ class RechercheController extends AbstractController
         $parameters = new RechercheParameters(
             filtrePrenom: "",
             filtreNom: "",
-            page: 0,
+            page: $page,
             filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
             filtreDateDeNaissanceMax: new DateTime("now"),
             niveauScolaire: null,
@@ -74,14 +76,16 @@ class RechercheController extends AbstractController
             checkedReponsesCandidat: []
         );
 
-        $cachedReponsesIds = $reponsesCandidatSessionStorage->getOrSetDefault(array());
-        $selectionnees = $reponseCandidatRepository->findAllByIds($cachedReponsesIds);
+
+        $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
+        $checkedReponsesAtPage = $this->reponsesToCheckedReponses($reponsesAtPage, $cachedReponsesIds);
+        $parameters->checkedReponsesCandidat = $checkedReponsesAtPage;
 
         $form = $this->createForm(RechercheParametersType::class, $parameters, [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() and $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             for ($page = 0; $page < $pageCount; $page++) {
 
@@ -92,23 +96,12 @@ class RechercheController extends AbstractController
                     $logger->debug("Choix de la page " . $page);
                     $parameters->page = $page;
 
-                    $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
-
-                    $checkedReponsesCandidat = array_map(
-                        function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
-                            return new ReponseCandidatChecked($reponseCandidat,
-                                in_array($reponseCandidat->id, $cachedReponsesIds));
-                        },
-                        $reponsesAtPage
+                    return $this->renderIndexForm(
+                        reponseCandidatRepository: $reponseCandidatRepository,
+                        parameters: $parameters,
+                        cachedReponsesIds: $cachedReponsesIds,
+                        pageCount: $pageCount
                     );
-
-                    $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
-                    $form = $this->createForm(RechercheParametersType::class, $form->getData(), [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
-
-                    return $this->render("recherche/index.html.twig", [
-                        "selectionnes" => $selectionnees,
-                        "form" => $form->createView()
-                    ]);
                 }
             }
 
@@ -117,52 +110,81 @@ class RechercheController extends AbstractController
 
             if ($submitSelectionner->isClicked()) {
 
-                throw new Exception();
+                foreach ($parameters->checkedReponsesCandidat as $reponseCandidatChecked) {
+                    if ($reponseCandidatChecked->checked && !in_array($reponseCandidatChecked->reponse_candidat->id, $cachedReponsesIds)) {
+                        $cachedReponsesIds[] = $reponseCandidatChecked->reponse_candidat->id;
+                    }
+                }
 
+                $reponsesCandidatSessionStorage->set($cachedReponsesIds);
+                return $this->renderIndexForm(
+                    reponseCandidatRepository: $reponseCandidatRepository,
+                    parameters: $parameters,
+                    cachedReponsesIds: $cachedReponsesIds,
+                    pageCount: $pageCount
+                );
             }
 
             /** @var ClickableInterface $submitFiltrer */
             $submitFiltrer = $form->get(RechercheParametersType::SUBMIT_FILTRER_KEY);
 
             if ($submitFiltrer->isClicked()) {
-                $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
-
-                $checkedReponsesCandidat = array_map(
-                    function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
-                        return new ReponseCandidatChecked($reponseCandidat,
-                            in_array($reponseCandidat->id, $cachedReponsesIds));
-                    },
-                    $reponsesAtPage
+                return $this->renderIndexForm(
+                    reponseCandidatRepository: $reponseCandidatRepository,
+                    parameters: $parameters,
+                    cachedReponsesIds: $cachedReponsesIds,
+                    pageCount: $pageCount
                 );
-
-                $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
-
-                return $this->render("recherche/index.html.twig", [
-                    "selectionnes" => $selectionnees,
-                    "form" => $form->createView()
-                ]);
             }
 
-            return $this->redirectToRoute("recherche_index");
+            $this->addFlash("danger", "Une erreur est survenue");
+            $logger->error("Unreachable");
         }
+
+        return $this->renderIndexForm(
+            reponseCandidatRepository: $reponseCandidatRepository,
+            parameters: $parameters,
+            cachedReponsesIds: $cachedReponsesIds,
+            pageCount: $pageCount
+        );
+    }
+
+    private function renderIndexForm(
+        ReponseCandidatRepository $reponseCandidatRepository,
+        RechercheParameters       $parameters,
+        array                     $cachedReponsesIds,
+        int                       $pageCount): Response
+    {
+        $selectionnes = $reponseCandidatRepository->findAllByIds($cachedReponsesIds);
 
         $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
 
-        $checkedReponsesCandidat = array_map(
+        $checkedReponsesCandidat = $this->reponsesToCheckedReponses($reponsesAtPage, $cachedReponsesIds);
+
+        $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
+
+        $form = $this->createForm(RechercheParametersType::class, $parameters, [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
+
+        return $this->render("recherche/index.html.twig", [
+            "selectionnes" => $selectionnes,
+            "form" => $form->createView()
+        ]);
+    }
+
+    /**
+     * @param ReponseCandidat[] $reponsesAtPage
+     * @param int[] $cachedReponsesIds
+     * @return ReponseCandidatChecked[]
+     */
+    private function reponsesToCheckedReponses(array $reponsesAtPage, array $cachedReponsesIds): array
+    {
+        return array_map(
             function (ReponseCandidat $reponseCandidat) use ($cachedReponsesIds) {
                 return new ReponseCandidatChecked($reponseCandidat,
                     in_array($reponseCandidat->id, $cachedReponsesIds));
             },
             $reponsesAtPage
         );
-
-        $parameters->checkedReponsesCandidat = $checkedReponsesCandidat;
-        $form->setData($parameters);
-
-        return $this->render("recherche/index.html.twig", [
-            "selectionnes" => $selectionnees,
-            "form" => $form->createView()
-        ]);
     }
 
 }

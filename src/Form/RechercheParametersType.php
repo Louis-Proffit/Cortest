@@ -56,7 +56,7 @@ class RechercheParametersType extends AbstractType
             } else {
                 $class = "btn btn-secondary";
             }
-            $builder->add(self::SUBMIT_PAGE_PREFIX_KEY . $page, SubmitType::class, ["label" => "$page", "attr" => ["class" => $class]]);
+            $builder->add(self::SUBMIT_PAGE_PREFIX_KEY . $page, SubmitType::class, ["label" => "" . ($page + 1), "attr" => ["class" => $class]]);
         }
     }
 

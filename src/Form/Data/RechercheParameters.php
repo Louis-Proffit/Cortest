@@ -8,7 +8,7 @@ use DateTime;
 
 class RechercheParameters
 {
-    const PAGE_SIZE = 20;
+    const PAGE_SIZE = 100;
 
     public string $filtrePrenom;
     public string $filtreNom;

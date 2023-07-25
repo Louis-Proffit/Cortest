@@ -77,9 +77,9 @@
             {{ form_row(form.session) }}
             {{ form_row(form.submit_filtrer) }}
             <br>
-            <h3>Candidats</h3>
-            <br>
             <hr class="hr hr-blurry">
+            <br>
+            <h3>Candidats</h3>
             <br>
             <div class="input-group">
                 {% for key, value in properties_starting_with(form.children,"submit_page_") %}
