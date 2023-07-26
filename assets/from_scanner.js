@@ -16,7 +16,7 @@ import {
     makeHTMLLink
 } from "./intervention_manuelle"
 
-import {CortestSerialPort, CortestPromptPort, timeout} from "./port"
+import {cortestPromptPort, cortestSerialPort, timeout} from "./port"
 
 global.$ = $
 global.Grid = Grid
@@ -33,6 +33,6 @@ global.formSelect = formSelect
 global.formConfirm = formConfirm
 global.makeHTMLQCM = makeHTMLQCM
 global.makeHTMLLink = makeHTMLLink
-global.CortestSerialPort = CortestSerialPort
-global.CortestPromptPort = CortestPromptPort
+global.cortestSerialPort = cortestSerialPort
+global.cortestPromptPort = cortestPromptPort
 global.timeout = timeout

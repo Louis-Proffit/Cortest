@@ -7,14 +7,17 @@ export class CortestPort {
 
     /**
      *
-     * @param callback
      * @returns {Promise<void>}
      */
-    async connect(callback) {
+    async connect() {
         throw Error("Abstract method")
     }
 
-    async tryConnect(callback) {
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
+    async tryConnect() {
         throw Error("Abstract method")
     }
 
@@ -60,20 +63,17 @@ export class CortestSerialPort extends CortestPort {
         this.port = null
     }
 
-    async connect(callback) {
+    async connect() {
         console.log("Connecting to serial port, with baudRate : ", this.baudRate)
         this.port = await navigator.serial.requestPort();
         await this.port.open({baudRate: this.baudRate});
         await this.read();
-        callback();
     }
 
-    async tryConnect(callback) {
+    async tryConnect() {
         const output = await this.exchange(TRY_CONNECT_COMMAND);
 
-        if (output.match(TRY_CONNECT_OUTPUT_REGEX) !== null) {
-            await callback();
-        }
+        return output.match(TRY_CONNECT_OUTPUT_REGEX) !== null;
     }
 
     async read() {
@@ -137,14 +137,13 @@ export class CortestPromptPort extends CortestPort {
         super();
     }
 
-    async tryConnect(callback) {
+    async tryConnect() {
         console.log("Trying connection to prompt port")
-        await this.connect(callback)
+        return true
     }
 
-    async connect(callback) {
+    async connect() {
         console.log("Connecting prompt port")
-        callback();
     }
 
     async write(content) {
@@ -168,4 +167,12 @@ export class CortestPromptPort extends CortestPort {
 
 export function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function cortestSerialPort() {
+    return new CortestSerialPort(BAUD_RATE)
+}
+
+export function cortestPromptPort() {
+    return new CortestPromptPort()
 }

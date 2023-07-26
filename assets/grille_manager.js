@@ -176,6 +176,7 @@ export class GrilleManager {
             this.codesAppaires.push(fid.code_barre);
             $("#nb-appaires").text(parseInt($("#nb-appaires").text()) + 2);
         }
+
         $("#nb-fid-lues").text(parseInt(this.FIDs.length));
         $("#nb-lues").text(parseInt(this.FIDs.length + this.QCMs.length));
     }
