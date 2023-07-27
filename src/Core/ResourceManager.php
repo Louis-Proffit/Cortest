@@ -5,6 +5,7 @@ namespace App\Core;
 use App\Entity\Resource;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 readonly class ResourceManager
@@ -28,11 +29,16 @@ readonly class ResourceManager
         }
     }
 
-    public function upload(UploadedFile $file, Resource $resource): void
+    public function upload(UploadedFile $file, Resource $resource): bool
     {
-        $fileName = $this->resourceFileName($resource);
-        $this->logger->info("Upload du fichier", ["fileName" => $fileName]);
-        $file->move($this->dir, $fileName);
+        try {
+            $fileName = $this->resourceFileName($resource);
+            $this->logger->info("Upload du fichier", ["fileName" => $fileName]);
+            $file->move($this->dir, $fileName);
+            return true;
+        } catch (FileException) {
+            return false;
+        }
     }
 
 
@@ -42,7 +48,17 @@ readonly class ResourceManager
         $this->filesystem->remove($this->resourceFilePath($resource));
     }
 
-    public function resourceFilePath(Resource $resource): string
+    public function resourcefilePathOrNull(Resource $resource): string|null
+    {
+        $filePath = $this->resourceFilePath($resource);
+        if ($this->filesystem->exists($filePath)) {
+            return $filePath;
+        } else {
+            return null;
+        }
+    }
+
+    private function resourceFilePath(Resource $resource): string
     {
         return $this->dir . DIRECTORY_SEPARATOR . $this->resourceFileName($resource);
     }
