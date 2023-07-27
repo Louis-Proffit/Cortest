@@ -35,6 +35,7 @@ security:
         - { path: ^/csv, roles: ROLE_CORRECTEUR }
         - { path: ^/pdf, roles: ROLE_CORRECTEUR }
         - { path: ^/calcul, roles: ROLE_CORRECTEUR }
+        - { path: ^/resource, roles: ROLE_CORRECTEUR }
         - { path: ^/$, roles: ROLE_CORRECTEUR }
         - { path: ^/, roles: ROLE_PSYCHOLOGUE }
 
