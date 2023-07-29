@@ -30,20 +30,21 @@ class Etalonnage
     #[ORM\Column]
     public int $nombre_classes;
 
+    #[ORM\OrderBy(["id" => "ASC"])]
     #[ORM\OneToMany(mappedBy: "etalonnage", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
     /**
      * @param int $id
-     * @param Structure $profil
+     * @param Structure $structure
      * @param string $nom
      * @param int $nombre_classes
      * @param Collection $echelles
      */
-    public function __construct(int $id, Structure $profil, string $nom, int $nombre_classes, Collection $echelles)
+    public function __construct(int $id, Structure $structure, string $nom, int $nombre_classes, Collection $echelles)
     {
         $this->id = $id;
-        $this->structure = $profil;
+        $this->structure = $structure;
         $this->nom = $nom;
         $this->nombre_classes = $nombre_classes;
         $this->echelles = $echelles;

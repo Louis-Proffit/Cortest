@@ -22,7 +22,7 @@ class SgapController extends AbstractController
         SgapRepository $sgapRepository,
     ): Response
     {
-        $sgaps = $sgapRepository->findAll();
+        $sgaps = $sgapRepository->findBy(criteria: [], orderBy: ["indice" => "ASC"]);
 
         return $this->render("sgap/index.html.twig", ["sgaps" => $sgaps]);
     }
@@ -51,7 +51,7 @@ class SgapController extends AbstractController
 
         }
 
-        return $this->render("sgap/form.html.twig", ["form" => $form->createView()]);
+        return $this->render("sgap/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
@@ -72,7 +72,7 @@ class SgapController extends AbstractController
             return $this->redirectToRoute("sgap_index");
         }
 
-        return $this->render("sgap/form.html.twig", ["form" => $form->createView()]);
+        return $this->render("sgap/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

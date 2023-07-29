@@ -3,7 +3,7 @@
 namespace App\Core\IO\ReponseCandidat;
 
 use App\Entity\Concours;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Repository\NiveauScolaireRepository;
@@ -39,7 +39,7 @@ class ImportReponsesCandidat
 
             $questionsReponses = [];
 
-            /** @var QuestionConcours $question */
+            /** @var QuestionTest $question */
             foreach ($questions as $question) {
                 $reponseQuestionString = $rawReponse[$question->abreviation];
                 $questionsReponses[$question->indice] = ExportReponsesCandidat::REPONSE_VALUE_TO_INDEX[$reponseQuestionString];
@@ -101,7 +101,7 @@ class ImportReponsesCandidat
             ExportReponsesCandidat::EIRS_KEY,
         ];
 
-        /** @var QuestionConcours $question */
+        /** @var QuestionTest $question */
         foreach ($concours->questions as $question) {
             $keys[] = $question->abreviation;
         }

@@ -5,35 +5,30 @@ namespace App\Fixture;
 use App\Entity\Concours;
 use App\Entity\CortestUser;
 use App\Entity\NiveauScolaire;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Entity\Sgap;
 use App\Repository\GrilleRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class InitFixture extends Fixture
+class InitFixture extends Fixture implements FixtureGroupInterface
 {
 
     public function __construct(
-        private readonly UserPasswordHasherInterface $password_hasher,
-        private readonly GrilleRepository            $grille_repository
+        private readonly UserPasswordHasherInterface $userPasswordHasher
     )
     {
     }
 
     public
-    function load(ObjectManager $manager)
+    function load(ObjectManager $manager): void
     {
         $sgaps = $this->sgaps();
         foreach ($sgaps as $sgap) {
             $manager->persist($sgap);
-        }
-
-        $all_concours = $this->concours();
-        foreach ($all_concours as $concours) {
-            $manager->persist($concours);
         }
 
         $niveaux_scolaire = $this->niveau_scolaire();
@@ -73,9 +68,9 @@ class InitFixture extends Fixture
             role: CortestUser::ROLE_CORRECTEUR
         );
 
-        $admin->password = $this->password_hasher->hashPassword($admin, $admin->password);
-        $psycologue->password = $this->password_hasher->hashPassword($psycologue, $psycologue->password);
-        $correcteur->password = $this->password_hasher->hashPassword($correcteur, $correcteur->password);
+        $admin->password = $this->userPasswordHasher->hashPassword($admin, $admin->password);
+        $psycologue->password = $this->userPasswordHasher->hashPassword($psycologue, $psycologue->password);
+        $correcteur->password = $this->userPasswordHasher->hashPassword($correcteur, $correcteur->password);
 
         return [$admin, $psycologue, $correcteur];
     }
@@ -93,81 +88,6 @@ class InitFixture extends Fixture
             new NiveauScolaire(id: 0, indice: 7, nom: "Licence ou Maîtrise"),
             new NiveauScolaire(id: 0, indice: 8, nom: "Ingénieur ou 3e cycle"),
         ];
-    }
-
-    private
-    function concours(): array
-    {
-        $result = [
-            new Concours(id: 0,
-                nom: "Comissaire de police [444]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '41', version_batterie: '444', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Officier (lieutenant de police) [003]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '31', version_batterie: '003', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Sélection spécialisée - Motard - Garde de sécurité ambassade [003]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '31',
-                version_batterie: '003',
-                questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Gardien de la paix [333]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '01', version_batterie: '333', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "BAC - sélection spécialisée [222] ",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '1', version_batterie: '222', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Cadet de la République [111]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '61', version_batterie: '111', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "PA [111]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '61', version_batterie: '111', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Technicien de la PTS [333]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '285', version_batterie: '333', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Technicien Principal (TPPTS) [003]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '461', version_batterie: '003', questions: new ArrayCollection()),
-            new Concours(id: 0,
-                nom: "Ingénieur [444]",
-                correcteurs: new ArrayCollection(),
-                sessions: new ArrayCollection(),
-                index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-                type_concours: '42', version_batterie: '444', questions: new ArrayCollection()),
-        ];
-
-        foreach ($result as $concours) {
-            QuestionConcours::initQuestions($this->grille_repository, $concours);
-        }
-
-        return $result;
     }
 
     private
@@ -195,5 +115,10 @@ class InitFixture extends Fixture
             new Sgap(id: 0, indice: 19, nom: "Mayotte"),
             new Sgap(id: 0, indice: 70, nom: "Lognes BFIE")
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ["init"];
     }
 }

@@ -4,7 +4,7 @@
     <br>
     <h1>Echelles disponibles</h1>
     <br>
-    <p class="lead">Liste des échelles utilisables par l'application Cortest.</p>
+    <p class="lead">Échelles utilisées par les structures de l'application Cortest.</p>
     <br>
     <table class="table">
         <thead>
@@ -13,7 +13,7 @@
             <th>Nom php</th>
             <th>Profil</th>
             <th>Type</th>
-            <th>Modifier</th>
+            <th>Modifier (la structure)</th>
         </tr>
         </thead>
         <tbody>
@@ -21,11 +21,11 @@
             <tr>
                 <td>{{ echelle.nom }}</td>
                 <td>{{ echelle.nom_php }}</td>
-                <td>{{ echelle.profil.nom }}</td>
+                <td>{{ echelle.structure.nom }}</td>
                 <td>{{ echelle.type }}</td>
                 <td>
-                    <a class="btn btn-primary"
-                       href="{{ path("profil_modifier", {"id":echelle.profil.id}) }}">Modifier</a>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("structure_modifier", {"id":echelle.structure.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

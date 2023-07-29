@@ -13,36 +13,36 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class EtalonnageChoiceType extends AbstractType
 {
 
-    const OPTION_PROFIL = "profil";
+    const OPTION_STRUCTURE = "structure";
 
-    private function etalonnageChoices(Structure $profil): array
+    private function etalonnageChoices(Structure $structure): array
     {
 
         $result = [];
 
         /** @var Etalonnage $etalonnage */
-        foreach ($profil->etalonnages as $etalonnage) {
+        foreach ($structure->etalonnages as $etalonnage) {
             $result[$etalonnage->nom] = $etalonnage;
         }
 
         return $result;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             "etalonnage",
             ChoiceType::class,
             [
-                "choices" => $this->etalonnageChoices($options[self::OPTION_PROFIL])
+                "choices" => $this->etalonnageChoices($options[self::OPTION_STRUCTURE])
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->define(self::OPTION_PROFIL);
-        $resolver->setAllowedTypes(self::OPTION_PROFIL, Structure::class);
+        $resolver->define(self::OPTION_STRUCTURE);
+        $resolver->setAllowedTypes(self::OPTION_STRUCTURE, Structure::class);
     }
 
 }

@@ -46,9 +46,7 @@ class EchelleEtalonnage
      * TODO service
      * public static function rangeEchelle(Echelle $echelle, Etalonnage $etalonnage, int $nombreClasses): EchelleEtalonnage
     {
-        return new EchelleEtalonnage(
-            id: 0, bounds: range(1, $nombreClasses - 1), echelle: $echelle, etalonnage: $etalonnage
-        );
+        return ;
     }*/
 
 

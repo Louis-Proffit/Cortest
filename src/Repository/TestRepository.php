@@ -20,4 +20,16 @@ class TestRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Test::class);
     }
+
+    public function choices(): array
+    {
+        $tests = $this->findAll();
+
+        $result = [];
+        foreach ($tests as $test) {
+            $result[$test->nom] = $test;
+        }
+
+        return $result;
+    }
 }

@@ -4,7 +4,7 @@
     <br>
     <h1>Concours</h1>
     <br>
-    <p class="lead">Liste des niveaux concours disponibles.</p>
+    <p class="lead">Liste des concours disponibles.</p>
     <br>
     <div class="row row-cols-auto">
         <div class="col">
@@ -16,22 +16,23 @@
         <thead>
         <tr>
             <th>Nom</th>
-            <th>Grille</th>
-            <th>Version batterie</th>
             <th>Type de concours</th>
-            <th>Consulter</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
-        {% for concours in items %}
+        {% for concours in concours %}
             <tr class="align-middle">
-                <td>{{ concours.nom }}</td>
-                <td>{{ grilles[concours.index_grille].nom }}</td>
-                <td>{{ concours.version_batterie }}</td>
+                <td>{{ concours.intitule }}</td>
                 <td>{{ concours.type_concours }}</td>
                 <td>
-                    <a class="btn btn-link fw-bold btn-rounded"
+                    <a class="btn btn-link fw-bold"
                        href="{{ path("concours_consulter", {"id":concours.id}) }}">Lien</a>
+                </td>
+                <td>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("concours_supprimer", {"id":concours.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

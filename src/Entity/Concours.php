@@ -29,7 +29,7 @@ class Concours
     #[ORM\Column]
     public string $type_concours;
 
-    #[ORM\ManyToMany(targetEntity: Test::class, inversedBy: "concours")]
+    #[ORM\ManyToMany(targetEntity: Test::class, mappedBy: "concours")]
     public Collection $tests;
 
     /**
@@ -44,5 +44,10 @@ class Concours
         $this->intitule = $nom;
         $this->type_concours = $type_concours;
         $this->tests = $tests;
+    }
+
+    public function summary(): string
+    {
+        return $this->intitule . " (" . $this->type_concours . ")";
     }
 }

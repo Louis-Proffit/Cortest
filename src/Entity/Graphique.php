@@ -34,14 +34,14 @@ class Graphique
 
     /**
      * @param int $id
-     * @param Structure $profil
+     * @param Structure $structure
      * @param string $nom
      * @param string $file_nom
      */
-    public function __construct(int $id, Structure $profil, string $nom, string $file_nom)
+    public function __construct(int $id, Structure $structure, string $nom, string $file_nom)
     {
         $this->id = $id;
-        $this->structure = $profil;
+        $this->structure = $structure;
         $this->nom = $nom;
         $this->file_nom = $file_nom;
     }

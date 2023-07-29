@@ -16,33 +16,19 @@ class EtalonnageCreerType extends AbstractType
 {
 
     public function __construct(
-        private readonly StructureRepository  $profil_repository,
-        private readonly EtalonnageRepository $etalonnageRepository
+        private readonly StructureRepository $structureRepository
     )
     {
     }
 
-    private function profilChoices(): array
-    {
-        $items = $this->profil_repository->findAll();
-
-        $result = [];
-
-        foreach ($items as $item) {
-            $result[$item->nom] = $item;
-        }
-
-        return $result;
-    }
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add("profil", ChoiceType::class, [
-                "choices" => $this->profilChoices()
-            ])
-            ->add("nom", TextType::class, ['constraints' => new UniqueDTO(field:'nom', message: 'Ce nom existe deja', repository: $this->etalonnageRepository)])
+            ->add("nom", TextType::class, ["label" => "Nom de l'étalonnage"])
             ->add("nombre_classes", IntegerType::class, ["label" => "Nombre de classes"])
+            ->add("structure", ChoiceType::class, [
+                "choices" => $this->structureRepository->choices()
+            ])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 

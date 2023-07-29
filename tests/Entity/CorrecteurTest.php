@@ -39,7 +39,7 @@ class CorrecteurTest extends KernelTestCase
                 sessions: new ArrayCollection(),
                 index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
                 type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
-            profil: new Structure(
+            structure: new Structure(
                 id: 0,
                 nom: "Structure",
                 echelles: new ArrayCollection(),

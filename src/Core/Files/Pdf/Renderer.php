@@ -4,17 +4,17 @@ namespace App\Core\Files\Pdf;
 
 use App\Core\Exception\MissingFileException;
 use App\Core\GraphiqueFileManager;
-use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
 use App\Entity\Graphique;
 use App\Entity\NiveauScolaire;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Entity\Sgap;
+use App\Entity\Test;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Twig\Environment;
@@ -39,8 +39,6 @@ class Renderer
     const KEY_SESSION_DATE = "session_date";
     const KEY_SESSION_NUMERO_ORDRE = "session_numero_ordre";
     const KEY_SESSION_SGAP_NOM = "session_sgap_nom";
-    const KEY_CONCOURS_NOM = "concours_nom";
-    const KEY_CONCOURS_TYPE = "concours_type";
     const KEY_CONCOURS_VERSION_BATTERIE = "concours_version_batterie";
     const KEY_ETALONNAGE_NOMBRE_CLASSES = "etalonnage_nombre_classes";
     const KEY_PREFIX_SCORE = "score_";
@@ -63,14 +61,14 @@ class Renderer
 
     public
     function optionKeys(
+        Test       $test,
         Correcteur $correcteur,
         Etalonnage $etalonnage,
     ): array
     {
         $profil = $correcteur->structure;
-        $concours = $correcteur->tests;
         $graphique = new Graphique(0, $profil, "TEST", "TEST");
-        $reponse = $this->dummyReponse($concours);
+        $reponse = $this->dummyReponse($test);
 
         $scoreValues = [];
         $profilValues = [];
@@ -117,8 +115,6 @@ class Renderer
             self::KEY_SESSION_DATE => $reponse->session->date,
             self::KEY_SESSION_NUMERO_ORDRE => $reponse->session->numero_ordre,
             self::KEY_SESSION_SGAP_NOM => $reponse->session->sgap->nom,
-            self::KEY_CONCOURS_NOM => $reponse->session->test->intitule,
-            self::KEY_CONCOURS_TYPE => $reponse->session->test->type_concours,
             self::KEY_CONCOURS_VERSION_BATTERIE => $reponse->session->test->version_batterie,
             self::KEY_IMAGE_DIRECTORY => $this->imagesDirectory,
             self::KEY_GRAPHIQUE_NOW => $graphique->nom,
@@ -181,7 +177,7 @@ class Renderer
     }
 
     public
-    function dummySession(Concours $concours): Session
+    function dummySession(Test $test): Session
     {
         $sgap = new Sgap(id: 0, indice: 1, nom: "SGAP TEST", sessions: new ArrayCollection());
         $session = new Session(
@@ -189,7 +185,7 @@ class Renderer
             date: new DateTime(),
             numero_ordre: 1,
             observations: "OBSERVATIONS TEST",
-            concours: $concours,
+            test: $test,
             sgap: $sgap,
             reponses_candidats: new ArrayCollection()
         );
@@ -198,18 +194,18 @@ class Renderer
     }
 
     public
-    function dummyReponse(Concours $concours): ReponseCandidat
+    function dummyReponse(Test $test): ReponseCandidat
     {
         $reponses = [];
 
-        /** @var QuestionConcours $question */
-        foreach ($concours->questions as $question) {
+        /** @var QuestionTest $question */
+        foreach ($test->questions as $question) {
             $reponses[$question->indice] = 3;
         }
 
         return new ReponseCandidat(
             id: 0,
-            session: $this->dummySession($concours),
+            session: $this->dummySession($test),
             reponses: $reponses,
             nom: "NOM TEST",
             prenom: "PRENOM TEST",

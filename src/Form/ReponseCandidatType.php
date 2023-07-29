@@ -29,7 +29,7 @@ class ReponseCandidatType extends AbstractType
             "choices" => $this->session_repository->choices()])
             ->add("nom", TextType::class)
             ->add("prenom", TextType::class)
-            ->add("nom_jeune_fille", TextType::class)
+            ->add("nom_jeune_fille", TextType::class, ["empty_data" => ""])
             ->add("niveau_scolaire", ChoiceType::class, [
                 "choices" => $this->niveau_scolaire_repository->choices()
             ])
@@ -40,9 +40,9 @@ class ReponseCandidatType extends AbstractType
                     "Femme" => ReponseCandidat::INDEX_FEMME
                 ]
             ])
-            ->add("reserve", TextType::class)
-            ->add("autre_1", TextType::class)
-            ->add("autre_2", TextType::class)
+            ->add("reserve", TextType::class, ["empty_data" => ""])
+            ->add("autre_1", TextType::class, ["empty_data" => ""])
+            ->add("autre_2", TextType::class, ["empty_data" => ""])
             ->add("code_barre", IntegerType::class)
             ->add("reponses", TextType::class, [
                 "getter" => function (ReponseCandidat $reponse_candidat) {

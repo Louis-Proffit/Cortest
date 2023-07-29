@@ -11,8 +11,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 #[ORM\Entity(repositoryClass: SgapRepository::class)]
-#[UniqueEntity('indice')]
-#[UniqueEntity('nom')]
+#[UniqueEntity('indice', message: "Cet indice existe déjà.")]
+#[UniqueEntity('nom', message: "Ce nom existe déjà.")]
 class Sgap
 {
     #[ORM\Id]

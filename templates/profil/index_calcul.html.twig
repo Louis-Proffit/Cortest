@@ -2,7 +2,7 @@
 
 {% block content %}
     <br>
-    <h1>Profils</h1>
+    <h1>Scores étalonnés</h1>
     <br>
     <div class="row row-cols-auto">
         <div class="col">
@@ -30,6 +30,8 @@
             <dl class="row">
                 <dt class="col-md-3">Date</dt>
                 <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
+                <dt class="col-md-3">Test</dt>
+                <dd class="col-md-9">{{ session.test.nom }}</dd>
                 <dt class="col-md-3">SGAP</dt>
                 <dd class="col-md-9">{{ session.sgap.nom }}</dd>
             </dl>
@@ -53,11 +55,12 @@
             </thead>
             <tbody>
             {% for reponse in reponses_candidats %}
-                <tr>
+                <tr class="align-middle">
                     <td>{{ reponse.nom }}</td>
                     <td>{{ reponse.prenom }}</td>
                     <td>
-                        <a href="{{ path("pdf_form_single", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
+                        <a class="btn btn-link fw-bold"
+                           href="{{ path("pdf_form_single", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
                     </td>
                     {% for echelle in correcteur.echelles %}
                         <td>{{ profils[reponse.id][echelle.echelle.nom_php] }}</td>

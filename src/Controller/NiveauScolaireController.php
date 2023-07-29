@@ -21,7 +21,7 @@ class NiveauScolaireController extends AbstractController
         NiveauScolaireRepository $niveauScolaireRepository
     ): Response
     {
-        $items = $niveauScolaireRepository->findAll();
+        $items = $niveauScolaireRepository->findBy(criteria: [], orderBy: ["indice" => "ASC"]);
 
         return $this->render("niveau_scolaire/index.html.twig", ["items" => $items]);
     }

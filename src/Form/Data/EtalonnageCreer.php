@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class EtalonnageCreer
 {
 
-    public Structure $profil;
+    public Structure $structure;
 
     #[GreaterThanOrEqual(2, message: "Le nombre de classes doit être supérieur à deux")]
     public int $nombre_classes;
@@ -24,7 +24,7 @@ class EtalonnageCreer
      */
     public function __construct(Structure $profil, int $nombre_classes, string $nom)
     {
-        $this->profil = $profil;
+        $this->structure = $profil;
         $this->nombre_classes = $nombre_classes;
         $this->nom = $nom;
     }

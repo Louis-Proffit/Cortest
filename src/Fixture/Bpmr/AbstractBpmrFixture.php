@@ -7,12 +7,10 @@ use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\EchelleEtalonnage;
-use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
-use App\Entity\Graphique;
 use App\Entity\NiveauScolaire;
 use App\Entity\Structure;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Entity\Sgap;
@@ -164,7 +162,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
     protected function questionsTypeIndexAsValue(Concours $concours, array $indexes, string $type): void
     {
         foreach ($indexes as $index) {
-            $concours->questions->add(new QuestionConcours(
+            $concours->questions->add(new QuestionTest(
                 id: 0,
                 indice: $index,
                 intitule: "Q" . $index,
@@ -178,7 +176,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
     protected function questionsTypeIndexAsKey(Concours $concours, array $index_to_any, string $type): void
     {
         foreach ($index_to_any as $index => $any) {
-            $concours->questions->add(new QuestionConcours(
+            $concours->questions->add(new QuestionTest(
                 id: 0,
                 indice: $index,
                 intitule: "Q" . $index,

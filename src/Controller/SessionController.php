@@ -9,6 +9,7 @@ use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
 use App\Repository\SessionRepository;
 use App\Repository\SgapRepository;
+use App\Repository\TestRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,7 +31,7 @@ class SessionController extends AbstractController
     ): Response
     {
         /** @var array $session */
-        $sessions = $sessionRepository->findBy(array(), array('id' => 'desc'));
+        $sessions = $sessionRepository->findBy([], ['id' => 'desc']);
 
         $grilles = $grilleRepository->indexToInstance();
 
@@ -41,19 +42,18 @@ class SessionController extends AbstractController
     public function creer(
         EntityManagerInterface $entityManager,
         SgapRepository         $sgapRepository,
-        ConcoursRepository     $concoursRepository,
+        TestRepository         $testRepository,
         Request                $request): Response
     {
-        $concours = $concoursRepository->findAll();
+        $tests = $testRepository->findAll();
         $sgaps = $sgapRepository->findAll();
-
 
         if (empty($sgaps)) {
             $this->addFlash("warning", "Pas de SGAP disponible, veuillez en créer un.");
             return $this->redirectToRoute("sgap_index");
         }
 
-        if (empty($concours)) {
+        if (empty($tests)) {
             $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
             return $this->redirectToRoute("concours_index");
         }
@@ -63,7 +63,7 @@ class SessionController extends AbstractController
             date: new DateTime("now"),
             numero_ordre: 0,
             observations: "",
-            concours: $concours[0],
+            test: $tests[0],
             sgap: $sgaps[0],
             reponses_candidats: new ArrayCollection()
         );
@@ -131,7 +131,6 @@ class SessionController extends AbstractController
                               ReponsesCandidatStorage $reponsesCandidatStorage,
                               Session                 $session): Response
     {
-
         $reponsesCandidatStorage->set(array()); // TODO be more specific ?, that is very conservative
 
         $logger->info("Suppression de la session : " . $session->id);

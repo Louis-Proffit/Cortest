@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Structures</h1>
+    <br>
+    <p class="lead">Liste des structures utilisables par l'application Cortest.</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("structure_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Echelles</th>
+            <th>Consulter</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for profil in structures %}
+            <tr>
+                <td>{{ profil.nom }}</td>
+                <td>
+                    {% for echelle in profil.echelles %}
+                        <p>{{ echelle.nom }} - {{ echelle.nom_php }}</p>
+                    {% endfor %}
+                </td>
+                <td><a class="btn btn-link fw-bold"
+                       href="{{ path('structure_consulter', {"id":profil.id}) }}">Lien</a>
+                </td>
+                <td><a class="btn btn-link fw-bold"
+                       href="{{ path('structure_modifier', {"id":profil.id}) }}">Lien</a>
+                </td>
+                <td><a class="btn btn-link fw-bold"
+                       href="{{ path('structure_supprimer', {"id":profil.id}) }}">Lien</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

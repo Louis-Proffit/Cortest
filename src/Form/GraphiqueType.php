@@ -30,7 +30,7 @@ class GraphiqueType extends AbstractType
     {
 
         $builder->add("nom", TextType::class)
-            ->add("profil", ChoiceType::class, [
+            ->add("structure", ChoiceType::class, [
                 "choices" => $this->profilRepository->choices()
             ])
             ->add(self::FILE_KEY, FileType::class, [

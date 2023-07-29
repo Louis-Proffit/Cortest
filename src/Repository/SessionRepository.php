@@ -56,7 +56,7 @@ class SessionRepository extends ServiceEntityRepository
 
         $result = [];
         foreach ($sessions as $session) {
-            $result[$session->id . " | " . $session->test->intitule . " | " . $session->date->format("d-m-Y") . " | " . $session->sgap->nom] = $session;
+            $result[$session->id . " | " . $session->test->nom . " | " . $session->date->format("d-m-Y") . " | " . $session->sgap->nom] = $session;
         }
 
         return $result;

@@ -3,10 +3,20 @@
 {% block content %}
 
     <br>
-    <h1>Configurer un correcteur</h1>
+    <h1>Modifier un correcteur</h1>
     <br>
     {{ form_start(form) }}
+    <div class="note note-info">
+        Le nom d'un correcteur n'est utilisé que pour se repérer dans Cortest.
+    </div>
+    <br>
     {{ form_row(form.nom) }}
+    <br>
+    <div class="note note-info">
+        Les correcteurs peuvent s'appliquer à un ou plusieurs tests.
+    </div>
+    <br>
+    {{ form_row(form.tests) }}
     <br>
     {% for fonction in fonctions %}
         <div class="alert alert-info mb-3">
@@ -18,7 +28,9 @@
     <br>
     {% for echelleCorrecteur in form.echelles %}
         <div class="mb-3">
-            <div class="form-label">{{ echelleCorrecteur.vars.value.echelle.nom }} ( {{ echelleCorrecteur.vars.value.echelle.type }} ) </div>
+            <div class="form-label">{{ echelleCorrecteur.vars.value.echelle.nom }}
+                ( {{ echelleCorrecteur.vars.value.echelle.type }} )
+            </div>
             {{ form_widget(echelleCorrecteur.expression) }}
         </div>
     {% endfor %}

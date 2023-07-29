@@ -33,7 +33,7 @@ class Test
     #[ORM\Column]
     public int $index_grille;
 
-    #[ORM\ManyToMany(targetEntity: Concours::class, mappedBy: "tests")]
+    #[ORM\ManyToMany(targetEntity: Concours::class, inversedBy: "tests")]
     public Collection $concours;
 
     #[ORM\ManyToMany(targetEntity: Correcteur::class, mappedBy: "tests")]
@@ -43,7 +43,7 @@ class Test
     public Collection $sessions;
 
     #[ORM\OrderBy(["indice" => "ASC"])]
-    #[ORM\OneToMany(mappedBy: "test", targetEntity: QuestionConcours::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(mappedBy: "test", targetEntity: QuestionTest::class, cascade: ["persist", "remove"])]
     public Collection $questions;
 
     /**

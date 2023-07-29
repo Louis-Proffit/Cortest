@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class CortestUserType extends AbstractType
 {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add("username", TextType::class, ["label" => "Nom d'utilisateur"])
             ->add("role", ChoiceType::class, [

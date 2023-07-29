@@ -17,6 +17,8 @@
         <tr>
             <th>Indice</th>
             <th>Nom</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -24,6 +26,8 @@
             <tr>
                 <td>{{ sgap.indice }}</td>
                 <td>{{ sgap.nom }}</td>
+                <td><a class="btn btn-link fw-bold" href="{{ path("sgap_modifier",{"id":sgap.id}) }}">Lien</a></td>
+                <td><a class="btn btn-link fw-bold" href="{{ path("sgap_supprimer",{"id":sgap.id}) }}">Lien</a></td>
                 <td>
             </tr>
         {% endfor %}

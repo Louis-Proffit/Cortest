@@ -12,12 +12,10 @@ use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
-use App\Form\Data\CorrecteurCreer;
 use App\Form\ImportCorrecteurType;
-use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
-use App\Repository\GrilleRepository;
 use App\Repository\StructureRepository;
+use App\Repository\TestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -36,28 +34,22 @@ class CorrecteurController extends AbstractController
 {
     #[Route("/index", name: 'index')]
     public function index(
-        CorrecteurRepository $correcteurRepository,
-        GrilleRepository     $grilleRepository
+        CorrecteurRepository $correcteurRepository
     ): Response
     {
         $correcteurs = $correcteurRepository->findAll();
 
-        $grilles = $grilleRepository->indexToInstance();
-
         return $this->render('correcteur/index.html.twig',
-            ["correcteurs" => $correcteurs, "grilles" => $grilles]);
+            ["correcteurs" => $correcteurs]);
     }
 
     #[Route("/consulter/{id}", name: 'consulter')]
     public function consulter(
-        GrilleRepository $grilleRepository,
-        Correcteur       $correcteur
+        Correcteur $correcteur
     ): Response
     {
-        $grille = $grilleRepository->getFromIndex($correcteur->tests->index_grille);
-
         return $this->render("correcteur/correcteur.html.twig",
-            ["correcteur" => $correcteur, "grille" => $grille]);
+            ["correcteur" => $correcteur]);
     }
 
     #[Route("/importer", name: "importer")]
@@ -84,7 +76,7 @@ class CorrecteurController extends AbstractController
 
                 $errors = $validator->validate($correcteur);
 
-                if(count($errors) == 0) {
+                if (count($errors) == 0) {
                     $entityManager->persist($correcteur);
                     $entityManager->flush();
 
@@ -106,49 +98,40 @@ class CorrecteurController extends AbstractController
     #[Route("/creer", name: "creer")]
     public function creer(
         EntityManagerInterface $entityManager,
-        ConcoursRepository     $concoursRepository,
-        StructureRepository    $profilRepository,
+        TestRepository         $testRepository,
+        StructureRepository    $structureRepository,
         Request                $request
     ): Response
     {
-        $profils = $profilRepository->findAll();
+        $structures = $structureRepository->findAll();
 
-        if (empty($profils)) {
-            $this->addFlash("warning", "Pas de profils disponibles, veuillez en créer un.");
-            return $this->redirectToRoute("profil_index");
+        if (empty($structures)) {
+            $this->addFlash("warning", "Pas de structures disponibles, veuillez en créer un.");
+            return $this->redirectToRoute("structure_index");
         }
 
-        $allConcours = $concoursRepository->findAll();
+        $tests = $testRepository->findAll();
 
-        if (empty($allConcours)) {
-            $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
-            return $this->redirectToRoute("concours_index");
+        if (empty($tests)) {
+            $this->addFlash("warning", "Pas de tests disponible, veuillez en créer au moins un.");
+            return $this->redirectToRoute("test_index");
         }
 
-        $correcteurCreer = new CorrecteurCreer(
-            profil: $profils[0],
-            concours: $allConcours[0],
-            nom: ""
+        $correcteur = new Correcteur(
+            id: 0,
+            tests: new ArrayCollection(),
+            structure: $structures[0],
+            nom: "",
+            echelles: new ArrayCollection()
         );
 
-        $form = $this->createForm(CorrecteurCreerType::class, $correcteurCreer);
+        $form = $this->createForm(CorrecteurCreerType::class, $correcteur);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $profil = $correcteurCreer->profil;
-            $concours = $correcteurCreer->concours;
-
-            $correcteur = new Correcteur(
-                id: 0,
-                concours: $concours,
-                profil: $profil,
-                nom: $correcteurCreer->nom,
-                echelles: new ArrayCollection()
-            );
-
-            foreach ($profil->echelles as $echelle) {
+            foreach ($correcteur->structure->echelles as $echelle) {
 
                 $echelleCorrecteur = new EchelleCorrecteur(
                     id: 0, expression: "0", echelle: $echelle, correcteur: $correcteur
@@ -167,7 +150,7 @@ class CorrecteurController extends AbstractController
             return $this->redirectToRoute("correcteur_modifier", ["id" => $correcteur->id]);
         }
 
-        return $this->render("correcteur/form.html.twig", ["form" => $form->createView()]);
+        return $this->render("correcteur/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
@@ -192,7 +175,7 @@ class CorrecteurController extends AbstractController
 
         $fonctions = $cortestExpressionLanguage->getCortestFunctions();
 
-        return $this->render("correcteur/modifier.html.twig",
+        return $this->render("correcteur/form_modifier.html.twig",
             ["form" => $form->createView(), "fonctions" => $fonctions]);
     }
 

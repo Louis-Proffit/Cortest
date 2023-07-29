@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Tests</h1>
+    <br>
+    <p class="lead">Liste des tests disponibles.</p>
+    <br>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path("test_creer") }}">Créer</a>
+        </div>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Version batterie</th>
+            <th>Grille</th>
+            <th>Consulter</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for test in tests %}
+            <tr class="align-middle">
+                <td>{{ test.nom }}</td>
+                <td>{{ test.version_batterie }}</td>
+                <td>{{ grilles[test.index_grille].nom }}</td>
+                <td>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("test_consulter", {"id":test.id}) }}">Lien</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endblock %}
+

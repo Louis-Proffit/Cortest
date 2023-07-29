@@ -20,6 +20,13 @@ class SessionCorrecteurMatcher
      */
     public function match(Session $session, Correcteur $correcteur): bool
     {
-        return $session->test->id === $correcteur->tests->id;
+        $testId = $session->test->id;
+
+        foreach ($correcteur->tests as $test) {
+            if ($test->id == $testId) {
+                return true;
+            }
+        }
+        return false;
     }
 }

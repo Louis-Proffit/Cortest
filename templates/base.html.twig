@@ -10,7 +10,6 @@
     <title>{% block title %}Cortest{% endblock %}</title>
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     {% endblock %}
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
@@ -38,7 +37,7 @@
                                 <a class="nav-link" href="{{ path("recherche_index") }}">Recherche</a>
                             </li>
                             {% if is_granted("ROLE_PSYCHOLOGUE") %}
-                                
+
                                 {% if is_granted("ROLE_ADMINISTRATEUR") %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{ path("admin_index") }}">Admin</a>
@@ -53,7 +52,10 @@
                                             <a class="nav-link" href="{{ path("grille_index") }}">Grilles</a>
                                         </li>
                                         <li class="dropdown-item">
-                                            <a class="nav-link" href="{{ path("profil_index") }}">Profils</a>
+                                            <a class="nav-link" href="{{ path("test_index") }}">Tests</a>
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <a class="nav-link" href="{{ path("structure_index") }}">Structures</a>
                                         </li>
                                         <li class="dropdown-item">
                                             <a class="nav-link" href="{{ path("sgap_index") }}">SGAPs</a>
@@ -69,14 +71,14 @@
                                             <a class="nav-link" href="{{ path("echelle_index") }}">Echelles</a>
                                         </li>
                                         <li class="dropdown-item">
-                                    <a class="nav-link" href="{{ path("correcteur_index") }}">Correcteurs</a>
-                                </li>
-                                <li class="dropdown-item">
-                                    <a class="nav-link" href="{{ path("etalonnage_index") }}">Etalonnages</a>
-                                </li>
-                                <li class="dropdown-item">
-                                    <a class="nav-link" href="{{ path("graphique_index") }}">Graphiques</a>
-                                </li>
+                                            <a class="nav-link" href="{{ path("correcteur_index") }}">Correcteurs</a>
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <a class="nav-link" href="{{ path("etalonnage_index") }}">Etalonnages</a>
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <a class="nav-link" href="{{ path("graphique_index") }}">Graphiques</a>
+                                        </li>
                                     </ul>
                                 </li>
                             {% endif %}

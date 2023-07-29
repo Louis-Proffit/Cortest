@@ -13,26 +13,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CorrecteurChoiceType extends AbstractType
 {
     const OPTION_SESSION = "session";
-
-    public function __construct(
-        private readonly CorrecteurRepository $repository
-    )
-    {
-    }
+    
 
     private function definitionCorrecteurChoice(Session $session): array
     {
-        $correcteurs = $this->repository->findBy(["concours" => $session->test]);
-
         $result = [];
-        foreach ($correcteurs as $correcteur) {
+
+        foreach ($session->test->correcteurs as $correcteur) {
             $result[$correcteur->nom] = $correcteur;
         }
 
         return $result;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             "correcteur",

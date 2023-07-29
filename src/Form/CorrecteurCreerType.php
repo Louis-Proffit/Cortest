@@ -3,9 +3,12 @@
 namespace App\Form;
 
 use App\Constraint\UniqueDTO;
+use App\Entity\Test;
 use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
 use App\Repository\StructureRepository;
+use App\Repository\TestRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,27 +19,19 @@ class CorrecteurCreerType extends AbstractType
 {
 
     public function __construct(
-        private readonly StructureRepository  $profil_repository,
-        private readonly ConcoursRepository   $concours_repository,
-        private readonly CorrecteurRepository $correcteurRepository,
+        private readonly StructureRepository $structureRepository
     )
     {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public
+    function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add("profil", ChoiceType::class, [
-                "choices" => $this->profil_repository->choices()
+            ->add("nom", TextType::class, ["label" => "Nom"])
+            ->add("structure", ChoiceType::class, [
+                "choices" => $this->structureRepository->choices()
             ])
-            ->add("concours", ChoiceType::class, [
-                "choices" => $this->concours_repository->choices()
-            ])
-            ->add("nom",
-                TextType::class,
-                ['constraints' => new UniqueDTO(field: 'nom',
-                    message: 'Ce nom existe deja',
-                    repository: $this->correcteurRepository)])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 

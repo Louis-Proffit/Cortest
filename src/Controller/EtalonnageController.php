@@ -2,20 +2,15 @@
 
 namespace App\Controller;
 
-use App\Core\Etalonnage\EtalonnageManager;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
-use App\Form\Data\EchelleEtalonnageGaussienCreer;
 use App\Form\Data\EtalonnageCreer;
-use App\Form\Data\EtalonnageGaussienCreer;
 use App\Form\EtalonnageCreerType;
-use App\Form\EtalonnageGaussienType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
 use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,19 +50,19 @@ class EtalonnageController extends AbstractController
     #[Route("/creer/simple", name: "creer_simple")]
     public function creerSimple(
         EntityManagerInterface $entityManager,
-        StructureRepository    $profilRepository,
+        StructureRepository    $structureRepository,
         Request                $request
     ): Response
     {
-        $profils = $profilRepository->findAll();
+        $structures = $structureRepository->findAll();
 
-        if (empty($profils)) {
-            $this->addFlash("warning", "Pas de profils disponibles, créez en un");
-            return $this->redirectToRoute("profil_index");
+        if (empty($structures)) {
+            $this->addFlash("warning", "Pas de structures disponibles, veuillez en créer une.");
+            return $this->redirectToRoute("structure_index");
         }
 
         $etalonnageCreer = new EtalonnageCreer(
-            profil: $profils[0],
+            profil: $structures[0],
             nombre_classes: 0,
             nom: ""
         );
@@ -79,21 +74,23 @@ class EtalonnageController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $nombreClasses = $etalonnageCreer->nombre_classes;
-            $profil = $etalonnageCreer->profil;
+            $profil = $etalonnageCreer->structure;
 
             $etalonnage = new Etalonnage(
                 id: 0,
-                profil: $profil,
+                structure: $profil,
                 nom: $etalonnageCreer->nom,
                 nombre_classes: $nombreClasses,
                 echelles: new ArrayCollection()
             );
 
             foreach ($profil->echelles as $echelle) {
-                $etalonnage->echelles->add(EchelleEtalonnage::rangeEchelle(
-                    $echelle,
-                    $etalonnage,
-                    $nombreClasses
+
+                $etalonnage->echelles->add(new EchelleEtalonnage(
+                    id: 0,
+                    bounds: range(1, $nombreClasses - 1),
+                    echelle: $echelle,
+                    etalonnage: $etalonnage
                 ));
             }
 
@@ -110,19 +107,19 @@ class EtalonnageController extends AbstractController
     #[Route("/creer/gaussien", name: "creer_gaussien")]
     public function creerGaussien(
         EntityManagerInterface $entityManager,
-        StructureRepository    $profilRepository,
+        StructureRepository    $structureRepository,
         Request                $request
     ): Response
     {
-        $profils = $profilRepository->findAll();
+        /*$structures = $structureRepository->findAll();
 
-        if (empty($profils)) {
-            $this->addFlash("warning", "Pas de profils disponibles, créez en un");
-            return $this->redirectToRoute("profil_index");
+        if (empty($structures)) {
+            $this->addFlash("warning", "Pas de structure disponible, veuillez en créer une.");
+            return $this->redirectToRoute("structure_index");
         }
 
         $etalonnageCreer = new EtalonnageCreer(
-            profil: $profils[0],
+            profil: $structures[0],
             nombre_classes: 0,
             nom: ""
         );
@@ -134,11 +131,11 @@ class EtalonnageController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $nombreClasses = $etalonnageCreer->nombre_classes;
-            $profil = $etalonnageCreer->profil;
+            $profil = $etalonnageCreer->structure;
 
             $etalonnage = new Etalonnage(
                 id: 0,
-                profil: $profil,
+                structure: $profil,
                 nom: $etalonnageCreer->nom,
                 nombre_classes: $nombreClasses,
                 echelles: new ArrayCollection()
@@ -159,10 +156,12 @@ class EtalonnageController extends AbstractController
             return $this->redirectToRoute("etalonnage_ajout_echelles_gaussiennes", ["id" => $etalonnage->id]);
         }
 
-        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);*/
+        $this->addFlash("danger", "Pas encore implémenté");
+        return $this->redirectToRoute("home");
     }
 
-    #[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
+    /*#[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
     public function ajoutEchellesGaussiennes(
         EntityManagerInterface $entityManager,
         EtalonnageManager      $etalonnageManager,
@@ -195,7 +194,7 @@ class EtalonnageController extends AbstractController
         }
 
         return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
-    }
+    }*/
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
@@ -211,7 +210,6 @@ class EtalonnageController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $entityManager->flush();
-
             return $this->redirectToRoute("etalonnage_consulter", ["id" => $etalonnage->id]);
 
         }
@@ -231,7 +229,7 @@ class EtalonnageController extends AbstractController
         $entityManager->remove($etalonnage);
         $entityManager->flush();
 
-        $this->addFlash("success", "Etalonnage supprimé");
+        $this->addFlash("success", "Etalonnage supprimé.");
 
         return $this->redirectToRoute("etalonnage_index");
     }

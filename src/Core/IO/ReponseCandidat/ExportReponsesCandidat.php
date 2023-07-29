@@ -2,7 +2,7 @@
 
 namespace App\Core\IO\ReponseCandidat;
 
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Entity\ReponseCandidat;
 
 class ExportReponsesCandidat
@@ -41,7 +41,7 @@ class ExportReponsesCandidat
         $data = [];
 
         if (!empty($reponses)) {
-            /** @var QuestionConcours[] $questions */
+            /** @var QuestionTest[] $questions */
             $questions = $reponses[0]->session->test->questions;
 
             foreach ($reponses as $reponse) {

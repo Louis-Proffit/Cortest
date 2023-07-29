@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\ProfilController;
+use App\Controller\StructureController;
 use App\Repository\StructureRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;

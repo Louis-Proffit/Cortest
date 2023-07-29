@@ -14,13 +14,13 @@ use Symfony\Component\Validator\Constraints\Positive;
 #[ORM\UniqueConstraint(fields: self::UNIQUE_FIELDS_INDICE)]
 #[UniqueEntity(fields: self::UNIQUE_FIELDS_ABREVIATION, message: "Cette abréviation existe déjà dans le même concours", errorPath: "abreviation")]
 #[UniqueEntity(fields: self::UNIQUE_FIELDS_INDICE, message: "Cet indice existe déjà dans le même concours", errorPath: "indice")]
-class QuestionConcours
+class QuestionTest
 {
     const MAX_LEN_INTITULE = 50;
     const MAX_LEN_ABREVIATION = 10;
 
-    const UNIQUE_FIELDS_ABREVIATION = ["concours", "abreviation"];
-    const UNIQUE_FIELDS_INDICE = ["concours", "indice"];
+    const UNIQUE_FIELDS_ABREVIATION = ["test", "abreviation"];
+    const UNIQUE_FIELDS_INDICE = ["test", "indice"];
 
     const TYPE_INUTILISE = "Inutilisé";
     const TYPE_VRAI_FAUX = "Vrai ou faux";

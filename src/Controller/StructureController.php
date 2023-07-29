@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Echelle;
 use App\Entity\Structure;
-use App\Form\CreerProfilType;
-use App\Form\ProfilType;
+use App\Form\CreerStructureType;
+use App\Form\StructureType;
 use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,27 +16,37 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route("/profil", name: "profil_")]
-class ProfilController extends AbstractController
+#[Route("/structure", name: "structure_")]
+class StructureController extends AbstractController
 {
 
     #[Route("/index", name: "index")]
     public function index(
-        StructureRepository $profilRepository
+        StructureRepository $structureRepository
     ): Response
     {
-        $items = $profilRepository->findAll();
+        $structures = $structureRepository->findAll();
 
-        return $this->render("profil/index.html.twig", ["items" => $items]);
+        return $this->render("structure/index.html.twig", ["structures" => $structures]);
+    }
+
+    #[Route("/consulter/{id}", name: "consulter")]
+    public function consulter(
+        Structure $structure
+    ): Response
+    {
+        // TODO implémenter
+        $this->addFlash("danger", "Pas encore implémenté.");
+        return $this->redirectToRoute("home");
     }
 
     #[Route("/creer", name: "creer")]
     public function creer(
         EntityManagerInterface $entityManager,
         Request                $request
-    ): RedirectResponse|Response
+    ): Response
     {
-        $item = new Structure(
+        $structure = new Structure(
             id: 0,
             nom: "",
             echelles: new ArrayCollection(),
@@ -44,12 +54,14 @@ class ProfilController extends AbstractController
             graphiques: new ArrayCollection()
         );
 
-        $form = $this->createForm(CreerProfilType::class, $item);
+        $form = $this->createForm(CreerStructureType::class, $structure);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            for ($i = 0; $i < $form[CreerProfilType::ECHELLES_COUNT_KEY]->getData(); $i++) {
+            $echelleCount = $form[CreerStructureType::ECHELLES_COUNT_KEY]->getData();
+
+            for ($i = 1; $i <= $echelleCount; $i++) {
                 $echelle = new Echelle(
                     id: 0,
                     nom: "Echelle " . $i . " (A MODIFIER)",
@@ -57,33 +69,30 @@ class ProfilController extends AbstractController
                     type: Echelle::TYPE_ECHELLE_SIMPLE,
                     echelles_correcteur: new ArrayCollection(),
                     echelles_etalonnage: new ArrayCollection(),
-                    echelles_graphiques: new ArrayCollection(),
-                    structure: $item
+                    structure: $structure
                 );
-                $item->echelles->add($echelle);
 
-                $entityManager->persist($echelle);
+                $structure->echelles->add($echelle);
             }
 
-            $entityManager->persist($item);
+            $entityManager->persist($structure);
             $entityManager->flush();
 
-            return $this->redirectToRoute("profil_index");
+            return $this->redirectToRoute("structure_index");
 
         }
 
-        return $this->render("profil/form_creer.html.twig", ["form" => $form->createView()]);
+        return $this->render("structure/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
         EntityManagerInterface $entityManager,
         Request                $request,
-        Structure $profil
+        Structure              $structure
     ): RedirectResponse|Response
     {
-
-        $form = $this->createForm(ProfilType::class, $profil);
+        $form = $this->createForm(StructureType::class, $structure);
 
         $form->handleRequest($request);
 
@@ -91,25 +100,25 @@ class ProfilController extends AbstractController
 
             $entityManager->flush();
 
-            return $this->redirectToRoute("profil_index");
+            return $this->redirectToRoute("structure_index");
         }
 
-        return $this->render("profil/form_modifier.html.twig", ["form" => $form->createView()]);
+        return $this->render("structure/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
-        Structure              $profil): RedirectResponse
+        Structure              $structure): RedirectResponse
     {
-        $logger->info("Suppression du profil : " . $profil->id);
+        $logger->info("Suppression de la structure : " . $structure->id);
 
-        $entityManager->remove($profil);
+        $entityManager->remove($structure);
         $entityManager->flush();
 
-        $this->addFlash("success", "Suppression du profil enregistrée.");
+        $this->addFlash("success", "La structure a bien été modifiée.");
 
-        return $this->redirectToRoute("profil_index");
+        return $this->redirectToRoute("structure_index");
     }
 }

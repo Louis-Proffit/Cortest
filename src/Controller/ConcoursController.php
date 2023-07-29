@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Concours;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use App\Form\ConcoursType;
-use App\Form\CreerConcoursType;
 use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,15 +27,12 @@ class ConcoursController extends AbstractController
      */
     #[Route("/index", name: "index")]
     public function index(
-        ConcoursRepository $concoursRepository,
-        GrilleRepository   $grilleRepository,
+        ConcoursRepository $concoursRepository
     ): Response
     {
-        $items = $concoursRepository->findAll();
+        $concours = $concoursRepository->findAll();
 
-        $grilles = $grilleRepository->indexToInstance();
-
-        return $this->render("concours/index.html.twig", ["items" => $items, "grilles" => $grilles]);
+        return $this->render("concours/index.html.twig", ["concours" => $concours]);
     }
 
     /**
@@ -47,13 +43,10 @@ class ConcoursController extends AbstractController
      */
     #[Route("/consulter/{id}", name: "consulter")]
     public function consulter(
-        GrilleRepository $grilleRepository,
-        Concours         $concours,
+        Concours $concours,
     ): Response
     {
-        $grille = $grilleRepository->getFromIndex($concours->index_grille);
-
-        return $this->render("concours/concours.html.twig", ["concours" => $concours, "grille" => $grille]);
+        return $this->render("concours/concours.html.twig", ["concours" => $concours]);
     }
 
     /**
@@ -66,28 +59,25 @@ class ConcoursController extends AbstractController
     #[Route("/creer", name: "creer")]
     public function creer(
         EntityManagerInterface $entityManager,
-        GrilleRepository       $grilleRepository,
         Request                $request
     ): RedirectResponse|Response
     {
         $concours = new Concours(
             id: 0,
             nom: "",
-            correcteurs: new ArrayCollection(),
-            sessions: new ArrayCollection(),
-            index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
-            type_concours: 0, version_batterie: 0, questions: new ArrayCollection()
+            type_concours: 0,
+            tests: new ArrayCollection()
         );
 
-        $form = $this->createForm(CreerConcoursType::class, $concours);
+        $form = $this->createForm(ConcoursType::class, $concours);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            QuestionConcours::initQuestions($grilleRepository, $concours);
-
             $entityManager->persist($concours);
             $entityManager->flush();
+
+            $this->addFlash("success", "Le concours a été créé.");
 
             return $this->redirectToRoute("concours_index");
         }
@@ -117,6 +107,8 @@ class ConcoursController extends AbstractController
 
             $entityManager->flush();
 
+            $this->addFlash("success", "Le concours a été modifié.");
+
             return $this->redirectToRoute("concours_consulter", ["id" => $concours->id]);
         }
 
@@ -137,7 +129,7 @@ class ConcoursController extends AbstractController
         $entityManager->remove($concours);
         $entityManager->flush();
 
-        $this->addFlash("success", "Suppression du concours enregistrée.");
+        $this->addFlash("success", "Le concours a été supprimé.");
 
         return $this->redirectToRoute("concours_index");
     }

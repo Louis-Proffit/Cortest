@@ -10,15 +10,14 @@ use App\Core\Files\Pdf\PdfManager;
 use App\Core\Files\Pdf\Renderer;
 use App\Core\GraphiqueFileManager;
 use App\Entity\Graphique;
-use App\Form\CorrecteurEtEtalonnageChoiceType;
-use App\Form\Data\CorrecteurEtEtalonnageChoice;
+use App\Form\TestCorrecteurEtalonnageChoiceType;
+use App\Form\Data\TestCorrecteurEtalonnageChoice;
 use App\Form\GraphiqueType;
 use App\Repository\GraphiqueRepository;
 use App\Repository\StructureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,20 +44,20 @@ class GraphiqueController extends AbstractController
     public function creer(
         GraphiqueFileManager   $graphiqueFileManager,
         EntityManagerInterface $entityManager,
-        StructureRepository    $profilRepository,
+        StructureRepository    $structureRepository,
         Request                $request
     ): Response
     {
-        $profils = $profilRepository->findAll();
+        $structures = $structureRepository->findAll();
 
-        if (empty($profils)) {
+        if (empty($structures)) {
             $this->addFlash("warning", "Pas de profils disponibles, veuillez en créez un");
-            return $this->redirectToRoute("profil_index");
+            return $this->redirectToRoute("structure_index");
         }
 
         $graphique = new Graphique(
             id: 0,
-            profil: $profils[0],
+            structure: $structures[0],
             nom: "",
             file_nom: ""
         );
@@ -80,7 +79,7 @@ class GraphiqueController extends AbstractController
             return $this->redirectToRoute("graphique_index");
         }
 
-        return $this->render("graphique/creer.html.twig", ["form" => $form->createView()]);
+        return $this->render("graphique/form_creer.html.twig", ["form" => $form->createView()]);
     }
 
     /**
@@ -110,7 +109,7 @@ class GraphiqueController extends AbstractController
             return $this->redirectToRoute("graphique_index");
         }
 
-        return $this->render("graphique/modifier.html.twig", ["form" => $form->createView()]);
+        return $this->render("graphique/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
     /**
@@ -124,20 +123,20 @@ class GraphiqueController extends AbstractController
         Request           $request,
         PdfManager        $pdfManager,
         Graphique         $graphique
-    ): BinaryFileResponse|Response
+    ): Response
     {
-        $correcteurEtalonnage = new CorrecteurEtEtalonnageChoice();
+        $correcteurEtalonnage = new TestCorrecteurEtalonnageChoice();
 
-        $form = $this->createForm(CorrecteurEtEtalonnageChoiceType::class, $correcteurEtalonnage, [CorrecteurEtEtalonnageChoiceType::OPTION_PROFIL => $graphique->structure]);
+        $form = $this->createForm(TestCorrecteurEtalonnageChoiceType::class, $correcteurEtalonnage, [TestCorrecteurEtalonnageChoiceType::OPTION_STRUCTURE => $graphique->structure]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $correcteurEtalonnage->both->correcteur;
-            $etalonnage = $correcteurEtalonnage->both->etalonnage;
+            $correcteur = $correcteurEtalonnage->value->correcteur;
+            $etalonnage = $correcteurEtalonnage->value->etalonnage;
 
-            $reponsesCandidat = $renderer->dummyReponse($correcteur->tests);
+            $reponsesCandidat = $renderer->dummyReponse($correcteur->tests[0]);
             $reponsesCandidats = [$reponsesCandidat];
 
             $scores = $correcteurManager->corriger(
@@ -167,7 +166,7 @@ class GraphiqueController extends AbstractController
             return $response;
         }
 
-        return $this->render("graphique/tester_form.twig", ["form" => $form->createView()]);
+        return $this->render("graphique/form_tester.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/download/{id}", name: "download")]
@@ -192,17 +191,19 @@ class GraphiqueController extends AbstractController
         Renderer $renderer,
     ): Response
     {
-        $correcteurEtalonnage = new CorrecteurEtEtalonnageChoice();
-        $form = $this->createForm(CorrecteurEtEtalonnageChoiceType::class, $correcteurEtalonnage);
+        $testCorrecteurEtalonnage = new TestCorrecteurEtalonnageChoice();
+        $form = $this->createForm(TestCorrecteurEtalonnageChoiceType::class, $testCorrecteurEtalonnage);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $correcteurEtalonnage->both->correcteur;
-            $etalonnage = $correcteurEtalonnage->both->etalonnage;
+            $test = $testCorrecteurEtalonnage->value->test;
+            $correcteur = $testCorrecteurEtalonnage->value->correcteur;
+            $etalonnage = $testCorrecteurEtalonnage->value->etalonnage;
 
             $keys = $renderer->optionKeys(
+                test: $test,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage
             );

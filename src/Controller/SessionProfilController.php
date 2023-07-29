@@ -13,8 +13,8 @@ use App\Core\SessionCorrecteurMatcher;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
 use App\Entity\Session;
-use App\Form\CorrecteurEtEtalonnageChoiceType;
-use App\Form\Data\CorrecteurEtEtalonnageChoice;
+use App\Form\TestCorrecteurEtalonnageChoiceType;
+use App\Form\Data\TestCorrecteurEtalonnageChoice;
 use App\Form\Data\EtalonnageChoice;
 use App\Form\EtalonnageChoiceType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -59,19 +59,19 @@ class SessionProfilController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $parametresCalculProfil = new CorrecteurEtEtalonnageChoice();
+        $parametresCalculProfil = new TestCorrecteurEtalonnageChoice();
 
         $form = $this->createForm(
-            CorrecteurEtEtalonnageChoiceType::class,
+            TestCorrecteurEtalonnageChoiceType::class,
             $parametresCalculProfil,
-            [CorrecteurEtEtalonnageChoiceType::OPTION_CONCOURS => $session->test]);
+            [TestCorrecteurEtalonnageChoiceType::OPTION_TEST => $session->test]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $correcteur = $parametresCalculProfil->both->correcteur;
-            $etalonnage = $parametresCalculProfil->both->etalonnage;
+            $correcteur = $parametresCalculProfil->value->correcteur;
+            $etalonnage = $parametresCalculProfil->value->etalonnage;
 
             return $this->redirectToRoute("calcul_profil_index", ["correcteur_id" => $correcteur->id, "etalonnage_id" => $etalonnage->id]);
         }
@@ -124,7 +124,7 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             EtalonnageChoiceType::class,
             $parametres_calcul_profil,
-            [EtalonnageChoiceType::OPTION_PROFIL => $correcteur->structure]);
+            [EtalonnageChoiceType::OPTION_STRUCTURE => $correcteur->structure]);
 
         $form->handleRequest($request);
 

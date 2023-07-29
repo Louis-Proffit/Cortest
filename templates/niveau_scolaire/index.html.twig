@@ -15,19 +15,24 @@
     <table class="table">
         <thead>
         <tr>
-            <th>Nom</th>
             <th>Indice</th>
+            <th>Nom</th>
             <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
         {% for niveau in items %}
             <tr>
-                <td>{{ niveau.nom }}</td>
                 <td>{{ niveau.indice }}</td>
+                <td>{{ niveau.nom }}</td>
                 <td>
-                    <a class="btn btn-link fw-bold btn-rounded"
-                       href="{{ path("niveau_scolaire_modifier", {"id":niveau.id}) }}">Modifier</a>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("niveau_scolaire_modifier", {"id":niveau.id}) }}">Lien</a>
+                </td>
+                <td>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("niveau_scolaire_supprimer", {"id":niveau.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

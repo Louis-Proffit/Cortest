@@ -36,15 +36,15 @@ class Correcteur
     /**
      * @param int $id
      * @param Collection $tests
-     * @param Structure $profil
+     * @param Structure $structure
      * @param string $nom
      * @param Collection $echelles
      */
-    public function __construct(int $id, Collection $tests, Structure $profil, string $nom, Collection $echelles)
+    public function __construct(int $id, Collection $tests, Structure $structure, string $nom, Collection $echelles)
     {
         $this->id = $id;
         $this->tests = $tests;
-        $this->structure = $profil;
+        $this->structure = $structure;
         $this->nom = $nom;
         $this->echelles = $echelles;
     }

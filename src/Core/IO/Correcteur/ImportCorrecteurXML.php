@@ -9,6 +9,7 @@ use App\Entity\EchelleCorrecteur;
 use App\Entity\Structure;
 use App\Repository\ConcoursRepository;
 use App\Repository\StructureRepository;
+use App\Repository\TestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use SimpleXMLElement;
 
@@ -25,7 +26,7 @@ class ImportCorrecteurXML
 
     public function __construct(
         private readonly StructureRepository $profilRepository,
-        private readonly ConcoursRepository  $concoursRepository,
+        private readonly TestRepository      $testRepository,
     )
     {
     }
@@ -50,7 +51,7 @@ class ImportCorrecteurXML
             return false;
         }
         $nom = $xml->{self::NOM_KEY};
-        $correcteur = new Correcteur(id: 0, concours: $concours, profil: $profil, nom: $nom, echelles: new ArrayCollection());
+        $correcteur = new Correcteur(id: 0, tests: $concours, structure: $profil, nom: $nom, echelles: new ArrayCollection());
 
         $echelles = $this->echelles($correcteurXMLErrorHandler, $xml, $correcteur);
 

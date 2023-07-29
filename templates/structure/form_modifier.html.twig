@@ -1,0 +1,49 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+    <h2>Modifier une structure</h2>
+    <br>
+    {{ form_start(form) }}
+    <br>
+    <div class="note note-info">
+        Le nom de la structure permet de la retrouver dans Cortest. Il n'est pas utilisé autrement dans l'application.
+    </div>
+    <br>
+    {{ form_row(form.nom) }}
+    <br>
+    <div class="note note-info">
+        Le nom d'une echelle permet de la retrouver dans Cortest. Il n'est pas utilisé autrement dans l'application.
+    </div>
+    <br>
+    <div class="note note-warning">
+        <p> Le "Nom php" permet de référencer une échelle dans un graphique.</p>
+        <p> Il ne peut contenir que des lettres des chiffres (pas au début) et des caractères '_'.</p>
+    </div>
+    <br>
+    <div class="note note-info">
+        Le type d'une échelle permet de calculer les scores bruts dans l'ordre (échelles simples puis échelles
+        composites).
+    </div>
+    <br>
+    {% for echelle in form.echelles %}
+        <div class="mb-3">
+            <div class="form-label">Echelle <b>{{ echelle.vars.value.nom }}</b></div>
+            <div class="row row-cols-auto">
+                <div class="col">
+                    {{ form_row(echelle.nom) }}
+                </div>
+                <div class="col">
+                    {{ form_row(echelle.nom_php) }}
+                </div>
+                <div class="col">
+                    {{ form_row(echelle.type) }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {{ form_end(form) }}
+
+{% endblock %}
+
+

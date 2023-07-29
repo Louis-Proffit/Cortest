@@ -8,12 +8,12 @@ use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\ReponseCandidat;
 
-class CorrecteurManager
+readonly class CorrecteurManager
 {
 
 
     public function __construct(
-        private readonly CortestExpressionLanguage $cortestExpressionLanguage
+        private CortestExpressionLanguage $cortestExpressionLanguage
     )
     {
     }

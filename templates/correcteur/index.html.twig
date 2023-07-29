@@ -5,35 +5,58 @@
     <br>
     <h1>Correcteurs disponibles</h1>
     <br>
-    <div class="lead">Liste des correcteurs disponibles pour l'application Cortest</div>
-    <br>
     <div class="row row-cols-auto">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("correcteur_creer") }}">Ajouter</a>
+            <a class="btn btn-primary" href="{{ path("correcteur_creer") }}">Créer</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary" href="{{ path("correcteur_importer") }}">Importer</a>
         </div>
     </div>
     <br>
+    <div class="lead">Liste des correcteurs disponibles pour l'application Cortest</div>
+    <br>
+    <div class="note note-info">
+        La structure associée à un correcteur est la structure de score bruts que peut créer le correcteur.
+    </div>
+    <br>
     <table class="table">
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Concours</th>
-            <th scope="col">Nom du profil</th>
+            <th scope="col">Test(s)</th>
+            <th scope="col">Structure associée</th>
             <th scope="col">Consulter</th>
+            <th scope="col">Modifier</th>
+            <th scope="col">Exporter</th>
+            <th scope="col">Supprimer</th>
         </tr>
         </thead>
         <tbody>
         {% for correcteur in correcteurs %}
             <tr>
                 <td>{{ correcteur.nom }}</td>
-                <td>{{ correcteur.concours.nom }}</td>
-                <td>{{ correcteur.profil.nom }}</td>
                 <td>
-                    <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link">
-                        Consulter</a>
+                    {% for test in correcteur.tests %}
+                        <li>{{ test.nom }}</li>
+                    {% endfor %}
+                </td>
+                <td>{{ correcteur.structure.nom }}</td>
+                <td>
+                    <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link fw-bold">
+                        Lien</a>
+                </td>
+                <td>
+                    <a href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}" class="btn btn-link fw-bold">
+                        Lien</a>
+                </td>
+                <td>
+                    <a href="{{ path("correcteur_exporter", {"id":correcteur.id}) }}" class="btn btn-link fw-bold">
+                        Lien</a>
+                </td>
+                <td>
+                    <a href="{{ path("correcteur_supprimer", {"id":correcteur.id}) }}" class="btn btn-link fw-bold link-danger">
+                        Lien</a>
                 </td>
             </tr>
         {% endfor %}

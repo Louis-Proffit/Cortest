@@ -7,7 +7,7 @@ use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\Structure;
-use App\Entity\QuestionConcours;
+use App\Entity\QuestionTest;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class BpmrOffFixture extends AbstractBpmrFixture
@@ -108,13 +108,13 @@ class BpmrOffFixture extends AbstractBpmrFixture
 
     protected function questions(Concours $concours): void
     {
-        $this->questionsTypeIndexAsValue($concours, self::INDEX_EXEMPLES, QuestionConcours::TYPE_EXEMPLE);
+        $this->questionsTypeIndexAsValue($concours, self::INDEX_EXEMPLES, QuestionTest::TYPE_EXEMPLE);
         $this->questionsTypeIndexAsKey(concours: $concours,
             index_to_any: self::ALL_APTITUDES_COGNITIVES,
-            type: QuestionConcours::TYPE_VRAI_FAUX);
+            type: QuestionTest::TYPE_VRAI_FAUX);
         $this->questionsTypeIndexAsKey($concours,
             self::ALL_PERSONNALITE_INDEX_TO_TYPE,
-            QuestionConcours::TYPE_SCORE);
+            QuestionTest::TYPE_SCORE);
     }
 
     private function correcteurEg(

@@ -9,30 +9,8 @@
     <div class="mb-3">
         <button class="btn btn-primary">Enregistrer</button>
     </div>
-    {{ form_row(form.nom) }}
-    {{ form_row(form.version_batterie) }}
+    {{ form_row(form.intitule) }}
     {{ form_row(form.type_concours) }}
-    <br>
-    <hr class="hr hr-blurry">
-    <br>
-    <h3>Type des questions</h3>
-    <br>
-    {% for question in form.questions %}
-        <div class="mb-3">
-            <div class="form-label"><b>Question n°{{ question.vars.value.indice }}</b></div>
-            <div class="row row-cols-auto">
-                <div class="col">
-                    {{ form_row(question.type) }}
-                </div>
-                <div class="col">
-                    {{ form_row(question.intitule) }}
-                </div>
-                <div class="col">
-                    {{ form_row(question.abreviation) }}
-                </div>
-            </div>
-        </div>
-    {% endfor %}
     <div class="mb-3">
         <button class="btn btn-primary">Enregistrer</button>
     </div>
