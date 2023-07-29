@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 
@@ -25,7 +26,8 @@ class Resource
     public string $nom;
 
     #[NotBlank]
-    #[ORM\Column]
+    #[Length(max: 256)]
+    #[ORM\Column(length: 256)]
     public string $file_nom;
 
     #[ORM\ManyToOne(targetEntity: CortestUser::class)]

@@ -4,7 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.res_dir: '%kernel.project_dir%/var/res'
+    app.resource_dir: '%kernel.project_dir%/var/resource'
+    app.graphique_dir: '%kernel.project_dir%/var/graphique'
 
 services:
     # default configuration for services in *this* file
@@ -31,9 +32,14 @@ services:
     app.pdf_merger: '@App\Core\Files\Pdf\Merger\Impl\PdfunitePdfMerger'
     App\Core\Files\Pdf\Merger\PdfMerger: '@app.pdf_merger'
 
-    App\Core\ResourceManager:
+    App\Core\ResourceFileManager:
         arguments:
-            $dir: '%app.res_dir%'
+            $dir: '%app.resource_dir%'
+
+
+    App\Core\GraphiqueFileManager:
+        arguments:
+            $dir: '%app.graphique_dir%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

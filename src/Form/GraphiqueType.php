@@ -18,6 +18,7 @@ class GraphiqueType extends AbstractType
 {
 
     const ALLOWED_FILE_EXTENSION = "twig";
+    const FILE_KEY = "file";
 
     public function __construct(
         private readonly ProfilRepository $profilRepository,
@@ -32,13 +33,13 @@ class GraphiqueType extends AbstractType
             ->add("profil", ChoiceType::class, [
                 "choices" => $this->profilRepository->choices()
             ])
-            ->add("file_content", FileType::class, [
+            ->add(self::FILE_KEY, FileType::class, [
                 "label" => "Fichier de contenu",
                 "getter" => function (Graphique $graphique, FormInterface $form) {
                     return null;
                 },
                 "setter" => function (Graphique $graphique, UploadedFile $uploadedFile, FormInterface $form) {
-                    $graphique->content = $uploadedFile->getContent();
+                    $graphique->file_nom = $uploadedFile->getClientOriginalName();
                 },
                 "constraints" => [
                     new File([

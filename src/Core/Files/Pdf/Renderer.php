@@ -2,6 +2,8 @@
 
 namespace App\Core\Files\Pdf;
 
+use App\Core\Exception\MissingFileException;
+use App\Core\GraphiqueFileManager;
 use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
@@ -51,8 +53,9 @@ class Renderer
 
 
     public function __construct(
-        private readonly Environment $environment,
-        private readonly string      $separator = "/"
+        private readonly GraphiqueFileManager $graphiqueFileManager,
+        private readonly Environment          $environment,
+        private readonly string               $separator = "/"
     )
     {
         $this->imagesDirectory = str_replace(DIRECTORY_SEPARATOR, $this->separator, getCwd() . DIRECTORY_SEPARATOR . "renderer" . DIRECTORY_SEPARATOR);
@@ -146,6 +149,7 @@ class Renderer
     /**
      * @throws SyntaxError
      * @throws LoaderError
+     * @throws MissingFileException
      */
     public
     function getFeuilleProfilContent(
@@ -157,7 +161,14 @@ class Renderer
         array           $profil,
     ): string
     {
-        $template = $this->environment->createTemplate($graphique->content);
+        $templatePath = $this->graphiqueFileManager->entityFilePathOrNull($graphique);
+
+        if ($templatePath == null) {
+            throw new MissingFileException($graphique);
+        }
+
+        $templateContent = file_get_contents($templatePath);
+        $template = $this->environment->createTemplate($templateContent);
 
         return $template->render(context: $this->rawOptionsArray(
             graphique: $graphique,

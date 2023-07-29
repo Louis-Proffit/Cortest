@@ -28,7 +28,6 @@ class ResourceType extends AbstractType
                     return null;
                 },
                 "setter" => function (Resource $resource, UploadedFile $file, FormInterface $form) {
-                    var_dump($file->getClientOriginalName());
                     $resource->file_nom = $file->getClientOriginalName();
                 }])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);

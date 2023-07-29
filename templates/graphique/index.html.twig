@@ -34,7 +34,7 @@
                 <td>{{ graphique.profil.nom }}</td>
                 <td><a class="btn btn-primary" href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Modifier</a>
                 <td><a class="btn btn-primary" href="{{ path('graphique_tester', {"id":graphique.id}) }}">Tester</a>
-                <td><a class="btn btn-primary" href="{{ path('graphique_telecharger', {"id":graphique.id}) }}">Télécharger</a>
+                <td><a class="btn btn-primary" href="{{ path('graphique_download', {"id":graphique.id}) }}">Télécharger</a>
                 <td><a class="btn btn-danger" href="{{ path('graphique_supprimer', {"id":graphique.id}) }}">Supprimer</a>
                 </td>
             </tr>

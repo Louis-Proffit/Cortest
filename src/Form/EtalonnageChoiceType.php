@@ -19,7 +19,6 @@ class EtalonnageChoiceType extends AbstractType
     {
 
         $result = [];
-        // dump($profil->etalonnages);
 
         /** @var Etalonnage $etalonnage */
         foreach ($profil->etalonnages as $etalonnage) {

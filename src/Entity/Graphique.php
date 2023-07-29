@@ -28,21 +28,21 @@ class Graphique
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    // TODO syntax validation
-    #[Orm\Column(length: self::MAX_FILE_SIZE)]
-    public string $content;
+    #[NotBlank]
+    #[ORM\Column]
+    public string $file_nom;
 
     /**
      * @param int $id
      * @param Profil $profil
      * @param string $nom
-     * @param string $content
+     * @param string $file_nom
      */
-    public function __construct(int $id, Profil $profil, string $nom, string $content)
+    public function __construct(int $id, Profil $profil, string $nom, string $file_nom)
     {
         $this->id = $id;
         $this->profil = $profil;
         $this->nom = $nom;
-        $this->content = $content;
+        $this->file_nom = $file_nom;
     }
 }

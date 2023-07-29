@@ -4,10 +4,11 @@ namespace App\Controller;
 
 use App\Core\Correcteur\CorrecteurManager;
 use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\FileUtils;
+use App\Core\Exception\UploadFailException;
 use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\Files\Pdf\PdfManager;
 use App\Core\Files\Pdf\Renderer;
+use App\Core\GraphiqueFileManager;
 use App\Entity\Graphique;
 use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
@@ -18,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,12 +35,15 @@ class GraphiqueController extends AbstractController
     {
         $graphiques = $graphiqueRepository->findAll();
 
-        return $this->render('graphique/index.html.twig',
-            ["graphiques" => $graphiques]);
+        return $this->render('graphique/index.html.twig', ["graphiques" => $graphiques]);
     }
 
+    /**
+     * @throws UploadFailException
+     */
     #[Route("/creer", name: "creer")]
     public function creer(
+        GraphiqueFileManager   $graphiqueFileManager,
         EntityManagerInterface $entityManager,
         ProfilRepository       $profilRepository,
         Request                $request
@@ -54,7 +59,8 @@ class GraphiqueController extends AbstractController
         $graphique = new Graphique(
             id: 0,
             profil: $profils[0],
-            nom: "", content: ""
+            nom: "",
+            file_nom: ""
         );
 
         $form = $this->createForm(GraphiqueType::class, $graphique);
@@ -63,9 +69,13 @@ class GraphiqueController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            /** @var UploadedFile $file */
+            $file = $form->get(GraphiqueType::FILE_KEY)->getData();
+
             $entityManager->persist($graphique);
             $entityManager->flush();
 
+            $graphiqueFileManager->upload($file, $graphique);
 
             return $this->redirectToRoute("graphique_index");
         }
@@ -73,8 +83,12 @@ class GraphiqueController extends AbstractController
         return $this->render("graphique/creer.html.twig", ["form" => $form->createView()]);
     }
 
+    /**
+     * @throws UploadFailException
+     */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        GraphiqueFileManager   $graphiqueFileManager,
         EntityManagerInterface $entityManager,
         Request                $request,
         Graphique              $graphique,
@@ -86,8 +100,12 @@ class GraphiqueController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entityManager->persist($graphique);
+            /** @var UploadedFile $file */
+            $file = $form->get(GraphiqueType::FILE_KEY)->getData();
+
             $entityManager->flush();
+
+            $graphiqueFileManager->upload($file, $graphique);
 
             return $this->redirectToRoute("graphique_index");
         }
@@ -135,7 +153,9 @@ class GraphiqueController extends AbstractController
             $response = $pdfManager->createPdfFile(
                 graphique: $graphique,
                 reponseCandidat: $reponsesCandidat,
-                correcteur: $correcteur, etalonnage: $etalonnage, score: $scores[0],
+                correcteur: $correcteur,
+                etalonnage: $etalonnage,
+                score: $scores[0],
                 profil: $profils[0]
             );
 
@@ -150,12 +170,20 @@ class GraphiqueController extends AbstractController
         return $this->render("graphique/tester_form.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/telecharger/{id}", name: "telecharger")]
-    public function telecharger(Graphique $graphique): Response
+    #[Route("/download/{id}", name: "download")]
+    public function telecharger(
+        Graphique            $graphique,
+        GraphiqueFileManager $graphiqueFileManager
+    ): Response
     {
-        $response = new Response($graphique->content);
-        FileUtils::setFileResponseFileName($response, $graphique->nom . ".tex.twig");
-        return $response;
+        $filePath = $graphiqueFileManager->entityFilePathOrNull($graphique);
+
+        if ($filePath == null) {
+            $this->addFlash("danger", "Le fichier n'existe pas.");
+            return $this->redirectToRoute("graphique_index");
+        } else {
+            return $this->file($filePath, $graphique->file_nom);
+        }
     }
 
     #[Route("/verifier-variables", name: "verifier_variables")]

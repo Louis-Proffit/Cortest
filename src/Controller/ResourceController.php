@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Core\ResourceManager;
+use App\Core\Exception\UploadFailException;
+use App\Core\ResourceFileManager;
 use App\Entity\Resource;
 use App\Form\ResourceType;
 use App\Security\ResourceVoter;
@@ -11,7 +12,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route("/resource", name: "resource_")]
 class ResourceController extends CortestAbstractController
@@ -19,11 +19,11 @@ class ResourceController extends CortestAbstractController
 
     #[Route("/download/{id}", name: "download")]
     public function download(
-        ResourceManager        $resourceManager,
+        ResourceFileManager    $resourceFileManager,
         EntityManagerInterface $entityManager,
         Resource               $resource): Response
     {
-        $filePath = $resourceManager->resourcefilePathOrNull($resource);
+        $filePath = $resourceFileManager->entityFilePathOrNull($resource);
 
         if ($filePath == null) {
             $this->addFlash("danger", "Le fichier n'existe pas. Suppression de la resource");
@@ -37,9 +37,12 @@ class ResourceController extends CortestAbstractController
         }
     }
 
+    /**
+     * @throws UploadFailException
+     */
     #[Route("/creer", name: "creer")]
     public function creer(Request                $request,
-                          ResourceManager        $resourceManager,
+                          ResourceFileManager    $resourceFileManager,
                           EntityManagerInterface $entityManager): Response
     {
         $resource = new Resource(id: 0, nom: "", file_nom: "", user: $this->getNonNullUser());
@@ -52,16 +55,10 @@ class ResourceController extends CortestAbstractController
             $entityManager->persist($resource);
             $entityManager->flush();
 
-            $result = $resourceManager->upload($form->get("file")->getData(), $resource);
+            $file = $form->get("file")->getData();
+            $resourceFileManager->upload($file, $resource);
 
-            if (!$result) {
-                $entityManager->remove($resource);
-                $entityManager->flush();
-                $this->addFlash("danger", "Echec de la mise en ligne du fichier");
-            } else {
-                $this->addFlash("success", "Resource enregistrée");
-                return $this->redirectToRoute("home");
-            }
+            return $this->redirectToRoute("home");
         }
 
         return $this->render("resource/form_creer.html.twig", ["form" => $form->createView()]);
@@ -70,13 +67,13 @@ class ResourceController extends CortestAbstractController
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         EntityManagerInterface $entityManager,
-        ResourceManager        $resourceManager,
+        ResourceFileManager    $resourceFileManager,
         Resource               $resource
     ): RedirectResponse
     {
         $this->denyAccessUnlessGranted(attribute: ResourceVoter::DELETE, subject: $resource);
 
-        $resourceManager->delete($resource);
+        $resourceFileManager->delete($resource);
 
         $entityManager->remove($resource);
         $entityManager->flush();
