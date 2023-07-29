@@ -27,15 +27,15 @@
         </thead>
         <tbody>
         {% for session in sessions %}
-            <tr>
-                <td><a class="btn btn-link btn-sm"
+            <tr class="align-middle">
+                <td><a class="btn btn-link fw-bold"
                        href="{{ path("session_consulter", {"id":session.id}) }}">{{ session.id }}</a></td>
                 <td>{{ session.date|date('d-m-Y') }}</td>
                 <td>{{ session.sgap.nom }} ({{ session.sgap.indice }})</td>
                 <td>{{ session.test.nom }}</td>
                 <td>{{ session.reponses_candidats.count() }}</td>
                 <td>{{ session.observations }}</td>
-                <td><a class="btn btn-link btn-sm" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
+                <td><a class="btn btn-link fw-bold" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}
