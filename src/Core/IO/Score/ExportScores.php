@@ -3,7 +3,7 @@
 namespace App\Core\IO\Score;
 
 use App\Entity\Echelle;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Entity\ReponseCandidat;
 
 /**
@@ -23,12 +23,12 @@ class ExportScores
 
     /**
      * Exporte des scores sous forme d'array en 6 colonnes
-     * @param Profil $profil
+     * @param Structure $profil
      * @param array $scores
      * @param array $reponses
      * @return array
      */
-    public function export(Profil $profil, array $scores, array $reponses): array
+    public function export(Structure $profil, array $scores, array $reponses): array
     {
         $data = [];
 

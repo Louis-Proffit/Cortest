@@ -4,7 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Controller\AdminController;
 use App\Entity\CortestUser;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

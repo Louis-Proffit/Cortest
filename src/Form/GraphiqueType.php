@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Graphique;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -21,7 +21,7 @@ class GraphiqueType extends AbstractType
     const FILE_KEY = "file";
 
     public function __construct(
-        private readonly ProfilRepository $profilRepository,
+        private readonly StructureRepository $profilRepository,
     )
     {
     }

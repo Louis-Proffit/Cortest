@@ -20,6 +20,6 @@ class SessionCorrecteurMatcher
      */
     public function match(Session $session, Correcteur $correcteur): bool
     {
-        return $session->concours->id === $correcteur->concours->id;
+        return $session->test->id === $correcteur->tests->id;
     }
 }

@@ -42,7 +42,7 @@ class ExportReponsesCandidat
 
         if (!empty($reponses)) {
             /** @var QuestionConcours[] $questions */
-            $questions = $reponses[0]->session->concours->questions;
+            $questions = $reponses[0]->session->test->questions;
 
             foreach ($reponses as $reponse) {
                 $toAdd = [

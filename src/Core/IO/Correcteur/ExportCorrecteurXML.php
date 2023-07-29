@@ -12,8 +12,8 @@ class ExportCorrecteurXML
     public function export(Correcteur $correcteur): string|false
     {
         $xml = new SimpleXMLElement("<correcteur/>");
-        $xml->addChild(ImportCorrecteurXML::CONCOURS_KEY, $correcteur->concours->nom);
-        $xml->addChild(ImportCorrecteurXML::PROFIL_KEY, $correcteur->profil->nom);
+        $xml->addChild(ImportCorrecteurXML::CONCOURS_KEY, $correcteur->tests->intitule);
+        $xml->addChild(ImportCorrecteurXML::PROFIL_KEY, $correcteur->structure->nom);
         $xml->addChild(ImportCorrecteurXML::NOM_KEY, $correcteur->nom);
 
         $echelles = $xml->addChild(ImportCorrecteurXML::ECHELLES_KEY);

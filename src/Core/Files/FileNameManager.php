@@ -26,7 +26,7 @@ class FileNameManager
      */
     public function sessionScoreCsvFileName(Session $session): string
     {
-        return "scores_session_" . $this->formatDate($session->date) . "_" . $session->concours->nom . self::CSV_EXTENSION;
+        return "scores_session_" . $this->formatDate($session->date) . "_" . $session->test->intitule . self::CSV_EXTENSION;
     }
 
     /**
@@ -36,7 +36,7 @@ class FileNameManager
      */
     public function sessionProfilCsvFileName(Session $session): string
     {
-        return "profils_session_" . $this->formatDate($session->date) . "_" . $session->concours->nom . self::CSV_EXTENSION;
+        return "profils_session_" . $this->formatDate($session->date) . "_" . $session->test->intitule . self::CSV_EXTENSION;
     }
 
     /**

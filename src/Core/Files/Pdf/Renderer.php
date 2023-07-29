@@ -67,8 +67,8 @@ class Renderer
         Etalonnage $etalonnage,
     ): array
     {
-        $profil = $correcteur->profil;
-        $concours = $correcteur->concours;
+        $profil = $correcteur->structure;
+        $concours = $correcteur->tests;
         $graphique = new Graphique(0, $profil, "TEST", "TEST");
         $reponse = $this->dummyReponse($concours);
 
@@ -117,12 +117,12 @@ class Renderer
             self::KEY_SESSION_DATE => $reponse->session->date,
             self::KEY_SESSION_NUMERO_ORDRE => $reponse->session->numero_ordre,
             self::KEY_SESSION_SGAP_NOM => $reponse->session->sgap->nom,
-            self::KEY_CONCOURS_NOM => $reponse->session->concours->nom,
-            self::KEY_CONCOURS_TYPE => $reponse->session->concours->type_concours,
-            self::KEY_CONCOURS_VERSION_BATTERIE => $reponse->session->concours->version_batterie,
+            self::KEY_CONCOURS_NOM => $reponse->session->test->intitule,
+            self::KEY_CONCOURS_TYPE => $reponse->session->test->type_concours,
+            self::KEY_CONCOURS_VERSION_BATTERIE => $reponse->session->test->version_batterie,
             self::KEY_IMAGE_DIRECTORY => $this->imagesDirectory,
             self::KEY_GRAPHIQUE_NOW => $graphique->nom,
-            self::KEY_PROFIL_NOM => $correcteur->profil->nom,
+            self::KEY_PROFIL_NOM => $correcteur->structure->nom,
             self::KEY_ETALONNAGE_NOMBRE_CLASSES => $etalonnage->nombre_classes
         ];
 

@@ -32,8 +32,8 @@ class Session
     #[ORM\Column(length: 2048)]
     public string $observations;
 
-    #[ORM\ManyToOne(targetEntity: Concours::class, inversedBy: "sessions")]
-    public Concours $concours;
+    #[ORM\ManyToOne(targetEntity: Test::class, inversedBy: "sessions")]
+    public Test $test;
 
     #[ORM\ManyToOne(targetEntity: Sgap::class, inversedBy: "sessions")]
     public Sgap $sgap;
@@ -46,18 +46,20 @@ class Session
      * @param DateTime $date
      * @param int $numero_ordre
      * @param string $observations
-     * @param Concours $concours
+     * @param Test $test
      * @param Sgap $sgap
      * @param Collection $reponses_candidats
      */
-    public function __construct(int $id, DateTime $date, int $numero_ordre, string $observations, Concours $concours, Sgap $sgap, Collection $reponses_candidats)
+    public function __construct(int $id, DateTime $date, int $numero_ordre, string $observations, Test $test, Sgap $sgap, Collection $reponses_candidats)
     {
         $this->id = $id;
         $this->date = $date;
         $this->numero_ordre = $numero_ordre;
         $this->observations = $observations;
-        $this->concours = $concours;
+        $this->test = $test;
         $this->sgap = $sgap;
         $this->reponses_candidats = $reponses_candidats;
     }
+
+
 }

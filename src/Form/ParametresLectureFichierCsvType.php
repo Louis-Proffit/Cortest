@@ -23,7 +23,7 @@ class ParametresLectureFichierCsvType extends AbstractType
             . " | "
             . $session->sgap->nom
             . " | "
-            . $session->concours->nom;
+            . $session->test->intitule;
     }
 
     private function sessionChoices(): array

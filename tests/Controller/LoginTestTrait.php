@@ -3,7 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\CortestUser;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait LoginTestTrait
@@ -15,7 +15,7 @@ trait LoginTestTrait
 
     protected function loadUser(string $role): CortestUser
     {
-        return self::getContainer()->get(UserRepository::class)->findOneBy(["role" => $role]);
+        return self::getContainer()->get(CortestUserRepository::class)->findOneBy(["role" => $role]);
     }
 
 }

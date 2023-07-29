@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
+use App\Repository\NiveauScolaireRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
-#[ORM\Entity]
-#[UniqueEntity('nom')]
-#[UniqueEntity('indice')]
+#[ORM\Entity(repositoryClass: NiveauScolaireRepository::class)]
+#[UniqueEntity('nom', message: "Ce nom de niveau scolaire existe déjà.")]
+#[UniqueEntity('indice', message: "Cet indice de niveau scolaire existe déjà.")]
 class NiveauScolaire
 {
     #[ORM\Id]

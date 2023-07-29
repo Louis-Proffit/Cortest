@@ -6,9 +6,9 @@ use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Repository\ConcoursRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use SimpleXMLElement;
 
@@ -24,8 +24,8 @@ class ImportCorrecteurXML
     const ECHELLE_EXPRESSION_KEY = "expression";
 
     public function __construct(
-        private readonly ProfilRepository   $profilRepository,
-        private readonly ConcoursRepository $concoursRepository,
+        private readonly StructureRepository $profilRepository,
+        private readonly ConcoursRepository  $concoursRepository,
     )
     {
     }
@@ -63,7 +63,7 @@ class ImportCorrecteurXML
         return $correcteur;
     }
 
-    private function profil(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Profil|false
+    private function profil(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Structure|false
     {
         $nom_profil = $xml->{self::PROFIL_KEY};
         $profils = $this->profilRepository->findBy(["nom" => $nom_profil]);
@@ -105,7 +105,7 @@ class ImportCorrecteurXML
     {
         $defined_echelles = [];
         /** @var Echelle $echelle */
-        foreach ($correcteur->profil->echelles as $echelle) {
+        foreach ($correcteur->structure->echelles as $echelle) {
             $defined_echelles[$echelle->nom_php] = false;
         }
 
@@ -122,10 +122,10 @@ class ImportCorrecteurXML
                 $valid = false;
             }
 
-            $echelle_entity = $this->echelleFromProfil($correcteur->profil, $nom_echelle);
+            $echelle_entity = $this->echelleFromProfil($correcteur->structure, $nom_echelle);
 
             if ($echelle_entity == null) {
-                $correcteurXMLErrorHandler->handleError("Aucune echelle n'a le nom $nom_echelle dans le profil " . $correcteur->profil->nom);
+                $correcteurXMLErrorHandler->handleError("Aucune echelle n'a le nom $nom_echelle dans le profil " . $correcteur->structure->nom);
                 $valid = false;
             }
 
@@ -148,7 +148,7 @@ class ImportCorrecteurXML
         }
     }
 
-    private function echelleFromProfil(Profil $profil, string $nom): Echelle|null
+    private function echelleFromProfil(Structure $profil, string $nom): Echelle|null
     {
         /** @var Echelle $echelle */
         foreach ($profil->echelles as $echelle) {

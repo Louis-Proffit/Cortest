@@ -11,7 +11,7 @@ use App\Entity\EchelleGraphique;
 use App\Entity\Etalonnage;
 use App\Entity\Graphique;
 use App\Entity\NiveauScolaire;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Entity\QuestionConcours;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
@@ -73,7 +73,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
 
         $this->questions($concours);
 
-        $profil = new Profil(
+        $profil = new Structure(
             0,
             $this->profil_nom,
             new ArrayCollection(),
@@ -189,7 +189,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         }
     }
 
-    protected function echellesSimplesAptitudesCognitives(Profil $profil, array $nom_php_to_nom): void
+    protected function echellesSimplesAptitudesCognitives(Structure $profil, array $nom_php_to_nom): void
     {
         foreach ($nom_php_to_nom as $nom_php => $nom) {
             $profil->echelles->add(new Echelle(
@@ -200,12 +200,12 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                 echelles_correcteur: new ArrayCollection(),
                 echelles_etalonnage: new ArrayCollection(),
                 echelles_graphiques: new ArrayCollection(),
-                profil: $profil
+                structure: $profil
             ));
         }
     }
 
-    protected function echellesSimplesEtCompositesPersonnalite(Profil $profil, array $nom_php_to_nom, array $nom_php_composite_to_noms_php_simples): void
+    protected function echellesSimplesEtCompositesPersonnalite(Structure $profil, array $nom_php_to_nom, array $nom_php_composite_to_noms_php_simples): void
     {
         foreach ($nom_php_composite_to_noms_php_simples as $nom_php_composite => $noms_php_simples) {
 
@@ -217,7 +217,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                 echelles_correcteur: new ArrayCollection(),
                 echelles_etalonnage: new ArrayCollection(),
                 echelles_graphiques: new ArrayCollection(),
-                profil: $profil
+                structure: $profil
             ));
 
             foreach ($noms_php_simples as $nom_php_simple) {
@@ -229,13 +229,13 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
                     echelles_correcteur: new ArrayCollection(),
                     echelles_etalonnage: new ArrayCollection(),
                     echelles_graphiques: new ArrayCollection(),
-                    profil: $profil
+                    structure: $profil
                 ));
             }
         }
     }
 
-    protected function echellesCorrecteurPersonnalite(Profil $profil, Correcteur $correcteur, array $nom_php_composite_to_nom_php_simple_to_index_to_type): void
+    protected function echellesCorrecteurPersonnalite(Structure $profil, Correcteur $correcteur, array $nom_php_composite_to_nom_php_simple_to_index_to_type): void
     {
 
         foreach ($nom_php_composite_to_nom_php_simple_to_index_to_type as $nom_php_composite => $nom_php_simple_to_index_to_type) {
@@ -276,7 +276,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         );
     }
 
-    protected function echellesCorrecteurAptitudeCognitive(Profil $profil, Correcteur $correcteur, array $nom_php_to_index_to_vrai, $base): void
+    protected function echellesCorrecteurAptitudeCognitive(Structure $profil, Correcteur $correcteur, array $nom_php_to_index_to_vrai, $base): void
     {
         foreach ($nom_php_to_index_to_vrai as $nom_php => $index_to_vrai) {
             $echelle = $this->findEchelleInProfil($profil, $nom_php);
@@ -294,7 +294,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             ));
         }
     }
-    protected function findEchelleInProfil(Profil $profil, string $nom_php): Echelle|null
+    protected function findEchelleInProfil(Structure $profil, string $nom_php): Echelle|null
     {
         /** @var Echelle $echelle */
         foreach ($profil->echelles as $echelle) {
@@ -307,13 +307,13 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
 
     protected abstract function questions(Concours $concours);
 
-    protected abstract function aptitudesCognitives(Profil $profil);
+    protected abstract function aptitudesCognitives(Structure $profil);
 
-    protected abstract function personnalite(Profil $profil);
+    protected abstract function personnalite(Structure $profil);
 
-    protected abstract function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur);
+    protected abstract function correcteurAptitudesCognitives(Structure $profil, Correcteur $correcteur);
 
-    protected abstract function correcteurPersonnalite(Profil $profil, Correcteur $correcteur);
+    protected abstract function correcteurPersonnalite(Structure $profil, Correcteur $correcteur);
 }
 
 

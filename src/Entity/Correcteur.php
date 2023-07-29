@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
-#[UniqueEntity('nom', message: "Ce nom de correcteur est déjà utilisé")]
+#[UniqueEntity(fields: 'nom', message: "Ce nom de correcteur est déjà utilisé")]
 class Correcteur
 {
     #[ORM\Id]
@@ -18,11 +18,11 @@ class Correcteur
     #[ORM\Column]
     public int $id;
 
-    #[ORM\ManyToOne(targetEntity: Concours::class, inversedBy: "correcteurs")]
-    public Concours $concours;
+    #[ORM\ManyToMany(targetEntity: Test::class, inversedBy: "correcteurs")]
+    public Collection $tests;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "correcteurs")]
-    public Profil $profil;
+    #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "correcteurs")]
+    public Structure $structure;
 
     #[NotBlank]
     #[ORM\Column(unique: true)]
@@ -32,18 +32,19 @@ class Correcteur
     #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
+
     /**
      * @param int $id
-     * @param Concours $concours
-     * @param Profil $profil
+     * @param Collection $tests
+     * @param Structure $profil
      * @param string $nom
      * @param Collection $echelles
      */
-    public function __construct(int $id, Concours $concours, Profil $profil, string $nom, Collection $echelles)
+    public function __construct(int $id, Collection $tests, Structure $profil, string $nom, Collection $echelles)
     {
         $this->id = $id;
-        $this->concours = $concours;
-        $this->profil = $profil;
+        $this->tests = $tests;
+        $this->structure = $profil;
         $this->nom = $nom;
         $this->echelles = $echelles;
     }

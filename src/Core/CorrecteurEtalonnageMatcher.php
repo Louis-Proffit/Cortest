@@ -19,6 +19,6 @@ class CorrecteurEtalonnageMatcher
      */
     public function match(Correcteur $correcteur, Etalonnage $etalonnage): bool
     {
-        return $correcteur->profil->id === $etalonnage->profil->id;
+        return $correcteur->structure->id === $etalonnage->structure->id;
     }
 }

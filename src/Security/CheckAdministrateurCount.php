@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Entity\CortestUser;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 
 /**
  * Opérations pour garantir la présence systématique d'au moins un administrateur
@@ -11,7 +11,7 @@ use App\Repository\UserRepository;
 readonly class CheckAdministrateurCount
 {
     public function __construct(
-        private UserRepository $userRepository
+        private CortestUserRepository $userRepository
     )
     {
     }

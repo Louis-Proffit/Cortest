@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Echelle;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Form\CreerProfilType;
 use App\Form\ProfilType;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -22,7 +22,7 @@ class ProfilController extends AbstractController
 
     #[Route("/index", name: "index")]
     public function index(
-        ProfilRepository $profilRepository
+        StructureRepository $profilRepository
     ): Response
     {
         $items = $profilRepository->findAll();
@@ -36,7 +36,7 @@ class ProfilController extends AbstractController
         Request                $request
     ): RedirectResponse|Response
     {
-        $item = new Profil(
+        $item = new Structure(
             id: 0,
             nom: "",
             echelles: new ArrayCollection(),
@@ -58,7 +58,7 @@ class ProfilController extends AbstractController
                     echelles_correcteur: new ArrayCollection(),
                     echelles_etalonnage: new ArrayCollection(),
                     echelles_graphiques: new ArrayCollection(),
-                    profil: $item
+                    structure: $item
                 );
                 $item->echelles->add($echelle);
 
@@ -79,7 +79,7 @@ class ProfilController extends AbstractController
     public function modifier(
         EntityManagerInterface $entityManager,
         Request                $request,
-        Profil                 $profil
+        Structure $profil
     ): RedirectResponse|Response
     {
 
@@ -101,7 +101,7 @@ class ProfilController extends AbstractController
     public function supprimer(
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
-        Profil                 $profil): RedirectResponse
+        Structure              $profil): RedirectResponse
     {
         $logger->info("Suppression du profil : " . $profil->id);
 

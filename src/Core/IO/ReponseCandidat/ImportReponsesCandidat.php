@@ -28,8 +28,8 @@ class ImportReponsesCandidat
     {
         $reponses = [];
 
-        $questions = $session->concours->questions;
-        $requiredKeys = $this->requiredKeys($session->concours);
+        $questions = $session->test->questions;
+        $requiredKeys = $this->requiredKeys($session->test);
 
         foreach ($rawReponses as $rawReponse) {
 

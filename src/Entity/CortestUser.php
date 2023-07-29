@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Constraint\CortestPassword;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: CortestUserRepository::class)]
 #[UniqueEntity("username", message: "Ce nom d'utilisateur existe déjà.")]
 class CortestUser implements UserInterface, PasswordAuthenticatedUserInterface
 {

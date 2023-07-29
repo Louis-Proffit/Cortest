@@ -3,24 +3,24 @@
 namespace App\Form\Data;
 
 use App\Entity\Concours;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CorrecteurCreer
 {
 
-    public Profil $profil;
+    public Structure $profil;
 
     public Concours $concours;
     #[NotBlank]
     public string $nom;
 
     /**
-     * @param Profil $profil
+     * @param Structure $profil
      * @param Concours $concours
      * @param string $nom
      */
-    public function __construct(Profil $profil, Concours $concours, string $nom)
+    public function __construct(Structure $profil, Concours $concours, string $nom)
     {
         $this->profil = $profil;
         $this->concours = $concours;

@@ -5,7 +5,7 @@ namespace App\Tests\Entity;
 use App\Core\Grille\Values\GrilleOctobre2019;
 use App\Entity\Concours;
 use App\Entity\Correcteur;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Repository\GrilleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
@@ -39,9 +39,9 @@ class CorrecteurTest extends KernelTestCase
                 sessions: new ArrayCollection(),
                 index_grille: GrilleRepository::GRILLE_OCTOBRE_2019_INDEX,
                 type_concours: 0, version_batterie: 0, questions: new ArrayCollection()),
-            profil: new Profil(
+            profil: new Structure(
                 id: 0,
-                nom: "Profil",
+                nom: "Structure",
                 echelles: new ArrayCollection(),
                 etalonnages: new ArrayCollection(),
                 graphiques: new ArrayCollection()

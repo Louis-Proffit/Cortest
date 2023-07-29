@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Graphique;
 use App\Entity\Resource;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;

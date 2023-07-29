@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Constraint\UniqueDTO;
 use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,7 +16,7 @@ class CorrecteurCreerType extends AbstractType
 {
 
     public function __construct(
-        private readonly ProfilRepository     $profil_repository,
+        private readonly StructureRepository  $profil_repository,
         private readonly ConcoursRepository   $concours_repository,
         private readonly CorrecteurRepository $correcteurRepository,
     )

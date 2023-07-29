@@ -64,7 +64,7 @@ class SessionProfilController extends AbstractController
         $form = $this->createForm(
             CorrecteurEtEtalonnageChoiceType::class,
             $parametresCalculProfil,
-            [CorrecteurEtEtalonnageChoiceType::OPTION_CONCOURS => $session->concours]);
+            [CorrecteurEtEtalonnageChoiceType::OPTION_CONCOURS => $session->test]);
 
         $form->handleRequest($request);
 
@@ -114,17 +114,17 @@ class SessionProfilController extends AbstractController
             return $this->redirectToRoute("home");
         }
 
-        if ($correcteur->profil->etalonnages->isEmpty()) {
-            $this->addFlash("danger", "Pas d'étalonnage disponible pour le profil " . $correcteur->profil->nom);
+        if ($correcteur->structure->etalonnages->isEmpty()) {
+            $this->addFlash("danger", "Pas d'étalonnage disponible pour le profil " . $correcteur->structure->nom);
             return $this->redirectToRoute("etalonnage_index");
         }
 
-        $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $correcteur->profil->etalonnages[0]);
+        $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $correcteur->structure->etalonnages[0]);
 
         $form = $this->createForm(
             EtalonnageChoiceType::class,
             $parametres_calcul_profil,
-            [EtalonnageChoiceType::OPTION_PROFIL => $correcteur->profil]);
+            [EtalonnageChoiceType::OPTION_PROFIL => $correcteur->structure]);
 
         $form->handleRequest($request);
 

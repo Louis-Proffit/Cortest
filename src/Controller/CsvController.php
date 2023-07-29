@@ -72,7 +72,7 @@ class CsvController extends AbstractController
 
         $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
 
-        $data = $exportScores->export(profil: $correcteur->profil, scores: $scores, reponses: $reponsesCandidats);
+        $data = $exportScores->export(profil: $correcteur->structure, scores: $scores, reponses: $reponsesCandidats);
 
         $file_name = $fileNameManager->sessionScoreCsvFileName($session);
 
@@ -121,7 +121,7 @@ class CsvController extends AbstractController
             scores: $scores
         );
 
-        $data = $exportProfils->export(profil: $correcteur->profil, profils: $profils, reponses: $reponsesCandidats);
+        $data = $exportProfils->export(profil: $correcteur->structure, profils: $profils, reponses: $reponsesCandidats);
 
         $fileName = $fileNameManager->sessionProfilCsvFileName($session);
         return $csvManager->export($data, $fileName);

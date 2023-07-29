@@ -17,7 +17,7 @@ use App\Form\ImportCorrecteurType;
 use App\Repository\ConcoursRepository;
 use App\Repository\CorrecteurRepository;
 use App\Repository\GrilleRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -54,7 +54,7 @@ class CorrecteurController extends AbstractController
         Correcteur       $correcteur
     ): Response
     {
-        $grille = $grilleRepository->getFromIndex($correcteur->concours->index_grille);
+        $grille = $grilleRepository->getFromIndex($correcteur->tests->index_grille);
 
         return $this->render("correcteur/correcteur.html.twig",
             ["correcteur" => $correcteur, "grille" => $grille]);
@@ -107,7 +107,7 @@ class CorrecteurController extends AbstractController
     public function creer(
         EntityManagerInterface $entityManager,
         ConcoursRepository     $concoursRepository,
-        ProfilRepository       $profilRepository,
+        StructureRepository    $profilRepository,
         Request                $request
     ): Response
     {

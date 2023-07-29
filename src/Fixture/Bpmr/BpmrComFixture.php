@@ -7,7 +7,7 @@ use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\Graphique;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Entity\QuestionConcours;
 use App\Entity\Subtest;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,7 +29,7 @@ class BpmrComFixture extends AbstractBpmrFixture
         );
     }
 
-    protected function aptitudesCognitives(Profil $profil): void
+    protected function aptitudesCognitives(Structure $profil): void
     {
         $this->echellesSimplesAptitudesCognitives($profil, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
 
@@ -41,7 +41,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
         $profil->echelles->add(new Echelle(
             id: 0,
@@ -51,11 +51,11 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
     }
 
-    protected function personnalite(Profil $profil): void
+    protected function personnalite(Structure $profil): void
     {
         $this->echellesSimplesEtCompositesPersonnalite(
             $profil,
@@ -71,7 +71,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
 
         $profil->echelles->add(new Echelle(
@@ -82,7 +82,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
 
         $profil->echelles->add(new Echelle(
@@ -93,7 +93,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
 
         $profil->echelles->add(new Echelle(
@@ -104,7 +104,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
             echelles_graphiques: new ArrayCollection(),
-            profil: $profil
+            structure: $profil
         ));
     }
 
@@ -120,7 +120,7 @@ class BpmrComFixture extends AbstractBpmrFixture
     }
 
     private function correcteurEg(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -136,7 +136,7 @@ class BpmrComFixture extends AbstractBpmrFixture
     }
 
     private function correcteurQr(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -173,7 +173,7 @@ class BpmrComFixture extends AbstractBpmrFixture
     }
 
     private function correcteurAt(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -185,7 +185,7 @@ class BpmrComFixture extends AbstractBpmrFixture
     }
 
     private function correcteurDs(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -197,7 +197,7 @@ class BpmrComFixture extends AbstractBpmrFixture
     }
 
     private function correcteurRc(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -215,7 +215,7 @@ class BpmrComFixture extends AbstractBpmrFixture
         ));
     }
     private function correcteurRcPourcent(
-        Profil     $profil,
+        Structure  $profil,
         Correcteur $correcteur
     ): void
     {
@@ -229,7 +229,7 @@ class BpmrComFixture extends AbstractBpmrFixture
             $correcteur
         ));
     }
-    protected function correcteurAptitudesCognitives(Profil $profil, Correcteur $correcteur): void
+    protected function correcteurAptitudesCognitives(Structure $profil, Correcteur $correcteur): void
     {
         $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
         $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
@@ -237,7 +237,7 @@ class BpmrComFixture extends AbstractBpmrFixture
         $this->correcteurQr($profil, $correcteur);
     }
 
-    protected function correcteurPersonnalite(Profil $profil, Correcteur $correcteur): void
+    protected function correcteurPersonnalite(Structure $profil, Correcteur $correcteur): void
     {
         $this->echellesCorrecteurPersonnalite($profil,
             $correcteur,

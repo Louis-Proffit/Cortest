@@ -2,14 +2,14 @@
 
 namespace App\Form\Data;
 
-use App\Entity\Profil;
+use App\Entity\Structure;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EtalonnageCreer
 {
 
-    public Profil $profil;
+    public Structure $profil;
 
     #[GreaterThanOrEqual(2, message: "Le nombre de classes doit être supérieur à deux")]
     public int $nombre_classes;
@@ -18,11 +18,11 @@ class EtalonnageCreer
     public string $nom;
 
     /**
-     * @param Profil $profil
+     * @param Structure $profil
      * @param int $nombre_classes
      * @param string $nom
      */
-    public function __construct(Profil $profil, int $nombre_classes, string $nom)
+    public function __construct(Structure $profil, int $nombre_classes, string $nom)
     {
         $this->profil = $profil;
         $this->nombre_classes = $nombre_classes;

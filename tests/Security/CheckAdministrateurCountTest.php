@@ -3,7 +3,7 @@
 namespace App\Tests\Security;
 
 use App\Entity\CortestUser;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 use App\Security\CheckAdministrateurCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -14,8 +14,8 @@ class CheckAdministrateurCountTest extends KernelTestCase
     public function testOneAdministrateur()
     {
 
-        /** @var UserRepository $userRepository */
-        $userRepository = self::getContainer()->get(UserRepository::class);
+        /** @var CortestUserRepository $userRepository */
+        $userRepository = self::getContainer()->get(CortestUserRepository::class);
         /** @var CheckAdministrateurCount $checkAdministrateurCount */
         $checkAdministrateurCount = self::getContainer()->get(CheckAdministrateurCount::class);
 

@@ -2,18 +2,16 @@
 
 namespace App\Entity;
 
+use App\Repository\ResourceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Blameable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Form\Test\FormInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 #[UniqueEntity(fields: "nom", message: "Ce nom de resource existe déjà", errorPath: "nom")]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ResourceRepository::class)]
 class Resource
 {
     #[ORM\Id]

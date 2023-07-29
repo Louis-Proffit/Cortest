@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Constraint\UniqueDTO;
 use App\Repository\EtalonnageRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -16,7 +16,7 @@ class EtalonnageCreerType extends AbstractType
 {
 
     public function __construct(
-        private readonly ProfilRepository $profil_repository,
+        private readonly StructureRepository  $profil_repository,
         private readonly EtalonnageRepository $etalonnageRepository
     )
     {

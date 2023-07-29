@@ -6,7 +6,7 @@ use App\Entity\CortestUser;
 use App\Form\CortestUserType;
 use App\Form\CreerCortestUserType;
 use App\Form\MotDePasseCortestUserType;
-use App\Repository\UserRepository;
+use App\Repository\CortestUserRepository;
 use App\Security\CheckAdministrateurCount;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -27,12 +27,12 @@ class AdminController extends AbstractController
 
     /**
      * Page d'accueil de l'administrateur, incluant la liste des utilisateurs
-     * @param UserRepository $userRepository
+     * @param CortestUserRepository $userRepository
      * @return Response
      */
     #[Route("/index", name: "index")]
     public function index(
-        UserRepository $userRepository,
+        CortestUserRepository $userRepository,
     ): Response
     {
         $items = $userRepository->findAll();

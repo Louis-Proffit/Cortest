@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Concours;
 use App\Entity\Etalonnage;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Entity\Session;
 use App\Form\Data\CorrecteurEtEtalonnagePair;
 use App\Repository\CorrecteurRepository;
@@ -25,7 +25,7 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
     {
     }
 
-    private function correcteurAndEtalonnageChoices(Concours|null $concours, Profil|null $profil): array
+    private function correcteurAndEtalonnageChoices(Concours|null $concours, Structure|null $profil): array
     {
         if ($concours != null) {
             $correcteurs = $this->correcteurRepository->findBy(["concours" => $concours]);
@@ -40,7 +40,7 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
 
             $sub_result = [];
 
-            $profil = $correcteur->profil;
+            $profil = $correcteur->structure;
 
             /** @var Etalonnage $etalonnage */
             foreach ($profil->etalonnages as $etalonnage) {
@@ -70,7 +70,7 @@ class CorrecteurEtEtalonnageChoiceType extends AbstractType
         $resolver->define(self::OPTION_CONCOURS);
         $resolver->define(self::OPTION_PROFIL);
         $resolver->setAllowedTypes(self::OPTION_CONCOURS, Concours::class);
-        $resolver->setAllowedTypes(self::OPTION_PROFIL, Profil::class);
+        $resolver->setAllowedTypes(self::OPTION_PROFIL, Structure::class);
     }
 
 }

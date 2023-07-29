@@ -3,13 +3,13 @@
 namespace App\Core\IO\Profil;
 
 use App\Entity\Echelle;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use App\Entity\ReponseCandidat;
 
 class ExportProfils
 {
 
-    public function export(Profil $profil, array $profils, array $reponses): array
+    public function export(Structure $profil, array $profils, array $reponses): array
     {
 
         $data = [];

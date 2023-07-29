@@ -6,6 +6,7 @@ use App\Repository\GrilleRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity]
@@ -15,6 +16,9 @@ use Symfony\Component\Validator\Constraints\Positive;
 #[UniqueEntity(fields: self::UNIQUE_FIELDS_INDICE, message: "Cet indice existe déjà dans le même concours", errorPath: "indice")]
 class QuestionConcours
 {
+    const MAX_LEN_INTITULE = 50;
+    const MAX_LEN_ABREVIATION = 10;
+
     const UNIQUE_FIELDS_ABREVIATION = ["concours", "abreviation"];
     const UNIQUE_FIELDS_INDICE = ["concours", "indice"];
 
@@ -33,14 +37,16 @@ class QuestionConcours
     #[ORM\Column]
     public int $indice;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: self::MAX_LEN_INTITULE)]
+    #[Length(max: self::MAX_LEN_INTITULE, maxMessage: "L'intitulé doit faire moins de " . self::MAX_LEN_ABREVIATION . "caractères")]
     public string $intitule;
 
-    #[ORM\Column(length: 10)]
+    #[Length(max: self::MAX_LEN_ABREVIATION, maxMessage: "L'abréviation doit faire moins de " . self::MAX_LEN_ABREVIATION . "caractères")]
+    #[ORM\Column(length: self::MAX_LEN_ABREVIATION)]
     public string $abreviation;
 
-    #[ORM\ManyToOne(targetEntity: Concours::class, inversedBy: "questions")]
-    public Concours $concours;
+    #[ORM\ManyToOne(targetEntity: Test::class, cascade: ["persist", "remove"], inversedBy: "questions")]
+    public Test $test;
 
     #[Choice(choices: self::TYPES)]
     #[ORM\Column]
@@ -51,21 +57,23 @@ class QuestionConcours
      * @param int $indice
      * @param string $intitule
      * @param string $abreviation
-     * @param Concours $concours
+     * @param Test $test
      * @param string $type
      */
-    public function __construct(int $id, int $indice, string $intitule, string $abreviation, Concours $concours, string $type)
+    public function __construct(int $id, int $indice, string $intitule, string $abreviation, Test $test, string $type)
     {
         $this->id = $id;
         $this->indice = $indice;
         $this->intitule = $intitule;
         $this->abreviation = $abreviation;
-        $this->concours = $concours;
+        $this->test = $test;
         $this->type = $type;
     }
 
 
-    public static function initQuestions(GrilleRepository $grilleRepository, Concours $concours): void
+    /*
+     * TODO service ?
+     * public static function initQuestions(GrilleRepository $grilleRepository, Concours $concours): void
     {
         $grille = $grilleRepository->getFromIndex($concours->index_grille);
 
@@ -81,5 +89,5 @@ class QuestionConcours
                 )
             );
         }
-    }
+    }*/
 }

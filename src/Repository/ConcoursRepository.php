@@ -35,7 +35,7 @@ class ConcoursRepository extends ServiceEntityRepository
 
         $result = [];
         foreach ($all_concours as $concours) {
-            $result[$concours->nom] = $concours;
+            $result[$concours->intitule] = $concours;
         }
 
         return $result;

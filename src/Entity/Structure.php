@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,9 +10,9 @@ use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[Entity]
+#[Entity(repositoryClass: StructureRepository::class)]
 #[UniqueEntity('nom')]
-class Profil
+class Structure
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,16 +23,16 @@ class Profil
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    #[ORM\OneToMany(mappedBy: "profil", targetEntity: Echelle::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Echelle::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
-    #[ORM\OneToMany(mappedBy: "profil", targetEntity: Correcteur::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Correcteur::class, cascade: ["remove", "persist"])]
     public Collection $correcteurs;
 
-    #[ORM\OneToMany(mappedBy: "profil", targetEntity: Etalonnage::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Etalonnage::class, cascade: ["remove", "persist"])]
     public Collection $etalonnages;
 
-    #[ORM\OneToMany(mappedBy: "profil", targetEntity: Graphique::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Graphique::class, cascade: ["remove", "persist"])]
     public Collection $graphiques;
 
     /**

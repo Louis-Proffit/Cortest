@@ -36,7 +36,7 @@ class PdfController extends AbstractController
     {
         $graphiques = $graphiqueRepository->findAll();
 
-        if ($correcteur->profil->graphiques->isEmpty()) {
+        if ($correcteur->structure->graphiques->isEmpty()) {
             $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
             return $this->redirectToRoute("graphique_index");
         }
@@ -44,7 +44,7 @@ class PdfController extends AbstractController
         $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
 
         $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
-            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->structure
         ]);
 
         $form->handleRequest($request);
@@ -77,7 +77,7 @@ class PdfController extends AbstractController
 
         $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
         $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
-            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->structure
         ]);
 
         $form->handleRequest($request);
@@ -112,7 +112,7 @@ class PdfController extends AbstractController
         $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
 
         $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
-            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->profil
+            GraphiqueChoiceType::OPTION_PROFIL => $correcteur->structure
         ]);
 
         $form->handleRequest($request);

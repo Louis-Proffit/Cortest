@@ -14,7 +14,7 @@ use App\Form\CorrecteurEtEtalonnageChoiceType;
 use App\Form\Data\CorrecteurEtEtalonnageChoice;
 use App\Form\GraphiqueType;
 use App\Repository\GraphiqueRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +45,7 @@ class GraphiqueController extends AbstractController
     public function creer(
         GraphiqueFileManager   $graphiqueFileManager,
         EntityManagerInterface $entityManager,
-        ProfilRepository       $profilRepository,
+        StructureRepository    $profilRepository,
         Request                $request
     ): Response
     {
@@ -128,7 +128,7 @@ class GraphiqueController extends AbstractController
     {
         $correcteurEtalonnage = new CorrecteurEtEtalonnageChoice();
 
-        $form = $this->createForm(CorrecteurEtEtalonnageChoiceType::class, $correcteurEtalonnage, [CorrecteurEtEtalonnageChoiceType::OPTION_PROFIL => $graphique->profil]);
+        $form = $this->createForm(CorrecteurEtEtalonnageChoiceType::class, $correcteurEtalonnage, [CorrecteurEtEtalonnageChoiceType::OPTION_PROFIL => $graphique->structure]);
 
         $form->handleRequest($request);
 
@@ -137,7 +137,7 @@ class GraphiqueController extends AbstractController
             $correcteur = $correcteurEtalonnage->both->correcteur;
             $etalonnage = $correcteurEtalonnage->both->etalonnage;
 
-            $reponsesCandidat = $renderer->dummyReponse($correcteur->concours);
+            $reponsesCandidat = $renderer->dummyReponse($correcteur->tests);
             $reponsesCandidats = [$reponsesCandidat];
 
             $scores = $correcteurManager->corriger(

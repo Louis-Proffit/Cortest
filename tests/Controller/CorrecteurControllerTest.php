@@ -52,7 +52,7 @@ class CorrecteurControllerTest extends WebTestCase
         self::assertStringContainsString("Correcteur", $text);
         self::assertStringContainsString("Nom", $text);
         self::assertStringContainsString("Concours", $text);
-        self::assertStringContainsString("Profil", $text);
+        self::assertStringContainsString("Structure", $text);
         self::assertStringContainsString("Consulter", $text);
     }
 

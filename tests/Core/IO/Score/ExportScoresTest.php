@@ -23,7 +23,7 @@ class ExportScoresTest extends KernelTestCase
         /** @var ExportScores $exportScores */
         $exportScores = self::getContainer()->get(ExportScores::class);
 
-        $raw = $exportScores->export($correcteur->profil, $scores, $session->reponses_candidats->toArray());
+        $raw = $exportScores->export($correcteur->structure, $scores, $session->reponses_candidats->toArray());
         self::assertCount($session->reponses_candidats->count(), $raw);
     }
 

@@ -12,7 +12,7 @@ use App\Form\EtalonnageCreerType;
 use App\Form\EtalonnageGaussienType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
-use App\Repository\ProfilRepository;
+use App\Repository\StructureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -55,7 +55,7 @@ class EtalonnageController extends AbstractController
     #[Route("/creer/simple", name: "creer_simple")]
     public function creerSimple(
         EntityManagerInterface $entityManager,
-        ProfilRepository       $profilRepository,
+        StructureRepository    $profilRepository,
         Request                $request
     ): Response
     {
@@ -110,7 +110,7 @@ class EtalonnageController extends AbstractController
     #[Route("/creer/gaussien", name: "creer_gaussien")]
     public function creerGaussien(
         EntityManagerInterface $entityManager,
-        ProfilRepository       $profilRepository,
+        StructureRepository    $profilRepository,
         Request                $request
     ): Response
     {

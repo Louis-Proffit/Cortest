@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Graphique;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,7 +14,7 @@ class GraphiqueChoiceType extends AbstractType
 {
     const OPTION_PROFIL = "profil";
 
-    private function graphiqueChoices(Profil $profil): array
+    private function graphiqueChoices(Structure $profil): array
     {
         $graphiques = $profil->graphiques;
 
@@ -41,6 +41,6 @@ class GraphiqueChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->define(self::OPTION_PROFIL);
-        $resolver->setAllowedTypes(self::OPTION_PROFIL, Profil::class);
+        $resolver->setAllowedTypes(self::OPTION_PROFIL, Structure::class);
     }
 }

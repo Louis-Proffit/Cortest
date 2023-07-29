@@ -2,18 +2,18 @@
 
 namespace App\Entity;
 
+use App\Repository\GraphiqueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Form\Test\FormInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 
-#[UniqueEntity(fields: "nom", message: "Ce nom de graphique existe déjà", errorPath: "nom")]
-#[ORM\Entity]
+#[UniqueEntity(fields: self::KEY_NOM_UNIQUE, message: "Ce nom de graphique existe déjà", errorPath: "nom")]
+#[ORM\Entity(repositoryClass: GraphiqueRepository::class)]
 class Graphique
 {
 
+    const KEY_NOM_UNIQUE = "nom";
     const MAX_FILE_SIZE = 1024 * 1024;
 
     #[ORM\Id]
@@ -21,8 +21,8 @@ class Graphique
     #[ORM\Column]
     public int $id;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "graphiques")]
-    public Profil $profil;
+    #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "graphiques")]
+    public Structure $structure;
 
     #[NotBlank]
     #[ORM\Column(unique: true)]
@@ -34,14 +34,14 @@ class Graphique
 
     /**
      * @param int $id
-     * @param Profil $profil
+     * @param Structure $profil
      * @param string $nom
      * @param string $file_nom
      */
-    public function __construct(int $id, Profil $profil, string $nom, string $file_nom)
+    public function __construct(int $id, Structure $profil, string $nom, string $file_nom)
     {
         $this->id = $id;
-        $this->profil = $profil;
+        $this->structure = $profil;
         $this->nom = $nom;
         $this->file_nom = $file_nom;
     }

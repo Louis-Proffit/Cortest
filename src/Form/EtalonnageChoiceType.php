@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Etalonnage;
-use App\Entity\Profil;
+use App\Entity\Structure;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,7 +15,7 @@ class EtalonnageChoiceType extends AbstractType
 
     const OPTION_PROFIL = "profil";
 
-    private function etalonnageChoices(Profil $profil): array
+    private function etalonnageChoices(Structure $profil): array
     {
 
         $result = [];
@@ -42,7 +42,7 @@ class EtalonnageChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->define(self::OPTION_PROFIL);
-        $resolver->setAllowedTypes(self::OPTION_PROFIL, Profil::class);
+        $resolver->setAllowedTypes(self::OPTION_PROFIL, Structure::class);
     }
 
 }

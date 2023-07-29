@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\Positive;
 
 
 #[ORM\Entity(repositoryClass: EtalonnageRepository::class)]
-#[UniqueEntity('nom')]
+#[UniqueEntity('nom', message: "Ce nom d'étalonnage existe déjà")]
 class Etalonnage
 {
     #[ORM\Id]
@@ -19,11 +19,11 @@ class Etalonnage
     #[ORM\Column]
     public int $id;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: "etalonnages")]
-    public Profil $profil;
+    #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "etalonnages")]
+    public Structure $structure;
 
     #[NotBlank]
-    #[ORM\Column(name:'nom', unique: true)]
+    #[ORM\Column(name: 'nom', unique: true)]
     public string $nom;
 
     #[Positive]
@@ -35,15 +35,15 @@ class Etalonnage
 
     /**
      * @param int $id
-     * @param Profil $profil
+     * @param Structure $profil
      * @param string $nom
      * @param int $nombre_classes
      * @param Collection $echelles
      */
-    public function __construct(int $id, Profil $profil, string $nom, int $nombre_classes, Collection $echelles)
+    public function __construct(int $id, Structure $profil, string $nom, int $nombre_classes, Collection $echelles)
     {
         $this->id = $id;
-        $this->profil = $profil;
+        $this->structure = $profil;
         $this->nom = $nom;
         $this->nombre_classes = $nombre_classes;
         $this->echelles = $echelles;
