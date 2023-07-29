@@ -2,12 +2,13 @@
 
 {% block content %}
     <br>
-    <h1>Scores</h1>
+    <h1>Scores bruts</h1>
     <br>
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path('calcul_profil_form_score', {"correcteur_id":correcteur.id}) }}">Calculer les profils</a>
+               href="{{ path('calcul_profil_form_score', {"correcteur_id":correcteur.id}) }}">Calculer les scores
+                étalonnés</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary"
@@ -25,8 +26,8 @@
                 <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
                 <dt class="col-md-3">SGAP</dt>
                 <dd class="col-md-9">{{ session.sgap.nom }}</dd>
-                <dt class="col-md-3">Concours</dt>
-                <dd class="col-md-9">{{ session.concours.nom }}</dd>
+                <dt class="col-md-3">Test</dt>
+                <dd class="col-md-9">{{ session.test.nom }}</dd>
             </dl>
         </dd>
         <dt class="col-md-3">Correcteur</dt>

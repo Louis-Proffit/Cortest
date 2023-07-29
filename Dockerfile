@@ -19,9 +19,11 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
 
 RUN docker-php-ext-install pdo mysqli pdo_mysql zip intl;
 
-WORKDIR /var/www
-
 COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+COPY composer.lock composer.lock
+RUN composer install
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY certificate.crt /etc/apache2/ssl/ssl.crt
@@ -34,7 +36,5 @@ RUN groupadd cortest-users \
     && usermod -a -G cortest-users $(whoami) \
     && chgrp -R cortest-users /tmp \
     && chmod -R g+w /tmp
-
-RUN composer install
 
 CMD ["apache2-foreground"]

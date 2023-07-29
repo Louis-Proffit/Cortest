@@ -20,7 +20,7 @@ services:
             - database
         ports:
             - "8081:80"
-        environment:  # Same as database service
+        environment: # Same as database service
             PMA_HOST: database
             PMA_PORT: 3306
             PMA_USER: mysql
@@ -31,5 +31,7 @@ services:
             - "8080:443"
         depends_on:
             - database
+        volumes:
+            - /var/www/var
 volumes:
     data:
