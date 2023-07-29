@@ -58,7 +58,7 @@ class PdfController extends AbstractController
                 "correcteur_id" => $correcteur->id]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/form/zip/{correcteur_id}/{etalonnage_id}", name: "form_zip")]
@@ -91,7 +91,7 @@ class PdfController extends AbstractController
             ]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
 
     }
 
@@ -126,7 +126,7 @@ class PdfController extends AbstractController
             ]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form]);
+        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
 
     }
 

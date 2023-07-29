@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Exception;
+namespace App\Core\Exception;
 
 use App\Core\Reponses\DifferentSessionException;
 use App\Core\Reponses\NoReponsesCandidatException;

@@ -29,7 +29,7 @@ COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY certificate.crt /etc/apache2/ssl/ssl.crt
 COPY certificate.key /etc/apache2/ssl/ssl.key
 
-COPY . /var/www
+COPY . .
 
 RUN groupadd cortest-users \
     && usermod -a -G cortest-users www-data \

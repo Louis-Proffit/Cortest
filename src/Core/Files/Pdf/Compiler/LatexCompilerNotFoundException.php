@@ -2,7 +2,6 @@
 
 namespace App\Core\Files\Pdf\Compiler;
 
-use App\Controller\Exception\LatexCompilationFailedExceptionEventListener;
 use Exception;
 
 

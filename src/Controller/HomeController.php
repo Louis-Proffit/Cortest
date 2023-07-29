@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
 use App\Repository\ResourceRepository;
 use App\Security\ResourceVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

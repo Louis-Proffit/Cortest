@@ -101,7 +101,7 @@ class EtalonnageController extends AbstractController
             return $this->redirectToRoute("etalonnage_modifier", ["id" => $etalonnage->id]);
         }
 
-        return $this->render("etalonnage/creer_simple.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/creer_simple.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/creer/gaussien", name: "creer_gaussien")]
@@ -157,6 +157,7 @@ class EtalonnageController extends AbstractController
         }
 
         return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);*/
+        // TODO
         $this->addFlash("danger", "Pas encore implémenté");
         return $this->redirectToRoute("home");
     }
@@ -214,7 +215,7 @@ class EtalonnageController extends AbstractController
 
         }
 
-        return $this->render("etalonnage/modifier.html.twig", ["form" => $form]);
+        return $this->render("etalonnage/modifier.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]

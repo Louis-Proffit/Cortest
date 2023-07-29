@@ -2,8 +2,6 @@
 
 namespace App\Core\Files\Pdf\Merger;
 
-use App\Controller\Exception\LatexCompilationFailedExceptionEventListener;
-use App\Core\Files\Pdf\Compiler\LatexCompiler;
 use Exception;
 
 

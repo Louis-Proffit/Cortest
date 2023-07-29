@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\SessionProfilController;
+use App\Controller\SessionScoresEtalonnesController;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\SessionRepository;

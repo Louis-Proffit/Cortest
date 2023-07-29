@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\ReponseCandidat;
-use App\Repository\ReponseCandidatRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

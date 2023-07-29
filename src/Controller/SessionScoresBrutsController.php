@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/calcul/score", name: "calcul_score_")]
-class SessionScoreController extends AbstractController
+class SessionScoresBrutsController extends AbstractController
 {
 
     #[Route('/form/session/{session_id}', name: "session_form")]

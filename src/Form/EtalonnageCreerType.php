@@ -2,8 +2,6 @@
 
 namespace App\Form;
 
-use App\Constraint\UniqueDTO;
-use App\Repository\EtalonnageRepository;
 use App\Repository\StructureRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

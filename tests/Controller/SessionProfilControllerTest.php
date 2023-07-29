@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\SessionProfilController;
+use App\Controller\SessionScoresEtalonnesController;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Repository\CorrecteurRepository;

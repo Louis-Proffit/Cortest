@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route("/calcul/profil", name: "calcul_profil_")]
-class SessionProfilController extends AbstractController
+class SessionScoresEtalonnesController extends AbstractController
 {
 
     /**

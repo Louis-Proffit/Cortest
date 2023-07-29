@@ -202,7 +202,7 @@ class LectureController extends AbstractController
         }
 
         return $this->render('lecture/from_scanner_parameters.html.twig', [
-            'form' => $form
+            'form' => $form->createView()
         ]);
     }
 

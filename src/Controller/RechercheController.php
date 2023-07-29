@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Core\Reponses\FiltreSessionStorage;
 use App\Core\Reponses\ReponsesCandidatSessionStorage;
 use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
@@ -11,7 +10,6 @@ use App\Form\Data\ReponseCandidatChecked;
 use App\Form\RechercheParametersType;
 use App\Repository\ReponseCandidatRepository;
 use DateTime;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\ClickableInterface;
@@ -19,7 +17,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function PHPUnit\Framework\throwException;
 
 #[Route("/recherche", name: "recherche_")]
 class RechercheController extends AbstractController

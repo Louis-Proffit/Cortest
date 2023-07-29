@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Concours;
-use App\Entity\QuestionTest;
 use App\Form\ConcoursType;
 use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
@@ -35,19 +34,6 @@ class ConcoursController extends AbstractController
         return $this->render("concours/index.html.twig", ["concours" => $concours]);
     }
 
-    /**
-     * Consulter un concours
-     * @param GrilleRepository $grilleRepository
-     * @param Concours $concours
-     * @return Response
-     */
-    #[Route("/consulter/{id}", name: "consulter")]
-    public function consulter(
-        Concours $concours,
-    ): Response
-    {
-        return $this->render("concours/concours.html.twig", ["concours" => $concours]);
-    }
 
     /**
      * Formulaire de création d'un concours

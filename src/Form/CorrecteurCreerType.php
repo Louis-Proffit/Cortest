@@ -2,13 +2,7 @@
 
 namespace App\Form;
 
-use App\Constraint\UniqueDTO;
-use App\Entity\Test;
-use App\Repository\ConcoursRepository;
-use App\Repository\CorrecteurRepository;
 use App\Repository\StructureRepository;
-use App\Repository\TestRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

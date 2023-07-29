@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Exception;
+namespace App\Core\Exception;
 
 use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
 use Psr\Log\LoggerInterface;

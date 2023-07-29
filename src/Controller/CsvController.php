@@ -17,8 +17,6 @@ use App\Core\Reponses\ReponsesCandidatStorage;
 use App\Core\SessionCorrecteurMatcher;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
-use App\Repository\CorrecteurRepository;
-use App\Repository\EtalonnageRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
