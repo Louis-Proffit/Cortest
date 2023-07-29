@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Generic;
 
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\Options;

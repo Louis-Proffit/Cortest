@@ -6,7 +6,7 @@ use App\Core\Exception\UploadFailException;
 use App\Core\ResourceFileManager;
 use App\Entity\Resource;
 use App\Form\ResourceType;
-use App\Security\ResourceVoter;
+use App\Security\DeleteResourceVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,7 +71,7 @@ class ResourceController extends CortestAbstractController
         Resource               $resource
     ): RedirectResponse
     {
-        $this->denyAccessUnlessGranted(attribute: ResourceVoter::DELETE, subject: $resource);
+        $this->denyAccessUnlessGranted(attribute: DeleteResourceVoter::DELETE, subject: $resource);
 
         $resourceFileManager->delete($resource);
 

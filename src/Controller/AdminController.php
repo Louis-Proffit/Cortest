@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\CortestUser;
-use App\Form\CortestUserType;
 use App\Form\CreerCortestUserType;
+use App\Form\Generic\CortestUserType;
 use App\Form\MotDePasseCortestUserType;
 use App\Repository\CortestUserRepository;
 use App\Security\CheckAdministrateurCount;

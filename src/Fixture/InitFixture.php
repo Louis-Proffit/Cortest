@@ -2,15 +2,11 @@
 
 namespace App\Fixture;
 
-use App\Entity\Concours;
 use App\Entity\CortestUser;
 use App\Entity\NiveauScolaire;
-use App\Entity\QuestionTest;
 use App\Entity\Sgap;
-use App\Repository\GrilleRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Generic;
 
 use App\Entity\CortestUser;
 use Symfony\Component\Form\AbstractType;

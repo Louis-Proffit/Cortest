@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\ReponseCandidat;
+use App\Form\Generic\CortestDateType;
 use App\Repository\NiveauScolaireRepository;
 use App\Repository\SessionRepository;
 use Symfony\Component\Form\AbstractType;

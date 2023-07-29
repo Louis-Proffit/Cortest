@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ResourceRepository;
-use App\Security\ResourceVoter;
+use App\Security\DeleteResourceVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ class HomeController extends AbstractController
 
         $deletable = [];
         foreach ($resources as $resource) {
-            $deletable[$resource->id] = $security->isGranted(ResourceVoter::DELETE, $resource);
+            $deletable[$resource->id] = $security->isGranted(DeleteResourceVoter::DELETE, $resource);
         }
 
         return $this->render('home.html.twig', ["resources" => $resources, "deletable" => $deletable]);

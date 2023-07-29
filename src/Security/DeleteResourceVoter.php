@@ -8,7 +8,7 @@ use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class ResourceVoter extends Voter
+class DeleteResourceVoter extends Voter
 {
     const DELETE = 'DELETE';
 
