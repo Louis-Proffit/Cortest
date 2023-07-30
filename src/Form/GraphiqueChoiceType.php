@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GraphiqueChoiceType extends AbstractType
 {
-    const OPTION_PROFIL = "profil";
+    const OPTION_PROFIL = "score_etalonne";
 
     private function graphiqueChoices(Structure $profil): array
     {

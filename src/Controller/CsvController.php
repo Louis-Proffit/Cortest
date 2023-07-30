@@ -2,18 +2,18 @@
 
 namespace App\Controller;
 
-use App\Core\Correcteur\CorrecteurManager;
 use App\Core\CorrecteurEtalonnageMatcher;
-use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\CsvManager;
-use App\Core\Files\FileNameManager;
-use App\Core\IO\Profil\ExportProfils;
-use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
-use App\Core\IO\Score\ExportScores;
-use App\Core\Reponses\CheckSingleSession;
-use App\Core\Reponses\DifferentSessionException;
-use App\Core\Reponses\NoReponsesCandidatException;
-use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Core\Exception\DifferentSessionException;
+use App\Core\Exception\NoReponsesCandidatException;
+use App\Core\IO\CsvManager;
+use App\Core\IO\FileNameManager;
+use App\Core\ReponseCandidat\CheckSingleSession;
+use App\Core\ReponseCandidat\ExportReponsesCandidat;
+use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ScoreBrut\CorrecteurManager;
+use App\Core\ScoreBrut\ExportScoresBruts;
+use App\Core\ScoreEtalonne\EtalonnageManager;
+use App\Core\ScoreEtalonne\ExportScoresEtalonnes;
 use App\Core\SessionCorrecteurMatcher;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
@@ -53,7 +53,7 @@ class CsvController extends AbstractController
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
-        ExportScores                                 $exportScores,
+        ExportScoresBruts                            $exportScores,
         FileNameManager                              $fileNameManager,
         CsvManager                                   $csvManager,
         #[MapEntity(id: "correcteur_id")] Correcteur $correcteur
@@ -70,7 +70,7 @@ class CsvController extends AbstractController
 
         $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
 
-        $data = $exportScores->export(profil: $correcteur->structure, scores: $scores, reponses: $reponsesCandidats);
+        $data = $exportScores->export(structure: $correcteur->structure, scoresBruts: $scores, reponsesCandidat: $reponsesCandidats);
 
         $file_name = $fileNameManager->sessionScoreCsvFileName($session);
 
@@ -87,7 +87,7 @@ class CsvController extends AbstractController
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
-        ExportProfils                                $exportProfils,
+        ExportScoresEtalonnes                        $exportProfils,
         FileNameManager                              $fileNameManager,
         CsvManager                                   $csvManager,
         SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
@@ -109,17 +109,18 @@ class CsvController extends AbstractController
             return $this->redirectToRoute("home");
         }
 
-        $scores = $correcteurManager->corriger(
+        $scoreBruts = $correcteurManager->corriger(
             correcteur: $correcteur,
             reponseCandidats: $reponsesCandidats
         );
 
-        $profils = $etalonnageManager->etalonner(
+        $scoresEtalonnes = $etalonnageManager->etalonner(
             etalonnage: $etalonnage,
-            scores: $scores
+            reponsesCandidat: $reponsesCandidats,
+            scoresBruts: $scoreBruts
         );
 
-        $data = $exportProfils->export(profil: $correcteur->structure, profils: $profils, reponses: $reponsesCandidats);
+        $data = $exportProfils->export(structure: $correcteur->structure, scoresEtalonnes: $scoresEtalonnes, reponses: $reponsesCandidats);
 
         $fileName = $fileNameManager->sessionProfilCsvFileName($session);
         return $csvManager->export($data, $fileName);

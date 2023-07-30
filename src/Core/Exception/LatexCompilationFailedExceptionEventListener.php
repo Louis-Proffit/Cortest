@@ -2,7 +2,7 @@
 
 namespace App\Core\Exception;
 
-use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
+use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;

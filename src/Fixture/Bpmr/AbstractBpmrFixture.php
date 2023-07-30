@@ -51,7 +51,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
 
     public function load(ObjectManager $manager): void
     {
-        // Session concours profil --------------------------------
+        // Session concours score_etalonne --------------------------------
         $concours = new Concours(
             0,
             $this->concours_nom,

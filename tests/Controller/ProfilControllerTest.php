@@ -24,19 +24,19 @@ class ProfilControllerTest extends WebTestCase
     public function testSupprimer()
     {
         $profil = self::getContainer()->get(StructureRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET, "/profil/supprimer/".$profil->id);
-        self::assertResponseRedirects("/profil/index");
+        $this->client->request(Request::METHOD_GET, "/score_etalonne/supprimer/".$profil->id);
+        self::assertResponseRedirects("/score_etalonne/index");
     }
 
     public function testCreer()
     {
-        $this->client->request(Request::METHOD_GET, "/profil/creer");
+        $this->client->request(Request::METHOD_GET, "/score_etalonne/creer");
         self::assertResponseIsSuccessful();
     }
 
     public function testIndex()
     {
-        $this->client->request(Request::METHOD_GET, "/profil/index");
+        $this->client->request(Request::METHOD_GET, "/score_etalonne/index");
         self::assertResponseIsSuccessful();
     }
 }

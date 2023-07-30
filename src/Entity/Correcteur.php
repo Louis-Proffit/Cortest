@@ -29,6 +29,7 @@ class Correcteur
     public string $nom;
 
     #[Valid]
+    #[ORM\OrderBy(["id" => "ASC"])]
     #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 

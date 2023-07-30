@@ -119,7 +119,7 @@ class EtalonnageController extends AbstractController
         }
 
         $etalonnageCreer = new EtalonnageCreer(
-            profil: $structures[0],
+            score_etalonne: $structures[0],
             nombre_classes: 0,
             nom: ""
         );
@@ -131,17 +131,17 @@ class EtalonnageController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $nombreClasses = $etalonnageCreer->nombre_classes;
-            $profil = $etalonnageCreer->structure;
+            $score_etalonne = $etalonnageCreer->structure;
 
             $etalonnage = new Etalonnage(
                 id: 0,
-                structure: $profil,
+                structure: $score_etalonne,
                 nom: $etalonnageCreer->nom,
                 nombre_classes: $nombreClasses,
                 echelles: new ArrayCollection()
             );
 
-            foreach ($profil->echelles as $echelle) {
+            foreach ($score_etalonne->echelles as $echelle) {
                 $etalonnage->echelles->add(EchelleEtalonnage::rangeEchelle(
                     $echelle,
                     $etalonnage,

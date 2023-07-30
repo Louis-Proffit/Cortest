@@ -12,16 +12,20 @@ class ExportCorrecteurXML
     public function export(Correcteur $correcteur): string|false
     {
         $xml = new SimpleXMLElement("<correcteur/>");
-        $xml->addChild(ImportCorrecteurXML::CONCOURS_KEY, $correcteur->tests->intitule);
-        $xml->addChild(ImportCorrecteurXML::PROFIL_KEY, $correcteur->structure->nom);
-        $xml->addChild(ImportCorrecteurXML::NOM_KEY, $correcteur->nom);
 
-        $echelles = $xml->addChild(ImportCorrecteurXML::ECHELLES_KEY);
+        foreach ($correcteur->tests as $test) {
+            $testXml = $xml->addChild(ImportCorrecteurXML::TEST_KEY);
+            $testXml->addAttribute(ImportCorrecteurXML::TEST_NOM_KEY, $test->nom);
+        }
+
+        $xml->addAttribute(ImportCorrecteurXML::STRUCTURE_KEY, $correcteur->structure->nom);
+        $xml->addAttribute(ImportCorrecteurXML::NOM_KEY, $correcteur->nom);
+
         /** @var EchelleCorrecteur $echelle */
         foreach ($correcteur->echelles as $echelle) {
-            $echelleXml = $echelles->addChild(ImportCorrecteurXML::ECHELLE_KEY);
-            $echelleXml->addChild(ImportCorrecteurXML::ECHELLE_NOM_KEY, $echelle->echelle->nom_php);
-            $echelleXml->addChild(ImportCorrecteurXML::ECHELLE_EXPRESSION_KEY, $echelle->expression);
+            $echelleXml = $xml->addChild(ImportCorrecteurXML::ECHELLE_KEY);
+            $echelleXml->addAttribute(ImportCorrecteurXML::ECHELLE_NOM_KEY, $echelle->echelle->nom_php);
+            $echelleXml->addAttribute(ImportCorrecteurXML::ECHELLE_EXPRESSION_KEY, $echelle->expression);
         }
 
 

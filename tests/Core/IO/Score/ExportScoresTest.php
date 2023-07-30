@@ -2,8 +2,8 @@
 
 namespace App\Tests\Core\IO\Score;
 
-use App\Core\Correcteur\CorrecteurManager;
-use App\Core\IO\Score\ExportScores;
+use App\Core\ScoreBrut\CorrecteurManager;
+use App\Core\ScoreBrut\ExportScoresBruts;
 use App\Repository\CorrecteurRepository;
 use App\Repository\SessionRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,8 +20,8 @@ class ExportScoresTest extends KernelTestCase
 
         $scores = $correcteurManager->corriger($correcteur, $session->reponses_candidats->toArray());
 
-        /** @var ExportScores $exportScores */
-        $exportScores = self::getContainer()->get(ExportScores::class);
+        /** @var ExportScoresBruts $exportScores */
+        $exportScores = self::getContainer()->get(ExportScoresBruts::class);
 
         $raw = $exportScores->export($correcteur->structure, $scores, $session->reponses_candidats->toArray());
         self::assertCount($session->reponses_candidats->count(), $raw);

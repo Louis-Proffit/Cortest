@@ -2,8 +2,8 @@
 
 namespace App\Tests\Core\Files\Csv\Reponses;
 
-use App\Core\IO\ReponseCandidat\ExportReponsesCandidat;
-use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
+use App\Core\ReponseCandidat\ExportReponsesCandidat;
+use App\Core\ReponseCandidat\ImportReponsesCandidat;
 use App\Entity\ReponseCandidat;
 use App\Repository\SessionRepository;
 use ArrayIterator;

@@ -2,8 +2,6 @@
 
 namespace App\Core\Exception;
 
-use App\Core\Reponses\DifferentSessionException;
-use App\Core\Reponses\NoReponsesCandidatException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;

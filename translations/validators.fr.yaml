@@ -137,21 +137,21 @@ Error: Erreur
 'Please select a valid option.': 'Veuillez sélectionner une option valide.'
 'Please select a valid range.': 'Veuillez sélectionner une plage valide.'
 'Please enter a valid week.': 'Veuillez entrer une semaine valide.'
-'Cette combinaison (intitulé/type concours) existe déjà.': '__Cette combinaison (intitulé/type concours) existe déjà.'
-'Ce nom de correcteur est déjà utilisé': '__Ce nom de correcteur est déjà utilisé'
-"Ce nom d'utilisateur existe déjà.": "__Ce nom d'utilisateur existe déjà."
-"Ce nom d'échelle php existe déjà pour cette structure": "__Ce nom d'échelle php existe déjà pour cette structure"
-"Ce nom d'échelle existe déjà pour cette structure": "__Ce nom d'échelle existe déjà pour cette structure"
-"Ce nom d'étalonnage existe déjà": "__Ce nom d'étalonnage existe déjà"
-'Ce nom de graphique existe déjà': '__Ce nom de graphique existe déjà'
-'Ce nom de niveau scolaire existe déjà.': '__Ce nom de niveau scolaire existe déjà.'
-'Cet indice de niveau scolaire existe déjà.': '__Cet indice de niveau scolaire existe déjà.'
-'Cette abréviation existe déjà dans le même concours': '__Cette abréviation existe déjà dans le même concours'
-'Cet indice existe déjà dans le même concours': '__Cet indice existe déjà dans le même concours'
-'Ce nom de resource existe déjà': '__Ce nom de resource existe déjà'
-'Cet indice existe déjà.': '__Cet indice existe déjà.'
-'Ce nom existe déjà.': '__Ce nom existe déjà.'
-'Le nombre de classes doit être supérieur à deux': '__Le nombre de classes doit être supérieur à deux'
-'Veuillez importer un fichier XML valide': '__Veuillez importer un fichier XML valide'
-'Veuillez choisir un fichier csv adéquat': '__Veuillez choisir un fichier csv adéquat'
-'Importer un fichier .json valide': '__Importer un fichier .json valide'
+'Cette combinaison (intitulé/type concours) existe déjà.': 'Cette combinaison (intitulé/type concours) existe déjà.'
+'Ce nom de correcteur est déjà utilisé': 'Ce nom de correcteur est déjà utilisé'
+"Ce nom d'utilisateur existe déjà.": "Ce nom d'utilisateur existe déjà."
+"Ce nom d'échelle php existe déjà pour cette structure": "Ce nom d'échelle php existe déjà pour cette structure"
+"Ce nom d'échelle existe déjà pour cette structure": "Ce nom d'échelle existe déjà pour cette structure"
+"Ce nom d'étalonnage existe déjà": "Ce nom d'étalonnage existe déjà"
+'Ce nom de graphique existe déjà': 'Ce nom de graphique existe déjà'
+'Ce nom de niveau scolaire existe déjà.': 'Ce nom de niveau scolaire existe déjà.'
+'Cet indice de niveau scolaire existe déjà.': 'Cet indice de niveau scolaire existe déjà.'
+'Cette abréviation existe déjà dans le même concours': 'Cette abréviation existe déjà dans le même concours'
+'Cet indice existe déjà dans le même concours': 'Cet indice existe déjà dans le même concours'
+'Ce nom de resource existe déjà': 'Ce nom de resource existe déjà'
+'Cet indice existe déjà.': 'Cet indice existe déjà.'
+'Ce nom existe déjà.': 'Ce nom existe déjà.'
+'Le nombre de classes doit être supérieur à deux': 'Le nombre de classes doit être supérieur à deux'
+'Veuillez importer un fichier XML valide': 'Veuillez importer un fichier XML valide'
+'Veuillez choisir un fichier csv adéquat': 'Veuillez choisir un fichier csv adéquat'
+'Importer un fichier .json valide': 'Importer un fichier .json valide'

@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Core\Grille\Grille;
-use App\Core\Grille\Values\GrilleOctobre2019;
+use App\Core\Grille\GrilleOctobre2019;
 
 class GrilleRepository
 {

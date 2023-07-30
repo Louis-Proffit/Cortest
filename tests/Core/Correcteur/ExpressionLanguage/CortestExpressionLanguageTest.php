@@ -2,9 +2,9 @@
 
 namespace App\Tests\Core\Correcteur\ExpressionLanguage;
 
-use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestCompilationEnvironment;
-use App\Core\Correcteur\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
+use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
+use App\Core\ScoreBrut\ExpressionLanguage\Environment\CortestCompilationEnvironment;
+use App\Core\ScoreBrut\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Entity\Echelle;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -84,7 +84,7 @@ class CortestExpressionLanguageTest extends KernelTestCase
 
         foreach ($expressions as $echelle => $expression) {
             self::assertNotEmpty(
-                $this->cortest_expression_language->compileCortest(
+                $this->cortest_expression_language->cortestCompile(
                     expression: $expression,
                     type: $types[$echelle],
                     environment: new CortestCompilationEnvironment(types: $types)
@@ -104,11 +104,11 @@ class CortestExpressionLanguageTest extends KernelTestCase
     public function testEvaluer(array $types, array $expressions, array $reponses, array $expected): void
     {
         $environment = new CortestEvaluationEnvironment(reponses: $reponses,
-            types: $types,
+            echelles: $types,
             expressions: $expressions,
-            cortest_expression_language: $this->cortest_expression_language);
+            cortestExpressionLanguage: $this->cortest_expression_language);
 
-        $result = $environment->compute_scores();
+        $result = $environment->computeScores();
         foreach ($expected as $echelle => $score) {
             self::assertEquals(expected: $score, actual: $result[$echelle]);
         }

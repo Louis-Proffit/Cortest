@@ -26,18 +26,18 @@ services:
     # Choix du compilateur pdflatex pour la production de fichiers pdf
     # Pdflatex est le seul proposé pour le moment
 
-    app.latex_compiler: '@App\Core\Files\Pdf\Compiler\Impl\PdflatexLatexCompiler'
-    App\Core\Files\Pdf\Compiler\LatexCompiler: '@app.latex_compiler'
+    App\Core\IO\Pdf\Compiler\LatexCompiler: '@app.latex_compiler'
+    app.latex_compiler: '@App\Core\IO\Pdf\Compiler\Impl\PdflatexLatexCompiler'
 
-    app.pdf_merger: '@App\Core\Files\Pdf\Merger\Impl\PdfunitePdfMerger'
-    App\Core\Files\Pdf\Merger\PdfMerger: '@app.pdf_merger'
+    App\Core\IO\Pdf\Merger\PdfMerger: '@app.pdf_merger'
+    app.pdf_merger: '@App\Core\IO\Pdf\Merger\Impl\PdfunitePdfMerger'
 
-    App\Core\ResourceFileManager:
+    App\Core\IO\ResourceFileRepository:
         arguments:
             $dir: '%app.resource_dir%'
 
 
-    App\Core\GraphiqueFileManager:
+    App\Core\IO\GraphiqueFileRepository:
         arguments:
             $dir: '%app.graphique_dir%'
 

@@ -17,8 +17,9 @@ use Symfony\Component\Validator\Constraints\Type;
 class ReponseCandidat
 {
 
-    public const INDEX_HOMME = 1;
-    public const INDEX_FEMME = 2;
+    const INDEX_HOMME = 1;
+    const INDEX_FEMME = 2;
+
 
     const TYPE_E = "E";
     const TYPE_I = "I";

@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use App\Core\Correcteur\ExpressionLanguage\CortestExpressionLanguage;
-use App\Core\Files\FileNameManager;
-use App\Core\Files\FileUtils;
 use App\Core\IO\Correcteur\ExportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandlerAddFlash;
+use App\Core\IO\FileNameManager;
+use App\Core\IO\FileUtils;
+use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Entity\Correcteur;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;

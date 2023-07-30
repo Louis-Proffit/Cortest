@@ -2,12 +2,11 @@
 
 namespace App\Core\IO\Correcteur;
 
-use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
 use App\Entity\Structure;
-use App\Repository\ConcoursRepository;
+use App\Entity\Test;
 use App\Repository\StructureRepository;
 use App\Repository\TestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,17 +14,16 @@ use SimpleXMLElement;
 
 class ImportCorrecteurXML
 {
-    const CORRECTEUR_KEY = "correcteur";
-    const PROFIL_KEY = "profil";
+    const STRUCTURE_KEY = "structure";
     const NOM_KEY = "nom";
-    const CONCOURS_KEY = "concours";
-    const ECHELLES_KEY = "echelles";
+    const TEST_KEY = "test";
+    const TEST_NOM_KEY = "nom";
     const ECHELLE_KEY = "echelle";
     const ECHELLE_NOM_KEY = "nom";
     const ECHELLE_EXPRESSION_KEY = "expression";
 
     public function __construct(
-        private readonly StructureRepository $profilRepository,
+        private readonly StructureRepository $structureRepository,
         private readonly TestRepository      $testRepository,
     )
     {
@@ -44,14 +42,15 @@ class ImportCorrecteurXML
             return false;
         }
 
-        $profil = $this->profil($correcteurXMLErrorHandler, $xml);
-        $concours = $this->concours($correcteurXMLErrorHandler, $xml);
+        $structure = $this->structure($correcteurXMLErrorHandler, $xml);
+        $tests = $this->tests($correcteurXMLErrorHandler, $xml);
 
-        if (!$concours || !$profil) {
+        if (!$tests || !$structure) {
             return false;
         }
-        $nom = $xml->{self::NOM_KEY};
-        $correcteur = new Correcteur(id: 0, tests: $concours, structure: $profil, nom: $nom, echelles: new ArrayCollection());
+
+        $nom = $xml[self::NOM_KEY];
+        $correcteur = new Correcteur(id: 0, tests: new ArrayCollection($tests), structure: $structure, nom: $nom, echelles: new ArrayCollection());
 
         $echelles = $this->echelles($correcteurXMLErrorHandler, $xml, $correcteur);
 
@@ -64,36 +63,48 @@ class ImportCorrecteurXML
         return $correcteur;
     }
 
-    private function profil(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Structure|false
+    private function structure(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Structure|false
     {
-        $nom_profil = $xml->{self::PROFIL_KEY};
-        $profils = $this->profilRepository->findBy(["nom" => $nom_profil]);
+        $nomStructure = $xml[self::STRUCTURE_KEY];
+        $structures = $this->structureRepository->findBy(["nom" => $nomStructure]);
 
-        if (empty($profils)) {
-            $correcteurXMLErrorHandler->handleError("Aucun profil n'existe au nom de $nom_profil");
+        if (empty($structures)) {
+            $correcteurXMLErrorHandler->handleError("Aucune structure n'existe au nom de $nomStructure");
             return false;
-        } else if (count($profils) > 1) {
-            $correcteurXMLErrorHandler->handleError("Plusieurs profils existent au nom de $nom_profil");
+        } else if (count($structures) > 1) {
+            $correcteurXMLErrorHandler->handleError("Plusieurs structures existent au nom de $nomStructure");
             return false;
         }
 
-        return $profils[0];
+        return $structures[0];
     }
 
-    private function concours(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): Concours|false
+    /**
+     * @param ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler
+     * @param SimpleXMLElement $xml
+     * @return Test[]|false
+     */
+    private function tests(ImportCorrecteurXMLErrorHandler $correcteurXMLErrorHandler, SimpleXMLElement $xml): array|false
     {
-        $nom_concours = $xml->{self::CONCOURS_KEY};
-        $concours = $this->concoursRepository->findBy(["nom" => $nom_concours]);
+        $result = [];
 
-        if (empty($concours)) {
-            $correcteurXMLErrorHandler->handleError("Aucun concours n'existe au nom de $nom_concours");
-            return false;
-        } else if (count($concours) > 1) {
-            $correcteurXMLErrorHandler->handleError("Plusieurs concours existent au nom de $nom_concours");
-            return false;
+        foreach ($xml->{self::TEST_KEY} as $testXml) {
+            $testNom = $testXml[self::TEST_NOM_KEY];
+            $test = $this->testRepository->findBy(["nom" => $testNom]);
+
+            if (empty($test)) {
+                $correcteurXMLErrorHandler->handleError("Aucun test n'existe au nom de $testXml");
+                return false;
+            } else if (count($test) > 1) {
+                $correcteurXMLErrorHandler->handleError("Plusieurs tests existent au nom de $testXml");
+                return false;
+            }
+
+            $result[] = $test[0];
         }
 
-        return $concours[0];
+
+        return $result;
     }
 
     /**
@@ -114,25 +125,25 @@ class ImportCorrecteurXML
         $echelles = [];
 
         /** @var SimpleXMLElement $echelle */
-        foreach ($xml->{self::ECHELLES_KEY}->{self::ECHELLE_KEY} as $echelle) {
+        foreach ($xml->{self::ECHELLE_KEY} as $echelle) {
 
-            $nom_echelle = (string)$echelle->{self::ECHELLE_NOM_KEY};
+            $nomEchelle = (string)$echelle[self::ECHELLE_NOM_KEY];
 
-            if (key_exists($nom_echelle, $defined_echelles) && $defined_echelles[$nom_echelle]) {
-                $correcteurXMLErrorHandler->handleError("L'échelle $nom_echelle est définie plusieurs fois");
+            if (key_exists($nomEchelle, $defined_echelles) && $defined_echelles[$nomEchelle]) {
+                $correcteurXMLErrorHandler->handleError("L'échelle $nomEchelle est définie plusieurs fois");
                 $valid = false;
             }
 
-            $echelle_entity = $this->echelleFromProfil($correcteur->structure, $nom_echelle);
+            $echelle_entity = $this->echelleFromProfil($correcteur->structure, $nomEchelle);
 
             if ($echelle_entity == null) {
-                $correcteurXMLErrorHandler->handleError("Aucune echelle n'a le nom $nom_echelle dans le profil " . $correcteur->structure->nom);
+                $correcteurXMLErrorHandler->handleError("Aucune echelle n'a le nom $nomEchelle dans le score_etalonne " . $correcteur->structure->nom);
                 $valid = false;
             }
 
-            $expression = $echelle->{self::ECHELLE_EXPRESSION_KEY};
+            $expression = $echelle[self::ECHELLE_EXPRESSION_KEY];
             $echelles[] = new EchelleCorrecteur(id: 0, expression: $expression, echelle: $echelle_entity, correcteur: $correcteur);
-            $defined_echelles[$nom_echelle] = true;
+            $defined_echelles[$nomEchelle] = true;
         }
 
         foreach ($defined_echelles as $nom => $defined) {

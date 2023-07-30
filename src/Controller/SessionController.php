@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\GrilleRepository;

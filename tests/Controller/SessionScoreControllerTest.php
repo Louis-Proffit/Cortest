@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\SessionScoresEtalonnesController;
+use App\Controller\ScoresEtalonnesController;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
 use App\Repository\SessionRepository;
@@ -28,7 +28,7 @@ class SessionScoreControllerTest extends WebTestCase
     {
         self::markTestIncomplete("TODO, enregistrer des réponses dans la session");
         $correcteur = self::getContainer()->get(CorrecteurRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET, "/calcul/score/index/" . $correcteur->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/score_brut/index/" . $correcteur->id);
         self::assertResponseIsSuccessful();
     }
 
@@ -36,7 +36,7 @@ class SessionScoreControllerTest extends WebTestCase
     {
         self::markTestIncomplete("TODO, enregistrer des réponses dans la session");
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
-        $this->client->request(Request::METHOD_GET, "/calcul/score/form");
+        $this->client->request(Request::METHOD_GET, "/calcul/score_brut/form");
         self::assertResponseIsSuccessful();
     }
 }

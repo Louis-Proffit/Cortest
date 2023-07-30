@@ -12,7 +12,7 @@ class CorrecteurEtalonnageMatcher
 {
     /**
      * Vérifie que le cprrecteur et l'étalonnage sont compatibles
-     * Pour cela, vérifie que les deux réfèrent au même profil
+     * Pour cela, vérifie que les deux réfèrent au même score_etalonne
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
      * @return bool

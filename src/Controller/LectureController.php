@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Core\Files\CsvManager;
-use App\Core\IO\ReponseCandidat\ImportReponsesCandidat;
-use App\Core\IO\ReponseCandidat\ImportReponsesCandidatException;
+use App\Core\Exception\ImportReponsesCandidatException;
+use App\Core\IO\CsvManager;
+use App\Core\ReponseCandidat\ImportReponsesCandidat;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\Data\ParametresLectureCsv;
@@ -31,28 +31,28 @@ use Symfony\Component\Routing\Annotation\Route;
 class LectureController extends AbstractController
 {
     #[Route("/index", name: "index")]
-    public function lectureHome(): Response
+    public function index(): Response
     {
         return $this->render("lecture/index.html.twig");
     }
 
     #[Route("/form", name: "form")]
     public function form(
-        SessionRepository        $session_repository,
-        NiveauScolaireRepository $niveau_scolaire_repository,
+        SessionRepository        $sessionRepository,
+        NiveauScolaireRepository $niveauScolaireRepository,
         Request                  $request,
-        EntityManagerInterface   $entity_manager
+        EntityManagerInterface   $entityManager
     ): Response
     {
 
-        $session = $session_repository->findOneBy([]);
+        $session = $sessionRepository->findOneBy([]);
 
         if ($session == null) {
             $this->addFlash("warning", "Pas de séance, veuilez en créer une");
             return $this->redirectToRoute("session_creer");
         }
 
-        $niveau_scolaire = $niveau_scolaire_repository->findOneBy([]);
+        $niveau_scolaire = $niveauScolaireRepository->findOneBy([]);
         if ($niveau_scolaire == null) {
             $this->addFlash("warning", "Pas de niveau scolaire, veuillez en créer un");
             return $this->redirectToRoute("niveau_scolaire_creer");
@@ -83,8 +83,8 @@ class LectureController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($reponse);
-            $entity_manager->flush();
+            $entityManager->persist($reponse);
+            $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $reponse->session->id]);
         }

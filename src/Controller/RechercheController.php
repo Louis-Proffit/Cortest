@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Core\Reponses\ReponsesCandidatSessionStorage;
-use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\RechercheParameters;
 use App\Form\Data\ReponseCandidatChecked;

@@ -9,16 +9,17 @@
             <a class="btn btn-primary" href="{{ path("session_modifier", {"id":session.id}) }}">Modifier</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-primary" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
+            <a class="btn btn-danger" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary" href="{{ path("calcul_score_session_form", {"session_id":session.id}) }}">Calculer
+            <a class="btn btn-secondary" href="{{ path("calcul_score_brut_session_form", {"session_id":session.id}) }}">Calculer
                 les
-                scores</a>
+                scores bruts</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary" href="{{ path("calcul_profil_form_session", {"session_id":session.id}) }}">Calculer
-                les profils</a>
+            <a class="btn btn-secondary"
+               href="{{ path("calcul_score_etalonne_form_session", {"session_id":session.id}) }}">Calculer
+                les scores étalonnés</a>
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("session_csv", {"id":session.id}) }}">Exporter en .csv</a>
@@ -64,7 +65,7 @@
             <th scope="col">Date de naissance</th>
             <th scope="col">Sexe</th>
             <th scope="col">Niveau scolaire</th>
-            <th scope="col">Type concours</th>
+            <th scope="col">Type de candidat (E-I-R-S)</th>
             <th scope="col">Supprimer</th>
             <th scope="col">Reponses brutes</th>
         </tr>

@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
-use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Etalonnage\EtalonnageManager;
 use App\Core\Exception\UploadFailException;
-use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
-use App\Core\Files\Pdf\PdfManager;
-use App\Core\Files\Pdf\Renderer;
-use App\Core\GraphiqueFileManager;
+use App\Core\IO\GraphiqueFileRepository;
+use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
+use App\Core\IO\Pdf\PdfManager;
+use App\Core\IO\Pdf\Renderer;
+use App\Core\ScoreBrut\CorrecteurManager;
+use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Entity\Graphique;
-use App\Form\TestCorrecteurEtalonnageChoiceType;
 use App\Form\Data\TestCorrecteurEtalonnageChoice;
 use App\Form\GraphiqueType;
+use App\Form\TestCorrecteurEtalonnageChoiceType;
 use App\Repository\GraphiqueRepository;
 use App\Repository\StructureRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,10 +42,10 @@ class GraphiqueController extends AbstractController
      */
     #[Route("/creer", name: "creer")]
     public function creer(
-        GraphiqueFileManager   $graphiqueFileManager,
-        EntityManagerInterface $entityManager,
-        StructureRepository    $structureRepository,
-        Request                $request
+        GraphiqueFileRepository $graphiqueFileManager,
+        EntityManagerInterface  $entityManager,
+        StructureRepository     $structureRepository,
+        Request                 $request
     ): Response
     {
         $structures = $structureRepository->findAll();
@@ -87,10 +87,10 @@ class GraphiqueController extends AbstractController
      */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        GraphiqueFileManager   $graphiqueFileManager,
-        EntityManagerInterface $entityManager,
-        Request                $request,
-        Graphique              $graphique,
+        GraphiqueFileRepository $graphiqueFileManager,
+        EntityManagerInterface  $entityManager,
+        Request                 $request,
+        Graphique               $graphique,
     ): Response
     {
         $form = $this->createForm(GraphiqueType::class, $graphique);
@@ -146,7 +146,7 @@ class GraphiqueController extends AbstractController
 
             $profils = $etalonnageManager->etalonner(
                 $etalonnage,
-                scores: $scores
+                scoresBruts: $scores
             );
 
             $response = $pdfManager->createPdfFile(
@@ -154,8 +154,8 @@ class GraphiqueController extends AbstractController
                 reponseCandidat: $reponsesCandidat,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage,
-                score: $scores[0],
-                profil: $profils[0]
+                scoreBrut: $scores[0],
+                scoreEtalonne: $profils[0]
             );
 
             if (!$response) {
@@ -172,7 +172,7 @@ class GraphiqueController extends AbstractController
     #[Route("/download/{id}", name: "download")]
     public function telecharger(
         Graphique            $graphique,
-        GraphiqueFileManager $graphiqueFileManager
+        GraphiqueFileRepository $graphiqueFileManager
     ): Response
     {
         $filePath = $graphiqueFileManager->entityFilePathOrNull($graphique);

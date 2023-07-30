@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CorrecteurChoiceType extends AbstractType
 {
     const OPTION_SESSION = "session";
-    
+
 
     private function definitionCorrecteurChoice(Session $session): array
     {
@@ -37,7 +37,7 @@ class CorrecteurChoiceType extends AbstractType
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define(self::OPTION_SESSION);
         $resolver->setAllowedTypes(self::OPTION_SESSION, Session::class);

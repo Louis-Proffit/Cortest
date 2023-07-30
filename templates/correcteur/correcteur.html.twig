@@ -27,10 +27,15 @@
     <dl class="row">
         <dt class="col-md-3">Nom</dt>
         <dd class="col-md-9">{{ correcteur.nom }}</dd>
-        <dt class="col-md-3">Grille</dt>
-        <dd class="col-md-9">{{ grille.nom }}</dd>
-        <dt class="col-md-3">Profil</dt>
-        <dd class="col-md-9">{{ correcteur.profil.nom }}</dd>
+        <dt class="col-md-3">Structure</dt>
+        <dd class="col-md-9">{{ correcteur.structure.nom }}</dd>
+        <dt class="col-md-3">Test(s)</dt>
+        {% for test in correcteur.tests %}
+            {% if not loop.first %}
+                <dt class="col-md-3"></dt>
+            {% endif %}
+            <dd class="col-md-9">{{ test.nom }}</dd>
+        {% endfor %}
     </dl>
     <table class="table">
         <thead>

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Core\Exception\UploadFailException;
-use App\Core\ResourceFileManager;
+use App\Core\IO\ResourceFileRepository;
 use App\Entity\Resource;
 use App\Form\ResourceType;
 use App\Security\DeleteResourceVoter;
@@ -19,7 +19,7 @@ class ResourceController extends CortestAbstractController
 
     #[Route("/download/{id}", name: "download")]
     public function download(
-        ResourceFileManager    $resourceFileManager,
+        ResourceFileRepository $resourceFileManager,
         EntityManagerInterface $entityManager,
         Resource               $resource): Response
     {
@@ -42,7 +42,7 @@ class ResourceController extends CortestAbstractController
      */
     #[Route("/creer", name: "creer")]
     public function creer(Request                $request,
-                          ResourceFileManager    $resourceFileManager,
+                          ResourceFileRepository $resourceFileManager,
                           EntityManagerInterface $entityManager): Response
     {
         $resource = new Resource(id: 0, nom: "", file_nom: "", user: $this->getNonNullUser());
@@ -67,7 +67,7 @@ class ResourceController extends CortestAbstractController
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         EntityManagerInterface $entityManager,
-        ResourceFileManager    $resourceFileManager,
+        ResourceFileRepository $resourceFileManager,
         Resource               $resource
     ): RedirectResponse
     {

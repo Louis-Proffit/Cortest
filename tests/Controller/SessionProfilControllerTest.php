@@ -2,8 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\SessionScoresEtalonnesController;
-use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Controller\ScoresEtalonnesController;
+use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Repository\CorrecteurRepository;
 use App\Repository\EtalonnageRepository;
@@ -33,7 +33,7 @@ class SessionProfilControllerTest extends WebTestCase
     {
         $session = self::getContainer()->get(SessionRepository::class)->findOneBy([]);
 
-        $this->client->request(Request::METHOD_GET, "/calcul/profil/form/session/" . $session->id);
+        $this->client->request(Request::METHOD_GET, "/calcul/score_etalonne/form/session/" . $session->id);
         self::assertResponseRedirects();
 
         $this->client->followRedirect();

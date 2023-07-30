@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
-use App\Core\Correcteur\CorrecteurManager;
-use App\Core\Etalonnage\EtalonnageManager;
-use App\Core\Files\Pdf\Compiler\LatexCompilationFailedException;
-use App\Core\Files\Pdf\PdfManager;
-use App\Core\Reponses\CheckSingleSession;
-use App\Core\Reponses\DifferentSessionException;
-use App\Core\Reponses\NoReponsesCandidatException;
-use App\Core\Reponses\ReponsesCandidatStorage;
+use App\Core\Exception\DifferentSessionException;
+use App\Core\Exception\NoReponsesCandidatException;
+use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
+use App\Core\IO\Pdf\PdfManager;
+use App\Core\ReponseCandidat\CheckSingleSession;
+use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ScoreBrut\CorrecteurManager;
+use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Entity\Correcteur;
 use App\Entity\Etalonnage;
 use App\Entity\Graphique;
@@ -58,7 +58,7 @@ class PdfController extends AbstractController
                 "correcteur_id" => $correcteur->id]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
+        return $this->render("score_etalonne/form_graphique.html.twig", ["form" => $form->createView()]);
     }
 
     #[Route("/form/zip/{correcteur_id}/{etalonnage_id}", name: "form_zip")]
@@ -91,7 +91,7 @@ class PdfController extends AbstractController
             ]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
+        return $this->render("score_etalonne/form_graphique.html.twig", ["form" => $form->createView()]);
 
     }
 
@@ -126,7 +126,7 @@ class PdfController extends AbstractController
             ]);
         }
 
-        return $this->render("profil/form_graphique.html.twig", ["form" => $form->createView()]);
+        return $this->render("score_etalonne/form_graphique.html.twig", ["form" => $form->createView()]);
 
     }
 
@@ -144,16 +144,17 @@ class PdfController extends AbstractController
         #[MapEntity(id: "candidat_reponse_id")] ReponseCandidat $reponseCandidat,
     ): Response
     {
-        $scores = $correcteurManager->corriger($correcteur, [$reponseCandidat]);
-        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
+        $reponsesCandidat = [];
+        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidat);
+        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidat, scoresBruts: $scores);
 
         return $pdfManager->createPdfFile(
             graphique: $graphique,
             reponseCandidat: $reponseCandidat,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            score: $scores[$reponseCandidat->id],
-            profil: $profils[$reponseCandidat->id]
+            scoreBrut: $scores->get($reponseCandidat),
+            scoreEtalonne: $profils->get($reponseCandidat)
         );
     }
 
@@ -186,15 +187,15 @@ class PdfController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
-        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
+        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
+        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scores);
 
         return $pdfManager->createZipFile(
             session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            scores: $scores,
-            profils: $profils,
+            scoresBruts: $scores,
+            scoresEtalonnes: $profils,
             graphique: $graphique,
             reponsesCandidat: $reponsesCandidats
         );
@@ -227,20 +228,20 @@ class PdfController extends AbstractController
     ): Response
     {
 
-        $reponses_candidat = $reponsesCandidatStorage->get();
-        $session = $checkSingleSession->findCommonSession($reponses_candidat);
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+        $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger($correcteur, $reponses_candidat);
-        $profils = $etalonnageManager->etalonner($etalonnage, $scores);
+        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
+        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scores);
 
         return $pdfManager->createPdfMergedFile(
             session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            scores: $scores,
-            profils: $profils,
+            scoresBruts: $scores,
+            scoresEtalonnes: $profils,
             graphique: $graphique,
-            reponsesCandidat: $reponses_candidat
+            reponsesCandidat: $reponsesCandidats
         );
     }
 }
