@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Echelle;
 use App\Entity\Test;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -15,12 +16,13 @@ class CorrecteurType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("nom", TextType::class)
+        $builder->add("nom", TextType::class, ["label" => "Nom du correcteur"])
             ->add("tests", EntityType::class, [
                 "class" => Test::class,
                 "choice_label" => "nom",
                 "multiple" => true,
-                "expanded" => true
+                "expanded" => true,
+                "label" => "Tests applicables"
             ])
             ->add(
                 "echelles", CollectionType::class, [

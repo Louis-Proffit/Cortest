@@ -42,8 +42,8 @@ class RechercheController extends AbstractController
         ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
         int                            $reponse_id): RedirectResponse
     {
-        $cached_reposes = $reponsesCandidatSessionStorage->get();
-        $reponsesCandidatSessionStorage->set(array_diff($cached_reposes, array($reponse_id)));
+        $cached_reponses = $reponsesCandidatSessionStorage->getOrSetDefault([]);
+        $reponsesCandidatSessionStorage->set(array_diff($cached_reponses, array($reponse_id)));
         $this->addFlash("success", "Le candidat a été retiré.");
         return $this->redirectToRoute("recherche_index");
     }

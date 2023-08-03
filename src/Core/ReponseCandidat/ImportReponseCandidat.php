@@ -27,8 +27,8 @@ readonly class ImportReponseCandidat
 
         /** @var QuestionTest $question */
         foreach ($questions as $question) {
-            $reponseQuestionString = $rawReponsesCandidat[$question->abreviation];
-            $questionsReponses[$question->indice] = ExportReponseCandidat::REPONSE_VALUE_TO_INDEX[$reponseQuestionString];
+            $reponseQuestion = $rawReponsesCandidat[$question->abreviation];
+            $questionsReponses[$question->indice] = ReponseCandidat::REPONSES_NOM_TO_INDEX[$reponseQuestion];
         }
 
         $nomNiveauScolaire = $rawReponsesCandidat[ExportReponseCandidat::NIVEAU_SCOLAIRE_KEY];

@@ -2,8 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\LectureController;
-use PHPUnit\Framework\TestCase;
+use App\Tests\LoginTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

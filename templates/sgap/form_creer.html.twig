@@ -5,7 +5,20 @@
     <br>
     <h1>Créer un SGAP</h1>
     <br>
-    {{ form(form) }}
+    {{ form_start(form) }}
+    <br>
+    <div class="note note-info">
+        Inscrire ici le nom du SGAP tel qu'il apparaîtra dans l'application.
+    </div>
+    <br>
+    {{ form_row(form.nom) }}
+    <br>
+    <div class="note note-info">
+        Inscrire ici le nom tel qu'il apparaitra dans l'application.
+    </div>
+    <br>
+    {{ form_row(form.indice) }}
+    {{ form_end(form) }}
 
 {% endblock %}
 

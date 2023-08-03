@@ -32,10 +32,10 @@ readonly abstract class AbstractFileRepository
 
     /**
      * @param UploadedFile $file
-     * @param mixed $entity
+     * @param $entity
      * @throws UploadFailException
      */
-    public function upload(UploadedFile $file, mixed $entity): void
+    public function upload(UploadedFile $file, $entity): void
     {
         try {
             $fileName = $this->entityFileName($entity);
@@ -46,22 +46,14 @@ readonly abstract class AbstractFileRepository
         }
     }
 
-
-    /**
-     * @param mixed $entity
-     * @return void
-     */
-    public function delete(mixed $entity): void
+    public function delete($entity): void
     {
         $this->logger->info("Upload du fichier", ["fileName" => $this->entityFilePath($entity)]);
         $this->filesystem->remove($this->entityFilePath($entity));
     }
 
-    /**
-     * @param mixed $entity
-     * @return string|null
-     */
-    public function entityFilePathOrNull(mixed $entity): string|null
+
+    public function entityFilePathOrNull($entity): string|null
     {
         $filePath = $this->entityFilePath($entity);
         if ($this->filesystem->exists($filePath)) {

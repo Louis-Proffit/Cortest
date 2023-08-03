@@ -8,6 +8,7 @@ use App\Repository\NiveauScolaireRepository;
 use App\Repository\SessionRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -41,19 +42,15 @@ class ReponseCandidatType extends AbstractType
                     "Femme" => ReponseCandidat::INDEX_FEMME
                 ]
             ])
-            ->add("reserve", TextType::class, ["empty_data" => ""])
-            ->add("autre_1", TextType::class, ["empty_data" => ""])
-            ->add("autre_2", TextType::class, ["empty_data" => ""])
+            ->add("reserve", TextType::class, ["empty_data" => "", "label" => "Réservé"])
+            ->add("autre_1", TextType::class, ["empty_data" => "", "label" => "Autre 1"])
+            ->add("autre_2", TextType::class, ["empty_data" => "", "label" => "Autre 2"])
             ->add("code_barre", IntegerType::class)
-            ->add("reponses", TextType::class, [
-                "getter" => function (ReponseCandidat $reponse_candidat) {
-                    /** @noinspection PhpRedundantOptionalArgumentInspection */
-                    # Ne pas enlever separator, même si l'ide le propose !
-                    return implode(separator: "", array: $reponse_candidat->reponses);
-                },
-                "setter" => function (ReponseCandidat $reponse_candidat, string $value) {
-                    $reponse_candidat->reponses = array_map("intval", str_split(string: $value));
-                }
+            ->add("reponses", CollectionType::class, [
+                "entry_type" => ChoiceType::class,
+                "entry_options" => [
+                    "choices" => ReponseCandidat::REPONSES_NOM_TO_INDEX
+                ]
             ])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }

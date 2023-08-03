@@ -2,9 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Sgap;
-use App\Repository\EchelleRepository;
 use App\Repository\SgapRepository;
+use App\Tests\LoginTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

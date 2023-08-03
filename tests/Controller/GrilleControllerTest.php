@@ -2,8 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\GrilleController;
-use PHPUnit\Framework\TestCase;
+use App\Tests\LoginTestTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use function PHPUnit\Framework\assertStringContainsString;

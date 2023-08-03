@@ -31,8 +31,8 @@
                        href="{{ path("niveau_scolaire_modifier", {"id":niveau.id}) }}">Lien</a>
                 </td>
                 <td>
-                    <a class="btn btn-link fw-bold"
-                       href="{{ path("niveau_scolaire_supprimer", {"id":niveau.id}) }}">Lien</a>
+                    <a class="btn btn-link fw-bold link-danger"
+                       href="{{ path("niveau_scolaire_supprimer_confirmer", {"id":niveau.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

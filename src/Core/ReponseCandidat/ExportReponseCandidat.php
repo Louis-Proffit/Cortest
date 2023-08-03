@@ -27,18 +27,15 @@ class ExportReponseCandidat
 
     const DATE_FORMAT = "d/m/Y";
 
-    const REPONSE_INDEX_TO_VALUE = [0 => "", 1 => "A", 2 => "B", 3 => "C", 4 => "D", 5 => "E"];
-    const REPONSE_VALUE_TO_INDEX = ["" => 0, "A" => 1, "B" => 2, "C" => 3, "D" => 4, "E" => 5];
-
     /**
      * Si les questions sont "null", les reponses du candidat aux questions ne sont pas incluses dans l'export
      * @param ReponseCandidat $reponsesCandidat
      * @param QuestionTest[]|null $questions
      * @return array
      */
-    public function export(ReponseCandidat $reponsesCandidat, array|null $questions): array
+    public function exportCandidat(ReponseCandidat $reponsesCandidat): array
     {
-        $result = [
+        return [
             self::NOM_KEY => $reponsesCandidat->nom,
             self::PRENOM_KEY => $reponsesCandidat->prenom,
             self::NOM_JEUNE_FILLE_KEY => $reponsesCandidat->nom_jeune_fille,
@@ -51,15 +48,27 @@ class ExportReponseCandidat
             self::CODE_BARRE_KEY => $reponsesCandidat->code_barre,
             self::EIRS_KEY => $reponsesCandidat->eirs,
         ];
+    }
+
+    /**
+     * @param ReponseCandidat $reponseCandidat
+     * @param QuestionTest[] $questions
+     * @return array
+     * @throws \Exception
+     */
+    public function exportReponses(ReponseCandidat $reponseCandidat, array $questions): array
+    {
+        $result = [];
 
         if ($questions != null) {
             foreach ($questions as $question) {
 
-                if (key_exists($question->indice, $reponsesCandidat->reponses)) {
-                    $formattedResponse = self::REPONSE_INDEX_TO_VALUE[$reponsesCandidat->reponses[$question->indice]];
+                $trueIndex = $question->indice - 1;
+                if (key_exists($trueIndex, $reponseCandidat->reponses)) {
+                    $reponseInt = $reponseCandidat->reponses[$trueIndex];
+                    $formattedResponse = ReponseCandidat::REPONSES_INDEX_TO_NOM[$reponseInt];
                 } else {
-                    // Pas de réponse à cette question, passer
-                    $formattedResponse = "";
+                    throw new \Exception("Missing question index " . $question->indice);
                 }
 
                 $result[$question->abreviation] = $formattedResponse;
@@ -67,5 +76,13 @@ class ExportReponseCandidat
         }
 
         return $result;
+    }
+
+    public function exportCandidatAndReponses(ReponseCandidat $reponseCandidat, array $questions): array
+    {
+        return array_merge(
+            $this->exportCandidat($reponseCandidat),
+            $this->exportReponses($reponseCandidat, $questions)
+        );
     }
 }

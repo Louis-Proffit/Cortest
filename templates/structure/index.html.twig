@@ -14,31 +14,33 @@
     <br>
     <table class="table">
         <thead>
-        <tr>
+        <tr class="align-middle">
             <th>Nom</th>
             <th>Echelles</th>
+            <th>Correcteurs</th>
+            <th>Etalonnages</th>
+            <th>Graphiques</th>
             <th>Consulter</th>
             <th>Modifier</th>
             <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
-        {% for profil in structures %}
-            <tr>
-                <td>{{ profil.nom }}</td>
-                <td>
-                    {% for echelle in profil.echelles %}
-                        <p>{{ echelle.nom }} - {{ echelle.nom_php }}</p>
-                    {% endfor %}
+        {% for structure in structures %}
+            <tr class="align-middle">
+                <td>{{ structure.nom }}</td>
+                <td>{{ structure.echelles.count }}</td>
+                <td>{{ structure.correcteurs.count }}</td>
+                <td>{{ structure.etalonnages.count }}</td>
+                <td>{{ structure.graphiques.count }}</td>
+                <td><a class="btn btn-link fw-bold"
+                       href="{{ path('structure_consulter', {"id":structure.id}) }}">Lien</a>
                 </td>
                 <td><a class="btn btn-link fw-bold"
-                       href="{{ path('structure_consulter', {"id":profil.id}) }}">Lien</a>
+                       href="{{ path('structure_modifier', {"id":structure.id}) }}">Lien</a>
                 </td>
-                <td><a class="btn btn-link fw-bold"
-                       href="{{ path('structure_modifier', {"id":profil.id}) }}">Lien</a>
-                </td>
-                <td><a class="btn btn-link fw-bold"
-                       href="{{ path('structure_supprimer', {"id":profil.id}) }}">Lien</a></td>
+                <td><a class="btn btn-link fw-bold link-danger"
+                       href="{{ path('structure_supprimer', {"id":structure.id}) }}">Lien</a></td>
             </tr>
         {% endfor %}
         </tbody>

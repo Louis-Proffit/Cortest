@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Exception\MissingFileException;
 use App\Core\Exception\UploadFailException;
 use App\Core\IO\GraphiqueFileRepository;
 use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 #[Route("/graphique", name: "graphique_")]
 class GraphiqueController extends AbstractController
@@ -113,7 +116,17 @@ class GraphiqueController extends AbstractController
     }
 
     /**
+     * @param Renderer $renderer
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param Request $request
+     * @param PdfManager $pdfManager
+     * @param Graphique $graphique
+     * @return Response
      * @throws LatexCompilationFailedException
+     * @throws MissingFileException
+     * @throws LoaderError
+     * @throws SyntaxError
      */
     #[Route("/tester/{id}", name: "tester")]
     public function tester(
@@ -145,7 +158,8 @@ class GraphiqueController extends AbstractController
             );
 
             $profils = $etalonnageManager->etalonner(
-                $etalonnage,
+                etalonnage:  $etalonnage,
+                reponsesCandidat: $reponsesCandidats,
                 scoresBruts: $scores
             );
 
@@ -169,7 +183,7 @@ class GraphiqueController extends AbstractController
         return $this->render("graphique/form_tester.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/download/{id}", name: "download")]
+    #[Route("/telecharger/{id}", name: "download")]
     public function telecharger(
         Graphique            $graphique,
         GraphiqueFileRepository $graphiqueFileManager

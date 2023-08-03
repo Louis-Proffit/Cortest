@@ -2,13 +2,11 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\LoginController;
 use App\Entity\CortestUser;
+use App\Tests\LoginTestTrait;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use function PHPUnit\Framework\assertStringContainsString;
 
 class LoginControllerTest extends WebTestCase

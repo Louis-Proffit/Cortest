@@ -2,9 +2,43 @@
 
 {% block content %}
     <br>
-    <h1>Correction manuelle</h1>
+    <h1>Saisie manuelle</h1>
+    {{ form_start(form) }}
     <br>
-    {{ form(form) }}
+    <h3>Informations sur le candidat</h3>
+    <br>
+    <div class="note note-info">
+        Sélectionner la session à laquelle le candidat à participé.
+        Si elle n'est pas disponible, <a href="{{ path('session_creer') }}">créez la</a>.
+    </div>
+    <br>
+    {{ form_row(form.session) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.prenom) }}
+    {{ form_row(form.nom_jeune_fille) }}
+    {{ form_row(form.niveau_scolaire) }}
+    {{ form_row(form.date_de_naissance) }}
+    {{ form_row(form.sexe) }}
+    <br>
+    <h3>Informations techniques</h3>
+    <br>
+    {{ form_row(form.reserve) }}
+    {{ form_row(form.autre_1) }}
+    {{ form_row(form.autre_2) }}
+    {{ form_row(form.code_barre) }}
+    <br>
+    <div class="note note-info">
+        Sélectionner les réponses du candidat à chaque question.
+        Les flèches du clavier et la touche <b>tab</b> peuvent accélerer la saisie.
+    </div>
+    <br>
+    {% for indice, reponse in form.reponses %}
+        <div class="input-group mb-3">
+            <span class="input-group-text">Question {{ indice }}</span>
+            {{ form_widget(reponse, {"attr":{"class":"form-control"}}) }}
+        </div>
+    {% endfor %}
+    {{ form_end(form) }}
     <br>
 {% endblock %}
 

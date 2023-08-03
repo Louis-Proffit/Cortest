@@ -12,14 +12,14 @@ class VraiA extends CortestFunction
     {
         parent::__construct(nom_affiche: "vraiA(numéro_question)",
             nom_php: "vraiA",
-            description: '
-            <p>Renvoie 1 si le candidat a choisi l\\\'item A à la question d\\\'indice [indice], 0 sinon</p>
+            description: "
+            <p>Renvoie 1 si le candidat a choisi l'item A à la question d'indice [indice], 0 sinon</p>
             <ul>
             <li>vraiA(3) : 1 point si le candidat a répondu A à la question 3, 0 sinon</li>
             <li>vraiA() : Erreur de syntaxe</li>
             <li>vraiA(3, 5) : Le 5 ne sera pas lu</li>
            </ul>
-            ',
+            ",
             evaluator: $this->evaluer(...),
             compiler: $this->compiler(...));
     }

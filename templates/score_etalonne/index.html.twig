@@ -17,7 +17,7 @@
         </div>
         <div class="col">
             <a class="btn btn-secondary"
-               href="{{ path("csv_profils", {"correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Exporter
+               href="{{ path("csv_scores_etalonnes", {"correcteur_id":correcteur.id, "etalonnage_id":etalonnage.id}) }}">Exporter
                 en .csv</a>
         </div>
     </div>
@@ -72,7 +72,9 @@
                            href="{{ path("pdf_form_single", {"candidat_reponse_id":reponse.id, "etalonnage_id":etalonnage.id, "correcteur_id":correcteur.id}) }}">Lien</a>
                     </td>
                     {% for echelle_etalonnage in etalonnage.echelles %}
-                        <td>{{ scores_etalonnes.get(reponse).get(echelle_etalonnage.echelle) }} (brut: {{ scores_bruts.get(reponse).get(echelle_etalonnage.echelle) }})</td>
+                        <td>{{ scores_etalonnes.get(reponse).get(echelle_etalonnage.echelle) }}
+                            (brut: {{ scores_bruts.get(reponse).get(echelle_etalonnage.echelle) }})
+                        </td>
                     {% endfor %}
                 </tr>
             {% endfor %}

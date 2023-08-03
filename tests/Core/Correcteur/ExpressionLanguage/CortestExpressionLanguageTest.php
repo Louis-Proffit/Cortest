@@ -6,6 +6,8 @@ use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\ScoreBrut\ExpressionLanguage\Environment\CortestCompilationEnvironment;
 use App\Core\ScoreBrut\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Entity\Echelle;
+use App\Entity\EchelleCorrecteur;
+use App\Entity\ReponseCandidat;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
@@ -14,7 +16,7 @@ use TypeError;
 class CortestExpressionLanguageTest extends KernelTestCase
 {
 
-    private CortestExpressionLanguage $cortest_expression_language;
+    private CortestExpressionLanguage $cortestExpressionLanguage;
 
     /**
      * @throws Exception
@@ -24,7 +26,7 @@ class CortestExpressionLanguageTest extends KernelTestCase
         self::bootKernel();
         $container = static::getContainer();
 
-        $this->cortest_expression_language = $container->get(CortestExpressionLanguage::class);
+        $this->cortestExpressionLanguage = $container->get(CortestExpressionLanguage::class);
     }
 
     public function compilerProvider(): array
@@ -84,7 +86,7 @@ class CortestExpressionLanguageTest extends KernelTestCase
 
         foreach ($expressions as $echelle => $expression) {
             self::assertNotEmpty(
-                $this->cortest_expression_language->cortestCompile(
+                $this->cortestExpressionLanguage->cortestCompile(
                     expression: $expression,
                     type: $types[$echelle],
                     environment: new CortestCompilationEnvironment(types: $types)
@@ -95,18 +97,17 @@ class CortestExpressionLanguageTest extends KernelTestCase
 
     /**
      * @dataProvider evaluerProvider
-     * @param array $types
-     * @param array $expressions
-     * @param array $reponses
+     * @param ReponseCandidat[] $reponses
+     * @param EchelleCorrecteur[] $echelles
      * @param array $expected
      * @return void
      */
-    public function testEvaluer(array $types, array $expressions, array $reponses, array $expected): void
+    public function testEvaluer(array $reponses, array $echelles, array $expected): void
     {
-        $environment = new CortestEvaluationEnvironment(reponses: $reponses,
-            echelles: $types,
-            expressions: $expressions,
-            cortestExpressionLanguage: $this->cortest_expression_language);
+        $environment = new CortestEvaluationEnvironment(
+            reponses: $reponses,
+            echelles: $echelles,
+            cortestExpressionLanguage: $this->cortestExpressionLanguage);
 
         $result = $environment->computeScores();
         foreach ($expected as $echelle => $score) {

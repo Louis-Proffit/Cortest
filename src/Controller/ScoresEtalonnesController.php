@@ -81,7 +81,7 @@ class ScoresEtalonnesController extends AbstractController
         ]);
     }
 
-    #[Route("/form/score_brut/session/{session_id}/{correcteur_id}", name: "form_score_session")]
+    #[Route("/form/score-brut/session/{session_id}/{correcteur_id}", name: "form_score_session")]
     public function formScoreSession(
         ReponsesCandidatStorage                $reponsesCandidatStorage,
         #[MapEntity(id: "session_id")] Session $session,
@@ -97,7 +97,7 @@ class ScoresEtalonnesController extends AbstractController
      * @throws DifferentSessionException
      * @throws NoReponsesCandidatException
      */
-    #[Route('/form/score_brut/{correcteur_id}', name: "form_score")]
+    #[Route('/form/score-brut/{correcteur_id}', name: "form_score")]
     public function sessionProfilForm(
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
@@ -186,7 +186,7 @@ class ScoresEtalonnesController extends AbstractController
             scoresBruts: $scoresBruts
         );
 
-        return $this->render("score_etalonne/index_calcul.html.twig",
+        return $this->render("score_etalonne/index.html.twig",
             ["scores_etalonnes" => $scoresEtalonnes,
                 "scores_bruts" => $scoresBruts,
                 "reponses_candidats" => $reponsesCandidats,

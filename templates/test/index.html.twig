@@ -18,7 +18,10 @@
             <th>Nom</th>
             <th>Version batterie</th>
             <th>Grille</th>
+            <th>Concours(s)</th>
             <th>Consulter</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -28,8 +31,23 @@
                 <td>{{ test.version_batterie }}</td>
                 <td>{{ grilles[test.index_grille].nom }}</td>
                 <td>
+                    <ul>
+                        {% for concours in test.concours %}
+                            <li>{{ concours.intitule }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
                     <a class="btn btn-link fw-bold"
                        href="{{ path("test_consulter", {"id":test.id}) }}">Lien</a>
+                </td>
+                <td>
+                    <a class="btn btn-link fw-bold"
+                       href="{{ path("test_modifier", {"id":test.id}) }}">Lien</a>
+                </td>
+                <td>
+                    <a class="btn btn-link fw-bold link-danger"
+                       href="{{ path("test_supprimer", {"id":test.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

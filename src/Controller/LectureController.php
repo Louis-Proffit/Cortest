@@ -14,6 +14,7 @@ use App\Form\ParametresLectureFichierCsvType;
 use App\Form\ParametresLectureFichierType;
 use App\Form\ParametresLectureOptiqueType;
 use App\Form\ReponseCandidatType;
+use App\Repository\GrilleRepository;
 use App\Repository\NiveauScolaireRepository;
 use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
@@ -40,6 +41,7 @@ class LectureController extends AbstractController
     public function form(
         SessionRepository        $sessionRepository,
         NiveauScolaireRepository $niveauScolaireRepository,
+        GrilleRepository         $grilleRepository,
         Request                  $request,
         EntityManagerInterface   $entityManager
     ): Response
@@ -58,10 +60,13 @@ class LectureController extends AbstractController
             return $this->redirectToRoute("niveau_scolaire_creer");
         }
 
+        $grille = $grilleRepository->getFromIndex($session->test->index_grille);
+        $reponses = array_fill(1, $grille->nombre_questions, 0);
+
         $reponse = new ReponseCandidat(
             id: 0,
             session: $session,
-            reponses: array(),
+            reponses: $reponses,
             nom: "",
             prenom: "",
             nom_jeune_fille: "",
@@ -92,7 +97,7 @@ class LectureController extends AbstractController
         return $this->render("lecture/from_form.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/fichier", name: 'fichier')]
+    #[Route("/fichier-json", name: 'fichier')]
     public function fichier(ManagerRegistry          $doctrine,
                             NiveauScolaireRepository $niveau_scolaire_repository,
                             Request                  $request,
@@ -176,7 +181,7 @@ class LectureController extends AbstractController
                 $manager->flush();
                 $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
 
-                return $this->redirectToRoute('home');
+                return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session->id]);
             } catch (ImportReponsesCandidatException $e) {
                 $this->addFlash("danger", $e->getMessage());
             }

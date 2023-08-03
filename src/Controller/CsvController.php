@@ -36,18 +36,18 @@ class CsvController extends AbstractController
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
 
-        $data = $exportReponsesCandidat->export($reponsesCandidats);
+        $content = $exportReponsesCandidat->export($reponsesCandidats);
 
         $fileName = $fileNameManager->reponsesCsvFileName($reponsesCandidats);
 
-        return $csvManager->export($data, $fileName);
+        return $csvManager->export($content, $fileName);
     }
 
     /**
      * @throws DifferentSessionException
      * @throws NoReponsesCandidatException
      */
-    #[Route("/scores/{correcteur_id}", name: "scores")]
+    #[Route("/scores-bruts/{correcteur_id}", name: "scores_bruts")]
     public function scores(
         SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
@@ -81,7 +81,7 @@ class CsvController extends AbstractController
      * @throws DifferentSessionException
      * @throws NoReponsesCandidatException
      */
-    #[Route("/profils/{correcteur_id}/{etalonnage_id}", name: "profils")]
+    #[Route("/scores-etalonnes/{correcteur_id}/{etalonnage_id}", name: "scores_etalonnes")]
     public function profils(
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,

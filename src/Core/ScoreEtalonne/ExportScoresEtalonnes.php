@@ -28,7 +28,7 @@ readonly class ExportScoresEtalonnes
         $data = [];
 
         foreach ($reponses as $reponseCandidat) {
-            $toAdd = $this->exportReponseCandidat->export(reponsesCandidat: $reponseCandidat, questions: null);
+            $toAdd = $this->exportReponseCandidat->exportCandidat(reponsesCandidat: $reponseCandidat);
 
             $scoreEtalonne = $scoresEtalonnes->get($reponseCandidat);
 

@@ -32,7 +32,8 @@ class CortestFunction
 
     protected function innerEvaluer(array $arguments, int $index, float $siVide, float $siA, float $siB, float $siC, float $siD, float $siE): float
     {
-        return match ($arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_REPONSES][$index]) {
+        $trueIndex = $index - 1;
+        return match ($arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_REPONSES][$trueIndex]) {
             0 => $siVide,
             1 => $siA,
             2 => $siB,
@@ -45,8 +46,9 @@ class CortestFunction
 
     protected function innerCompiler(int $index, float $siVide, float $siA, float $siB, float $siC, float $siD, float $siE): string
     {
+        $trueIndex = $index - 1;
         return sprintf('(reponses[%1$d] == 0 ? %2$d : (reponses[%1$d] == 1 ? %3$d : (reponses[%1$d] == 2 ? %4$d : (reponses[%1$d] == 3 ? %5$d : (reponses[%1$d] == 4 ? %6$d : %7$d)))))',
-            $index,
+            $trueIndex,
             $siVide,
             $siA,
             $siB,

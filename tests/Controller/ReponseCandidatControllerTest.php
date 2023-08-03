@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Repository\ReponseCandidatRepository;
+use App\Tests\LoginTestTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Core\Exception\DifferentSessionException;
+use App\Core\Exception\MissingFileException;
 use App\Core\Exception\NoReponsesCandidatException;
 use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\IO\Pdf\PdfManager;
@@ -22,11 +23,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 #[Route("/pdf", name: "pdf_")]
 class PdfController extends AbstractController
 {
-    #[Route("/form/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form_single")]
+    #[Route("/form/simple/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}", name: "form_single")]
     public function form(
         GraphiqueRepository                          $graphiqueRepository,
         Request                                      $request,
@@ -131,17 +134,28 @@ class PdfController extends AbstractController
     }
 
     /**
+     * @param CorrecteurManager $correcteurManager
+     * @param EtalonnageManager $etalonnageManager
+     * @param PdfManager $pdfManager
+     * @param Correcteur $correcteur
+     * @param Etalonnage $etalonnage
+     * @param Graphique $graphique
+     * @param ReponseCandidat $reponseCandidat
+     * @return Response
      * @throws LatexCompilationFailedException
+     * @throws LoaderError
+     * @throws MissingFileException
+     * @throws SyntaxError
      */
-    #[Route("/download/single/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
+    #[Route("/telecharger/simple/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
     public function download(
         CorrecteurManager                                       $correcteurManager,
         EtalonnageManager                                       $etalonnageManager,
         PdfManager                                              $pdfManager,
+        #[MapEntity(id: "candidat_reponse_id")] ReponseCandidat $reponseCandidat,
         #[MapEntity(id: "correcteur_id")] Correcteur            $correcteur,
         #[MapEntity(id: "etalonnage_id")] Etalonnage            $etalonnage,
         #[MapEntity(id: "graphique_id")] Graphique              $graphique,
-        #[MapEntity(id: "candidat_reponse_id")] ReponseCandidat $reponseCandidat,
     ): Response
     {
         $reponsesCandidat = [];
@@ -170,9 +184,12 @@ class PdfController extends AbstractController
      * @return Response
      * @throws DifferentSessionException
      * @throws LatexCompilationFailedException
+     * @throws LoaderError
+     * @throws MissingFileException
      * @throws NoReponsesCandidatException
+     * @throws SyntaxError
      */
-    #[Route("/download/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
+    #[Route("/telecharger/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
     public function formSessionZip(
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
@@ -214,8 +231,11 @@ class PdfController extends AbstractController
      * @throws DifferentSessionException
      * @throws LatexCompilationFailedException
      * @throws NoReponsesCandidatException
+     * @throws MissingFileException
+     * @throws LoaderError
+     * @throws SyntaxError
      */
-    #[Route("/download/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
+    #[Route("/telecharger/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
     public function formSessionPdf(
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,

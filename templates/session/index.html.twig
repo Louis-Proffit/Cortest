@@ -23,6 +23,8 @@
             <th>Nb candidats</th>
             <th>Observations</th>
             <th>Consulter</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -36,6 +38,9 @@
                 <td>{{ session.reponses_candidats.count() }}</td>
                 <td>{{ session.observations }}</td>
                 <td><a class="btn btn-link fw-bold" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
+                <td><a class="btn btn-link fw-bold" href="{{ path("session_modifier", {"id":session.id}) }}">Lien</a>
+                <td><a class="btn btn-link fw-bold link-danger"
+                       href="{{ path("session_supprimer", {"id":session.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

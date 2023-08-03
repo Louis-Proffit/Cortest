@@ -14,7 +14,7 @@
     <br>
     <table class="table">
         <thead>
-        <tr>
+        <tr class="align-middle">
             <th>Nom d'utilisateur</th>
             <th>Rôle</th>
             <th>Modifier</th>
@@ -24,17 +24,17 @@
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
+            <tr class="align-middle">
                 <td>{{ user.username }}</td>
                 <td>{{ user.role }}</td>
                 <td>
-                    <a class="btn btn-primary" href="{{ path("admin_modifier", {"id":user.id}) }}">Modifier</a>
+                    <a class="btn btn-link fw-bold" href="{{ path("admin_modifier", {"id":user.id}) }}">Lien</a>
                 </td>
                 <td>
-                    <a class="btn btn-primary" href="{{ path("admin_modifier_mdp", {"id":user.id}) }}">Modifier</a>
+                    <a class="btn btn-link fw-bold" href="{{ path("admin_modifier_mdp", {"id":user.id}) }}">Lien</a>
                 </td>
                 <td>
-                    <a class="btn btn-primary" href="{{ path("admin_supprimer", {"id":user.id}) }}">Supprimer</a>
+                    <a class="btn btn-link fw-bold link-danger" href="{{ path("admin_supprimer", {"id":user.id}) }}">Lien</a>
                 </td>
             </tr>
         {% endfor %}

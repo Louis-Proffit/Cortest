@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Type;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
 class ReponseCandidat
 {
@@ -20,12 +21,15 @@ class ReponseCandidat
     const INDEX_HOMME = 1;
     const INDEX_FEMME = 2;
 
-
     const TYPE_E = "E";
     const TYPE_I = "I";
     const TYPE_R = "R";
     const TYPE_S = "S";
     const TYPES = [self::TYPE_E, self::TYPE_I, self::TYPE_R, self::TYPE_S];
+
+    const REPONSES = [0, 1, 2, 3, 4, 5];
+    const REPONSES_INDEX_TO_NOM = [0 => "Vide", 1 => "A", 2 => "B", 3 => "C", 4 => "D", 5 => "E"];
+    const REPONSES_NOM_TO_INDEX = ["Vide" => 0, "A" => 1, "B" => 2, "C" => 3, "D" => 4, "E" => 5];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,10 +41,9 @@ class ReponseCandidat
 
     #[All([
         new Type("int"),
-        new LessThanOrEqual(5),
-        new GreaterThanOrEqual(0)
+        new Choice(self::REPONSES)
     ])]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::JSON)]
     public array $reponses;
 
     #[Length(max: 15)]
@@ -123,5 +126,10 @@ class ReponseCandidat
         $this->raw = $raw;
     }
 
-
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function formatReponsesArray(): void
+    {
+        $this->reponses = array_values($this->reponses);
+    }
 }

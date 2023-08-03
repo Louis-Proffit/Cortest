@@ -22,82 +22,79 @@
             date_naissance: {asked: true, expected: false, print: true},
             sexe: {asked: true, expected: false, print: true},
             concours: {asked: true, expected: false, print: true},
-            SGAP: {asked: true, expected: '{% if session.sgap.indice < 10 %}0{% endif %}{{ session.sgap.indice }}', print: true},
+            SGAP: {
+                asked: true,
+                expected: '{% if session.sgap.indice < 10 %}0{% endif %}{{ session.sgap.indice }}',
+                print: true
+            },
             date_examen: {asked: true, expected: false, print: true},
-            type_concours: {asked: true, expected: '{{ session.concours.type_concours }}', print: true},
-            batterie: {asked: true, expected: '{{ session.concours.version_batterie }}', print: true},
+            type_concours: {asked: true, expected: '{{ session.test.concours[0].type_concours }}', print: true},
+            batterie: {asked: true, expected: '{{ session.test.version_batterie }}', print: true},
             reserve: {asked: false, expected: false, print: true},
             option_1: {asked: false, expected: false, print: true},
             option_2: {asked: false, expected: false, print: true},
         };
         var questions = {};
-        {% for questionInfos in session.concours.questions %}
-            questions['{{questionInfos.indice}}'] = '{{questionInfos.type}}';
+        {% for questionInfos in session.test.questions %}
+        questions['{{ questionInfos.indice }}'] = '{{ questionInfos.type }}';
         {% endfor %}
 
-            var choice = [];
+        var choice = [];
         {% for niveau in niveaux %}
-            choice.push({read: '{{niveau.indice}}', print: '{{niveau.nom}}', store:  {{niveau.id}} });
+        choice.push({read: '{{ niveau.indice }}', print: '{{ niveau.nom }}', store:  {{ niveau.id }} });
         {% endfor %}
 
 
-            var gm = new GrilleManager(request, questions, choice);
-            var agOptions = gm.getGridConfig();
-            // setup the grid after the page has finished loading
-            document.addEventListener('DOMContentLoaded', () => {
-                const gridDiv = document.querySelector('#myGrid');
-                ag = new agGrid.Grid(gridDiv, agOptions);
-            });
+        var gm = new GrilleManager(request, questions, choice);
+        var agOptions = gm.getGridConfig();
+        // setup the grid after the page has finished loading
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridDiv = document.querySelector('#myGrid');
+            ag = new agGrid.Grid(gridDiv, agOptions);
+        });
 
-            var lunch = function () {
-                $("#btn-fid").removeAttr("disabled");
-                $("#btn-qcm").removeAttr("disabled");
-            };
+        var lunch = function () {
+            $("#btn-fid").removeAttr("disabled");
+            $("#btn-qcm").removeAttr("disabled");
+        };
 
-            $(document).ready(function () {
-                $("#btn-fid").attr("disabled", true);
-                $("#btn-qcm").attr("disabled", true);
-                $("#btn-test-connexion").attr("disabled", true);
-                $("#spinner-fid").hide();
-                $("#spinner-qcm").hide();
-                console.log('ready');
-                
-                
+        $(document).ready(function () {
+            $("#btn-fid").attr("disabled", true);
+            $("#btn-qcm").attr("disabled", true);
+            $("#btn-test-connexion").attr("disabled", true);
+            $("#spinner-fid").hide();
+            $("#spinner-qcm").hide();
+            console.log('ready');
 
 
+            /*gm.FIDs = [];
+             gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];*/
+        });
 
-                /*gm.FIDs = [];
-                 gm.QCMs = [{code_barre: "123", qcm: ['a', 'b', 'c']}];*/
-            });
-
-            var testFID = {
-                code_barre: "125273",
-                nom: "COLLARD",
-                prenom: 'Julien',
-                nom_jeune_fille: "",
-                niveau_scolaire: 33,
-                date_naissance: '10/12/2001',
-                sexe: 1,
-                concours: "E",
-                SGAP: 12,
-                date_examen: "22/02/2023",
-                type_concours: 23,
-                batterie: 344,
-                reserve: "",
-                option_1: "",
-                option_2: "",
-            };
-
-
-            var testQCM = {code_barre: "5667", qcm: ['A','B','C']};
-            
-            var debugPort = false;
-            
-            var test = true;
-            
-            
+        var testFID = {
+            code_barre: "125273",
+            nom: "COLLARD",
+            prenom: 'Julien',
+            nom_jeune_fille: "",
+            niveau_scolaire: 33,
+            date_naissance: '10/12/2001',
+            sexe: 1,
+            concours: "E",
+            SGAP: 12,
+            date_examen: "22/02/2023",
+            type_concours: 23,
+            batterie: 344,
+            reserve: "",
+            option_1: "",
+            option_2: "",
+        };
 
 
+        var testQCM = {code_barre: "5667", qcm: ['A', 'B', 'C']};
+
+        var debugPort = false;
+
+        var test = true;
 
 
     </script>
@@ -112,26 +109,26 @@
     <table class="table">
 
         <tbody>
-            <tr>
-                <td>Date
-                <td><em>{{ session.date |date("m/d/Y") }}</em></td>
-            </tr>
-            <tr>
-                <td>Concours
-                <td><em>{{ session.concours.nom }}</em></td>
-            </tr>
-            <tr>
-                <td>Type concours
-                <td><em>{{ session.concours.type_concours }}</em></td>
-            </tr>
-            <tr>
-                <td>Batterie
-                <td><em>{{ session.concours.version_batterie }}</em></td>
-            </tr>
-            <tr>
-                <td>SGAP
-                <td><em>{{ session.sgap.nom }}</em></td>
-            </tr>
+        <tr>
+            <td>Date
+            <td><em>{{ session.date |date("m/d/Y") }}</em></td>
+        </tr>
+        <tr>
+            <td>Concours
+            <td><em>{{ session.test.concours[0].intitule }}</em></td>
+        </tr>
+        <tr>
+            <td>Type concours
+            <td><em>{{ session.test.concours[0].type_concours }}</em></td>
+        </tr>
+        <tr>
+            <td>Batterie
+            <td><em>{{ session.test.version_batterie }}</em></td>
+        </tr>
+        <tr>
+            <td>SGAP
+            <td><em>{{ session.sgap.nom }}</em></td>
+        </tr>
         </tbody>
     </table>
 
@@ -222,7 +219,7 @@
                     </button>
                 </div>
                 <div class='col-3'>
-                    <p class="card-text">Pages appairées : <strong id='nb-appaires'>0</strong></strong></p>
+                    <p class="card-text">Pages appairées : <strong id='nb-appaires'>0</strong></p>
                 </div>
                 <div class='col-2'>
                     <p class="card-text">Pages lues : <strong id='nb-lues'>0</strong></p>
@@ -254,7 +251,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle de la FID : <strong
-                            class='code-barre'></strong></h1>
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -294,7 +291,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Correction manuelle du QCM : <strong
-                            class='code-barre'></strong></h1>
+                                class='code-barre'></strong></h1>
                 </div>
                 <div class="modal-body">
                     <p>Certaines erreurs de lectures ont été détectées, veuillez les corriger manuellement :</p>
@@ -418,7 +415,9 @@
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Enregistrement avec succès</h1>
                 </div>
                 <div class="modal-body">
-                    <p>Les tests corrigés ont bien été enregistrés !</p><a href="/session/consulter/{{ session.id }}" class="btn btn-success valider" >Fin de la correction</a>
+                    <p>Les tests corrigés ont bien été enregistrés !</p><a href="/session/consulter/{{ session.id }}"
+                                                                           class="btn btn-success valider">Fin de la
+                        correction</a>
                 </div>
             </div>
         </div>

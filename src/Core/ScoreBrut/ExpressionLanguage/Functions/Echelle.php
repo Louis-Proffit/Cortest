@@ -12,12 +12,12 @@ class Echelle extends CortestFunction
     {
         parent::__construct(nom_affiche: "echelle('nom_echelle_php')",
             nom_php: "echelle",
-            description: '
-            <p>Renvoie le score_brut obtenu à l\\\'echelle [nom_echelle]</p>
+            description: "
+            <p>Renvoie le score_brut obtenu à l'échelle [nom_echelle]</p>
             <ul>
-            <li>echelle(x) : score_brut obtenu à l\\\'echelle x</li>
+            <li>echelle(x) : score_brut obtenu à l'échelle x</li>
            </ul>
-            ',
+            ",
             evaluator: $this->evaluer(...),
             compiler: $this->compiler(...));
     }

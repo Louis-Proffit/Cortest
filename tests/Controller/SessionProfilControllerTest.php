@@ -2,19 +2,12 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\ScoresEtalonnesController;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
-use App\Repository\CorrecteurRepository;
-use App\Repository\EtalonnageRepository;
 use App\Repository\SessionRepository;
-use Exception;
-use PHPUnit\Framework\TestCase;
+use App\Tests\LoginTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SessionProfilControllerTest extends WebTestCase
 {

@@ -2,10 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\GraphiqueController;
 use App\Repository\GraphiqueRepository;
-use App\Repository\GrilleRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\LoginTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

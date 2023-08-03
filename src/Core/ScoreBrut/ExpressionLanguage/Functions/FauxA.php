@@ -12,10 +12,10 @@ class FauxA extends CortestFunction
     {
         parent::__construct(nom_affiche: "fauxA(numéro_question)",
             nom_php: "fauxA",
-            description: '
-            <p>Renvoie 0 si le candidat a choisi l\\\'item A à la question d\\\'indice [indice], 1 sinon</p>
+            description: "
+            <p>Renvoie 0 si le candidat a choisi l'item A à la question d'indice [indice], 1 sinon</p>
            </ul>
-            ',
+            ",
             evaluator: $this->evaluer(...),
             compiler: $this->compiler(...));
     }

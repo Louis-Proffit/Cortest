@@ -73,16 +73,21 @@ class NiveauScolaireController extends AbstractController
         return $this->render("niveau_scolaire/form.html.twig", ["form" => $form->createView()]);
     }
 
-    #[Route("/supprimer", name: "supprimer")]
-    public function supprimer(
-        NiveauScolaireRepository $niveau_scolaire_repository,
-        EntityManagerInterface   $entity_manager,
-        int                      $id): RedirectResponse
+    #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
+    public function supprimerConfirmer(NiveauScolaire $niveauScolaire): Response
     {
-        $item = $niveau_scolaire_repository->find($id);
+        return $this->render("niveau_scolaire/supprimer.html.twig", ["niveau_scolaire" => $niveauScolaire]);
+    }
 
-        $entity_manager->remove($item);
-        $entity_manager->flush();
+    #[Route("/supprimer/{id}", name: "supprimer")]
+    public function supprimer(
+        EntityManagerInterface $entityManager,
+        NiveauScolaire         $niveauScolaire): RedirectResponse
+    {
+        $entityManager->remove($niveauScolaire);
+        $entityManager->flush();
+
+        $this->addFlash("success", "Suppression effectuée.");
 
         return $this->redirectToRoute("niveau_scolaire_index");
     }

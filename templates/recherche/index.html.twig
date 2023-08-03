@@ -83,8 +83,6 @@
             <h3>Candidats</h3>
             <br>
             <div class="input-group">
-
-
                 {% for key, value in properties_starting_with(form.children,"submit_page_") %}
                     {{ form_widget(value) }}
                 {% endfor %}

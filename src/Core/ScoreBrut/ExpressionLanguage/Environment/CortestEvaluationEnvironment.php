@@ -6,12 +6,13 @@ use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\ScoreBrut\ScoreBrut;
 use App\Entity\Echelle;
 use App\Entity\EchelleCorrecteur;
+use App\Entity\ReponseCandidat;
 
 readonly class CortestEvaluationEnvironment
 {
 
     /**
-     * @param int[] $reponses
+     * @param ReponseCandidat[] $reponses
      * @param EchelleCorrecteur[] $echelles
      * @param CortestExpressionLanguage $cortestExpressionLanguage
      */

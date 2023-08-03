@@ -25,13 +25,10 @@ readonly class ExportReponsesCandidat
 
         if (!empty($reponses)) {
             /** @var QuestionTest[] $questions */
-            $questions = $reponses[0]->session->test->questions;
+            $questions = $reponses[0]->session->test->questions->toArray();
 
             foreach ($reponses as $reponseCandidat) {
-                $data[] = $this->exportReponseCandidat->export(
-                    reponsesCandidat: $reponseCandidat,
-                    questions: $questions
-                );
+                $data[] = $this->exportReponseCandidat->exportCandidatAndReponses($reponseCandidat, $questions);
             }
         }
 

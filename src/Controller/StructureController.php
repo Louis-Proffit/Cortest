@@ -35,9 +35,7 @@ class StructureController extends AbstractController
         Structure $structure
     ): Response
     {
-        // TODO implémenter
-        $this->addFlash("danger", "Pas encore implémenté.");
-        return $this->redirectToRoute("home");
+        return $this->render("structure/structure.html.twig", ["structure" => $structure]);
     }
 
     #[Route("/creer", name: "creer")]

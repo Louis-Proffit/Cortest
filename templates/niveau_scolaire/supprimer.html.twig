@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Supprimer un niveau scolaire</h1>
+    <br>
+    <p>Supprimer le niveau <b>{{ niveau_scolaire.nom }}</b></p>
+    <br>
+    <a class="btn btn-danger" href="{{ path("niveau_scolaire_supprimer", {"id":niveau_scolaire.id}) }}">Supprimer</a>
+    <br>
+{% endblock %}
+

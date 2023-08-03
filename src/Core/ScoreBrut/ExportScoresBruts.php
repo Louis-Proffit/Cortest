@@ -32,7 +32,7 @@ readonly class ExportScoresBruts
 
         /** @var ReponseCandidat $reponse */
         foreach ($reponsesCandidat as $reponseCandidat) {
-            $toAdd = $this->exportReponseCandidat->export(reponsesCandidat: $reponseCandidat, questions: null);
+            $toAdd = $this->exportReponseCandidat->exportCandidat(reponsesCandidat: $reponseCandidat);
 
             $scoreBrut = $scoresBruts->get($reponseCandidat);
 

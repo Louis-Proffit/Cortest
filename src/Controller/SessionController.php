@@ -130,7 +130,7 @@ class SessionController extends AbstractController
                               ReponsesCandidatStorage $reponsesCandidatStorage,
                               Session                 $session): Response
     {
-        $reponsesCandidatStorage->set(array()); // TODO be more specific ?, that is very conservative
+        $reponsesCandidatStorage->set(array()); // TODO être un peu plus précis, c'est très conservatif
 
         $logger->info("Suppression de la session : " . $session->id);
 
