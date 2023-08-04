@@ -28,6 +28,10 @@
                 <td>{{ concours.type_concours }}</td>
                 <td>
                     <a class="btn btn-link fw-bold"
+                       href="{{ path("concours_modifier", {"id":concours.id}) }}">Lien</a>
+                </td>
+                <td>
+                    <a class="btn btn-link fw-bold link-danger"
                        href="{{ path("concours_supprimer", {"id":concours.id}) }}">Lien</a>
                 </td>
             </tr>

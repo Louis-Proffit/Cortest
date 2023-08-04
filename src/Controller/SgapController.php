@@ -6,6 +6,7 @@ use App\Entity\Sgap;
 use App\Form\SgapType;
 use App\Repository\SgapRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Loggable\Entity\LogEntry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -87,6 +88,15 @@ class SgapController extends AbstractController
 
         $this->addFlash("success", "Suppression du SGAP enregistrée");
 
+        return $this->redirectToRoute("sgap_index");
+    }
+
+    #[Route("/revert/{id}", name: "revert")]
+    public function revert(Sgap $sgap, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $logEntryRepository = $entityManager->getRepository(LogEntry::class);
+        $logs = $logEntryRepository->getLogEntries($sgap);
+        var_dump($logs);
         return $this->redirectToRoute("sgap_index");
     }
 }

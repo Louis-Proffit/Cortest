@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\GraphiqueRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 
+#[Gedmo\Loggable]
 #[UniqueEntity(fields: self::KEY_NOM_UNIQUE, message: "Ce nom de graphique existe déjà", errorPath: "nom")]
 #[ORM\Entity(repositoryClass: GraphiqueRepository::class)]
 class Graphique
@@ -25,10 +27,12 @@ class Graphique
     public Structure $structure;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $file_nom;
 

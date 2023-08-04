@@ -7,8 +7,10 @@ use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
+#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: SessionRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Session
@@ -19,6 +21,7 @@ class Session
     public int $id;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Gedmo\Versioned]
     public DateTime $date;
 
     /**
@@ -26,15 +29,19 @@ class Session
      * Sert à générer des numéros de session [type_concours]_[annee]_[numero_ordre]
      */
     #[PositiveOrZero]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public int $numero_ordre;
 
     #[ORM\Column(length: 2048)]
+    #[Gedmo\Versioned]
     public string $observations;
 
+    #[Gedmo\Versioned]
     #[ORM\ManyToOne(targetEntity: Test::class, inversedBy: "sessions")]
     public Test $test;
 
+    #[Gedmo\Versioned]
     #[ORM\ManyToOne(targetEntity: Sgap::class, inversedBy: "sessions")]
     public Sgap $sgap;
 

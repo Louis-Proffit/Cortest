@@ -18,6 +18,7 @@
             <th>Indice</th>
             <th>Nom</th>
             <th>Modifier</th>
+            <th>Revert</th>
             <th>Supprimer</th>
         </tr>
         </thead>
@@ -27,6 +28,7 @@
                 <td>{{ sgap.indice }}</td>
                 <td>{{ sgap.nom }}</td>
                 <td><a class="btn btn-link fw-bold" href="{{ path("sgap_modifier",{"id":sgap.id}) }}">Lien</a></td>
+                <td><a class="btn btn-link fw-bold" href="{{ path("sgap_revert",{"id":sgap.id}) }}">Lien</a></td>
                 <td><a class="btn btn-link fw-bold link-danger" href="{{ path("sgap_supprimer",{"id":sgap.id}) }}">Lien</a></td>
                 <td>
             </tr>

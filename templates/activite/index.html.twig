@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <br>
+    <h1>Activité</h1>
+    <br>
+    <p class="lead">Rapport d'activité de Cortest</p>
+    <br>
+    <table class="table">
+        <tr class="align-middle">
+            <th>Utilisateur</th>
+            <th>Action</th>
+            <th>Instant</th>
+            <th>Type</th>
+            <th>Lien</th>
+        </tr>
+        {% for log in logs %}
+            <tr class="align-middle">
+                <td>{{ log.entry.username }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.entry.loggedAt|date("d/m/y H:i") }}</td>
+                <td>{{ log.class }}</td>
+                <td>
+                    {% if log.lien is not null %}
+                        <a href="{{ log.lien }}" class="btn btn-link fw-bold">Lien</a>
+                    {% else %}
+                        Pas de lien
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+

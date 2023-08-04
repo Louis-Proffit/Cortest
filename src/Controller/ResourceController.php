@@ -45,7 +45,7 @@ class ResourceController extends CortestAbstractController
                           ResourceFileRepository $resourceFileManager,
                           EntityManagerInterface $entityManager): Response
     {
-        $resource = new Resource(id: 0, nom: "", file_nom: "", user: $this->getNonNullUser());
+        $resource = new Resource(id: 0, nom: "", file_nom: "");
         $form = $this->createForm(ResourceType::class, $resource);
 
         $form->handleRequest($request);

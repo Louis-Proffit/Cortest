@@ -7,10 +7,12 @@ use App\Repository\EchelleRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[Gedmo\Loggable]
 #[Entity(repositoryClass: EchelleRepository::class)]
 #[UniqueEntity(fields: self::FIELDS_UNIQUE_NOM_PHP, message: "Ce nom d'échelle php existe déjà pour cette structure", errorPath: "nom_php")]
 #[UniqueEntity(fields: self::FIELDS_UNIQUE_NOM, message: "Ce nom d'échelle existe déjà pour cette structure", errorPath: "nom")]
@@ -40,15 +42,18 @@ class Echelle
     public int $id;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $nom;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[PhpIdentifier]
     #[ORM\Column]
     public string $nom_php;
 
     #[Choice(choices: self::TYPE_ECHELLE_OPTIONS)]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $type;
 
@@ -57,7 +62,6 @@ class Echelle
 
     #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
     public Collection $echelles_etalonnage;
-
 
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "echelles")]
     public Structure $structure;

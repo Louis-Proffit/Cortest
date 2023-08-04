@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\ConcoursRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: ConcoursRepository::class)]
 #[ORM\UniqueConstraint(fields: self::KEY_NOM_TYPE_UNIQUE)]
 #[UniqueEntity(fields: self::KEY_NOM_TYPE_UNIQUE, message: "Cette combinaison (intitulé/type concours) existe déjà.")]
@@ -22,10 +24,12 @@ class Concours
     public int $id;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $intitule;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $type_concours;
 

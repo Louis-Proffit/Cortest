@@ -5,10 +5,12 @@ namespace App\Entity;
 use App\Repository\CorrecteurRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
+#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
 #[UniqueEntity(fields: 'nom', message: "Ce nom de correcteur est déjà utilisé")]
 class Correcteur
@@ -25,6 +27,7 @@ class Correcteur
     public Structure $structure;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 
@@ -32,7 +35,6 @@ class Correcteur
     #[ORM\OrderBy(["id" => "ASC"])]
     #[ORM\OneToMany(mappedBy: "correcteur", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
-
 
     /**
      * @param int $id
@@ -65,20 +67,5 @@ class Correcteur
         }
 
         return $result;
-    }
-
-    /**
-     * TODO inutile ?
-     * @return array
-     */
-    public function get_echelles_ids(): array
-    {
-        $echelles_ids = array();
-        if (!$this->echelles->isEmpty()) {
-            foreach ($this->echelles->getValues() as $echelle) {
-                $echelles_ids[] = $echelle->id;
-            }
-        }
-        return $echelles_ids;
     }
 }

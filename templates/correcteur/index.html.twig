@@ -24,8 +24,8 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Test(s)</th>
-            <th scope="col">Structure associée</th>
+            <th scope="col">Création</th>
+            <th scope="col">Modification</th>
             <th scope="col">Consulter</th>
             <th scope="col">Modifier</th>
             <th scope="col">Exporter</th>
@@ -36,12 +36,8 @@
         {% for correcteur in correcteurs %}
             <tr>
                 <td>{{ correcteur.nom }}</td>
-                <td>
-                    {% for test in correcteur.tests %}
-                        <li>{{ test.nom }}</li>
-                    {% endfor %}
-                </td>
-                <td>{{ correcteur.structure.nom }}</td>
+                <td><b>{{ correcteur.user_create.username }}</b> ({{ correcteur.date_create|date("d/m/y i:h") }})</td>
+                <td><b>{{ correcteur.user_update.username }}</b> ({{ correcteur.date_update|date("d/m/y i:h") }})</td>
                 <td>
                     <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link fw-bold">
                         Lien</a>

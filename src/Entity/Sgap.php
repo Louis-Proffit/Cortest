@@ -6,10 +6,13 @@ use App\Repository\SgapRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
+#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: SgapRepository::class)]
 #[UniqueEntity('indice', message: "Cet indice existe déjà.")]
 #[UniqueEntity('nom', message: "Ce nom existe déjà.")]
@@ -21,10 +24,12 @@ class Sgap
     public int $id;
 
     #[PositiveOrZero]
+    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public int $indice;
 
     #[NotBlank]
+    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 
