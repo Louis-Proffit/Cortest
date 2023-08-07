@@ -6,6 +6,15 @@
     <br>
     <p class="lead">Rapport d'activité de Cortest</p>
     <br>
+    {% if pages > 1 %}
+        <div class="input-group">
+            {% for i in range(0, pages - 1, 1) %}
+                <a class="btn {{ (page == i) ? 'btn-primary' : 'btn-secondary' }}"
+                   href="{{ path("admin_activite", {"page":i}) }}">{{ i + 1 }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <br>
     <table class="table">
         <tr class="align-middle">
             <th>Utilisateur</th>

@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\LogEntryProcessor;
 use App\Entity\CortestUser;
 use App\Form\CreerCortestUserType;
 use App\Form\Generic\CortestUserType;
 use App\Form\MotDePasseCortestUserType;
 use App\Repository\CortestUserRepository;
+use App\Repository\LogEntryRepository;
 use App\Security\CheckAdministrateurCount;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\QueryException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -26,18 +29,28 @@ class AdminController extends AbstractController
 {
 
     /**
-     * Page d'accueil de l'administrateur, incluant la liste des utilisateurs
-     * @param CortestUserRepository $userRepository
+     * Page d'accueil de l'administrateur
      * @return Response
      */
     #[Route("/index", name: "index")]
-    public function index(
+    public function index(): Response
+    {
+        return $this->render("admin/index.html.twig");
+    }
+
+    /**
+     * Gestion des utilisateurs
+     * @param CortestUserRepository $userRepository
+     * @return Response
+     */
+    #[Route("/utilisateurs", name: "utilisateurs")]
+    public function utilisateurs(
         CortestUserRepository $userRepository,
     ): Response
     {
         $items = $userRepository->findAll();
 
-        return $this->render("admin/index.html.twig", ["users" => $items]);
+        return $this->render("admin/index_utilisateur.html.twig", ["users" => $items]);
     }
 
     /**
@@ -183,5 +196,20 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute("admin_index");
+    }
+
+    #[Route("/activite/{page}", name: "activite", defaults: ["page" => 0])]
+    public function activite(
+        LogEntryRepository $logEntryRepository,
+        LogEntryProcessor  $logEntryProcessor,
+        int                $page
+    ): Response
+    {
+        $count = $logEntryRepository->count([]);
+
+        $pages = ceil($count / LogEntryRepository::PAGE_SIZE);
+        $logEntries = $logEntryRepository->findAllAtPage($page);
+        $wrappedLogEntries = $logEntryProcessor->processAll(logEntries: $logEntries);
+        return $this->render("admin/index_activite.html.twig", ["logs" => $wrappedLogEntries, "pages" => $pages, "page" => $page]);
     }
 }

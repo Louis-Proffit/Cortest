@@ -52,64 +52,84 @@ class LogEntryProcessor
         LogEntryInterface::ACTION_REMOVE => "Suppression"
     ];
 
-    private LogEntryRepository $logEntryRepository;
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly RouterInterface        $router
     )
     {
-        $this->logEntryRepository = $entityManager->getRepository(LogEntry::class);
     }
 
-
     /**
+     * @param LogEntry[] $logEntries
      * @return LogEntryWrapper[]
      */
-    public function findAll(): array
+    public function processAll(array $logEntries): array
     {
-        $logEntries = $this->logEntryRepository->findBy([], orderBy: ["loggedAt" => "DESC"]);
 
         $result = [];
 
         foreach ($logEntries as $logEntry) {
-            $object = $this->entityManager->find($logEntry->getObjectClass(), $logEntry->getObjectId());
-            $result[] = new LogEntryWrapper(
-                entry: $logEntry,
-                class: self::CLASSES[$logEntry->getObjectClass()],
-                action: self::ACTIONS[$logEntry->getAction()],
-                lien: $object ? $this->lien($object) : null,
-                object: $object,
-                message: "TODO"
-            );
-
+            $result[] = $this->process($logEntry);
         }
 
         return $result;
 
     }
 
+    private function process(LogEntry $logEntry): LogEntryWrapper
+    {
+        $object = $this->entityManager->find(
+            className: $logEntry->getObjectClass(),
+            id: $logEntry->getObjectId()
+        );
+
+        return new LogEntryWrapper(
+            entry: $logEntry,
+            class: self::CLASSES[$logEntry->getObjectClass()],
+            action: self::ACTIONS[$logEntry->getAction()],
+            lien: $object ? $this->lien($object) : null,
+            object: $object,
+            message: "TODO"
+        );
+    }
+
     public function lien(object $object): string|null
     {
-        return match ($object::class) {
-            Concours::class => $this->router->generate("concours_index"),
-            Correcteur::class => $this->router->generate("correcteur_consulter", ["id" => $object->id]),
-            CortestUser::class => $this->router->generate("admin_index"),
-            Echelle::class => $this->router->generate("echelle_index"),
-            EchelleCorrecteur::class => $this->router->generate("correcteur_consulter", ["id" => $object->correcteur->id]),
-            EchelleEtalonnage::class => $this->router->generate("etalonnage_consulter", ["id" => $object->etalonnage->id]),
-            Etalonnage::class => $this->router->generate("etalonnage_index", ["id" => $object->id]),
-            Graphique::class => $this->router->generate("graphique_index", ["id" => $object->id]),
-            NiveauScolaire::class => $this->router->generate("niveau_scolaire_index"),
-            QuestionTest::class => $this->router->generate("test_consulter", ["id" => $object->test->id]),
-            ReponseCandidat::class => $this->router->generate("session_consulter", ["id" => $object->session->id]),
-            Resource::class => $this->router->generate("home"),
-            Session::class => $this->router->generate("session_consulter", ["id" => $object->id]),
-            Sgap::class => $this->router->generate("sgap_index"),
-            Structure::class => $this->router->generate("structure_consulter", ["id" => $object->id]),
-            Test::class => $this->router->generate("test_consulter", ["id" => $object->id]),
-            default => null
-        };
+        if ($object instanceof Concours) {
+            return $this->router->generate("concours_index");
+        } elseif ($object instanceof Correcteur) {
+            return $this->router->generate("correcteur_consulter", ["id" => $object->id]);
+        } elseif ($object instanceof CortestUser) {
+            return $this->router->generate("admin_index");
+        } elseif ($object instanceof Echelle) {
+            return $this->router->generate("echelle_index");
+        } elseif ($object instanceof EchelleCorrecteur) {
+            return $this->router->generate("correcteur_consulter", ["id" => $object->correcteur->id]);
+        } elseif ($object instanceof EchelleEtalonnage) {
+            return $this->router->generate("etalonnage_consulter", ["id" => $object->etalonnage->id]);
+        } elseif ($object instanceof Etalonnage) {
+            return $this->router->generate("etalonnage_index", ["id" => $object->id]);
+        } elseif ($object instanceof Graphique) {
+            return $this->router->generate("graphique_index", ["id" => $object->id]);
+        } elseif ($object instanceof NiveauScolaire) {
+            return $this->router->generate("niveau_scolaire_index");
+        } elseif ($object instanceof QuestionTest) {
+            return $this->router->generate("test_consulter", ["id" => $object->test->id]);
+        } elseif ($object instanceof ReponseCandidat) {
+            return $this->router->generate("session_consulter", ["id" => $object->session->id]);
+        } elseif ($object instanceof Resource) {
+            return $this->router->generate("home");
+        } elseif ($object instanceof Session) {
+            return $this->router->generate("session_consulter", ["id" => $object->id]);
+        } elseif ($object instanceof Sgap) {
+            return $this->router->generate("sgap_index");
+        } elseif ($object instanceof Structure) {
+            return $this->router->generate("structure_consulter", ["id" => $object->id]);
+        } elseif ($object instanceof Test) {
+            return $this->router->generate("test_consulter", ["id" => $object->id]);
+        } else {
+            return null;
+        }
     }
 
 }

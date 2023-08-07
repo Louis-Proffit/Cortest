@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CorrecteurRepository;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;

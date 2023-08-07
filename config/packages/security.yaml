@@ -29,7 +29,6 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }
-        - { path: ^/activite, roles: ROLE_ADMINISTRATEUR }
         - { path: ^/session, roles: ROLE_CORRECTEUR }
         - { path: ^/lecture, roles: ROLE_CORRECTEUR }
         - { path: ^/recherche, roles: ROLE_CORRECTEUR }

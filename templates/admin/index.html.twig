@@ -1,45 +1,27 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+
     <br>
-    <h1>Utilisateurs</h1>
+    <h1>Administrateur</h1>
     <br>
-    <p class="lead">Liste des utilisateurs ayant accès à l'application Cortest.</p>
+    <p class="lead">Fonctions d'administration</p>
     <br>
     <div class="row row-cols-auto">
-        <div class="col">
-            <a class="btn btn-primary" href="{{ path("admin_creer") }}">Créer</a>
+        <div class="card col-lg">
+            <div class="card-body">
+                <h5 class="card-title">Utilisateurs</h5>
+                <p class="card-text">Liste les utilisateurs disponibles, leurs droits et permet le changement de mot de
+                    passe.</p>
+                <a type="button" class="btn btn-primary" href="{{ path("admin_utilisateurs") }}">Choisir</a>
+            </div>
+        </div>
+        <div class="card col-lg ms-3">
+            <div class="card-body">
+                <h5 class="card-title">Activité</h5>
+                <p class="card-text">Gestion de l'activité sur Cortest</p>
+                <a type="button" class="btn btn-primary" href="{{ path("admin_activite") }}">Choisir</a>
+            </div>
         </div>
     </div>
-    <br>
-    <table class="table">
-        <thead>
-        <tr class="align-middle">
-            <th>Nom d'utilisateur</th>
-            <th>Rôle</th>
-            <th>Modifier</th>
-            <th>Modifier le mot de passe</th>
-            <th>Supprimer</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr class="align-middle">
-                <td>{{ user.username }}</td>
-                <td>{{ user.role }}</td>
-                <td>
-                    <a class="btn btn-link fw-bold" href="{{ path("admin_modifier", {"id":user.id}) }}">Lien</a>
-                </td>
-                <td>
-                    <a class="btn btn-link fw-bold" href="{{ path("admin_modifier_mdp", {"id":user.id}) }}">Lien</a>
-                </td>
-                <td>
-                    <a class="btn btn-link fw-bold link-danger" href="{{ path("admin_supprimer", {"id":user.id}) }}">Lien</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <br>
 {% endblock %}
-
