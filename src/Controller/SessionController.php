@@ -53,8 +53,8 @@ class SessionController extends AbstractController
         }
 
         if (empty($tests)) {
-            $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
-            return $this->redirectToRoute("concours_index");
+            $this->addFlash("warning", "Pas de tests disponible, veuillez en créer un.");
+            return $this->redirectToRoute("test_index");
         }
 
         $session = new Session(

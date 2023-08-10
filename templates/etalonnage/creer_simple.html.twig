@@ -5,7 +5,23 @@
     <br>
     <h1>Création d'un étalonnage simple</h1>
     <br>
-    {{ form(form) }}
+    {{ form_start(form) }}
+    <div class="note note-info">
+        La création de l'étalonnage se fait en deux temps.
+        Saisissez d'abord son nom, son nombre de classes et la structure à laquelle il s'applique.
+        Vous pourrez ensuite paramétrer les bornes pour chaque échelle et chaque classe.
+    </div>
+    <br>
+    {{ form_row(form.nom) }}
+    <br>
+    <div class="note note-warning">
+        Le nombre de classes ne sera pas modifiable après l'étape de création de l'étalonnage
+    </div>
+    <br>
+    {{ form_row(form.nombre_classes) }}
+    {{ form_row(form.structure) }}
+    <button class="btn btn-primary">Valider</button>
+    {{ form_end(form) }}
 
 {% endblock %}
 

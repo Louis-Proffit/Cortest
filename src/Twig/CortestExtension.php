@@ -2,10 +2,8 @@
 
 namespace App\Twig;
 
-use App\Entity\EchelleGraphique;
 use App\Entity\ReponseCandidat;
-use App\Entity\Subtest;
-use App\Repository\EchelleGraphiqueRepository;
+use App\Entity\Session;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -28,6 +26,7 @@ class CortestExtension extends AbstractExtension
         return [
             new TwigFilter('sexe', [$this, 'formatSexe']),
             new TwigFilter('eirs', [$this, 'formatEirs']),
+            new TwigFilter('session_format', [$this, 'sessionFormat']),
         ];
     }
 
@@ -63,5 +62,10 @@ class CortestExtension extends AbstractExtension
     public function formatEirs(string $eirs): string
     {
         return self::FULL_EIRS_NAME[$eirs];
+    }
+
+    public function sessionFormat(Session $session): string
+    {
+        return Session::formatLong($session);
     }
 }

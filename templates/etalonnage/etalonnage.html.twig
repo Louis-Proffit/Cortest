@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <br>
@@ -8,11 +10,19 @@
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("etalonnage_supprimer", {"id":etalonnage.id}) }}">Supprimer</a>
+               href="{{ path("etalonnage_modifier", {"id":etalonnage.id}) }}">Modifier</a>
         </div>
         <div class="col">
-            <a class="btn btn-secondary"
-               href="{{ path("etalonnage_modifier", {"id":etalonnage.id}) }}">Modifier</a>
+            <a class="btn btn-danger"
+               data-mdb-toggle="modal" data-mdb-target="#supprimerEtalonnage">
+                <i class="fa fa-check"></i>
+                Supprimer</a>
+            {{ supprimer(
+                "supprimerEtalonnage",
+                "Supprimer l'étalonnage",
+                "Supprimer l'étalonnage ? Toutes l'information sur les bornes associées sera perdue.",
+                path("etalonnage_supprimer", {"id":etalonnage.id})
+            ) }}
         </div>
         <div class="col">
             <a class="btn btn-secondary"

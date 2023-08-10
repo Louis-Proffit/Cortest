@@ -104,19 +104,34 @@ class StructureController extends AbstractController
         return $this->render("structure/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
+    #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
+    public function supprimerConfirmer(Structure $structure): Response
+    {
+        $supprimable = Structure::supprimable($structure);
+        return $this->render("structure/supprimer.html.twig", ["structure" => $structure, "supprimable" => $supprimable]);
+    }
+
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Structure              $structure): RedirectResponse
     {
-        $logger->info("Suppression de la structure : " . $structure->id);
+        $supprimable = Structure::supprimable($structure);
+        if ($supprimable) {
+            $entityManager->remove($structure);
+            $entityManager->flush();
 
-        $entityManager->remove($structure);
-        $entityManager->flush();
+            $this->addFlash("success", "La structure a bien été supprimée");
 
-        $this->addFlash("success", "La structure a bien été modifiée.");
+            return $this->redirectToRoute("structure_index");
+        } else {
+            $logger->info("Impossible de supprimer la structure", ["structure" => $structure]);
+            $this->addFlash("danger", "Impossible de supprimer la structure");
 
-        return $this->redirectToRoute("structure_index");
+            return $this->redirectToRoute("structure_supprimer_confirmer", ["id" => $structure->id]);
+        }
+
+
     }
 }

@@ -10,6 +10,7 @@ use App\Form\MotDePasseCortestUserType;
 use App\Repository\CortestUserRepository;
 use App\Repository\LogEntryRepository;
 use App\Security\CheckAdministrateurCount;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\QueryException;
 use Psr\Log\LoggerInterface;
@@ -48,7 +49,7 @@ class AdminController extends AbstractController
         CortestUserRepository $userRepository,
     ): Response
     {
-        $items = $userRepository->findAll();
+        $items = $userRepository->findBy([], orderBy: ["id" => Criteria::DESC]);
 
         return $this->render("admin/index_utilisateur.html.twig", ["users" => $items]);
     }
@@ -158,7 +159,8 @@ class AdminController extends AbstractController
 
                 if ($checkAdministrateurCount->atLeastOneAdministrateur()) {
                     $entityManager->flush();
-                    return $this->redirectToRoute("admin_index");
+
+                    return $this->redirectToRoute("admin_utilisateurs");
                 } else {
                     $this->addFlash("danger", "Opération impossible, il ne resterait plus d'administrateur");
                 }
@@ -198,18 +200,34 @@ class AdminController extends AbstractController
         return $this->redirectToRoute("admin_index");
     }
 
-    #[Route("/activite/{page}", name: "activite", defaults: ["page" => 0])]
+    #[Route("/activite/{page}", name: "activite", defaults: ["page" => 1])]
     public function activite(
         LogEntryRepository $logEntryRepository,
         LogEntryProcessor  $logEntryProcessor,
         int                $page
     ): Response
     {
+        if ($page <= 0) {
+            return $this->redirectToRoute("admin_activite", ["page" => 1]);
+        }
+
         $count = $logEntryRepository->count([]);
 
         $pages = ceil($count / LogEntryRepository::PAGE_SIZE);
+
+        if ($page > $pages) {
+            return $this->redirectToRoute("admin_activite", ["page" => $pages]);
+        }
         $logEntries = $logEntryRepository->findAllAtPage($page);
         $wrappedLogEntries = $logEntryProcessor->processAll(logEntries: $logEntries);
-        return $this->render("admin/index_activite.html.twig", ["logs" => $wrappedLogEntries, "pages" => $pages, "page" => $page]);
+        return $this->render("admin/index_activite.html.twig", [
+            "logs" => $wrappedLogEntries,
+            "pages" => $pages,
+            "page" => $page,
+            "action_names" => LogEntryProcessor::ACTION_NAMES,
+            "action_infos" => LogEntryProcessor::ACTION_INFOS,
+            "class_names" => LogEntryProcessor::CLASS_NAMES,
+            "class_infos" => LogEntryProcessor::CLASS_INFOS
+        ]);
     }
 }

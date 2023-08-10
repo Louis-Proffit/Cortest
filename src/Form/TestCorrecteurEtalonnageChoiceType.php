@@ -72,7 +72,7 @@ class TestCorrecteurEtalonnageChoiceType extends AbstractType
                 }
             }
 
-            $result[$structure->nom] = $sub_result;
+            $result["Structure " . $structure->nom] = $sub_result;
         }
 
         return $result;

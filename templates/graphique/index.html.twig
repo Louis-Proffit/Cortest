@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block content %}
+{% from "_supprimer.html.twig" import supprimer %}
 
+{% block content %}
     <br>
     <h1>Graphiques</h1>
     <br>
@@ -9,7 +10,7 @@
     <br>
     <div class="row row-cols-auto">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("graphique_creer") }}">Ajouter</a>
+            <a class="btn btn-primary" href="{{ path("graphique_creer") }}">Créer</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary" href="{{ path("graphique_verifier_variables") }}">Vérifier les variables</a>
@@ -32,13 +33,24 @@
             <tr class="align-middle">
                 <td>{{ graphique.nom }}</td>
                 <td>{{ graphique.structure.nom }}</td>
-                <td><a class="btn btn-link fw-bold" href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Modifier</a>
                 <td><a class="btn btn-link fw-bold"
-                       href="{{ path('graphique_tester', {"id":graphique.id}) }}">Tester</a>
+                       href="{{ path('graphique_modifier', {"id":graphique.id}) }}">Lien</a>
                 <td><a class="btn btn-link fw-bold"
-                       href="{{ path('graphique_download', {"id":graphique.id}) }}">Télécharger</a>
-                <td><a class="btn btn-link fw-bold link-danger"
-                       href="{{ path('graphique_supprimer', {"id":graphique.id}) }}">Supprimer</a>
+                       href="{{ path('graphique_tester', {"id":graphique.id}) }}">Lien</a>
+                <td><a class="btn btn-link fw-bold"
+                       href="{{ path('graphique_download', {"id":graphique.id}) }}">Lien</a>
+                <td>
+                    <button class="btn btn-link fw-bold link-danger"
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerGraphique">
+                        <i class="fa fa-check"></i>
+                        Lien
+                    </button>
+                    {{ supprimer(
+                        "supprimerGraphique",
+                        "Supprimer le graphique",
+                        "Supprimer le graphique ? Le fichier associé sera perdu.",
+                        path("graphique_supprimer", {"id":graphique.id})
+                    ) }}
                 </td>
             </tr>
         {% endfor %}

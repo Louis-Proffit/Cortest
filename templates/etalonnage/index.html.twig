@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <br>
@@ -26,7 +28,7 @@
         </thead>
         <tbody>
         {% for etalonnage in etalonnages %}
-            <tr>
+            <tr class="align-middle">
                 <td>{{ etalonnage.nom }}</td>
                 <td>{{ etalonnage.structure.nom }}</td>
                 <td>{{ etalonnage.nombre_classes }}</td>
@@ -39,9 +41,17 @@
                         Lien</a>
                 </td>
                 <td>
-                    <a href="{{ path("etalonnage_supprimer", {"id":etalonnage.id}) }}"
-                       class="btn btn-link fw-bold link-danger">
-                        Lien</a>
+                    <button class="btn btn-link fw-bold link-danger"
+                    data-mdb-toggle="modal" data-mdb-target="#supprimerEtalonnage">
+                        <i class="fa fa-check"></i>
+                        Lien
+                    </button>
+                    {{ supprimer(
+                        "supprimerEtalonnage",
+                        "Supprimer l'étalonnage",
+                        "Supprimer l'étalonnage ? Toutes les informations sur les bornes seront perdues.",
+                        path("etalonnage_supprimer", {"id":etalonnage.id})
+                    ) }}
                 </td>
             </tr>
         {% endfor %}

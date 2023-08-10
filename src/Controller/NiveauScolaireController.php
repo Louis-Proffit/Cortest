@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\NiveauScolaire;
+use App\Entity\ReponseCandidat;
 use App\Form\NiveauScolaireType;
 use App\Repository\NiveauScolaireRepository;
+use App\Repository\ReponseCandidatRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,21 +77,36 @@ class NiveauScolaireController extends AbstractController
     }
 
     #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
-    public function supprimerConfirmer(NiveauScolaire $niveauScolaire): Response
+    public function supprimerConfirmer(
+        NiveauScolaire $niveauScolaire
+    ): Response
     {
-        return $this->render("niveau_scolaire/supprimer.html.twig", ["niveau_scolaire" => $niveauScolaire]);
+        $supprimable = NiveauScolaire::supprimable($niveauScolaire);
+        return $this->render("niveau_scolaire/supprimer.html.twig", [
+            "niveau_scolaire" => $niveauScolaire,
+            "supprimable" => $supprimable
+        ]);
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         NiveauScolaire         $niveauScolaire): RedirectResponse
     {
-        $entityManager->remove($niveauScolaire);
-        $entityManager->flush();
+        $supprimable = NiveauScolaire::supprimable($niveauScolaire);
+        if ($supprimable) {
+            $entityManager->remove($niveauScolaire);
+            $entityManager->flush();
 
-        $this->addFlash("success", "Suppression effectuée.");
+            $this->addFlash("success", "Suppression effectuée.");
 
-        return $this->redirectToRoute("niveau_scolaire_index");
+            return $this->redirectToRoute("niveau_scolaire_index");
+        } else {
+            $logger->error("Supression d'un niveau scolaire non supprimable", ["niveau_scolaire" => $niveauScolaire]);
+            $this->addFlash("danger", "Impossible de supprimer le niveau scolaire.");
+
+            return $this->redirectToRoute("niveau_scolaire_supprimer_confirmer", ["id" => $niveauScolaire->id]);
+        }
     }
 }

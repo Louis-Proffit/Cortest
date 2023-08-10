@@ -6,29 +6,49 @@
     <br>
     <p class="lead">Rapport d'activité de Cortest</p>
     <br>
+    <div class="row">
+        <div class="col mx-1 note note-info">
+            Le lien peut ne pas être disponible, si l'objet a été supprimé depuis.
+        </div>
+        <div class="col mx-1 note note-warning">
+            Si le lien existe, il peut renvoyer vers un objet plus important.
+            Ex : le lien d'une échelle renvoie vers la structure contenant cette échelle.
+        </div>
+    </div>
+    <br>
     {% if pages > 1 %}
         <div class="input-group">
-            {% for i in range(0, pages - 1, 1) %}
+            {% for i in range(1, pages, 1) %}
                 <a class="btn {{ (page == i) ? 'btn-primary' : 'btn-secondary' }}"
-                   href="{{ path("admin_activite", {"page":i}) }}">{{ i + 1 }}</a>
+                   href="{{ path("admin_activite", {"page":i}) }}">{{ i }}</a>
             {% endfor %}
         </div>
+    {% else %}
+        <p><i>Page {{ page }}/{{ pages }}</i></p>
     {% endif %}
     <br>
     <table class="table">
         <tr class="align-middle">
             <th>Utilisateur</th>
-            <th>Action</th>
-            <th>Instant</th>
+            <th>Type d'action</th>
+            <th>Date/Heure</th>
             <th>Type</th>
             <th>Lien</th>
         </tr>
         {% for log in logs %}
             <tr class="align-middle">
                 <td>{{ log.entry.username }}</td>
-                <td>{{ log.action }}</td>
+                <td>
+                    <a data-mdb-toggle="tooltip" title="{{ action_infos[log.action] }}"><i class="fa fa-info"></i></a>
+                    &nbsp;
+                    {{ action_names[log.action] }}
+                </td>
                 <td>{{ log.entry.loggedAt|date("d/m/y H:i") }}</td>
-                <td>{{ log.class }}</td>
+                <td>
+                    <a data-mdb-toggle="tooltip" title="{{ class_infos[log.class] }}"><i class="fa fa-info"></i></a>
+                    &nbsp;
+                    {{ class_names[log.class] }}
+                </td>
                 <td>
                     {% if log.lien is not null %}
                         <a href="{{ log.lien }}" class="btn btn-link fw-bold">Lien</a>

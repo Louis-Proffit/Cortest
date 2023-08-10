@@ -1,0 +1,17 @@
+{% macro supprimer(id, title, message, url) %}
+    <div class="modal fade" id="{{ id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ title }}</h5>
+                    <button class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">{{ message }}</div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" data-mdb-dismiss="modal">Annuler</a>
+                    <a class="btn btn-danger" href="{{ url }}">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

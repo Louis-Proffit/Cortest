@@ -52,7 +52,7 @@ class PdfController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() and $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             return $this->redirectToRoute("pdf_single", [
                 "candidat_reponse_id" => $candidat_reponse_id,
@@ -71,14 +71,14 @@ class PdfController extends AbstractController
         #[MapEntity(id: "correcteur_id")] Correcteur $correcteur,
         int                                          $etalonnage_id): Response
     {
-        $graphiques = $graphiqueRepository->findAll();
+        $graphique = $graphiqueRepository->findOneBy([]);
 
-        if (empty($graphiques)) {
+        if ($graphique == null) {
             $this->addFlash("warning", "Pas de graphique disponible, veuillez en créer un");
             return $this->redirectToRoute("graphique_index");
         }
 
-        $graphiqueChoice = new GraphiqueChoice(graphique: $graphiques[0]);
+        $graphiqueChoice = new GraphiqueChoice(graphique: $graphique);
         $form = $this->createForm(GraphiqueChoiceType::class, $graphiqueChoice, [
             GraphiqueChoiceType::OPTION_PROFIL => $correcteur->structure
         ]);
@@ -158,7 +158,7 @@ class PdfController extends AbstractController
         #[MapEntity(id: "graphique_id")] Graphique              $graphique,
     ): Response
     {
-        $reponsesCandidat = [];
+        $reponsesCandidat = [$reponseCandidat];
         $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidat);
         $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidat, scoresBruts: $scores);
 

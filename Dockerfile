@@ -1,5 +1,7 @@
 FROM php:8.2-apache
 
+VOLUME /var/www/var
+
 RUN a2enmod rewrite ssl
 
 RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
@@ -23,14 +25,13 @@ COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 COPY composer.json composer.json
-COPY composer.lock composer.lock
-COPY . .
-
 RUN composer install
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY certificate.crt /etc/apache2/ssl/ssl.crt
 COPY certificate.key /etc/apache2/ssl/ssl.key
+
+COPY . .
 
 RUN groupadd cortest-users \
     && usermod -a -G cortest-users www-data \

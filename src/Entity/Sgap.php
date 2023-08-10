@@ -33,7 +33,7 @@ class Sgap
     #[ORM\Column(unique: true)]
     public string $nom;
 
-    #[ORM\OneToMany(mappedBy: "sgap", targetEntity: Session::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "sgap", targetEntity: Session::class, cascade: ["persist"])]
     public Collection $sessions;
 
     /**
@@ -50,5 +50,9 @@ class Sgap
         $this->sessions = $sessions;
     }
 
+    public static function supprimable(Sgap $sgap): bool
+    {
+        return $sgap->sessions->isEmpty();
+    }
 
 }

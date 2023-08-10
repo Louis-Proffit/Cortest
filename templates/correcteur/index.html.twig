@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <br>
@@ -24,8 +26,6 @@
         <thead>
         <tr>
             <th scope="col">Nom</th>
-            <th scope="col">Création</th>
-            <th scope="col">Modification</th>
             <th scope="col">Consulter</th>
             <th scope="col">Modifier</th>
             <th scope="col">Exporter</th>
@@ -36,8 +36,6 @@
         {% for correcteur in correcteurs %}
             <tr>
                 <td>{{ correcteur.nom }}</td>
-                <td><b>{{ correcteur.user_create.username }}</b> ({{ correcteur.date_create|date("d/m/y i:h") }})</td>
-                <td><b>{{ correcteur.user_update.username }}</b> ({{ correcteur.date_update|date("d/m/y i:h") }})</td>
                 <td>
                     <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}" class="btn btn-link fw-bold">
                         Lien</a>
@@ -51,8 +49,17 @@
                         Lien</a>
                 </td>
                 <td>
-                    <a href="{{ path("correcteur_supprimer", {"id":correcteur.id}) }}" class="btn btn-link fw-bold link-danger">
-                        Lien</a>
+                    <button class="btn btn-link fw-bold link-danger"
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerCorrecteur">
+                        <i class="fa fa-check"></i>
+                        Supprimer
+                    </button>
+                    {{ supprimer(
+                        "supprimerCorrecteur",
+                        "Supprimer le correcteur",
+                        "Supprimer le correcteur ? Toutes les échelles associées seront perdues.",
+                        path("correcteur_supprimer", {"id":correcteur.id})
+                    ) }}
                 </td>
             </tr>
         {% endfor %}

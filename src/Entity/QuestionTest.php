@@ -48,7 +48,7 @@ class QuestionTest
     #[ORM\Column(length: self::MAX_LEN_ABREVIATION)]
     public string $abreviation;
 
-    #[ORM\ManyToOne(targetEntity: Test::class, cascade: ["persist", "remove"], inversedBy: "questions")]
+    #[ORM\ManyToOne(targetEntity: Test::class, cascade: ["persist"], inversedBy: "questions")]
     public Test $test;
 
     #[Choice(choices: self::TYPES)]

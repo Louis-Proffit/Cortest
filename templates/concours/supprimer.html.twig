@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% from "_supprimer.html.twig" import supprimer %}
+
+{% block content %}
+
+    <br>
+    <h1>Supprimer le concours {{ concours.intitule }}</h1>
+    <br>
+    <div class="note note-warning">
+        Pour supprimer un concours, aucun test ne doit y être relié.
+        Si un ou plusieurs test(s) y sont reliés, commencez par les traiter.
+    </div>
+    <br>
+    {% if not supprimable %}
+        <p>Impossible de supprimer le concours, {{ concours.tests|length }} test(s) l'utilisent.</p>
+        {% if not concours.tests is empty %}
+            <h3>Tests utilisant le concours {{ concours.intitule }}</h3>
+            <ul>
+                {% for test in concours.tests %}
+                    <li>
+                        <a href="{{ path("test_consulter", {"id":test.id}) }}">
+                            {{ test.nom }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+    <div class="row row-cols-auto">
+        <button class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
+                data-mdb-toggle="modal" data-mdb-target="#supprimerConcours">
+            <i class="fa fa-check"></i>
+            Supprimer
+        </button>
+        {{ supprimer(
+            "supprimerConcours",
+            "Supprimer le concours",
+            "Supprimer le concours ?",
+            path("concours_supprimer", {"id":concours.id})
+        ) }}
+        &nbsp;
+        <a class="btn btn-secondary" href="{{ path("concours_index") }}">Retour à la liste</a>
+    </div>
+
+{% endblock %}
+

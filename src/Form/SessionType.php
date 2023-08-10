@@ -31,7 +31,7 @@ class SessionType extends AbstractType
             ->add("sgap", ChoiceType::class, [
                 "choices" => $this->sgapRepository->choices()
             ])
-            ->add("observations", TextareaType::class)
+            ->add("observations", TextareaType::class, ["empty_data" => ""])
             ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 

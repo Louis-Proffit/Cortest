@@ -212,11 +212,10 @@ class CorrecteurController extends AbstractController
         Correcteur             $correcteur
     ): Response
     {
-        $entityManager->remove($correcteur);
-
         $this->addFlash("success", "Correcteur supprimé");
-        $logger->info("Suppression du correcteur " . $correcteur->id);
+        $logger->info("Suppression du correcteur.", ["correcteur" => $correcteur]);
 
+        $entityManager->remove($correcteur);
         $entityManager->flush();
 
         return $this->redirectToRoute("correcteur_index");
