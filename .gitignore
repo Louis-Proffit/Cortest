@@ -25,6 +25,7 @@ yarn-error.log
 /docs
 
 certificate.crt
+certificate.csr
 certificate.key
 
 .idea

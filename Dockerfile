@@ -22,14 +22,15 @@ RUN docker-php-ext-install pdo mysqli pdo_mysql zip intl;
 COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+COPY composer.json composer.json
 COPY composer.lock composer.lock
+COPY . .
+
 RUN composer install
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY certificate.crt /etc/apache2/ssl/ssl.crt
 COPY certificate.key /etc/apache2/ssl/ssl.key
-
-COPY . .
 
 RUN groupadd cortest-users \
     && usermod -a -G cortest-users www-data \
