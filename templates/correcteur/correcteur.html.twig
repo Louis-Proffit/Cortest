@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <br>
@@ -15,8 +17,17 @@
                href="{{ path("correcteur_exporter", {"id":correcteur.id}) }}">Exporter</a>
         </div>
         <div class="col">
-            <a class="btn btn-danger"
-               href="{{ path("correcteur_supprimer", {"id":correcteur.id}) }}">Supprimer</a>
+            <button class="btn btn-danger"
+                    data-mdb-toggle="modal" data-mdb-target="#supprimerCorrecteur">
+                <i class="fa fa-check"></i>
+                Supprimer
+            </button>
+            {{ supprimer(
+                "supprimerCorrecteur",
+                "Supprimer le correcteur",
+                "Supprimer le correcteur ? Toutes les échelles associées seront perdues.",
+                path("correcteur_supprimer", {"id":correcteur.id})
+            ) }}
         </div>
         <div class="col">
             <a class="btn btn-secondary"

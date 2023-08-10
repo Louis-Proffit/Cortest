@@ -32,7 +32,10 @@
                 </td>
                 <td>
                     <a class="btn btn-link fw-bold link-danger"
-                       href="{{ path("concours_supprimer", {"id":concours.id}) }}">Lien</a>
+                       href="{{ path("concours_supprimer_confirmer", {"id":concours.id}) }}">
+                        <i class="fa fa-check"></i>
+                        Lien
+                    </a>
                 </td>
             </tr>
         {% endfor %}

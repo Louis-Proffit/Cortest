@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
 use App\Form\Data\EtalonnageCreer;
-use App\Form\EtalonnageCreerType;
+use App\Form\CreerEtalonnageType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
 use App\Repository\StructureRepository;
@@ -67,7 +67,7 @@ class EtalonnageController extends AbstractController
             nom: ""
         );
 
-        $form = $this->createForm(EtalonnageCreerType::class, $etalonnageCreer);
+        $form = $this->createForm(CreerEtalonnageType::class, $etalonnageCreer);
 
         $form->handleRequest($request);
 
@@ -124,7 +124,7 @@ class EtalonnageController extends AbstractController
             nom: ""
         );
 
-        $form = $this->createForm(EtalonnageCreerType::class, $etalonnageCreer);
+        $form = $this->createForm(CreerEtalonnageType::class, $etalonnageCreer);
 
         $form->handleRequest($request);
 

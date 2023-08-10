@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Entity\Concours;
 use App\Form\ConcoursType;
 use App\Repository\ConcoursRepository;
-use App\Repository\GrilleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,6 @@ class ConcoursController extends AbstractController
     /**
      * Consulter la liste des concours
      * @param ConcoursRepository $concoursRepository
-     * @param GrilleRepository $grilleRepository
      * @return Response
      */
     #[Route("/index", name: "index")]
@@ -38,7 +37,6 @@ class ConcoursController extends AbstractController
     /**
      * Formulaire de création d'un concours
      * @param EntityManagerInterface $entityManager
-     * @param GrilleRepository $grilleRepository
      * @param Request $request
      * @return RedirectResponse|Response
      */
@@ -95,28 +93,48 @@ class ConcoursController extends AbstractController
 
             $this->addFlash("success", "Le concours a été modifié.");
 
-            return $this->redirectToRoute("concours_consulter", ["id" => $concours->id]);
+            return $this->redirectToRoute("concours_index", ["id" => $concours->id]);
         }
 
         return $this->render("concours/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
+
+    #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
+    public function supprimerConfirmer(Concours $concours): Response
+    {
+        return $this->render("concours/supprimer.html.twig", [
+            "concours" => $concours,
+            "supprimable" => Concours::supprimable($concours)
+        ]);
+    }
+
     /**
      * Supprime un concours
+     * @param LoggerInterface $logger
      * @param EntityManagerInterface $entityManager
      * @param Concours $concours
      * @return RedirectResponse
      */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Concours               $concours): RedirectResponse
     {
-        $entityManager->remove($concours);
-        $entityManager->flush();
+        if (!Concours::supprimable($concours)) {
+            $logger->error("Impossible de supprimer le concours", ["concours" => $concours]);
+            $this->addFlash("danger", "Impossible de supprimer le concours");
 
-        $this->addFlash("success", "Le concours a été supprimé.");
+            return $this->redirectToRoute("concours_supprimer_confirmer", ["id" => $concours->id]);
+        } else {
+            $logger->info("Suppression du concours", ["concours" => $concours]);
+            $this->addFlash("success", "Le concours a été supprimé.");
 
-        return $this->redirectToRoute("concours_index");
+            $entityManager->remove($concours);
+            $entityManager->flush();
+
+            return $this->redirectToRoute("concours_index");
+        }
     }
 }

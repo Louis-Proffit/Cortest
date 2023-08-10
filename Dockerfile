@@ -1,5 +1,7 @@
 FROM php:8.2-apache
 
+VOLUME /var/www/var
+
 RUN a2enmod rewrite ssl
 
 RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
@@ -22,7 +24,7 @@ RUN docker-php-ext-install pdo mysqli pdo_mysql zip intl;
 COPY --from=composer/composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
-COPY composer.lock composer.lock
+COPY composer.json composer.json
 RUN composer install
 
 COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf

@@ -20,7 +20,6 @@ use App\Entity\Structure;
 use App\Entity\Test;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\Loggable\Entity\LogEntry;
-use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 use Gedmo\Loggable\LogEntryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -28,6 +27,25 @@ class LogEntryProcessor
 {
 
     const CLASSES = [
+        Concours::class,
+        Correcteur::class,
+        CortestUser::class,
+        Echelle::class,
+        EchelleCorrecteur::class,
+        EchelleEtalonnage::class,
+        Etalonnage::class,
+        Graphique::class,
+        NiveauScolaire::class,
+        QuestionTest::class,
+        ReponseCandidat::class,
+        Resource::class,
+        Session::class,
+        Sgap::class,
+        Structure::class,
+        Test::class
+    ];
+
+    const CLASS_NAMES = [
         Concours::class => "Concours",
         Correcteur::class => "Correcteur",
         CortestUser::class => "Utilisateur",
@@ -46,10 +64,41 @@ class LogEntryProcessor
         Test::class => "Test"
     ];
 
+    const CLASS_INFOS = [
+        Concours::class => "Concours, avec intitulé et type",
+        Correcteur::class => "",
+        CortestUser::class => "",
+        Echelle::class => "",
+        EchelleCorrecteur::class => "",
+        EchelleEtalonnage::class => "",
+        Etalonnage::class => "",
+        Graphique::class => "",
+        NiveauScolaire::class => "",
+        QuestionTest::class => "",
+        ReponseCandidat::class => "",
+        Resource::class => "",
+        Session::class => "Session d'examen",
+        Sgap::class => "",
+        Structure::class => "",
+        Test::class => ""
+    ];
+
     const ACTIONS = [
+        LogEntryInterface::ACTION_CREATE,
+        LogEntryInterface::ACTION_UPDATE,
+        LogEntryInterface::ACTION_REMOVE,
+    ];
+
+    const ACTION_NAMES = [
         LogEntryInterface::ACTION_CREATE => "Création",
         LogEntryInterface::ACTION_UPDATE => "Mise à jour",
         LogEntryInterface::ACTION_REMOVE => "Suppression"
+    ];
+
+    const ACTION_INFOS = [
+        LogEntryInterface::ACTION_CREATE => "Création d'un objet",
+        LogEntryInterface::ACTION_UPDATE => "Mise à jour, modification d'un objet",
+        LogEntryInterface::ACTION_REMOVE => "Suppression d'un objet. Le lien ne devrait pas être disponible."
     ];
 
     public function __construct(
@@ -85,8 +134,8 @@ class LogEntryProcessor
 
         return new LogEntryWrapper(
             entry: $logEntry,
-            class: self::CLASSES[$logEntry->getObjectClass()],
-            action: self::ACTIONS[$logEntry->getAction()],
+            class: $logEntry->getObjectClass(),
+            action: $logEntry->getAction(),
             lien: $object ? $this->lien($object) : null,
             object: $object,
             message: "TODO"
@@ -131,5 +180,4 @@ class LogEntryProcessor
             return null;
         }
     }
-
 }

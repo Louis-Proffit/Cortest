@@ -160,13 +160,7 @@ class Renderer
         ScoreEtalonne   $scoreEtalonne,
     ): string
     {
-        $templatePath = $this->graphiqueFileManager->entityFilePathOrNull($graphique);
-
-        if ($templatePath == null) {
-            throw new MissingFileException($graphique);
-        }
-
-        $templateContent = file_get_contents($templatePath);
+        $templateContent = $this->graphiqueFileManager->entityFileContent($graphique);
         $template = $this->environment->createTemplate($templateContent);
 
         return $template->render(context: $this->rawOptionsArray(

@@ -7,15 +7,33 @@
     <br>
     {{ form_start(form) }}
     <div class="mb-3">
-        <button class="btn btn-primary">Enregistrer</button>
+        <button class="btn btn-primary">Valider</button>
     </div>
+    <br>
+    <h3>Informations générales</h3>
+    <br>
     {{ form_row(form.nom) }}
     {{ form_row(form.version_batterie) }}
+    <br>
+    <div class="note note-info">
+        Choisissez les concours auquel ce test peut s'appliquer.
+    </div>
     {{ form_row(form.concours) }}
     <br>
     <hr class="hr hr-blurry">
     <br>
     <h3>Type des questions</h3>
+    <br>
+    <div class="note note-info">
+        Pour chaque question, saisissez son type, son intitulé (50 caractères max) et son abbréviation (10 caractères
+        max).
+    </div>
+    <br>
+    <div class="note note-warning">
+        Le type d'une question permet de vérifier que le lecteur optique (ou le candidat) donne une réponse plausible.
+        Répondre 'C' à une question Vrai/Faux par exemple n'est pas possible.
+        Si la question correspondante est correctement configurée, le correcteur sera invité à corriger cette "erreur".
+    </div>
     <br>
     {% for question in form.questions %}
         <div class="mb-3">
@@ -34,7 +52,8 @@
         </div>
     {% endfor %}
     <div class="mb-3">
-        <button class="btn btn-primary">Enregistrer</button>
+        <button class="btn btn-primary">Valider</button>
+        <button class="btn btn-secondary" onclick="document.documentElement.scrollTop = 0">Retour en haut</button>
     </div>
     {{ form_end(form) }}
 

@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
     <h1>Bienvenue sur Cortest</h1>
     <p class="lead">Cortest est l'outil de correction des évaluations psychologiques dans les forces de l'ordre.</p>
@@ -23,11 +25,17 @@
     {% endif %}
     <ul>
         {% for resource in resources %}
-            <li><b>{{ resource.nom }}</b> ({{ resource.user.username }}) <a class="fa fa-download"
+            <li><b>{{ resource.nom }}</b> : <i>{{ resource.file_nom }}</i> <b>(par {{ resource.user.username }})</b> <a class="fa fa-download"
                                                                             href="{{ path('resource_download', {"id":resource.id}) }}"></a>
                 {% if deletable[resource.id] %}
                     <a class="fa fa-trash"
-                       href="{{ path("resource_supprimer", {"id":resource.id}) }}"></a>
+                       data-mdb-toggle="modal" data-mdb-target="#supprimerResource{{ resource.id }}"></a>
+                    {{ supprimer(
+                        "supprimerResource"~resource.id,
+                        "Supprimer la resource",
+                        "Supprimer la resource ? Le fichier associé sera perdu.",
+                        path("resource_supprimer", {"id":resource.id})
+                    ) }}
                 {% endif %}
             </li>
         {% endfor %}

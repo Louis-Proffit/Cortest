@@ -26,6 +26,6 @@ class TestCorrecteurEtalonnageTriplet
 
     public function summary(): string
     {
-        return $this->test->nom . " | " . $this->correcteur->nom . " | " . $this->etalonnage->nom;
+        return "Test : " . $this->test->nom . " | Correcteur : " . $this->correcteur->nom . " | Etalonnage : " . $this->etalonnage->nom;
     }
 }

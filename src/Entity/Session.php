@@ -68,5 +68,8 @@ class Session
         $this->reponses_candidats = $reponses_candidats;
     }
 
-
+    public static function formatLong(Session $session): string
+    {
+        return $session->id . " | " . $session->test->nom . " | " . $session->date->format("d-m-Y") . " | " . $session->sgap->nom;
+    }
 }

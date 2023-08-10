@@ -2,6 +2,7 @@
 
 namespace App\Core\IO;
 
+use App\Core\Exception\MissingFileException;
 use App\Core\Exception\UploadFailException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,6 +61,19 @@ readonly abstract class AbstractFileRepository
             return $filePath;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * @throws MissingFileException
+     */
+    public function entityFileContent($entity): string
+    {
+        $filePath = $this->entityFilePath($entity);
+        if ($this->filesystem->exists($filePath)) {
+            return file_get_contents($filePath);
+        } else {
+            throw new MissingFileException($entity);
         }
     }
 

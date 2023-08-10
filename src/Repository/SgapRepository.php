@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Sgap;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,7 +32,7 @@ class SgapRepository extends ServiceEntityRepository
 
     public function choices(): array
     {
-        $items = $this->findAll();
+        $items = $this->findBy([], orderBy: ["indice" => Criteria::ASC]);
 
         $result = [];
 

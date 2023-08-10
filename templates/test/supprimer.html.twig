@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% from "_supprimer.html.twig" import supprimer %}
+
+{% block content %}
+
+    <br>
+    <h1>Supprimer le test {{ test.nom }}</h1>
+    <br>
+    <div class="note note-warning">
+        Pour supprimer un test, aucune session et aucun correcteur ne doit y être relié.
+        Si ce n'est pas le cas, commencez par traiter les session et/ou les correcteurs concernés.
+    </div>
+    <br>
+    {% if not supprimable %}
+        <p>Impossible de supprimer le test, {{ test.correcteurs|length }} correcteur(s) et {{ test.sessions|length }}
+            session(s)
+            l'utilisent.</p>
+        {% if not test.correcteurs is empty %}
+            <h3>Correcteurs utilisant le test {{ test.nom }}</h3>
+            <ul>
+                {% for correcteur in test.correcteurs %}
+                    <li>
+                        <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}">
+                            {{ correcteur.nom }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if not test.sessions is empty %}
+            <br>
+            <h3>Session(s) utilisant le test {{ test.nom }}</h3>
+            <ul>
+                {% for session in test.sessions %}
+                    <li>
+                        <a href="{{ path("session_consulter", {"id":session.id}) }}">
+                            {{ session|session_format }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+    <div class="row row-cols-auto">
+        <button class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
+                data-mdb-toggle="modal" data-mdb-target="#supprimerTest">
+            <i class="fa fa-check"></i>
+            Supprimer
+        </button>
+        {{ supprimer(
+            "supprimerTest",
+            "Supprimer le test",
+            "Supprimer le test ? Ce choix est irréversible.",
+            path("test_supprimer", {"id":test.id})
+        ) }}
+        &nbsp;
+        <a class="btn btn-secondary" href="{{ path("test_index") }}">Retour à la liste</a>
+    </div>
+
+{% endblock %}
+

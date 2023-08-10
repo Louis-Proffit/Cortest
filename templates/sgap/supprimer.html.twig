@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% from "_supprimer.html.twig" import supprimer %}
+
+{% block content %}
+
+    <br>
+    <h1>Supprimer le SGAP {{ sgap.nom }}</h1>
+    <br>
+    <div class="note note-warning">
+        Pour supprimer un sgap, aucune session ne doit être associée à ce SGAP.
+        Si c'est le cas, commencez par traiter les sessions en question.
+    </div>
+    <br>
+    {% if not supprimable %}
+        <p>Impossible de supprimer le SGAP, {{ sgap.sessions|length }} session(s) l'utilisent.</p>
+        {% if not sgap.sessions is empty %}
+            <br>
+            <h3>Session(s) utilisant le SGAP {{ sgap.nom }}</h3>
+            <ul>
+                {% for session in sgap.sessions %}
+                    <li>
+                        <a href="{{ path("session_consulter", {"id":session.id}) }}">
+                            {{ session|session_format }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+    <br>
+    <div class="row row-cols-auto">
+        <button class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
+                data-mdb-toggle="modal" data-mdb-target="#supprimerSgap">
+            <i class="fa fa-check"></i>
+            Supprimer
+        </button>
+        {{ supprimer(
+            "supprimerSgap",
+            "Supprimer le SGAP",
+            "Supprimer le SGAP ?",
+            path("sgap_supprimer", {"id":sgap.id})
+        ) }}
+        &nbsp;
+        <a class="btn btn-secondary" href="{{ path("sgap_index") }}">Retour à la liste</a>
+    </div>
+
+{% endblock %}
+

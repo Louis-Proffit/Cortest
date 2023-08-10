@@ -47,7 +47,10 @@
                 </td>
                 <td>
                     <a class="btn btn-link fw-bold link-danger"
-                       href="{{ path("test_supprimer", {"id":test.id}) }}">Lien</a>
+                       href="{{ path("test_supprimer_confirmer", {"id":test.id}) }}">
+                        <i class="fa fa-check"></i>
+                        Lien
+                    </a>
                 </td>
             </tr>
         {% endfor %}

@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <br>
+    <h1>Supprimer la structure '{{ structure.nom }}'</h1>
+    <br>
+    <div class="note note-warning">
+        Pour supprimer une structure, aucun correcteur, aucun étalonnage et aucun graphique ne doit y être associé.
+        Si cette condition n'est pas remplie, commencez par traiter les objets liés.
+    </div>
+    <br>
+    {% if supprimable %}
+        <p>La structure est supprimable.</p>
+    {% else %}
+        <p>Impossible de supprimer la structure, {{ structure.correcteurs|length }}
+            correcteur(s), {{ structure.etalonnages|length }} étalonnage(s) et {{ structure.graphiques|length }}
+            graphique(s) utilisent cette structure.</p>
+        {% if not structure.correcteurs is empty %}
+            <h3>Correcteurs utilisant la structure '{{ structure.nom }}'</h3>
+            <ul>
+                {% for correcteur in structure.correcteurs %}
+                    <li>
+                        <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}">
+                            {{ correcteur.nom }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if not structure.etalonnages is empty %}
+            <h3>Etalonnage(s) utilisant la structure '{{ structure.nom }}'</h3>
+            <ul>
+                {% for etalonnage in structure.etalonnages %}
+                    <li>
+                        <a href="{{ path("etalonnage_consulter", {"id":etalonnage.id}) }}">
+                            {{ etalonnage.nom }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if not structure.graphiques is empty %}
+            <h3>Graphique(s) utilisant la structure '{{ structure.nom }}'</h3>
+            <ul>
+                {% for graphique in structure.graphiques %}
+                    <li>
+                        <a href="{{ path("graphique_index") }}">
+                            {{ graphique.nom }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+    <div class="row row-cols-auto">
+        <a class="col btn btn-danger mx-1 {{ supprimable ? '': 'disabled' }}"
+           href="{{ path("structure_supprimer", {"id":structure.id}) }}">
+            Supprimer
+        </a>
+        <a class="col btn btn-secondary mx-1" href="{{ path("structure_index") }}">Retour à la liste</a>
+        <a class="col btn btn-secondary mx-1" href="{{ path("structure_consulter", {"id":structure.id}) }}">Retour à la
+            structure</a>
+    </div>
+
+{% endblock %}
+

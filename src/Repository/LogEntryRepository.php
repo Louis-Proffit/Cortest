@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\QueryException;
 use Gedmo\Loggable\Entity\LogEntry;
 
 class LogEntryRepository extends \Gedmo\Loggable\Entity\Repository\LogEntryRepository
@@ -25,7 +24,7 @@ class LogEntryRepository extends \Gedmo\Loggable\Entity\Repository\LogEntryRepos
     public function findAllAtPage(int $page): array
     {
         return $this->createQueryBuilder('l')
-            ->setFirstResult($page * self::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * self::PAGE_SIZE)
             ->setMaxResults(self::PAGE_SIZE)
             ->orderBy("l.loggedAt", Criteria::DESC)
             ->getQuery()

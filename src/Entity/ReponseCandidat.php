@@ -61,7 +61,7 @@ class ReponseCandidat
     #[ORM\Column]
     public string $nom_jeune_fille;
 
-    #[ORM\ManyToOne(targetEntity: NiveauScolaire::class)]
+    #[ORM\ManyToOne(targetEntity: NiveauScolaire::class, inversedBy: "reponses_candidat")]
     public NiveauScolaire $niveau_scolaire;
 
     #[ORM\Column]
@@ -135,4 +135,5 @@ class ReponseCandidat
     {
         $this->reponses = array_values($this->reponses);
     }
+
 }

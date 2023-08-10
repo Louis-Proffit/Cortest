@@ -40,7 +40,9 @@
                        href="{{ path('structure_modifier', {"id":structure.id}) }}">Lien</a>
                 </td>
                 <td><a class="btn btn-link fw-bold link-danger"
-                       href="{{ path('structure_supprimer', {"id":structure.id}) }}">Lien</a></td>
+                       href="{{ path('structure_supprimer_confirmer', {"id":structure.id}) }}">
+                        Lien&nbsp;<i class="fa fa-check"></i>
+                    </a></td>
             </tr>
         {% endfor %}
         </tbody>

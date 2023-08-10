@@ -57,10 +57,10 @@ class Echelle
     #[ORM\Column]
     public string $type;
 
-    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleCorrecteur::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleCorrecteur::class, cascade: ["persist"])]
     public Collection $echelles_correcteur;
 
-    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "echelle", targetEntity: EchelleEtalonnage::class, cascade: ["persist"])]
     public Collection $echelles_etalonnage;
 
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "echelles")]

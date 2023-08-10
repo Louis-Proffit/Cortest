@@ -54,4 +54,9 @@ class Concours
     {
         return $this->intitule . " (" . $this->type_concours . ")";
     }
+
+    public static function supprimable(Concours $concours): bool
+    {
+        return $concours->tests->isEmpty();
+    }
 }

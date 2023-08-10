@@ -3,11 +3,34 @@
 {% block content %}
 
     <br>
-    <h1>Supprimer un niveau scolaire</h1>
+    <h1>Supprimer le niveau scolaire {{ niveau_scolaire.nom }}</h1>
     <br>
-    <p>Supprimer le niveau <b>{{ niveau_scolaire.nom }}</b></p>
+    <div class="note note-warning">
+        Pour supprimer un niveau scolaire, aucun candidat ne doit y être relié.
+        Si un candidat y est relié, modifiez le (en passant par l'onglet recherche par exemple).
+    </div>
     <br>
-    <a class="btn btn-danger" href="{{ path("niveau_scolaire_supprimer", {"id":niveau_scolaire.id}) }}">Supprimer</a>
-    <br>
+    {% if not supprimable %}
+        <p>Impossible de supprimer le niveau, {{ niveau_scolaire.reponses_candidat|length }} réponses de candidat utilisent ce niveau
+            scolaire.</p>
+        <ul>
+            {% for reponse_candidat in niveau_scolaire.reponses_candidat %}
+                <li>
+                    <a href="{{ path("session_consulter", {"id":reponse_candidat.session.id}) }}">
+                        Session : {{ reponse_candidat.session|session_format }}
+                    </a>; Nom : {{ reponse_candidat.nom }} | Prénom : {{ reponse_candidat.prenom }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="row row-cols-auto">
+        <a class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
+           href="{{ path("niveau_scolaire_supprimer", {"id":niveau_scolaire.id}) }}">
+            Supprimer
+        </a>
+        &nbsp;
+        <a class="btn btn-secondary" href="{{ path("niveau_scolaire_index") }}">Retour à la liste</a>
+    </div>
+
 {% endblock %}
 

@@ -9,7 +9,13 @@
             <a class="btn btn-primary" href="{{ path("test_modifier", {"id":test.id}) }}">Modifier</a>
         </div>
         <div class="col">
-            <a class="btn btn-danger" href="{{ path("test_supprimer", {"id":test.id}) }}">Supprimer</a>
+            <a class="btn btn-danger" href="{{ path("test_supprimer_confirmer", {"id":test.id}) }}">
+                <i class="fa fa-check"></i>
+                Supprimer
+            </a>
+        </div>
+        <div class="col">
+            <a class="btn btn-secondary" href="{{ path("test_index", {"id":test.id}) }}">Retour à la liste</a>
         </div>
     </div>
     <br>

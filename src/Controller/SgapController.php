@@ -76,27 +76,33 @@ class SgapController extends AbstractController
         return $this->render("sgap/form_modifier.html.twig", ["form" => $form->createView()]);
     }
 
+    #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
+    public function supprimerConfirmer(Sgap $sgap): Response
+    {
+        return $this->render("sgap/supprimer.html.twig", [
+            "sgap" => $sgap,
+            "supprimable" => Sgap::supprimable($sgap)
+        ]);
+    }
+
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Sgap                   $sgap): RedirectResponse
     {
-        $logger->info("Suppression du sgap : " . $sgap->nom);
-        $entityManager->remove($sgap);
-        $entityManager->flush();
+        if (!Sgap::supprimable($sgap)) {
+            $logger->error("Impossible de supprimer le sgap", ["sgap" => $sgap]);
+            $this->addFlash("danger", "Impossible de supprimer le SGAP");
 
-        $this->addFlash("success", "Suppression du SGAP enregistrée");
+            return $this->redirectToRoute("sgap_supprimer_confirmer", ["id" => $sgap->id]);
+        } else {
+            $logger->info("Suppression du SGAP.", ["sgap" => $sgap]);
+            $this->addFlash("success", "Suppression du SGAP enregistrée",);
 
-        return $this->redirectToRoute("sgap_index");
-    }
-
-    #[Route("/revert/{id}", name: "revert")]
-    public function revert(Sgap $sgap, EntityManagerInterface $entityManager): RedirectResponse
-    {
-        $logEntryRepository = $entityManager->getRepository(LogEntry::class);
-        $logs = $logEntryRepository->getLogEntries($sgap);
-        var_dump($logs);
-        return $this->redirectToRoute("sgap_index");
+            $entityManager->remove($sgap);
+            $entityManager->flush();
+            return $this->redirectToRoute("sgap_index");
+        }
     }
 }

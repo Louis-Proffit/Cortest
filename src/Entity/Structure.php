@@ -30,13 +30,13 @@ class Structure
     #[ORM\OneToMany(mappedBy: "structure", targetEntity: Echelle::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 
-    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Correcteur::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Correcteur::class, cascade: ["persist"])]
     public Collection $correcteurs;
 
-    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Etalonnage::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Etalonnage::class, cascade: ["persist"])]
     public Collection $etalonnages;
 
-    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Graphique::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "structure", targetEntity: Graphique::class, cascade: ["persist"])]
     public Collection $graphiques;
 
     /**
@@ -55,5 +55,12 @@ class Structure
         $this->correcteurs = $correcteurs;
         $this->etalonnages = $etalonnages;
         $this->graphiques = $graphiques;
+    }
+
+    public static function supprimable(Structure $structure): bool
+    {
+        return $structure->correcteurs->isEmpty()
+            && $structure->etalonnages->isEmpty()
+            && $structure->graphiques->isEmpty();
     }
 }

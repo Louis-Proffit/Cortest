@@ -6,7 +6,6 @@ migrations
 var
 vendor
 .idea
-composer.lock
 package-lock.json
 .env.local
 .env.*.local

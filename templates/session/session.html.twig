@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <h2>Session</h2>
@@ -9,7 +11,13 @@
             <a class="btn btn-primary" href="{{ path("session_modifier", {"id":session.id}) }}">Modifier</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-danger" href="{{ path("session_supprimer", {"id":session.id}) }}">Supprimer</a>
+            <button class="btn btn-danger" data-mdb-toggle="modal" data-mdb-target="#modalSupprimer">Supprimer</button>
+            {{ supprimer(
+                "modalSupprimer",
+                "Supprimer la séance",
+                "Supprimer la séance ? Toutes les réponses des candidats seront perdues.",
+                path("session_supprimer", {"id":session.id})
+            ) }}
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("calcul_score_brut_session_form", {"session_id":session.id}) }}">Calculer
@@ -25,7 +33,7 @@
             <a class="btn btn-secondary" href="{{ path("session_csv", {"id":session.id}) }}">Exporter en .csv</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary" href="{{ path("lecture_optique", {"id":session.id}) }}">Lire des feuilles</a>
+            <a class="btn btn-secondary" href="{{ path("lecture_index", {"id":session.id}) }}">Lire des feuilles</a>
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("session_index") }}">Retour à la liste</a>
@@ -89,6 +97,8 @@
         {% endfor %}
         </tbody>
     </table>
+
+
 
 {% endblock %}
 

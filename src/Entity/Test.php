@@ -45,7 +45,7 @@ class Test
     #[ORM\ManyToMany(targetEntity: Correcteur::class, mappedBy: "tests")]
     public Collection $correcteurs;
 
-    #[ORM\OneToMany(mappedBy: "test", targetEntity: Session::class, cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: "test", targetEntity: Session::class, cascade: ["persist"])]
     public Collection $sessions;
 
     #[ORM\OrderBy(["indice" => "ASC"])]
@@ -72,5 +72,11 @@ class Test
         $this->correcteurs = $correcteurs;
         $this->sessions = $sessions;
         $this->questions = $questions;
+    }
+
+    public static function supprimable(Test $test): bool
+    {
+        return $test->sessions->isEmpty()
+            && $test->correcteurs->isEmpty();
     }
 }

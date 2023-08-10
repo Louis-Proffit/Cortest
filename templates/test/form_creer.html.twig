@@ -6,9 +6,22 @@
     <h1>Créer un test</h1>
     <br>
     {{ form_start(form) }}
+    <div class="note note-info">
+        La création d'un test se fait en deux étapes.
+        Saisissez d'abord son nom, sa 'version batterie' et la grille à laquelle il s'applique.
+        Vous pourrez ensuite paramétrer les autres propriétés : les concours auxquels il s'applique et les informations
+        sur chaque question.
+    </div>
+    <br>
     {{ form_row(form.nom) }}
     {{ form_row(form.version_batterie) }}
     {{ form_row(form.index_grille) }}
+    <br>
+    <div class="note note-info">
+        En cliquant sur le bouton ci-dessous, vous serez redirigé vers la page "Modifier le test", ou vous pourrez
+        configurer le reste des propriétés du test.
+    </div>
+    <br>
     <div class="mb-3">
         <button class="btn btn-primary">Créer</button>
     </div>

@@ -10,6 +10,7 @@ use App\Repository\GrilleRepository;
 use App\Repository\TestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,7 +91,9 @@ class TestController extends AbstractController
             $entityManager->persist($test);
             $entityManager->flush();
 
-            return $this->redirectToRoute("test_index");
+            $this->addFlash("success", "Le test a été créé. Vous pouvez maintenant paramétrer son contenu.");
+
+            return $this->redirectToRoute("test_modifier", ["id" => $test->id]);
         }
 
         return $this->render("test/form_creer.html.twig", ["form" => $form->createView()]);
@@ -107,7 +110,7 @@ class TestController extends AbstractController
     public function modifier(
         EntityManagerInterface $entityManager,
         Request                $request,
-        Test               $test,
+        Test                   $test,
     ): Response
     {
         $form = $this->createForm(TestType::class, $test);
@@ -126,20 +129,41 @@ class TestController extends AbstractController
 
     /**
      * Supprime un test
+     * @param Test $test
+     * @return Response
+     */
+    #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
+    public function supprimerConfirmer(Test $test): Response
+    {
+        $supprimable = Test:: supprimable($test);
+        return $this->render("test/supprimer.html.twig", ["test" => $test, "supprimable" => $supprimable]);
+    }
+
+    /**
+     * Supprime un test
      * @param EntityManagerInterface $entityManager
      * @param Test $test
      * @return RedirectResponse
      */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Test                   $test): RedirectResponse
     {
-        $entityManager->remove($test);
-        $entityManager->flush();
+        $supprimable = Test::supprimable($test);
+        if ($supprimable) {
+            $entityManager->remove($test);
+            $entityManager->flush();
 
-        $this->addFlash("success", "Suppression du test enregistrée.");
+            $this->addFlash("success", "Suppression du test enregistrée.");
 
-        return $this->redirectToRoute("test_index");
+            return $this->redirectToRoute("test_index");
+        } else {
+            $logger->error("Impossible de supprimer le test", ["test" => $test]);
+            $this->addFlash("danger", "Impossible de supprimer le test");
+
+            return $this->redirectToRoute("test_supprimer_confirmer", ["id" => $test->id]);
+        }
     }
 }

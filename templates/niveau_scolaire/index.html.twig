@@ -32,7 +32,11 @@
                 </td>
                 <td>
                     <a class="btn btn-link fw-bold link-danger"
-                       href="{{ path("niveau_scolaire_supprimer_confirmer", {"id":niveau.id}) }}">Lien</a>
+                       href="{{ path("niveau_scolaire_supprimer_confirmer", {"id":niveau.id}) }}">
+                        Lien
+                        &nbsp;
+                        <i class="fa fa-check"></i>
+                    </a>
                 </td>
             </tr>
         {% endfor %}

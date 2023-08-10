@@ -177,7 +177,6 @@ class SmokeTestCase extends WebTestCase
             id: 0,
             nom: "nom",
             file_nom: "file",
-            user: $administrateur
         );
 
         $entityManager->persist($sgap);
@@ -264,7 +263,8 @@ class SmokeTestCase extends WebTestCase
         yield "test_creer" => [fn() => "/test/creer", null];
         yield "test_consulter" => [fn() => "/test/consulter/" . self::$testId, null];
         yield "test_modifier" => [fn() => "/test/modifier/" . self::$testId, null];
-        yield "test_supprimer" => [fn() => "/test/supprimer/" . self::$testId, "/test/index"];
+        yield "test_supprimer_confirmer" => [fn() => "/test/supprimer/confirmer/" . self::$testId, null];
+        yield "test_supprimer" => [fn() => "/test/supprimer/" . self::$testId, fn() => "/test/supprimer/confirmer/" . self::$testId];
 
         yield "admin_index" => [fn() => "/admin/index", null];
         yield "admin_creer" => [fn() => "/admin/creer", null];
@@ -275,23 +275,27 @@ class SmokeTestCase extends WebTestCase
         yield "sgap_index" => [fn() => "/sgap/index", null];
         yield "sgap_creer" => [fn() => "/sgap/creer", null];
         yield "sgap_modifier" => [fn() => "/sgap/modifier/" . self::$sgapId, null];
-        yield "sgap_supprimer" => [fn() => "/sgap/supprimer/" . self::$sgapId, "/sgap/index"];
+        yield "sgap_supprimer_confirmer" => [fn() => "/sgap/supprimer/confirmer/" . self::$sgapId, null];
+        yield "sgap_supprimer" => [fn() => "/sgap/supprimer/" . self::$sgapId, fn() => "/sgap/supprimer/confirmer/" . self::$sgapId];
 
         yield "structure_index" => [fn() => "/structure/index", null];
         yield "structure_creer" => [fn() => "/structure/creer", null];
         yield "structure_consulter" => [fn() => "/structure/consulter/" . self::$structureId, null];
         yield "structure_modifier" => [fn() => "/structure/modifier/" . self::$structureId, null];
-        yield "structure_supprimer" => [fn() => "/structure/supprimer/" . self::$structureId, "/structure/index"];
+        yield "structure_supprimer_confirmer" => [fn() => "/structure/supprimer/confirmer/" . self::$structureId, null];
+        yield "structure_supprimer" => [fn() => "/structure/supprimer/" . self::$structureId, fn() => "/structure/supprimer/confirmer/" . self::$structureId];
 
         yield "niveau_scolaire_index" => [fn() => "/niveau-scolaire/index", null];
         yield "niveau_scolaire_creer" => [fn() => "/niveau-scolaire/creer", null];
         yield "niveau_scolaire_modifier" => [fn() => "/niveau-scolaire/modifier/" . self::$niveauScolaireId, null];
-        yield "niveau_scolaire_supprimer" => [fn() => "/niveau-scolaire/supprimer/" . self::$niveauScolaireId, "/niveau-scolaire/index"];
+        yield "niveau_scolaire_supprimer_confirmer" => [fn() => "/niveau-scolaire/supprimer/confirmer/" . self::$niveauScolaireId, null];
+        yield "niveau_scolaire_supprimer" => [fn() => "/niveau-scolaire/supprimer/" . self::$niveauScolaireId, fn() => "/niveau-scolaire/supprimer/confirmer/" . self::$niveauScolaireId];
 
         yield "concours_index" => [fn() => "/concours/index", null];
         yield "concours_creer" => [fn() => "/concours/creer", null];
         yield "concours_modifier" => [fn() => "/concours/modifier/" . self::$concoursId, null];
-        yield "concours_supprimer" => [fn() => "/concours/supprimer/" . self::$concoursId, "/concours/index"];
+        yield "concours_supprimer_confirmer" => [fn() => "/concours/supprimer/confirmer/" . self::$concoursId, null];
+        yield "concours_supprimer" => [fn() => "/concours/supprimer/" . self::$concoursId, fn() => "/concours/supprimer/confirmer/" . self::$concoursId];
 
         yield "correcteur_index" => [fn() => "/correcteur/index", null];
         yield "correcteur_consulter" => [fn() => "/correcteur/index", null];
@@ -316,11 +320,11 @@ class SmokeTestCase extends WebTestCase
         yield "graphique_tester" => [fn() => "/graphique/tester/" . self::$graphiqueId, null];
         yield "graphique_telecharger" => [fn() => "/graphique/telecharger/" . self::$graphiqueId, null];
         yield "graphique_verifier_variables" => [fn() => "/graphique/verifier-variables", null];
-        yield "graphique_supprimer" => [fn() => "/graphique/supprimer/" . self::$graphiqueId, null];
+        yield "graphique_supprimer" => [fn() => "/graphique/supprimer/" . self::$graphiqueId, "/graphique/index"];
 
         yield "csv_reponses" => [fn() => "/csv/reponses", null];
         yield "csv_scores_bruts" => [fn() => "/csv/scores-bruts/" . self::$correcteurId, null];
-        yield "csv_scores_etalonnes" => [fn() => "/csv/scores-etalonnes/" . self::$etalonnageId, null];
+        yield "csv_scores_etalonnes" => [fn() => "/csv/scores-etalonnes/" . self::$correcteurId . "/" . self::$etalonnageId, null];
 
         yield "reponse_candidat_supprimer" => [fn() => "/reponse-candidat/supprimer/" . self::$reponseCandidatId, fn() => "/session/consulter/" . self::$sessionId];
 
