@@ -50,7 +50,7 @@ class InitFixture extends Fixture implements FixtureGroupInterface
             role: CortestUser::ROLE_ADMINISTRATEUR
         );
 
-        $psycologue = new CortestUser(
+        $psychologue = new CortestUser(
             id: 0,
             username: "psychologue",
             password: "UvsTr8L7Fz76m4",
@@ -65,10 +65,10 @@ class InitFixture extends Fixture implements FixtureGroupInterface
         );
 
         $admin->password = $this->userPasswordHasher->hashPassword($admin, $admin->password);
-        $psycologue->password = $this->userPasswordHasher->hashPassword($psycologue, $psycologue->password);
+        $psychologue->password = $this->userPasswordHasher->hashPassword($psychologue, $psychologue->password);
         $correcteur->password = $this->userPasswordHasher->hashPassword($correcteur, $correcteur->password);
 
-        return [$admin, $psycologue, $correcteur];
+        return [$admin, $psychologue, $correcteur];
     }
 
     private

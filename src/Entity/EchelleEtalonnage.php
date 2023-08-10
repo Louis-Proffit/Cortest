@@ -45,12 +45,21 @@ class EchelleEtalonnage
         $this->etalonnage = $etalonnage;
     }
 
-    /*
-     * TODO service
-     * public static function rangeEchelle(Echelle $echelle, Etalonnage $etalonnage, int $nombreClasses): EchelleEtalonnage
+    public static function rangeEchelle(Echelle $echelle, Etalonnage $etalonnage, int $nombreClasses): EchelleEtalonnage
     {
-        return ;
-    }*/
+        $bounds = [];
+
+        for ($i =1; $i <= $nombreClasses - 1; $i++) {
+            $bounds[] = $i;
+        }
+
+        return new EchelleEtalonnage(
+            id: 0,
+            bounds: $bounds,
+            echelle: $echelle,
+            etalonnage: $etalonnage,
+        );
+    }
 
 
 }

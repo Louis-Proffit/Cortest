@@ -9,7 +9,7 @@ use App\Entity\EchelleCorrecteur;
 use App\Entity\Graphique;
 use App\Entity\Structure;
 use App\Entity\QuestionTest;
-use App\Entity\Subtest;
+use App\Entity\Test;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class BpmrComFixture extends AbstractBpmrFixture
@@ -22,36 +22,35 @@ class BpmrComFixture extends AbstractBpmrFixture
             "550",
             468,
             self::CONCOURS_NOM,
-            self::PROFIL_NOM,
+            self::STRUCTURE_NOM,
             self::CORRECTEUR_NOM,
             self::ETALONNAGE_NOM,
-            9
+            9,
+            self::TEST_NOM,
         );
     }
 
-    protected function aptitudesCognitives(Structure $profil): void
+    protected function aptitudesCognitives(Structure $structure): void
     {
-        $this->echellesSimplesAptitudesCognitives($profil, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
+        $this->echellesSimplesAptitudesCognitives($structure, self::APTITUDES_COGNITIVES_NOM_PHP_TO_NOM);
 
-        $profil->echelles->add(new Echelle(
+        $structure->echelles->add(new Echelle(
             id: 0,
             nom: "EG",
             nom_php: self::EG,
             type: Echelle::TYPE_ECHELLE_COMPOSITE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
-            structure: $profil
+            structure: $structure
         ));
-        $profil->echelles->add(new Echelle(
+        $structure->echelles->add(new Echelle(
             id: 0,
             nom: "QR",
             nom_php: self::QR,
             type: Echelle::TYPE_ECHELLE_COMPOSITE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
-            structure: $profil
+            structure: $structure
         ));
     }
 
@@ -70,7 +69,6 @@ class BpmrComFixture extends AbstractBpmrFixture
             type: Echelle::TYPE_ECHELLE_SIMPLE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
             structure: $profil
         ));
 
@@ -81,7 +79,6 @@ class BpmrComFixture extends AbstractBpmrFixture
             type: Echelle::TYPE_ECHELLE_SIMPLE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
             structure: $profil
         ));
 
@@ -92,7 +89,6 @@ class BpmrComFixture extends AbstractBpmrFixture
             type: Echelle::TYPE_ECHELLE_SIMPLE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
             structure: $profil
         ));
 
@@ -103,18 +99,17 @@ class BpmrComFixture extends AbstractBpmrFixture
             type: Echelle::TYPE_ECHELLE_SIMPLE,
             echelles_correcteur: new ArrayCollection(),
             echelles_etalonnage: new ArrayCollection(),
-            echelles_graphiques: new ArrayCollection(),
             structure: $profil
         ));
     }
 
-    protected function questions(Concours $concours): void
+    protected function questions(Test $test): void
     {
-        $this->questionsTypeIndexAsValue($concours, self::INDEX_EXEMPLES, QuestionTest::TYPE_EXEMPLE);
-        $this->questionsTypeIndexAsKey($concours,
+        $this->questionsTypeIndexAsValue($test, self::INDEX_EXEMPLES, QuestionTest::TYPE_EXEMPLE);
+        $this->questionsTypeIndexAsKey($test,
             self::ALL_APTITUDES_COGNITIVES,
             QuestionTest::TYPE_VRAI_FAUX);
-        $this->questionsTypeIndexAsKey($concours,
+        $this->questionsTypeIndexAsKey($test,
             self::ALL_PERSONNALITE_INDEX_TO_TYPE,
             QuestionTest::TYPE_SCORE);
     }
@@ -229,29 +224,30 @@ class BpmrComFixture extends AbstractBpmrFixture
             $correcteur
         ));
     }
-    protected function correcteurAptitudesCognitives(Structure $profil, Correcteur $correcteur): void
+    protected function correcteurAptitudesCognitives(Structure $structure, Correcteur $correcteur): void
     {
-        $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
-        $this->echellesCorrecteurAptitudeCognitive($profil, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
-        $this->correcteurEg($profil, $correcteur);
-        $this->correcteurQr($profil, $correcteur);
+        $this->echellesCorrecteurAptitudeCognitive($structure, $correcteur, self::VRAI_NOM_PHP_TO_INDEX_VRAI, "vrai");
+        $this->echellesCorrecteurAptitudeCognitive($structure, $correcteur, self::FAUX_NOM_PHP_TO_INDEX_VRAI, "faux");
+        $this->correcteurEg($structure, $correcteur);
+        $this->correcteurQr($structure, $correcteur);
     }
 
-    protected function correcteurPersonnalite(Structure $profil, Correcteur $correcteur): void
+    protected function correcteurPersonnalite(Structure $structure, Correcteur $correcteur): void
     {
-        $this->echellesCorrecteurPersonnalite($profil,
+        $this->echellesCorrecteurPersonnalite($structure,
             $correcteur,
             self::NOM_PHP_COMPOSITE_TO_NOM_PHP_SIMPLE_TO_INDEX_TO_TYPE);
-        $this->correcteurAt($profil, $correcteur);
-        $this->correcteurDs($profil, $correcteur);
-        $this->correcteurRc($profil, $correcteur);
-        $this->correcteurRcPourcent($profil, $correcteur);
+        $this->correcteurAt($structure, $correcteur);
+        $this->correcteurDs($structure, $correcteur);
+        $this->correcteurRc($structure, $correcteur);
+        $this->correcteurRcPourcent($structure, $correcteur);
     }
 
-    const CONCOURS_NOM = "Concours BPMR - Commissaire";
-    const PROFIL_NOM = "BPMR - Commissaire";
-    const CORRECTEUR_NOM = "Correcteur par défaut BPMR - Comissaire";
-    const ETALONNAGE_NOM = "Etalonnage de test BPMR - Comissaire";
+    const CONCOURS_NOM = "Commissaire de Police";
+    const STRUCTURE_NOM = "Structure de BPMR - Commissaire";
+    const CORRECTEUR_NOM = "Correcteur par défaut BPMR - Commissaire";
+    const ETALONNAGE_NOM = "Etalonnage de test BPMR - Commissaire";
+    const TEST_NOM = "BPMR-COM 2023";
 
     const INDEX_EXEMPLES = [1, 52, 73, 98, 99, 100, 116, 141, 162];
 
