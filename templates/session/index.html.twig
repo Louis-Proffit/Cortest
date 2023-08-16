@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
 
     <br>
@@ -39,8 +41,18 @@
                 <td>{{ session.observations }}</td>
                 <td><a class="btn btn-link fw-bold" href="{{ path("session_consulter", {"id":session.id}) }}">Lien</a>
                 <td><a class="btn btn-link fw-bold" href="{{ path("session_modifier", {"id":session.id}) }}">Lien</a>
-                <td><a class="btn btn-link fw-bold link-danger"
-                       href="{{ path("session_supprimer", {"id":session.id}) }}">Lien</a>
+                <td>
+                    <button class="btn btn-link fw-bold link-danger"
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerSession">
+                        <i class="fa fa-check"></i>
+                        Lien
+                    </button>
+                    {{ supprimer(
+                        "supprimerSession",
+                        "Supprimer la session",
+                        "Supprimer la session ? Les réponses des candidats associées seront perdues.",
+                        path("session_supprimer", {"id":session.id})
+                    ) }}
                 </td>
             </tr>
         {% endfor %}
