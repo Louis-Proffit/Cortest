@@ -168,8 +168,8 @@ class GraphiqueController extends AbstractController
                 reponseCandidat: $reponsesCandidat,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage,
-                scoreBrut: $scores[0],
-                scoreEtalonne: $profils[0]
+                scoreBrut: $scores->get($reponsesCandidat),
+                scoreEtalonne: $profils->get($reponsesCandidat)
             );
 
             if (!$response) {
