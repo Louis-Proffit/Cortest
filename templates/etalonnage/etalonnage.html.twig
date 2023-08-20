@@ -7,6 +7,12 @@
     <br>
     <h1>Consulter un étalonnage</h1>
     <br>
+    <div class="note note-info">
+        Un étalonnage transforme des scores bruts en des scores étalonnés.
+        Pour chaque échelle (simple, composite...) d'une structure, il détermine une classe en fonction du score brut
+        sur cette échelle et des bornes spécifiées dans l'étalonnage.
+    </div>
+    <br>
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
@@ -26,8 +32,16 @@
         </div>
         <div class="col">
             <a class="btn btn-secondary"
-               href="{{ path("etalonnage_index") }}">Revenir à la liste</a>
+               href="{{ path("etalonnage_index") }}">Liste des étalonnages</a>
         </div>
+    </div>
+    <br>
+    <div class="note note-info">
+        Pour un étalonnage à
+        <math>n</math>
+        classes, il y a
+        <math>n-1</math>
+        bornes.
     </div>
     <br>
     <dl class="row">

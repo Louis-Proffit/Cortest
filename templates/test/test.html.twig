@@ -6,16 +6,16 @@
     <br>
     <div class="row row-cols-auto">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("test_modifier", {"id":test.id}) }}">Modifier</a>
+            <a class="btn btn-primary" href="{{ path("test_modifier", {"id":test.id}) }}">Modifier le test</a>
         </div>
         <div class="col">
             <a class="btn btn-danger" href="{{ path("test_supprimer_confirmer", {"id":test.id}) }}">
                 <i class="fa fa-check"></i>
-                Supprimer
+                Supprimer le test
             </a>
         </div>
         <div class="col">
-            <a class="btn btn-secondary" href="{{ path("test_index", {"id":test.id}) }}">Retour à la liste</a>
+            <a class="btn btn-secondary" href="{{ path("test_index", {"id":test.id}) }}">Liste des tests</a>
         </div>
     </div>
     <br>
@@ -25,19 +25,27 @@
         <dt class="col-md-3">Nom</dt>
         <dd class="col-md-9">{{ test.nom }}</dd>
         <dt class="col-md-3">Grille</dt>
-        <dd class="col-md-9">{{ grille.nom }}</dd>
-        <dt class="col-md-3">Nombre de questions</dt>
-        <dd class="col-md-9">{{ grille.nombre_questions }}</dd>
+        <dd class="col-md-9"><a href="{{ path("grille_index") }}">{{ grille.nom }}</a> ({{ grille.nombre_questions }}
+            questions)
+        </dd>
         <dt class="col-md-3">Concours(s)</dt>
         {% for concours in test.concours %}
             {% if not loop.first %}
                 <dt class="col-md-3"></dt>
             {% endif %}
-            <dd class="col-md-9">{{ concours.intitule }}</dd>
+            <dd class="col-md-9"><a href="{{ path("concours_index") }}">{{ concours.intitule }}</a></dd>
         {% endfor %}
     </dl>
     <br>
-    <h3>Questions</h3>
+    <h3>Questions du test</h3>
+    <br>
+    <div class="note note-info">
+        L'abréviation et l'intitulé des questions servent à l'import/export.
+    </div>
+    <br>
+    <div class="note note-info">
+        Le type de question sert à corriger les éventuelles erreurs du candidat et/ou de la lecture optique.
+    </div>
     <br>
     <table class="table table-sm">
         <thead>

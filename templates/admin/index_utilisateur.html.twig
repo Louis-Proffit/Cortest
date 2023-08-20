@@ -4,12 +4,41 @@
     <br>
     <h1>Utilisateurs</h1>
     <br>
-    <p class="lead">Liste des utilisateurs ayant accès à l'application Cortest.</p>
-    <br>
     <div class="row row-cols-auto">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("admin_creer") }}">Créer</a>
+            <a class="btn btn-primary" href="{{ path("admin_creer") }}">Créer un utilisateur</a>
         </div>
+    </div>
+    <br>
+    <div class="note note-info">
+        Rôles des utilisateurs :
+        <ul>
+            <li>
+                <b>ROLE_ADMINISTRATEUR</b>
+                <ul>
+                    <li>Accès complet</li>
+                </ul>
+            </li>
+            <li>
+                <b>ROLE_PSYCHOLOGUE</b>
+                <ul>
+                    <li>Tous les droits de ROLE_CORRECTEUR</li>
+                    <li>Création, modification, suppression de concours, tests, structures, correcteurs, étalonnages,
+                        niveaux scolaires, SGAPs et graphiques
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <b>ROLE_CORRECTEUR</b>
+                <ul>
+                    <li>Onglet recherche</li>
+                    <li>Saisie de candidats (lecture optique, formulaire, import/export)</li>
+                    <li>Créer, modifier et supprimer des sessions</li>
+                    <li>Calculer des scores bruts et étalonnés</li>
+                    <li>Générer des exports .csv et des feuilles de profil .pdf</li>
+                </ul>
+            </li>
+        </ul>
     </div>
     <br>
     <table class="table">

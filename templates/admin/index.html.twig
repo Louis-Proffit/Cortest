@@ -5,21 +5,28 @@
     <br>
     <h1>Administrateur</h1>
     <br>
-    <p class="lead">Fonctions d'administration</p>
+    <div class="note note-info">
+        Seuls les utilisateurs ayant le rôle ROLE_ADMINISTRATEUR peuvent consulter cette page.
+    </div>
+    <br>
+    <div class="note note-warning">
+        Seuls les administrateurs peuvent modifier le mot de passe des autres utilisateurs.
+    </div>
     <br>
     <div class="row row-cols-auto">
         <div class="card col-lg">
             <div class="card-body">
                 <h5 class="card-title">Utilisateurs</h5>
-                <p class="card-text">Liste les utilisateurs disponibles, leurs droits et permet le changement de mot de
-                    passe.</p>
+                <p class="card-text">Liste les utilisateurs disponibles, leurs droits, permet la modification de leur
+                    nom, de leur(s) droit(s) et de changer les mots de passe.</p>
                 <a type="button" class="btn btn-primary" href="{{ path("admin_utilisateurs") }}">Choisir</a>
             </div>
         </div>
         <div class="card col-lg ms-3">
             <div class="card-body">
                 <h5 class="card-title">Activité</h5>
-                <p class="card-text">Gestion de l'activité sur Cortest</p>
+                <p class="card-text">Liste les éléments d'activité de Cortest : créations, modifications, suppressions,
+                    calculs, imports, exports et connexion des utilisateurs.</p>
                 <a type="button" class="btn btn-primary" href="{{ path("admin_activite") }}">Choisir</a>
             </div>
         </div>

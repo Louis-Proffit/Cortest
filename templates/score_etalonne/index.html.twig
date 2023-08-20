@@ -25,7 +25,9 @@
     <h3>Informations générales</h3>
     <br>
     <dl class="row">
-        <dt class="col-md-3">Session</dt>
+        <dt class="col-md-3">
+            <a href="{{ path("session_consulter", {"id":session.id}) }}">Session</a>
+        </dt>
         <dd class="col-md-9">
             <dl class="row">
                 <dt class="col-md-3">Date</dt>
@@ -36,11 +38,22 @@
                 <dd class="col-md-9">{{ session.sgap.nom }}</dd>
             </dl>
         </dd>
-        <dt class="col-md-3">Etalonnage</dt>
+        <dt class="col-md-3">
+            <a href="{{ path("correcteur_consulter", {"id":correcteur.id}) }}">Correcteur</a>
+        </dt>
         <dd class="col-md-9">
             <dl class="row">
                 <dt class="col-md-3">Nom</dt>
-                <dd class="col-md-9">{{ etalonnage.nom }}</dd>
+                <dd class="col-md-9">{{ correcteur.nom }}</dd>
+            </dl>
+        </dd>
+        <dt class="col-md-3">
+            <a href="{{ path("etalonnage_consulter", {"id":etalonnage.id}) }}">Etalonnage</a>
+        </dt>
+        <dd class="col-md-9">
+            <dl class="row">
+                <dt class="col-md-3">Nom</dt>
+                <dd class="col-md-9">{{ correcteur.nom }}</dd>
                 <dt class="col-md-3">Nombre de classes</dt>
                 <dd class="col-md-9">{{ etalonnage.nombre_classes }}</dd>
             </dl>

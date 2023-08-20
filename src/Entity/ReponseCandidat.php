@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Type;
 
-#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
 class ReponseCandidat
 {
@@ -123,12 +122,4 @@ class ReponseCandidat
         $this->eirs = $eirs;
         $this->raw = $raw;
     }
-
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function formatReponsesArray(): void
-    {
-        $this->reponses = array_values($this->reponses);
-    }
-
 }
