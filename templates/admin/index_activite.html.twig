@@ -6,14 +6,8 @@
     <br>
     <p class="lead">Rapport d'activité de Cortest</p>
     <br>
-    <div class="row">
-        <div class="col mx-1 note note-info">
-            Le lien peut ne pas être disponible, si l'objet a été supprimé depuis.
-        </div>
-        <div class="col mx-1 note note-warning">
-            Si le lien existe, il peut renvoyer vers un objet plus important.
-            Ex : le lien d'une échelle renvoie vers la structure contenant cette échelle.
-        </div>
+    <div class="note note-info">
+        Le lien peut ne pas être disponible, si l'objet a été supprimé depuis par exemple.
     </div>
     <br>
     {% if pages > 1 %}
@@ -27,37 +21,49 @@
         <p><i>Page {{ page }}/{{ pages }}</i></p>
     {% endif %}
     <br>
-    <table class="table">
-        <tr class="align-middle">
-            <th>Utilisateur</th>
-            <th>Type d'action</th>
-            <th>Date/Heure</th>
-            <th>Type</th>
-            <th>Lien</th>
-        </tr>
-        {% for log in logs %}
+    <div class="table-responsive">
+        <table class="table">
             <tr class="align-middle">
-                <td>{{ log.entry.username }}</td>
-                <td>
-                    <a data-mdb-toggle="tooltip" title="{{ action_infos[log.action] }}"><i class="fa fa-info"></i></a>
-                    &nbsp;
-                    {{ action_names[log.action] }}
-                </td>
-                <td>{{ log.entry.loggedAt|date("d/m/y H:i") }}</td>
-                <td>
-                    <a data-mdb-toggle="tooltip" title="{{ class_infos[log.class] }}"><i class="fa fa-info"></i></a>
-                    &nbsp;
-                    {{ class_names[log.class] }}
-                </td>
-                <td>
-                    {% if log.lien is not null %}
-                        <a href="{{ log.lien }}" class="btn btn-link fw-bold">Lien</a>
-                    {% else %}
-                        Pas de lien
-                    {% endif %}
-                </td>
+                <th>Utilisateur</th>
+                <th>Type d'action</th>
+                <th>Date/Heure</th>
+                <th>Lien</th>
+                <th>Données supplémentaires</th>
+                <th>Commentaire</th>
             </tr>
-        {% endfor %}
-    </table>
+            {% for log in logs %}
+                <tr class="align-middle text-nowrap">
+                    <td>{{ log.log.username }}</td>
+                    <td>
+                        <a data-mdb-toggle="tooltip"
+                           title="{{ action_infos[log.log.action] }} | {{ class_infos[log.log.object_class] }}"><i
+                                    class="fa fa-info"></i></a>
+                        &nbsp;
+                        {{ action_names[log.log.action] }} | {{ class_names[log.log.object_class] }}
+                    </td>
+                    <td>{{ log.log.logged_at|date("d/m/y H:i") }}</td>
+                    <td>
+                        {% if log.lien is not null %}
+                            <a href="{{ log.lien }}" class="btn btn-link fw-bold">Lien</a>
+                        {% else %}
+                            Pas de lien
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if (log.log.data is not null) and log.log.data is not empty %}
+                            <ul class="mb-0">
+                                {% for key, value in log.log.data %}
+                                    <li><b>{{ key }} : </b>{{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Sans objet
+                        {% endif %}
+                    </td>
+                    <td>{{ log.log.message }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}
 

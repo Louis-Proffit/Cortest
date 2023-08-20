@@ -6,14 +6,11 @@ use App\Repository\GrilleRepository;
 use App\Repository\TestRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Loggable\Loggable;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: TestRepository::class)]
-#[Gedmo\Loggable()]
 #[UniqueEntity(self::KEY_UNIQUE_NOM)]
 class Test
 {
@@ -25,17 +22,14 @@ class Test
     public int $id;
 
     #[NotBlank]
-    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 
     #[NotBlank]
-    #[Gedmo\Versioned]
     #[ORM\Column]
     public string $version_batterie;
 
     #[Choice(choices: GrilleRepository::INDEX)]
-    #[Gedmo\Versioned]
     #[ORM\Column]
     public int $index_grille;
 

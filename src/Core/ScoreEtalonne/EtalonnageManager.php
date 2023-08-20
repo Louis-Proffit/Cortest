@@ -28,7 +28,10 @@ class EtalonnageManager
      */
     public function etalonner(Etalonnage $etalonnage, array $reponsesCandidat, ScoresBruts $scoresBruts): ScoresEtalonnes
     {
-        $scoresEtalonnes = new ScoresEtalonnes();
+        $scoresEtalonnes = new ScoresEtalonnes(
+            etalonnage: $etalonnage,
+            scoresBruts: $scoresBruts
+        );
 
         foreach ($reponsesCandidat as $reponseCandidat) {
 

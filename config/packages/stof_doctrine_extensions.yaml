@@ -5,6 +5,3 @@ stof_doctrine_extensions:
     orm:
         default:
             blameable: true
-            loggable: true
-    class:
-        loggable: 'App\Doctrine\CortestLoggableListener'

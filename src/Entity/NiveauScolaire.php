@@ -6,12 +6,10 @@ use App\Repository\NiveauScolaireRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
-#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: NiveauScolaireRepository::class)]
 #[UniqueEntity('nom', message: "Ce nom de niveau scolaire existe déjà.")]
 #[UniqueEntity('indice', message: "Cet indice de niveau scolaire existe déjà.")]
@@ -24,12 +22,10 @@ class NiveauScolaire
 
     #[NotBlank]
     #[Positive]
-    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public int $indice;
 
     #[NotBlank]
-    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 

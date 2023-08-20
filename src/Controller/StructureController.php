@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\Echelle;
 use App\Entity\Structure;
 use App\Form\CreerStructureType;
@@ -40,6 +42,7 @@ class StructureController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request
     ): Response
@@ -73,6 +76,11 @@ class StructureController extends AbstractController
                 $structure->echelles->add($echelle);
             }
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $structure,
+                message: "Création d'une structure par formulaire"
+            );
             $entityManager->persist($structure);
             $entityManager->flush();
 
@@ -85,6 +93,7 @@ class StructureController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request,
         Structure              $structure
@@ -96,6 +105,11 @@ class StructureController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $structure,
+                message: "Modification d'une structure par formulaire"
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("structure_index");
@@ -113,12 +127,19 @@ class StructureController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Structure              $structure): RedirectResponse
     {
         $supprimable = Structure::supprimable($structure);
         if ($supprimable) {
+
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_SUPPRIMER,
+                object: $structure,
+                message: "Suppression d'une structure"
+            );
             $entityManager->remove($structure);
             $entityManager->flush();
 

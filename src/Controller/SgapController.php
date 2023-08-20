@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\Sgap;
 use App\Form\SgapType;
 use App\Repository\SgapRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Gedmo\Loggable\Entity\LogEntry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,22 +31,28 @@ class SgapController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request
     ): RedirectResponse|Response
     {
-        $item = new Sgap(
+        $sgap = new Sgap(
             id: 0,
             indice: 0,
             nom: ""
         );
 
-        $form = $this->createForm(SgapType::class, $item);
+        $form = $this->createForm(SgapType::class, $sgap);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entityManager->persist($item);
+            $entityManager->persist($sgap);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $sgap,
+                message: "Création d'un SGAP par formulaire"
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("sgap_index");
@@ -57,6 +64,7 @@ class SgapController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request,
         Sgap                   $sgap
@@ -67,7 +75,11 @@ class SgapController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
-
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $sgap,
+                message: "Modification d'un SGAP par formulaire"
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("sgap_index");
@@ -87,6 +99,7 @@ class SgapController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Sgap                   $sgap): RedirectResponse
@@ -98,8 +111,13 @@ class SgapController extends AbstractController
             return $this->redirectToRoute("sgap_supprimer_confirmer", ["id" => $sgap->id]);
         } else {
             $logger->info("Suppression du SGAP.", ["sgap" => $sgap]);
-            $this->addFlash("success", "Suppression du SGAP enregistrée",);
+            $this->addFlash("success", "Suppression du SGAP enregistrée");
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_SUPPRIMER,
+                object: $sgap,
+                message: "Suppression d'un SGAP"
+            );
             $entityManager->remove($sgap);
             $entityManager->flush();
             return $this->redirectToRoute("sgap_index");

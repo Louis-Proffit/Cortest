@@ -2,17 +2,18 @@
 
 namespace App\Controller;
 
-use App\Core\Activite\LogEntryProcessor;
+use App\Core\Activite\ActiviteLogger;
+use App\Core\Activite\CortestLogEntryProcessor;
+use App\Entity\CortestLogEntry;
 use App\Entity\CortestUser;
 use App\Form\CreerCortestUserType;
 use App\Form\Generic\CortestUserType;
 use App\Form\MotDePasseCortestUserType;
+use App\Repository\CortestLogEntryRepository;
 use App\Repository\CortestUserRepository;
-use App\Repository\LogEntryRepository;
 use App\Security\CheckAdministrateurCount;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\QueryException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -49,26 +50,28 @@ class AdminController extends AbstractController
         CortestUserRepository $userRepository,
     ): Response
     {
-        $items = $userRepository->findBy([], orderBy: ["id" => Criteria::DESC]);
+        $users = $userRepository->findBy([], orderBy: ["id" => Criteria::DESC]);
 
-        return $this->render("admin/index_utilisateur.html.twig", ["users" => $items]);
+        return $this->render("admin/index_utilisateur.html.twig", ["users" => $users]);
     }
 
     /**
      * Formulaire pour la création d'un utilisateur
+     * @param ActiviteLogger $activiteLogger
      * @param LoggerInterface $logger
      * @param EntityManagerInterface $entityManager
      * @param UserPasswordHasherInterface $userPasswordHasher
      * @param Request $request
-     * @return RedirectResponse|Response
+     * @return Response
      */
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger              $activiteLogger,
         LoggerInterface             $logger,
         EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $userPasswordHasher,
         Request                     $request
-    ): RedirectResponse|Response
+    ): Response
     {
         $user = new CortestUser(id: 0, username: "", password: "", role: CortestUser::ROLE_CORRECTEUR);
 
@@ -84,10 +87,16 @@ class AdminController extends AbstractController
             );
 
             $entityManager->persist($user);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $user,
+                message: "Création d'un utilisateur par formulaire"
+            );
             $entityManager->flush();
 
-            $logger->info("Création d'un utilisateur : id=" . $user->id);
-            $this->addFlash("info", "Création enregistrée");
+
+            $logger->info("Création d'un utilisateur", ["user" => $user]);
+            $this->addFlash("info", "Utilisateur enregistré");
 
             return $this->redirectToRoute("admin_index");
 
@@ -98,6 +107,7 @@ class AdminController extends AbstractController
 
     /**
      * Formulaire lour la modification du mot de passe d'un utilisateur
+     * @param ActiviteLogger $activiteLogger
      * @param EntityManagerInterface $entityManager
      * @param UserPasswordHasherInterface $userPasswordHasher
      * @param Request $request
@@ -106,10 +116,11 @@ class AdminController extends AbstractController
      */
     #[Route("/modifier-mdp/{id}", name: "modifier_mdp")]
     public function modifierMotDePasse(
+        ActiviteLogger              $activiteLogger,
         EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $userPasswordHasher,
         Request                     $request,
-        CortestUser                 $user // Mapped from $id
+        CortestUser                 $user
     ): Response
     {
         $form = $this->createForm(MotDePasseCortestUserType::class, $user);
@@ -123,6 +134,12 @@ class AdminController extends AbstractController
                 $user->password
             );
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $user,
+                message: "Modification du mot de passe"
+            );
+
             $entityManager->flush();
 
             return $this->redirectToRoute("admin_index");
@@ -133,6 +150,7 @@ class AdminController extends AbstractController
 
     /**
      * Formulaire pour modifier un utilisateur, à l'exception du mot de passe
+     * @param ActiviteLogger $activiteLogger
      * @param EntityManagerInterface $entityManager
      * @param Request $request
      * @param CheckAdministrateurCount $checkAdministrateurCount
@@ -142,10 +160,11 @@ class AdminController extends AbstractController
      */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger           $activiteLogger,
         EntityManagerInterface   $entityManager,
         Request                  $request,
         CheckAdministrateurCount $checkAdministrateurCount,
-        CortestUser              $user // Mapped by id
+        CortestUser              $user
     ): Response
     {
 
@@ -158,6 +177,12 @@ class AdminController extends AbstractController
             if ($user->role !== CortestUser::ROLE_ADMINISTRATEUR) {
 
                 if ($checkAdministrateurCount->atLeastOneAdministrateur()) {
+
+                    $activiteLogger->persistAction(
+                        action: CortestLogEntry::ACTION_MODIFIER,
+                        object: $user,
+                        message: "Modification de l'utilisateur"
+                    );
                     $entityManager->flush();
 
                     return $this->redirectToRoute("admin_utilisateurs");
@@ -173,6 +198,7 @@ class AdminController extends AbstractController
     /**
      * Supprimer un utilisateur.
      * Vérifie que l'utilisateur supprimé n'est pas l'actuel, ou que si c'est l'actuel, il reste au moins un autre administrateur.
+     * @param ActiviteLogger $activiteLogger
      * @param EntityManagerInterface $entityManager
      * @param CheckAdministrateurCount $checkAdministrateurCount
      * @param CortestUser $currentUser
@@ -181,6 +207,7 @@ class AdminController extends AbstractController
      */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger             $activiteLogger,
         EntityManagerInterface     $entityManager,
         CheckAdministrateurCount   $checkAdministrateurCount,
         #[CurrentUser] CortestUser $currentUser,
@@ -189,7 +216,13 @@ class AdminController extends AbstractController
 
         if ($currentUser->id !== $user->id || $checkAdministrateurCount->atLeastTwoAdministrateurs()) {
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_SUPPRIMER,
+                object: $user,
+                message: "Suppression de l'utilisateur"
+            );
             $entityManager->remove($user);
+
             $entityManager->flush();
 
             $this->addFlash("info", "Suppression enregistrée");
@@ -202,9 +235,9 @@ class AdminController extends AbstractController
 
     #[Route("/activite/{page}", name: "activite", defaults: ["page" => 1])]
     public function activite(
-        LogEntryRepository $logEntryRepository,
-        LogEntryProcessor  $logEntryProcessor,
-        int                $page
+        CortestLogEntryRepository $logEntryRepository,
+        CortestLogEntryProcessor  $logEntryProcessor,
+        int                       $page
     ): Response
     {
         if ($page <= 0) {
@@ -213,21 +246,26 @@ class AdminController extends AbstractController
 
         $count = $logEntryRepository->count([]);
 
-        $pages = ceil($count / LogEntryRepository::PAGE_SIZE);
+        $pages = ceil($count / CortestLogEntryRepository::PAGE_SIZE);
+
+        if ($pages == 0) {
+            $pages = 1;
+        }
 
         if ($page > $pages) {
             return $this->redirectToRoute("admin_activite", ["page" => $pages]);
         }
         $logEntries = $logEntryRepository->findAllAtPage($page);
         $wrappedLogEntries = $logEntryProcessor->processAll(logEntries: $logEntries);
+
         return $this->render("admin/index_activite.html.twig", [
             "logs" => $wrappedLogEntries,
             "pages" => $pages,
             "page" => $page,
-            "action_names" => LogEntryProcessor::ACTION_NAMES,
-            "action_infos" => LogEntryProcessor::ACTION_INFOS,
-            "class_names" => LogEntryProcessor::CLASS_NAMES,
-            "class_infos" => LogEntryProcessor::CLASS_INFOS
+            "action_names" => CortestLogEntryProcessor::ACTION_NAMES,
+            "action_infos" => CortestLogEntryProcessor::ACTION_INFOS,
+            "class_names" => CortestLogEntryProcessor::CLASS_NAMES,
+            "class_infos" => CortestLogEntryProcessor::CLASS_INFOS
         ]);
     }
 }

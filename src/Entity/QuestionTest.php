@@ -2,17 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\GrilleRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Loggable\Loggable;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity]
-#[Gedmo\Loggable]
 #[ORM\UniqueConstraint(fields: self::UNIQUE_FIELDS_ABREVIATION)]
 #[ORM\UniqueConstraint(fields: self::UNIQUE_FIELDS_INDICE)]
 #[UniqueEntity(fields: self::UNIQUE_FIELDS_ABREVIATION, message: "Cette abréviation existe déjà dans le même concours", errorPath: "abreviation")]

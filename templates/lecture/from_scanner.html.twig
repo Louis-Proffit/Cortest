@@ -107,22 +107,17 @@
 
     <p class="lead">Session : </p>
     <table class="table">
-
         <tbody>
         <tr>
             <td>Date
             <td><em>{{ session.date |date("m/d/Y") }}</em></td>
         </tr>
         <tr>
-            <td>Concours
-            <td><em>{{ session.test.concours[0].intitule }}</em></td>
+            <td>Test</td>
+            <td><em>{{ session.test.nom }}</em></td>
         </tr>
         <tr>
-            <td>Type concours
-            <td><em>{{ session.test.concours[0].type_concours }}</em></td>
-        </tr>
-        <tr>
-            <td>Batterie
+            <td>Version batterie</td>
             <td><em>{{ session.test.version_batterie }}</em></td>
         </tr>
         <tr>

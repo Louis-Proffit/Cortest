@@ -6,16 +6,12 @@ use App\Repository\ReponseCandidatRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Type;
 
 #[ORM\HasLifecycleCallbacks]
-#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: ReponseCandidatRepository::class)]
 class ReponseCandidat
 {
@@ -45,7 +41,6 @@ class ReponseCandidat
         new Type("int"),
         new Choice(self::REPONSES)
     ])]
-    #[Gedmo\Versioned]
     #[ORM\Column(type: Types::JSON)]
     public array $reponses;
 

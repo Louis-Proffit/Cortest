@@ -2,7 +2,7 @@
 
 namespace App\Tests\Core\Activite;
 
-use App\Core\Activite\LogEntryProcessor;
+use App\Core\Activite\CortestLogEntryProcessor;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertSameSize;
 
@@ -11,13 +11,13 @@ class LogEntryProcessorTest extends TestCase {
 
     public function testActionContent(): void
     {
-        assertSameSize(LogEntryProcessor::ACTIONS, LogEntryProcessor::ACTION_INFOS);
-        assertSameSize(LogEntryProcessor::ACTIONS, LogEntryProcessor::ACTION_INFOS);
+        assertSameSize(CortestLogEntryProcessor::ACTIONS, CortestLogEntryProcessor::ACTION_INFOS);
+        assertSameSize(CortestLogEntryProcessor::ACTIONS, CortestLogEntryProcessor::ACTION_INFOS);
     }
 
     public function testClassContent(): void
     {
-        assertSameSize(LogEntryProcessor::CLASSES, LogEntryProcessor::CLASS_NAMES);
-        assertSameSize(LogEntryProcessor::CLASSES, LogEntryProcessor::CLASS_INFOS);
+        assertSameSize(CortestLogEntryProcessor::CLASSES, CortestLogEntryProcessor::CLASS_NAMES);
+        assertSameSize(CortestLogEntryProcessor::CLASSES, CortestLogEntryProcessor::CLASS_INFOS);
     }
 }

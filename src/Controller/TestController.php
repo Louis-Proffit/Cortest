@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\Test;
 use App\Entity\QuestionTest;
 use App\Form\CreerTestType;
@@ -47,6 +49,7 @@ class TestController extends AbstractController
 
     /**
      * Formulaire de création d'un test
+     * @param ActiviteLogger $activiteLogger
      * @param EntityManagerInterface $entityManager
      * @param GrilleRepository $grilleRepository
      * @param Request $request
@@ -54,6 +57,7 @@ class TestController extends AbstractController
      */
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         GrilleRepository       $grilleRepository,
         Request                $request
@@ -89,6 +93,11 @@ class TestController extends AbstractController
             }
 
             $entityManager->persist($test);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $test,
+                message: "Création d'un test par formulaire",
+            );
             $entityManager->flush();
 
             $this->addFlash("success", "Le test a été créé. Vous pouvez maintenant paramétrer son contenu.");
@@ -101,6 +110,7 @@ class TestController extends AbstractController
 
     /**
      * Formulaire de modification d'un test
+     * @param ActiviteLogger $activiteLogger
      * @param EntityManagerInterface $entityManager
      * @param Request $request
      * @param Test $test
@@ -108,6 +118,7 @@ class TestController extends AbstractController
      */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request,
         Test                   $test,
@@ -119,6 +130,11 @@ class TestController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $test,
+                message: "Modification d'un test par formulaire",
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("test_consulter", ["id" => $test->id]);
@@ -135,24 +151,32 @@ class TestController extends AbstractController
     #[Route("/supprimer/confirmer/{id}", name: "supprimer_confirmer")]
     public function supprimerConfirmer(Test $test): Response
     {
-        $supprimable = Test:: supprimable($test);
+        $supprimable = Test::supprimable($test);
         return $this->render("test/supprimer.html.twig", ["test" => $test, "supprimable" => $supprimable]);
     }
 
     /**
      * Supprime un test
+     * @param ActiviteLogger $activiteLogger
+     * @param LoggerInterface $logger
      * @param EntityManagerInterface $entityManager
      * @param Test $test
      * @return RedirectResponse
      */
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Test                   $test): RedirectResponse
     {
         $supprimable = Test::supprimable($test);
         if ($supprimable) {
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_SUPPRIMER,
+                object: $test,
+                message: "Suppression d'un test",
+            );
             $entityManager->remove($test);
             $entityManager->flush();
 

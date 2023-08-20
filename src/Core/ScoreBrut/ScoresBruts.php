@@ -2,6 +2,7 @@
 
 namespace App\Core\ScoreBrut;
 
+use App\Entity\Correcteur;
 use App\Entity\ReponseCandidat;
 
 class ScoresBruts
@@ -11,7 +12,8 @@ class ScoresBruts
      * @param ScoreBrut[] $__array
      */
     public function __construct(
-        private array $__array = []
+        readonly Correcteur $correcteur,
+        private array               $__array = []
     )
     {
     }

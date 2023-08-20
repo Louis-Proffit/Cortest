@@ -5,13 +5,11 @@ namespace App\Entity;
 use App\Repository\EtalonnageRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 
 
-#[Gedmo\Loggable]
 #[ORM\Entity(repositoryClass: EtalonnageRepository::class)]
 #[UniqueEntity('nom', message: "Ce nom d'étalonnage existe déjà")]
 class Etalonnage
@@ -21,12 +19,10 @@ class Etalonnage
     #[ORM\Column]
     public int $id;
 
-    #[Gedmo\Versioned]
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: "etalonnages")]
     public Structure $structure;
 
     #[NotBlank]
-    #[Gedmo\Versioned]
     #[ORM\Column(name: 'nom', unique: true)]
     public string $nom;
 

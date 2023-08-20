@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\ReponseCandidat;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -15,6 +17,7 @@ class ReponseCandidatController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         ReponseCandidat        $reponseCandidat): Response
@@ -23,6 +26,11 @@ class ReponseCandidatController extends AbstractController
 
         $logger->info("Suppression des réponses du candidat . " . $reponseCandidat->id . " de la session " . $sessionId);
 
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $reponseCandidat,
+            message: "Suppression d'une réponse de candidat"
+        );
         $entityManager->remove($reponseCandidat);
         $entityManager->flush();
 

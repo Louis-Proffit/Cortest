@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\NoReponsesCandidatException;
 use App\Core\ReponseCandidat\CheckSingleSession;
@@ -79,6 +80,7 @@ class ScoresBrutsController extends AbstractController
      */
     #[Route("/index/{correcteur_id}", name: "index")]
     public function consulter(
+        ActiviteLogger                               $activiteLogger,
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
@@ -89,8 +91,13 @@ class ScoresBrutsController extends AbstractController
 
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
+        $scoresBruts = $correcteurManager->corriger($correcteur, $reponsesCandidats);
+        $activiteLogger->persistCalcul(
+            calcul: $scoresBruts,
+            message: "Calcul de scores bruts",
+        );
+        $activiteLogger->flush();
 
-        return $this->render("score_brut/index.html.twig", ["scores" => $scores, "session" => $session, "reponses_candidats" => $reponsesCandidats, "correcteur" => $correcteur]);
+        return $this->render("score_brut/index.html.twig", ["scores" => $scoresBruts, "session" => $session, "reponses_candidats" => $reponsesCandidats, "correcteur" => $correcteur]);
     }
 }
