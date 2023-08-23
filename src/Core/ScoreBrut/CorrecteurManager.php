@@ -24,7 +24,7 @@ readonly class CorrecteurManager
      */
     public function corriger(Correcteur $correcteur, array $reponseCandidats): ScoresBruts
     {
-        $corrige = new ScoresBruts();
+        $corrige = new ScoresBruts($correcteur);
 
         foreach ($reponseCandidats as $reponseCandidat) {
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\IO\Correcteur\ExportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXML;
 use App\Core\IO\Correcteur\ImportCorrecteurXMLErrorHandlerAddFlash;
@@ -9,6 +10,7 @@ use App\Core\IO\FileNameManager;
 use App\Core\IO\FileUtils;
 use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Entity\Correcteur;
+use App\Entity\CortestLogEntry;
 use App\Entity\EchelleCorrecteur;
 use App\Form\CorrecteurCreerType;
 use App\Form\CorrecteurType;
@@ -54,6 +56,7 @@ class CorrecteurController extends AbstractController
 
     #[Route("/importer", name: "importer")]
     public function importer(
+        ActiviteLogger         $activiteLogger,
         ValidatorInterface     $validator,
         EntityManagerInterface $entityManager,
         Session                $session,
@@ -78,6 +81,11 @@ class CorrecteurController extends AbstractController
 
                 if (count($errors) == 0) {
                     $entityManager->persist($correcteur);
+                    $activiteLogger->persistAction(
+                        action: CortestLogEntry::ACTION_CREER,
+                        object: $correcteur,
+                        message: "Import d'un correcteur par un fichier XML"
+                    );
                     $entityManager->flush();
 
                     $this->addFlash("success", "Correcteur importé");
@@ -97,6 +105,7 @@ class CorrecteurController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         TestRepository         $testRepository,
         StructureRepository    $structureRepository,
@@ -145,6 +154,11 @@ class CorrecteurController extends AbstractController
             }
 
             $entityManager->persist($correcteur);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $correcteur,
+                message: "Création d'un correcteur par formulaire"
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("correcteur_modifier", ["id" => $correcteur->id]);
@@ -155,7 +169,8 @@ class CorrecteurController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        ManagerRegistry           $doctrine,
+        ActiviteLogger            $activiteLogger,
+        EntityManagerInterface    $entityManager,
         CortestExpressionLanguage $cortestExpressionLanguage,
         Request                   $request,
         Correcteur                $correcteur
@@ -167,7 +182,12 @@ class CorrecteurController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $doctrine->getManager()->flush();
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $correcteur,
+                message: "Modification d'un correcteur par formulaire"
+            );
+            $entityManager->flush();
 
             return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
 
@@ -181,6 +201,7 @@ class CorrecteurController extends AbstractController
 
     #[Route("/exporter/{id}", name: "exporter")]
     public function exporter(
+        ActiviteLogger      $activiteLogger,
         ExportCorrecteurXML $exportCorrecteurXML,
         FileNameManager     $fileNameManager,
         Correcteur          $correcteur
@@ -201,12 +222,22 @@ class CorrecteurController extends AbstractController
 
             FileUtils::setFileResponseFileName($response, $fileName);
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_EXPORTER,
+                object: $correcteur,
+                message: "Export d'un correcteur vers un fichier xml",
+                data: ["fichier" => $fileName]
+            );
+
+            $activiteLogger->flush();
+
             return $response;
         }
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Correcteur             $correcteur
@@ -215,6 +246,11 @@ class CorrecteurController extends AbstractController
         $this->addFlash("success", "Correcteur supprimé");
         $logger->info("Suppression du correcteur.", ["correcteur" => $correcteur]);
 
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $correcteur,
+            message: "Suppression d'un correcteur"
+        );
         $entityManager->remove($correcteur);
         $entityManager->flush();
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\Exception\MissingFileException;
 use App\Core\Exception\UploadFailException;
 use App\Core\IO\GraphiqueFileRepository;
@@ -10,6 +11,7 @@ use App\Core\IO\Pdf\PdfManager;
 use App\Core\IO\Pdf\Renderer;
 use App\Core\ScoreBrut\CorrecteurManager;
 use App\Core\ScoreEtalonne\EtalonnageManager;
+use App\Entity\CortestLogEntry;
 use App\Entity\Graphique;
 use App\Form\Data\TestCorrecteurEtalonnageChoice;
 use App\Form\GraphiqueType;
@@ -45,6 +47,7 @@ class GraphiqueController extends AbstractController
      */
     #[Route("/creer", name: "creer")]
     public function creer(
+        ActiviteLogger          $activiteLogger,
         GraphiqueFileRepository $graphiqueFileManager,
         EntityManagerInterface  $entityManager,
         StructureRepository     $structureRepository,
@@ -75,6 +78,12 @@ class GraphiqueController extends AbstractController
             $file = $form->get(GraphiqueType::FILE_KEY)->getData();
 
             $entityManager->persist($graphique);
+
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $graphique,
+                message: "Création d'un graphique par formulaire",
+            );
             $entityManager->flush();
 
             $graphiqueFileManager->upload($file, $graphique);
@@ -90,6 +99,7 @@ class GraphiqueController extends AbstractController
      */
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger          $activiteLogger,
         GraphiqueFileRepository $graphiqueFileManager,
         EntityManagerInterface  $entityManager,
         Request                 $request,
@@ -105,6 +115,11 @@ class GraphiqueController extends AbstractController
             /** @var UploadedFile $file */
             $file = $form->get(GraphiqueType::FILE_KEY)->getData();
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $graphique,
+                message: "Modification d'un graphique par formulaire",
+            );
             $entityManager->flush();
 
             $graphiqueFileManager->upload($file, $graphique);
@@ -158,7 +173,7 @@ class GraphiqueController extends AbstractController
             );
 
             $profils = $etalonnageManager->etalonner(
-                etalonnage:  $etalonnage,
+                etalonnage: $etalonnage,
                 reponsesCandidat: $reponsesCandidats,
                 scoresBruts: $scores
             );
@@ -185,7 +200,8 @@ class GraphiqueController extends AbstractController
 
     #[Route("/telecharger/{id}", name: "download")]
     public function telecharger(
-        Graphique            $graphique,
+        ActiviteLogger          $activiteLogger,
+        Graphique               $graphique,
         GraphiqueFileRepository $graphiqueFileManager
     ): Response
     {
@@ -195,6 +211,14 @@ class GraphiqueController extends AbstractController
             $this->addFlash("danger", "Le fichier n'existe pas.");
             return $this->redirectToRoute("graphique_index");
         } else {
+
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_EXPORTER,
+                object: $graphique,
+                message: "Téléchargement du fichier graphique",
+                data: ["fichier" => $graphique->file_nom]
+            );
+
             return $this->file($filePath, $graphique->file_nom);
         }
     }
@@ -230,6 +254,7 @@ class GraphiqueController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Graphique              $graphique
@@ -237,6 +262,11 @@ class GraphiqueController extends AbstractController
     {
         $logger->info("Suppression du graphique " . $graphique->id);
 
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $graphique,
+            message: "Suppression d'un graphique",
+        );
         $entityManager->remove($graphique);
         $entityManager->flush();
 

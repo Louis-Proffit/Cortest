@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\CorrecteurEtalonnageMatcher;
 use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\NoReponsesCandidatException;
@@ -115,22 +116,23 @@ class ScoresEtalonnesController extends AbstractController
         }
 
         if ($correcteur->structure->etalonnages->isEmpty()) {
-            $this->addFlash("danger", "Pas d'étalonnage disponible pour le score_etalonne " . $correcteur->structure->nom);
+            $this->addFlash("danger", "Pas d'étalonnage disponible pour le score étalonne " . $correcteur->structure->nom);
             return $this->redirectToRoute("etalonnage_index");
         }
 
-        $parametres_calcul_profil = new EtalonnageChoice(etalonnage: $correcteur->structure->etalonnages[0]);
+        $etalonnageChoice = new EtalonnageChoice(etalonnage: $correcteur->structure->etalonnages[0]);
 
         $form = $this->createForm(
-            EtalonnageChoiceType::class,
-            $parametres_calcul_profil,
-            [EtalonnageChoiceType::OPTION_STRUCTURE => $correcteur->structure]);
+            type: EtalonnageChoiceType::class,
+            data: $etalonnageChoice,
+            options: [EtalonnageChoiceType::OPTION_STRUCTURE => $correcteur->structure]
+        );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $etalonnage = $parametres_calcul_profil->etalonnage;
+            $etalonnage = $etalonnageChoice->etalonnage;
 
             return $this->redirectToRoute(
                 "calcul_score_etalonne_index",
@@ -152,6 +154,7 @@ class ScoresEtalonnesController extends AbstractController
      */
     #[Route("/index/{correcteur_id}/{etalonnage_id}", name: "index")]
     public function index(
+        ActiviteLogger                               $activiteLogger,
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
@@ -185,6 +188,11 @@ class ScoresEtalonnesController extends AbstractController
             reponsesCandidat: $reponsesCandidats,
             scoresBruts: $scoresBruts
         );
+        $activiteLogger->persistCalcul(
+            calcul: $scoresEtalonnes,
+            message: "Calcul de scores étalonnés",
+        );
+        $activiteLogger->flush();
 
         return $this->render("score_etalonne/index.html.twig",
             ["scores_etalonnes" => $scoresEtalonnes,

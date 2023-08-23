@@ -5,9 +5,7 @@ namespace App\Entity;
 use App\Constraint\Compilable;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
-use Gedmo\Mapping\Annotation as Gedmo;
 
-#[Gedmo\Loggable]
 #[Entity]
 class EchelleCorrecteur
 {
@@ -18,7 +16,6 @@ class EchelleCorrecteur
     public int $id;
 
     #[Compilable]
-    #[Gedmo\Versioned]
     #[ORM\Column(length: 10000)]
     public string $expression;
 

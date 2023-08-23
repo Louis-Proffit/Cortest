@@ -4,12 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\Type;
 
-#[Gedmo\Loggable()]
 #[Entity]
 class EchelleEtalonnage
 {
@@ -21,7 +19,6 @@ class EchelleEtalonnage
 
     #[Expression("this.etalonnage.nombre_classes == count(this.bounds)")]
     #[All(new Type("numeric"))]
-    #[Gedmo\Versioned]
     #[ORM\Column]
     public array $bounds;
 

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\NiveauScolaire;
 use App\Entity\ReponseCandidat;
 use App\Form\NiveauScolaireType;
@@ -31,19 +33,25 @@ class NiveauScolaireController extends AbstractController
 
     #[Route("/creer", name: "creer")]
     public function creer(
-        EntityManagerInterface $entity_manager,
+        ActiviteLogger         $activiteLogger,
+        EntityManagerInterface $entityManager,
         Request                $request
     ): RedirectResponse|Response
     {
-        $item = new NiveauScolaire(id: 0, indice: 0, nom: "");
+        $niveauScolaire = new NiveauScolaire(id: 0, indice: 0, nom: "");
 
-        $form = $this->createForm(NiveauScolaireType::class, $item);
+        $form = $this->createForm(NiveauScolaireType::class, $niveauScolaire);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->persist($item);
-            $entity_manager->flush();
+            $entityManager->persist($niveauScolaire);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $niveauScolaire,
+                message: "Création d'un niveau scolaire par formulaire"
+            );
+            $entityManager->flush();
 
             return $this->redirectToRoute("niveau_scolaire_index");
 
@@ -54,21 +62,24 @@ class NiveauScolaireController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
-        NiveauScolaireRepository $niveau_scolaire_repository,
-        EntityManagerInterface   $entity_manager,
-        Request                  $request,
-        int                      $id
+        ActiviteLogger         $activiteLogger,
+        EntityManagerInterface $entityManager,
+        Request                $request,
+        NiveauScolaire         $niveauScolaire
     ): Response
     {
-        $item = $niveau_scolaire_repository->find($id);
-
-        $form = $this->createForm(NiveauScolaireType::class, $item);
+        $form = $this->createForm(NiveauScolaireType::class, $niveauScolaire);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entity_manager->flush();
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $niveauScolaire,
+                message: "Modification d'un niveau scolaire par formulaire"
+            );
+            $entityManager->flush();
 
             return $this->redirectToRoute("niveau_scolaire_index");
         }
@@ -90,12 +101,19 @@ class NiveauScolaireController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         NiveauScolaire         $niveauScolaire): RedirectResponse
     {
         $supprimable = NiveauScolaire::supprimable($niveauScolaire);
+
         if ($supprimable) {
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_SUPPRIMER,
+                object: $niveauScolaire,
+                message: "Suppression d'un niveau scolaire"
+            );
             $entityManager->remove($niveauScolaire);
             $entityManager->flush();
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\MissingFileException;
 use App\Core\Exception\NoReponsesCandidatException;
@@ -134,13 +135,14 @@ class PdfController extends AbstractController
     }
 
     /**
+     * @param ActiviteLogger $activiteLogger
      * @param CorrecteurManager $correcteurManager
      * @param EtalonnageManager $etalonnageManager
      * @param PdfManager $pdfManager
+     * @param ReponseCandidat $reponseCandidat
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
      * @param Graphique $graphique
-     * @param ReponseCandidat $reponseCandidat
      * @return Response
      * @throws LatexCompilationFailedException
      * @throws LoaderError
@@ -149,6 +151,7 @@ class PdfController extends AbstractController
      */
     #[Route("/telecharger/simple/{candidat_reponse_id}/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "single")]
     public function download(
+        ActiviteLogger                                          $activiteLogger,
         CorrecteurManager                                       $correcteurManager,
         EtalonnageManager                                       $etalonnageManager,
         PdfManager                                              $pdfManager,
@@ -159,20 +162,27 @@ class PdfController extends AbstractController
     ): Response
     {
         $reponsesCandidat = [$reponseCandidat];
-        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidat);
-        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidat, scoresBruts: $scores);
+        $scoresBruts = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidat);
+        $scoresEtalonnes = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidat, scoresBruts: $scoresBruts);
+
+        $activiteLogger->persistExportCalcul(
+            calcul: $scoresEtalonnes,
+            message: "Export d'une feuille de profil unique"
+        );
+        $activiteLogger->flush();
 
         return $pdfManager->createPdfFile(
             graphique: $graphique,
             reponseCandidat: $reponseCandidat,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            scoreBrut: $scores->get($reponseCandidat),
-            scoreEtalonne: $profils->get($reponseCandidat)
+            scoreBrut: $scoresBruts->get($reponseCandidat),
+            scoreEtalonne: $scoresEtalonnes->get($reponseCandidat)
         );
     }
 
     /**
+     * @param ActiviteLogger $activiteLogger
      * @param CorrecteurManager $correcteurManager
      * @param EtalonnageManager $etalonnageManager
      * @param PdfManager $pdfManager
@@ -191,6 +201,7 @@ class PdfController extends AbstractController
      */
     #[Route("/telecharger/zip/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "zip")]
     public function formSessionZip(
+        ActiviteLogger                               $activiteLogger,
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
         PdfManager                                   $pdfManager,
@@ -204,21 +215,28 @@ class PdfController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
-        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scores);
+        $scoresBruts = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
+        $scoresEtalonnes = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scoresBruts);
+
+        $activiteLogger->persistExportCalcul(
+            calcul: $scoresEtalonnes,
+            message: "Export de feuilles de profils en fichier zip"
+        );
+        $activiteLogger->flush();
 
         return $pdfManager->createZipFile(
             session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            scoresBruts: $scores,
-            scoresEtalonnes: $profils,
+            scoresBruts: $scoresBruts,
+            scoresEtalonnes: $scoresEtalonnes,
             graphique: $graphique,
             reponsesCandidat: $reponsesCandidats
         );
     }
 
     /**
+     * @param ActiviteLogger $activiteLogger
      * @param CorrecteurManager $correcteurManager
      * @param EtalonnageManager $etalonnageManager
      * @param PdfManager $pdfManager
@@ -230,13 +248,14 @@ class PdfController extends AbstractController
      * @return Response
      * @throws DifferentSessionException
      * @throws LatexCompilationFailedException
-     * @throws NoReponsesCandidatException
-     * @throws MissingFileException
      * @throws LoaderError
+     * @throws MissingFileException
+     * @throws NoReponsesCandidatException
      * @throws SyntaxError
      */
     #[Route("/telecharger/merged/{correcteur_id}/{etalonnage_id}/{graphique_id}", name: "merged")]
     public function formSessionPdf(
+        ActiviteLogger                               $activiteLogger,
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
         PdfManager                                   $pdfManager,
@@ -247,19 +266,24 @@ class PdfController extends AbstractController
         #[MapEntity(id: "graphique_id")] Graphique   $graphique,
     ): Response
     {
-
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
 
-        $scores = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
-        $profils = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scores);
+        $scoresBruts = $correcteurManager->corriger(correcteur: $correcteur, reponseCandidats: $reponsesCandidats);
+        $scoresEtalonnes = $etalonnageManager->etalonner(etalonnage: $etalonnage, reponsesCandidat: $reponsesCandidats, scoresBruts: $scoresBruts);
+
+        $activiteLogger->persistExportCalcul(
+            calcul: $scoresEtalonnes,
+            message: "Export de feuilles de profils en un fichier pdf unique"
+        );
+        $activiteLogger->flush();
 
         return $pdfManager->createPdfMergedFile(
             session: $session,
             correcteur: $correcteur,
             etalonnage: $etalonnage,
-            scoresBruts: $scores,
-            scoresEtalonnes: $profils,
+            scoresBruts: $scoresBruts,
+            scoresEtalonnes: $scoresEtalonnes,
             graphique: $graphique,
             reponsesCandidat: $reponsesCandidats
         );

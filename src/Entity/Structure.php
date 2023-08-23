@@ -7,12 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
-use Gedmo\Loggable\Loggable;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[Gedmo\Loggable]
 #[Entity(repositoryClass: StructureRepository::class)]
 #[UniqueEntity('nom')]
 class Structure
@@ -23,7 +20,6 @@ class Structure
     public int $id;
 
     #[NotBlank]
-    #[Gedmo\Versioned]
     #[ORM\Column(unique: true)]
     public string $nom;
 

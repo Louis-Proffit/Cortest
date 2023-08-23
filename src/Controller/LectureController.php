@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\Exception\ImportReponsesCandidatException;
 use App\Core\IO\CsvManager;
 use App\Core\ReponseCandidat\ImportReponsesCandidat;
+use App\Entity\CortestLogEntry;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\Data\ParametresLectureCsv;
@@ -20,7 +22,7 @@ use App\Repository\ReponseCandidatRepository;
 use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,6 +41,7 @@ class LectureController extends AbstractController
 
     #[Route("/form", name: "form")]
     public function form(
+        ActiviteLogger           $activiteLogger,
         SessionRepository        $sessionRepository,
         NiveauScolaireRepository $niveauScolaireRepository,
         GrilleRepository         $grilleRepository,
@@ -81,7 +84,6 @@ class LectureController extends AbstractController
             raw: null
         );
 
-
         $form = $this->createForm(ReponseCandidatType::class, $reponse);
 
         $form->handleRequest($request);
@@ -89,6 +91,12 @@ class LectureController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $entityManager->persist($reponse);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $reponse,
+                message: "Saisie des réponses d'un candidat par formulaire"
+            );
+
             $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $reponse->session->id]);
@@ -98,13 +106,13 @@ class LectureController extends AbstractController
     }
 
     #[Route("/fichier-json", name: 'fichier')]
-    public function fichier(ManagerRegistry          $doctrine,
-                            NiveauScolaireRepository $niveau_scolaire_repository,
-                            Request                  $request,
-                            LoggerInterface          $logger): Response
+    public function fichier(
+        ActiviteLogger           $activiteLogger,
+        EntityManagerInterface   $entityManager,
+        NiveauScolaireRepository $niveau_scolaire_repository,
+        Request                  $request,
+        LoggerInterface          $logger): Response
     {
-        $manager = $doctrine->getManager();
-
         $uploadSessionBase = new ParametresLectureJSON();
         $form = $this->createForm(ParametresLectureFichierType::class, $uploadSessionBase);
 
@@ -140,9 +148,15 @@ class LectureController extends AbstractController
                     eirs: $reponses_candidat_json["EIRS"],
                     raw: $reponses_candidat_json
                 );
-                $manager->persist($reponse_candidat);
+                $entityManager->persist($reponse_candidat);
             }
-            $manager->flush();
+
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $uploadSessionBase->session,
+                message: "Chargement de réponses de candidats par fichier json",
+            );
+            $entityManager->flush();
 
             $this->addFlash('success', 'Le fichier a bien été introduit dans la base de données');
             return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session->id]);
@@ -154,13 +168,14 @@ class LectureController extends AbstractController
     }
 
     #[Route("/fichier-csv", name: 'fichier_csv')]
-    public function importCsv(ManagerRegistry        $doctrine,
-                              Request                $request,
-                              CsvManager             $csvManager,
-                              ImportReponsesCandidat $reponsesCandidatImport
+    public function importCsv(
+        ActiviteLogger         $activiteLogger,
+        EntityManagerInterface $entityManager,
+        Request                $request,
+        CsvManager             $csvManager,
+        ImportReponsesCandidat $reponsesCandidatImport
     ): Response
     {
-        $manager = $doctrine->getManager();
 
         $uploadSessionBase = new ParametresLectureCsv();
         $form = $this->createForm(ParametresLectureFichierCsvType::class, $uploadSessionBase);
@@ -175,10 +190,16 @@ class LectureController extends AbstractController
                 $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
 
                 foreach ($reponsesCandidats as $reponseCandidat) {
-                    $manager->persist($reponseCandidat);
+                    $entityManager->persist($reponseCandidat);
                 }
 
-                $manager->flush();
+                $activiteLogger->persistAction(
+                    action: CortestLogEntry::ACTION_CREER,
+                    object: $uploadSessionBase->session,
+                    message: "Saisie de réponses de candidats par fichier csv",
+                );
+
+                $entityManager->flush();
                 $this->addFlash('success', 'Le fichier CSV a bien été introduit dans la base de données');
 
                 return $this->redirectToRoute('session_consulter', ["id" => $uploadSessionBase->session->id]);
@@ -224,22 +245,29 @@ class LectureController extends AbstractController
     }
 
 
+    /**
+     * @throws Exception
+     */
     #[Route("/scanner/save", name: 'saveFromScanner')]
-    public function saveFromScanner(Request                   $request,
-                                    EntityManagerInterface    $entityManager,
-                                    SessionRepository         $sessionRepository,
-                                    NiveauScolaireRepository  $niveauScolaireRepository,
-                                    ReponseCandidatRepository $reponseCandidatRepository
+    public function saveFromScanner(
+        ActiviteLogger            $activiteLogger,
+        Request                   $request,
+        EntityManagerInterface    $entityManager,
+        SessionRepository         $sessionRepository,
+        NiveauScolaireRepository  $niveauScolaireRepository,
+        ReponseCandidatRepository $reponseCandidatRepository
     ): Response
     {
 
         $data = json_decode($request->request->get("data"), true);
 
+        $session = $sessionRepository->find($request->request->get('session'));
+
         foreach ($data as $i => $ligne) {
             if (count($reponseCandidatRepository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
-                $rep = new ReponseCandidat(
+                $reponseCandidat = new ReponseCandidat(
                     id: 0,
-                    session: $sessionRepository->find($request->request->get('session')),
+                    session: $session,
                     reponses: $ligne['qcm'],
                     nom: $ligne['nom'],
                     prenom: $ligne['prenom'],
@@ -254,11 +282,16 @@ class LectureController extends AbstractController
                     eirs: $ligne['concours'],
                     raw: null
                 );
-                $entityManager->persist($rep);
-                $entityManager->flush();
+                $entityManager->persist($reponseCandidat);
             }
-
         }
+
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_CREER,
+            object: $session,
+            message: "Lecture optique de réponses de candidats"
+        );
+        $entityManager->flush();
 
         return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
     }

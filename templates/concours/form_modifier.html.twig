@@ -5,14 +5,18 @@
     <br>
     <h1>Modifier un concours</h1>
     <br>
-    {{ form_start(form) }}
-    <div class="mb-3">
-        <button class="btn btn-primary">Enregistrer</button>
+    <div class="note note-warning">
+        En modifiant un concours, vous répercuterez le changement partout dans CORTEST.
+        Ce ne sont que des changements de dénominations : aucun calcul ne sera impacté.
+        Le concours sera toujours associé au(x) même(s) test(s).
     </div>
+    <br>
+    {{ form_start(form) }}
     {{ form_row(form.intitule) }}
     {{ form_row(form.type_concours) }}
+    <br>
     <div class="mb-3">
-        <button class="btn btn-primary">Enregistrer</button>
+        <button class="btn btn-primary">Valider</button>
     </div>
     {{ form_end(form) }}
 

@@ -4,58 +4,75 @@
     <br>
     <h1>Tests</h1>
     <br>
-    <p class="lead">Liste des tests disponibles.</p>
+    <div class="note note-info">
+        Un test est la donnée d'un <b>nom</b>, d'une <b>version batterie</b>, d'une <b>grille</b> et des informations
+        (statut, intitulé et abréviation) pour chacune des questions possibles dans la <b>grille</b>
+    </div>
+    <br>
+    <div class="note note-info">
+        Le statut d'une question est l'un de :
+        <ul class="mb-0">
+            <li><b>Inutilisé</b> : ignoré par CORTEST</li>
+            <li><b>Exemple</b> : ignoré par CORTEST</li>
+            <li><b>Vrai/Faux</b> : CORTEST n'acceptera que les réponses vides, A, ou B</li>
+            <li><b>Score</b> : CORTEST acceptera toutes les réponses.</li>
+        </ul>
+    </div>
     <br>
     <div class="row row-cols-auto">
         <div class="col">
-            <a class="btn btn-primary" href="{{ path("test_creer") }}">Créer</a>
+            <a class="btn btn-primary" href="{{ path("test_creer") }}">Créer un test</a>
         </div>
     </div>
     <br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Version batterie</th>
-            <th>Grille</th>
-            <th>Concours(s)</th>
-            <th>Consulter</th>
-            <th>Modifier</th>
-            <th>Supprimer</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for test in tests %}
-            <tr class="align-middle">
-                <td>{{ test.nom }}</td>
-                <td>{{ test.version_batterie }}</td>
-                <td>{{ grilles[test.index_grille].nom }}</td>
-                <td>
-                    <ul>
-                        {% for concours in test.concours %}
-                            <li>{{ concours.intitule }}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-                <td>
-                    <a class="btn btn-link fw-bold"
-                       href="{{ path("test_consulter", {"id":test.id}) }}">Lien</a>
-                </td>
-                <td>
-                    <a class="btn btn-link fw-bold"
-                       href="{{ path("test_modifier", {"id":test.id}) }}">Lien</a>
-                </td>
-                <td>
-                    <a class="btn btn-link fw-bold link-danger"
-                       href="{{ path("test_supprimer_confirmer", {"id":test.id}) }}">
-                        <i class="fa fa-check"></i>
-                        Lien
-                    </a>
-                </td>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Version batterie</th>
+                <th>Grille</th>
+                <th>Concours(s) correspondant(s)</th>
+                <th>Consulter</th>
+                <th>Modifier</th>
+                <th>Supprimer</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for test in tests %}
+                <tr class="align-middle">
+                    <td>{{ test.nom }}</td>
+                    <td>{{ test.version_batterie }}</td>
+                    <td>
+                        <a href="{{ path("grille_index") }}">{{ grilles[test.index_grille].nom }}</a>
+                    </td>
+                    <td>
+                        <ul>
+                            {% for concours in test.concours %}
+                                <li>{{ concours.intitule }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        <a class="btn btn-link fw-bold"
+                           href="{{ path("test_consulter", {"id":test.id}) }}">Lien</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-link fw-bold"
+                           href="{{ path("test_modifier", {"id":test.id}) }}">Lien</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-link fw-bold link-danger"
+                           href="{{ path("test_supprimer_confirmer", {"id":test.id}) }}">
+                            <i class="fa fa-check"></i>
+                            Lien
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
     <br>
 {% endblock %}
 

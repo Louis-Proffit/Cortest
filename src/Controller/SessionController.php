@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Entity\CortestLogEntry;
 use App\Entity\Session;
 use App\Form\SessionType;
 use App\Repository\GrilleRepository;
@@ -39,20 +41,21 @@ class SessionController extends AbstractController
 
     #[Route('/creer', name: "creer")]
     public function creer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         SgapRepository         $sgapRepository,
         TestRepository         $testRepository,
         Request                $request): Response
     {
-        $tests = $testRepository->findAll();
-        $sgaps = $sgapRepository->findAll();
+        $test = $testRepository->findOneBy([]);
+        $sgap = $sgapRepository->findOneBy([]);
 
-        if (empty($sgaps)) {
+        if ($sgap == null) {
             $this->addFlash("warning", "Pas de SGAP disponible, veuillez en créer un.");
             return $this->redirectToRoute("sgap_index");
         }
 
-        if (empty($tests)) {
+        if ($test == null) {
             $this->addFlash("warning", "Pas de tests disponible, veuillez en créer un.");
             return $this->redirectToRoute("test_index");
         }
@@ -62,8 +65,8 @@ class SessionController extends AbstractController
             date: new DateTime("now"),
             numero_ordre: 0,
             observations: "",
-            test: $tests[0],
-            sgap: $sgaps[0],
+            test: $test,
+            sgap: $sgap,
             reponses_candidats: new ArrayCollection()
         );
 
@@ -74,6 +77,11 @@ class SessionController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $entityManager->persist($session);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $session,
+                message: "Création d'une session par formulaire",
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $session->id]);
@@ -87,6 +95,7 @@ class SessionController extends AbstractController
 
     #[Route('/modifier/{id}', name: "modifier")]
     public function modifier(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request,
         Session                $session): Response
@@ -97,6 +106,11 @@ class SessionController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $session,
+                message: "Modification d'une session par formulaire",
+            );
             $entityManager->flush();
 
             return $this->redirectToRoute("session_consulter", ["id" => $session->id]);
@@ -125,17 +139,24 @@ class SessionController extends AbstractController
     }
 
     #[Route("/supprimer/{id}", name: "supprimer")]
-    public function supprimer(LoggerInterface         $logger,
-                              ManagerRegistry         $doctrine,
-                              ReponsesCandidatStorage $reponsesCandidatStorage,
-                              Session                 $session): Response
+    public function supprimer(
+        ActiviteLogger          $activiteLogger,
+        LoggerInterface         $logger,
+        EntityManagerInterface  $entityManager,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        Session                 $session): Response
     {
         $reponsesCandidatStorage->set(array()); // TODO être un peu plus précis, c'est très conservatif
 
         $logger->info("Suppression de la session : " . $session->id);
 
-        $doctrine->getManager()->remove($session);
-        $doctrine->getManager()->flush();
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $session,
+            message: "Suppression d'une session",
+        );
+        $entityManager->remove($session);
+        $entityManager->flush();
 
         $this->addFlash("success", "La session a bien été supprimée.");
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\CorrecteurEtalonnageMatcher;
 use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\NoReponsesCandidatException;
@@ -16,6 +17,7 @@ use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Core\ScoreEtalonne\ExportScoresEtalonnes;
 use App\Core\SessionCorrecteurMatcher;
 use App\Entity\Correcteur;
+use App\Entity\CortestLogEntry;
 use App\Entity\Etalonnage;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +30,7 @@ class CsvController extends AbstractController
 
     #[Route("/reponses", name: "reponses")]
     public function reponses(
+        ActiviteLogger          $activiteLogger,
         ReponsesCandidatStorage $reponsesCandidatStorage,
         ExportReponsesCandidat  $exportReponsesCandidat,
         CsvManager              $csvManager,
@@ -40,6 +43,13 @@ class CsvController extends AbstractController
 
         $fileName = $fileNameManager->reponsesCsvFileName($reponsesCandidats);
 
+        $activiteLogger->persist(
+            action: CortestLogEntry::ACTION_EXPORTER,
+            message: "Export de réponses de candidats",
+            data: ["fichier" => $fileName, "nombre" => count($reponsesCandidats)]
+        );
+        $activiteLogger->flush();
+
         return $csvManager->export($content, $fileName);
     }
 
@@ -49,6 +59,7 @@ class CsvController extends AbstractController
      */
     #[Route("/scores-bruts/{correcteur_id}", name: "scores_bruts")]
     public function scores(
+        ActiviteLogger                               $activiteLogger,
         SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
@@ -68,13 +79,20 @@ class CsvController extends AbstractController
             return $this->redirectToRoute("home");
         }
 
-        $scores = $correcteurManager->corriger($correcteur, $reponsesCandidats);
+        $scoresBruts = $correcteurManager->corriger($correcteur, $reponsesCandidats);
 
-        $data = $exportScores->export(structure: $correcteur->structure, scoresBruts: $scores, reponsesCandidat: $reponsesCandidats);
+        $data = $exportScores->export(structure: $correcteur->structure, scoresBruts: $scoresBruts, reponsesCandidat: $reponsesCandidats);
 
-        $file_name = $fileNameManager->sessionScoreCsvFileName($session);
+        $fileName = $fileNameManager->sessionScoreCsvFileName($session);
 
-        return $csvManager->export($data, $file_name);
+        $activiteLogger->persistExportCalcul(
+            calcul: $scoresBruts,
+            message: "Export de scores bruts de candidats",
+            data: ["fichier" => $fileName]
+        );
+        $activiteLogger->flush();
+
+        return $csvManager->export($data, $fileName);
     }
 
     /**
@@ -83,6 +101,7 @@ class CsvController extends AbstractController
      */
     #[Route("/scores-etalonnes/{correcteur_id}/{etalonnage_id}", name: "scores_etalonnes")]
     public function profils(
+        ActiviteLogger                               $activiteLogger,
         ReponsesCandidatStorage                      $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
@@ -123,6 +142,14 @@ class CsvController extends AbstractController
         $data = $exportProfils->export(structure: $correcteur->structure, scoresEtalonnes: $scoresEtalonnes, reponses: $reponsesCandidats);
 
         $fileName = $fileNameManager->sessionProfilCsvFileName($session);
+
+        $activiteLogger->persistExportCalcul(
+            calcul: $scoresEtalonnes,
+            message: "Export de scores étalonnés de candidats",
+            data: ["fichier" => $fileName]
+        );
+        $activiteLogger->flush();
+
         return $csvManager->export($data, $fileName);
     }
 

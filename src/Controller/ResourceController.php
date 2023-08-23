@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
 use App\Core\Exception\UploadFailException;
 use App\Core\IO\ResourceFileRepository;
+use App\Entity\CortestLogEntry;
 use App\Entity\Resource;
 use App\Form\ResourceType;
 use App\Security\DeleteResourceVoter;
@@ -41,9 +43,11 @@ class ResourceController extends CortestAbstractController
      * @throws UploadFailException
      */
     #[Route("/creer", name: "creer")]
-    public function creer(Request                $request,
-                          ResourceFileRepository $resourceFileManager,
-                          EntityManagerInterface $entityManager): Response
+    public function creer(
+        ActiviteLogger         $activiteLogger,
+        Request                $request,
+        ResourceFileRepository $resourceFileManager,
+        EntityManagerInterface $entityManager): Response
     {
         $resource = new Resource(id: 0, nom: "", file_nom: "");
         $form = $this->createForm(ResourceType::class, $resource);
@@ -53,6 +57,11 @@ class ResourceController extends CortestAbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $entityManager->persist($resource);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $resource,
+                message: "Création d'une ressource"
+            );
             $entityManager->flush();
 
             $file = $form->get("file")->getData();
@@ -66,6 +75,7 @@ class ResourceController extends CortestAbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         ResourceFileRepository $resourceFileManager,
         Resource               $resource
@@ -75,6 +85,11 @@ class ResourceController extends CortestAbstractController
 
         $resourceFileManager->delete($resource);
 
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $resource,
+            message: "Suppression d'une resource"
+        );
         $entityManager->remove($resource);
         $entityManager->flush();
 

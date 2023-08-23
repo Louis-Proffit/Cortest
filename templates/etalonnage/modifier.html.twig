@@ -9,7 +9,7 @@
     {{ form_row(form.nom) }}
     <br>
     <div class="note note-info">
-        Pour chaque échelle, et pour chaque classe consécutive, saisissez la valeur séparant les deux classes.
+        Pour chaque échelle, et pour chaque classes consécutives, saisissez la valeur séparant les deux classes.
         Logiquement, les valeurs doivent être croissantes.
     </div>
     <br>
@@ -17,12 +17,12 @@
         <div class="mb-3">
             <div class="form-label">Echelle : <b>{{ echelleEtalonnage.vars.value.echelle.nom }}</b></div>
             <div class="input-group">
-                <div class="input-group-text">∞</div>
+                <div class="input-group-text">-∞</div>
                 {% for bound in echelleEtalonnage.bounds %}
-                    <div class="input-group-text">Classe {{ loop.index }}</div>
+                    <div class="input-group-text"><b>Classe {{ loop.index }}</b></div>
                     {{ form_widget(bound) }}
                     {% if loop.last %}
-                        <div class="input-group-text">Classe {{ loop.index + 1 }}</div>
+                        <div class="input-group-text"><b>Classe {{ loop.index + 1 }}</b></div>
                     {% endif %}
                 {% endfor %}
                 <div class="input-group-text">∞</div>

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Activite\ActiviteLogger;
+use App\Entity\CortestLogEntry;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
 use App\Form\Data\EtalonnageCreer;
@@ -49,6 +51,7 @@ class EtalonnageController extends AbstractController
 
     #[Route("/creer/simple", name: "creer_simple")]
     public function creerSimple(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         StructureRepository    $structureRepository,
         Request                $request
@@ -95,6 +98,11 @@ class EtalonnageController extends AbstractController
             }
 
             $entityManager->persist($etalonnage);
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_CREER,
+                object: $etalonnage,
+                message: "Création d'un étalonnage par formulaire simple.",
+            );
             $entityManager->flush();
 
 
@@ -199,6 +207,7 @@ class EtalonnageController extends AbstractController
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(
+        ActiviteLogger         $activiteLogger,
         EntityManagerInterface $entityManager,
         Request                $request,
         Etalonnage             $etalonnage
@@ -210,9 +219,13 @@ class EtalonnageController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            $activiteLogger->persistAction(
+                action: CortestLogEntry::ACTION_MODIFIER,
+                object: $etalonnage,
+                message: "Modification d'un étalonnage par formulaire",
+            );
             $entityManager->flush();
             return $this->redirectToRoute("etalonnage_consulter", ["id" => $etalonnage->id]);
-
         }
 
         return $this->render("etalonnage/modifier.html.twig", ["form" => $form->createView()]);
@@ -220,6 +233,7 @@ class EtalonnageController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
+        ActiviteLogger         $activiteLogger,
         LoggerInterface        $logger,
         EntityManagerInterface $entityManager,
         Etalonnage             $etalonnage
@@ -227,6 +241,11 @@ class EtalonnageController extends AbstractController
     {
         $logger->info("Suppression de l'étalonnage " . $etalonnage->id);
 
+        $activiteLogger->persistAction(
+            action: CortestLogEntry::ACTION_SUPPRIMER,
+            object: $etalonnage,
+            message: "Suppression d'un étalonnage",
+        );
         $entityManager->remove($etalonnage);
         $entityManager->flush();
 
