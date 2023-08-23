@@ -47,8 +47,9 @@ class Renderer
     const KEY_PREFIX_SCORE = "score_";
     const KEY_PREFIX_PROFIL = "profil_";
     const KEY_PREFIX_ETALONNAGE = "etalonnage_borne_";
-    const KEY_GRAPHIQUE_NOW = "graphique_nom";
+    const KEY_GRAPHIQUE_NOM = "graphique_nom";
     const KEY_PROFIL_NOM = "profil_nom";
+    const KEY_PREFIX_NOM = "nom_";
 
     private string $imagesDirectory;
 
@@ -120,7 +121,7 @@ class Renderer
             self::KEY_SESSION_SGAP_NOM => $reponse->session->sgap->nom,
             self::KEY_CONCOURS_VERSION_BATTERIE => $reponse->session->test->version_batterie,
             self::KEY_IMAGE_DIRECTORY => $this->imagesDirectory,
-            self::KEY_GRAPHIQUE_NOW => $graphique->nom,
+            self::KEY_GRAPHIQUE_NOM => $graphique->nom,
             self::KEY_PROFIL_NOM => $correcteur->structure->nom,
             self::KEY_ETALONNAGE_NOMBRE_CLASSES => $etalonnage->nombre_classes
         ];
@@ -131,6 +132,10 @@ class Renderer
 
         foreach ($scoreEtalonne->getAll() as $echelle => $profilValue) {
             $result[self::KEY_PREFIX_PROFIL . $echelle] = $profilValue;
+        }
+
+        foreach ($correcteur->get_echelle_noms() as $echelle_php => $echelle_nom) {
+            $result[self::KEY_PREFIX_NOM . $echelle_php] = $echelle_nom;
         }
 
         /** @var EchelleEtalonnage $echelleEtalonnage */

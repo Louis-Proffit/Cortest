@@ -69,4 +69,20 @@ class Correcteur
 
         return $result;
     }
+
+    /**
+     * Associe le nom des echelles php à leur type
+     * @return string[]
+     */
+    public function get_echelle_noms(): array
+    {
+        $result = [];
+
+        /** @var EchelleCorrecteur $echelle */
+        foreach ($this->echelles as $echelle) {
+            $result[$echelle->echelle->nom_php] = $echelle->echelle->nom;
+        }
+
+        return $result;
+    }
 }
