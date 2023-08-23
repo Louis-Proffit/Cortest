@@ -50,4 +50,9 @@ class Sgap
         return $sgap->sessions->isEmpty();
     }
 
+    public static function affichage(Sgap $sgap): string
+    {
+        return $sgap->indice . " - " . $sgap->nom ;
+    }
+
 }
