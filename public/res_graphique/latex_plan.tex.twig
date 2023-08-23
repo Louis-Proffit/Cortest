@@ -1,0 +1,250 @@
+\documentclass[10pt, a4paper,landscape]{article}    % Définition de la classe du document latex, '10pt' correspond à la police dans le document
+\usepackage[scaled]{helvet}                         % Import de la police de caractère 'helvetica' proche du arial
+\renewcommand\familydefault{\sfdefault}             % Utilisation de Helvetica dans tout le document
+\usepackage[utf8]{inputenc}                         % Les lignes commençant par usepackage représentent l'import de différentes bibliothèques Latex
+\usepackage{rotating}
+\usepackage{array}
+\usepackage[margin=1cm]{geometry}                   % 'margin=1cm' définit les marges à droite et à gauche du tableau et peut être modifié
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage[table]{xcolor}
+
+% Les lignes suivantes ne sont pas écrites en Latex mais en twig.
+% L'application commence par lire toutes les lignes de twig, et crée un fichier latex en compilant le twig.
+% La fonction twig ci-dessous prend en entrée 3 entiers a, b et c et sert à créer une colonne de n lignes contenant les entiers de a à b.
+% Pour revenir à la ligne, il faut utiliser \\, donc format_cellule(1, 3, 2) renvoit '1 - 2 \\ 3',
+% et format_cellule(1, 1, 2) renvoie '\\ 1' par exemple.
+{% macro format_cellule(a, b, n) %}
+{% set j = n-1 %}
+{% for i in range (b, a) %}
+    {% if (i - a + 1) * n / (b - a + 1) > j %}
+        {% if i == b %}
+{{ i }}
+        {% else %}
+-{{ i }}
+        {% endif %}
+    {% else %}
+\\ {{ i }}
+        {% set j = j - 1 %}
+    {% endif %}
+{% endfor %}
+{% endmacro %}
+
+% On définit n_remplissage comme étant le nombre de lignes dans les cellules: c'est très important, cela fait partie
+% des paramètres de base à modifier.
+{% set n_remplissage = 5 %}
+
+{% import _self as macros %}
+
+% Ci-dessous, diverses commandes pour permettre au tableau d'aligner le contenu des cellules au centre
+\renewcommand{\cellalign}{vh}
+
+% Ci-dessous, ce qui permet de compresser le contenu des cellules : pour l'utiliser il faut décommenter les deux lignes ensemble
+% 'arraystretch' compresse légèrement le contenu des cellules (distance entre deux chiffres consécutifs dans une même cellule
+% 'extrarowheight' ajoute de l'espace au-dessus du premier chiffre et en-dessous du dernier chiffre
+% Il est intéressant de jouer sur ces deux nombres si le tableau prend trop ou trop peu de place
+% \renewcommand\cellset{\renewcommand\arraystretch{0.6}
+% \setlength\extrarowheight{2pt}}
+
+\begin{document}
+    \thispagestyle{empty} % Enlever la numérotation de page
+
+% Nom et prénom
+    \footnotesize   % Taille de caractère de 8pt pour un document à 10pt: en première ligne le document ne peut pas prendre de taille
+                    % inférieure à 10pt, donc il faut utiliser les commandes spéciales (comme tiny ou footnote size),
+                    % cf le site https://www.sascha-frank.com/latex-font-size.html
+    \begin{tabular}{l l l l}    % Création d'un tableau à quatre colonnes
+        % les textes entre deux accolades successives appellent des variables twig. Les variables pouvant être appelées sont détaillées dans
+        % la page 'Vérifier les variables' accessible depuis l'onglet 'Graphiques'.
+        % Dans un tableau Latex, les cellules sont séparées par & et le retour à la ligne est signalé par \\
+        \textbf{Nom:} & {{ reponse_nom }} & \textbf{Prénom:} & {{ reponse_prenom }} \\
+    \end{tabular}
+
+    \vspace{0.2cm} % Correspond à la séparation entre les nom et prénom et le tableau de notes
+
+% Tableau
+
+    \centering
+    % La ligne ci dessous est nécessaire lorsque le tableau dépasse 20 colonnes, parce que tabularx ne peut pas prendre
+    % en compte plus de 20 colonnes. Il définit la largeur des colonnes, il faut donc tester et ajuster ce nombre.
+    \setlength{\tabcolsep}{11.5pt} % Choix de la largeur des colonnes, à modifier si le nombre de colonnes change, ici à 11.5pt
+    \begin{tabularx}{\linewidth}{|c| >{\centering\arraybackslash}X*{32} {>{\centering\arraybackslash}X}|} % Création du tableau
+        \multicolumn{1}{c}{}        % Première case vide
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_as_br }} } }     % Les noms des variables définis dans l'application sont 'nom_nom_php'
+                                                                    % Il est possible d'aller plus vite comme nous allons le voir, mais c'est la manière simple de faire
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_dic_br }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_vb_br }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_rais_br }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cv_br }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_rm_br }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_vt_br }} } }
+        &
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_fp1_anx }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_fp2_instros }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_fp3_hdep }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_fp4_dev }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_fp5_gen }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_me1_ce }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_me2_modes }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_me3_coope }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_me4_amb }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_me5_droit }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cp1_fiab }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cp2_autodisc }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cp3_refl }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cp4_rig }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_cp5_sva }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_ar1_conf }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_ar2_grega }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_ar3_spont }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_ar4_nouv }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_ar5_dyn }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_pm1_lead }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_pm2_affirm }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_pm3_emp }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_pm4_ing }} } }
+        & \rotatebox[origin=l]{90}{\textbf{ {{ nom_pm5_sintel }} } }
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{IX}}
+        % Ci-dessous on appelle la fonction twig définie en haut entre les deux bornes de l'étalonnage de chaque fonction, que l'on arrondit à l'entier supérieur à l'aide du filtre twig round
+        % Il est bien sûr possible de rentrer à la main certaines des bornes, dans le cas où le rendu de la fonction ne serait pas celui souhaité
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_as_br_7|round(0, 'ceil'), etalonnage_borne_as_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_dic_br_7|round(0, 'ceil'), etalonnage_borne_dic_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_vb_br_7|round(0, 'ceil'), etalonnage_borne_vb_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_rais_br_7|round(0, 'ceil'), etalonnage_borne_rais_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cv_br_7|round(0, 'ceil'), etalonnage_borne_cv_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_rm_br_7|round(0, 'ceil'), etalonnage_borne_rm_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_vt_br_7|round(0, 'ceil'), etalonnage_borne_vt_br_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        &
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_fp1_anx_7|round(0, 'ceil'), etalonnage_borne_fp1_anx_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_fp2_instros_7|round(0, 'ceil'), etalonnage_borne_fp2_instros_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_fp3_hdep_7|round(0, 'ceil'), etalonnage_borne_fp3_hdep_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_fp4_dev_7|round(0, 'ceil'), etalonnage_borne_fp4_dev_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_fp5_gen_7|round(0, 'ceil'), etalonnage_borne_fp5_gen_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_me1_ce_7|round(0, 'ceil'), etalonnage_borne_me1_ce_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_me2_modes_7|round(0, 'ceil'), etalonnage_borne_me2_modes_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_me3_coope_7|round(0, 'ceil'), etalonnage_borne_me3_coope_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_me4_amb_7|round(0, 'ceil'), etalonnage_borne_me4_amb_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_me5_droit_7|round(0, 'ceil'), etalonnage_borne_me5_droit_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cp1_fiab_7|round(0, 'ceil'), etalonnage_borne_cp1_fiab_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cp2_autodisc_7|round(0, 'ceil'), etalonnage_borne_cp2_autodisc_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cp3_refl_7|round(0, 'ceil'), etalonnage_borne_cp3_refl_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cp4_rig_7|round(0, 'ceil'), etalonnage_borne_cp4_rig_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_cp5_sva_7|round(0, 'ceil'), etalonnage_borne_cp5_sva_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_ar1_conf_7|round(0, 'ceil'), etalonnage_borne_ar1_conf_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_ar2_grega_7|round(0, 'ceil'), etalonnage_borne_ar2_grega_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_ar3_spont_7|round(0, 'ceil'), etalonnage_borne_ar3_spont_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_ar4_nouv_7|round(0, 'ceil'), etalonnage_borne_ar4_nouv_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_ar5_dyn_7|round(0, 'ceil'), etalonnage_borne_ar5_dyn_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_pm1_lead_7|round(0, 'ceil'), etalonnage_borne_pm1_lead_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_pm2_affirm_7|round(0, 'ceil'), etalonnage_borne_pm2_affirm_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_pm3_emp_7|round(0, 'ceil'), etalonnage_borne_pm3_emp_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_pm4_ing_7|round(0, 'ceil'), etalonnage_borne_pm4_ing_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        & \makecell{ {{ macros.format_cellule(etalonnage_borne_pm5_sintel_7|round(0, 'ceil'), etalonnage_borne_pm5_sintel_7|round(0, 'ceil') - 1 + n_remplissage, n_remplissage) }} }
+        \\
+
+        % Pour automatiser le processus, on peut utiliser une boucle for twig. Tout d'abord il faut créer des listes avec les noms php des échelles
+        % J'en ai créé deux pour marquer la séparation entre les deux types d'échelle par une colonne vide
+        {% set echelles_br = ['as_br', 'dic_br', 'vb_br', 'rais_br', 'cv_br', 'rm_br', 'vt_br'] %}
+        {% set echelles_simples = ['fp1_anx', 'fp2_instros', 'fp3_hdep', 'fp4_dev', 'fp5_gen', 'me1_ce', 'me2_modes', 'me3_coope',
+        'me4_amb', 'me5_droit', 'cp1_fiab', 'cp2_autodisc', 'cp3_refl', 'cp4_rig', 'cp5_sva', 'ar1_conf', 'ar2_grega', 'ar3_spont',
+        'ar4_nouv', 'ar5_dyn', 'pm1_lead', 'pm2_affirm', 'pm3_emp', 'pm4_ing', 'pm5_sintel'] %}
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{VIII}}
+        {% for echelle in echelles_br %}
+        % Pour appeler etalonnage_borne_as_br_6 par exemple, il faut utiliser la fonction attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_6') avec echelle = 'as_br'
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_6')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_7')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_6')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_7')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{VII}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_5')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_6')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_5')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_6')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{VI}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_4')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_5')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_4')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_5')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        % \rowcolor{lightgray} met un fond gris clair sur toute la ligne du tableau
+        \rowcolor{lightgray} \rotatebox[origin=c]{90}{\textbf{V}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_3')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_4')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_3')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_4')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{IV}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_2')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_3')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_2')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_3')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{III}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_1')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_2')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_1')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_2')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{II}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_0')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_1')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_0')|round(0, 'ceil'), attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_1')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+        \rotatebox[origin=c]{90}{\textbf{I}}
+        {% for echelle in echelles_br %}
+        & \makecell{ {{ macros.format_cellule(0, attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_0')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        & \makecell{ {% for i in range(1, n_remplissage) %} \\ {%  endfor %} }
+        {% for echelle in echelles_simples %}
+        & \makecell{ {{ macros.format_cellule(0, attribute(_context, 'etalonnage_borne_' ~ echelle ~ '_0')|round(0, 'ceil') - 1 , n_remplissage) }} }
+        {% endfor %}
+        \\
+
+        \hline
+
+    \end{tabularx}
+
+
+
+\end{document}
