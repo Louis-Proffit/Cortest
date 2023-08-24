@@ -32,18 +32,22 @@ class Concours
     #[ORM\ManyToMany(targetEntity: Test::class, mappedBy: "concours")]
     public Collection $tests;
 
+    #[ORM\OneToMany(mappedBy: "concours", targetEntity: Session::class, cascade: ["persist"])]
+    public Collection $sessions;
+
     /**
      * @param int $id
      * @param string $nom
      * @param string $type_concours
      * @param Collection $tests
      */
-    public function __construct(int $id, string $nom, string $type_concours, Collection $tests)
+    public function __construct(int $id, string $nom, string $type_concours, Collection $tests, Collection $sessions)
     {
         $this->id = $id;
         $this->intitule = $nom;
         $this->type_concours = $type_concours;
         $this->tests = $tests;
+        $this->sessions = $sessions;
     }
 
     public function summary(): string

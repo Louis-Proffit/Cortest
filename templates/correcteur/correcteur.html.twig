@@ -5,12 +5,12 @@
 {% block content %}
 
     <br>
-    <h1>Consulter un correcteur</h1>
+    <h1>Consulter les paramètres d'une correction</h1>
     <br>
     <div class="row row-cols-auto">
         <div class="col">
             <a class="btn btn-primary"
-               href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}">Modifier</a>
+               href="{{ path("correcteur_modifier", {"id":correcteur.id}) }}">Modifier le calcul des scores</a>
         </div>
         <div class="col">
             <a class="btn btn-secondary"
@@ -24,8 +24,8 @@
             </button>
             {{ supprimer(
                 "supprimerCorrecteur",
-                "Supprimer le correcteur",
-                "Supprimer le correcteur ? Toutes les échelles associées seront perdues.",
+                "Supprimer la correction",
+                "Supprimer la correction ? Toutes les échelles associées seront perdues.",
                 path("correcteur_supprimer", {"id":correcteur.id})
             ) }}
         </div>

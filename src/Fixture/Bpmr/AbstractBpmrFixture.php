@@ -59,6 +59,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             $this->concours_nom,
             $this->type_concours,
             new ArrayCollection(),
+            new ArrayCollection(),
         );
 
         $test = new Test(
@@ -78,6 +79,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             $test,
             $manager->getRepository(Sgap::class)->findOneBy([]),
             $manager->getRepository(NiveauScolaire::class)->findOneBy([]),
+            $concours,
         );
 
         $this->questions($test);
@@ -133,7 +135,7 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
         $manager->flush();
     }
 
-    private function sessionExemple(Test $test, Sgap $sgap, NiveauScolaire $niveau_scolaire): Session
+    private function sessionExemple(Test $test, Sgap $sgap, NiveauScolaire $niveau_scolaire, Concours $concours): Session
     {
         $session = new Session(
             0,
@@ -142,7 +144,8 @@ abstract class AbstractBpmrFixture extends Fixture implements FixtureGroupInterf
             "Pas d'observations",
             $test,
             $sgap,
-            new ArrayCollection()
+            new ArrayCollection(),
+            $concours,
         );
 
         $reponses = array_fill(1, $this->nombre_questions, 3);

@@ -3,19 +3,19 @@
 {% block content %}
 
     <br>
-    <h1>Modifier un correcteur</h1>
+    <h1>Modifier les paramètres d'une correction</h1>
     <br>
     <h3>Informations générales</h3>
     <br>
     {{ form_start(form) }}
     <div class="note note-info">
-        Le nom d'un correcteur n'est utilisé que pour se repérer dans Cortest.
+        Le nom d'une correction n'est utilisé que pour se repérer dans Cortest.
     </div>
     <br>
     {{ form_row(form.nom) }}
     <br>
     <div class="note note-info">
-        Les correcteurs peuvent s'appliquer à un ou plusieurs tests.
+        Les corrections peuvent s'appliquer à un ou plusieurs tests.
     </div>
     <br>
     {{ form_row(form.tests) }}

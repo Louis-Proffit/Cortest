@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CorrecteurRepository::class)]
-#[UniqueEntity(fields: 'nom', message: "Ce nom de correcteur est déjà utilisé")]
+#[UniqueEntity(fields: 'nom', message: "Ce nom de correction est déjà utilisé")]
 class Correcteur
 {
     #[ORM\Id]

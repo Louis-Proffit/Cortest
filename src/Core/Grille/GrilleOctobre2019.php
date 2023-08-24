@@ -8,7 +8,7 @@ namespace App\Core\Grille;
 class GrilleOctobre2019 extends Grille
 {
 
-    const NOM = "Grille d'octobre 2019";
+    const NOM = "Test psychotechnique - feuille rose";
     const NOMBRE_QUESTIONS = 640;
 
     public function __construct()

@@ -18,13 +18,13 @@ class EtalonnageCreer
     public string $nom;
 
     /**
-     * @param Structure $profil
+     * @param Structure $structure
      * @param int $nombre_classes
      * @param string $nom
      */
-    public function __construct(Structure $profil, int $nombre_classes, string $nom)
+    public function __construct(Structure $structure, int $nombre_classes, string $nom)
     {
-        $this->structure = $profil;
+        $this->structure = $structure;
         $this->nombre_classes = $nombre_classes;
         $this->nom = $nom;
     }

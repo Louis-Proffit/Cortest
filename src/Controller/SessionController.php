@@ -7,6 +7,7 @@ use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\CortestLogEntry;
 use App\Entity\Session;
 use App\Form\SessionType;
+use App\Repository\ConcoursRepository;
 use App\Repository\GrilleRepository;
 use App\Repository\SessionRepository;
 use App\Repository\SgapRepository;
@@ -45,10 +46,12 @@ class SessionController extends AbstractController
         EntityManagerInterface $entityManager,
         SgapRepository         $sgapRepository,
         TestRepository         $testRepository,
+        ConcoursRepository     $concoursRepository,
         Request                $request): Response
     {
         $test = $testRepository->findOneBy([]);
         $sgap = $sgapRepository->findOneBy([]);
+        $concours = $concoursRepository->findOneBy([]);
 
         if ($sgap == null) {
             $this->addFlash("warning", "Pas de SGAP disponible, veuillez en créer un.");
@@ -60,6 +63,11 @@ class SessionController extends AbstractController
             return $this->redirectToRoute("test_index");
         }
 
+        if ($concours == null) {
+            $this->addFlash("warning", "Pas de concours disponible, veuillez en créer un.");
+            return $this->redirectToRoute("concours_index");
+        }
+
         $session = new Session(
             id: 0,
             date: new DateTime("now"),
@@ -67,7 +75,8 @@ class SessionController extends AbstractController
             observations: "",
             test: $test,
             sgap: $sgap,
-            reponses_candidats: new ArrayCollection()
+            reponses_candidats: new ArrayCollection(),
+            concours: $concours,
         );
 
         $form = $this->createForm(SessionType::class, $session);
@@ -88,7 +97,7 @@ class SessionController extends AbstractController
         }
 
         return $this->render(
-            'session/modifier.html.twig',
+            'session/creer.html.twig',
             ["form" => $form->createView()]
         );
     }

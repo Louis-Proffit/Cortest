@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\Core\Activite\ActiviteLogger;
+use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Entity\CortestLogEntry;
 use App\Entity\EchelleEtalonnage;
 use App\Entity\Etalonnage;
+use App\Form\Data\EchelleEtalonnageGaussienCreer;
 use App\Form\Data\EtalonnageCreer;
 use App\Form\CreerEtalonnageType;
+use App\Form\Data\EtalonnageGaussienCreer;
+use App\Form\EtalonnageGaussienType;
 use App\Form\EtalonnageType;
 use App\Repository\EtalonnageRepository;
 use App\Repository\StructureRepository;
@@ -65,7 +69,7 @@ class EtalonnageController extends AbstractController
         }
 
         $etalonnageCreer = new EtalonnageCreer(
-            profil: $structures[0],
+            structure: $structures[0],
             nombre_classes: 0,
             nom: ""
         );
@@ -119,7 +123,7 @@ class EtalonnageController extends AbstractController
         Request                $request
     ): Response
     {
-        /*$structures = $structureRepository->findAll();
+        $structures = $structureRepository->findAll();
 
         if (empty($structures)) {
             $this->addFlash("warning", "Pas de structure disponible, veuillez en créer une.");
@@ -127,9 +131,9 @@ class EtalonnageController extends AbstractController
         }
 
         $etalonnageCreer = new EtalonnageCreer(
-            score_etalonne: $structures[0],
+            structure: $structures[0],
             nombre_classes: 0,
-            nom: ""
+            nom: "",
         );
 
         $form = $this->createForm(CreerEtalonnageType::class, $etalonnageCreer);
@@ -164,13 +168,10 @@ class EtalonnageController extends AbstractController
             return $this->redirectToRoute("etalonnage_ajout_echelles_gaussiennes", ["id" => $etalonnage->id]);
         }
 
-        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);*/
-        // TODO
-        $this->addFlash("danger", "Pas encore implémenté");
-        return $this->redirectToRoute("home");
+        return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
     }
 
-    /*#[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
+    #[Route("/ajout/echelles/gaussiennes/{id}", name: "ajout_echelles_gaussiennes")]
     public function ajoutEchellesGaussiennes(
         EntityManagerInterface $entityManager,
         EtalonnageManager      $etalonnageManager,
@@ -203,7 +204,7 @@ class EtalonnageController extends AbstractController
         }
 
         return $this->render("etalonnage/creer_gaussien.html.twig", ["form" => $form]);
-    }*/
+    }
 
     #[Route("/modifier/{id}", name: "modifier")]
     public function modifier(

@@ -26,7 +26,8 @@ class CreerEtalonnageType extends AbstractType
             ->add("nombre_classes", IntegerType::class, ["label" => "Nombre de classes"])
             ->add("structure", ChoiceType::class, [
                 "choices" => $this->structureRepository->choices()
-            ]);
+            ])
+            ->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
 
 }

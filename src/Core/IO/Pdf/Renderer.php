@@ -7,6 +7,7 @@ use App\Core\IO\GraphiqueFileRepository;
 use App\Core\ScoreBrut\ScoreBrut;
 use App\Core\ScoreEtalonne\ScoreEtalonne;
 use App\Core\ScoreEtalonne\ScoresEtalonnes;
+use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\Echelle;
 use App\Entity\EchelleEtalonnage;
@@ -50,6 +51,8 @@ class Renderer
     const KEY_GRAPHIQUE_NOM = "graphique_nom";
     const KEY_PROFIL_NOM = "profil_nom";
     const KEY_PREFIX_NOM = "nom_";
+    const KEY_CONCOURS_TYPE_CONCOURS = "concours_type_concours";
+    const KEY_CONCOURS_INTITULE = "concours_intitule";
 
     private string $imagesDirectory;
 
@@ -123,7 +126,9 @@ class Renderer
             self::KEY_IMAGE_DIRECTORY => $this->imagesDirectory,
             self::KEY_GRAPHIQUE_NOM => $graphique->nom,
             self::KEY_PROFIL_NOM => $correcteur->structure->nom,
-            self::KEY_ETALONNAGE_NOMBRE_CLASSES => $etalonnage->nombre_classes
+            self::KEY_ETALONNAGE_NOMBRE_CLASSES => $etalonnage->nombre_classes,
+            self::KEY_CONCOURS_TYPE_CONCOURS => $reponse->session->concours->type_concours,
+            self::KEY_CONCOURS_INTITULE => $reponse->session->concours->intitule,
         ];
 
         foreach ($scoreBrut->getAll() as $echelle => $scoreValue) {
@@ -189,7 +194,8 @@ class Renderer
             observations: "OBSERVATIONS TEST",
             test: $test,
             sgap: $sgap,
-            reponses_candidats: new ArrayCollection()
+            reponses_candidats: new ArrayCollection(),
+            concours: new Concours(0, 'Concours Test', '000', new ArrayCollection(), new ArrayCollection())
         );
         $sgap->sessions->add($session);
         return $session;

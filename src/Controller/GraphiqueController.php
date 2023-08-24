@@ -275,4 +275,11 @@ class GraphiqueController extends AbstractController
         return $this->redirectToRoute("graphique_index");
     }
 
+    #[Route("/ressources", name: 'ressources')]
+    public function ressources(
+    ): Response
+    {
+        return $this->render('graphique/ressources.html.twig', []);
+    }
+
 }

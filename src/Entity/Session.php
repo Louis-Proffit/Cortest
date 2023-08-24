@@ -35,6 +35,9 @@ class Session
     #[ORM\ManyToOne(targetEntity: Test::class, inversedBy: "sessions")]
     public Test $test;
 
+    #[ORM\ManyToOne(targetEntity: Concours::class, inversedBy: "sessions")]
+    public Concours $concours;
+
     #[ORM\ManyToOne(targetEntity: Sgap::class, inversedBy: "sessions")]
     public Sgap $sgap;
 
@@ -50,7 +53,7 @@ class Session
      * @param Sgap $sgap
      * @param Collection $reponses_candidats
      */
-    public function __construct(int $id, DateTime $date, int $numero_ordre, string $observations, Test $test, Sgap $sgap, Collection $reponses_candidats)
+    public function __construct(int $id, DateTime $date, int $numero_ordre, string $observations, Test $test, Sgap $sgap, Collection $reponses_candidats, Concours $concours)
     {
         $this->id = $id;
         $this->date = $date;
@@ -59,10 +62,11 @@ class Session
         $this->test = $test;
         $this->sgap = $sgap;
         $this->reponses_candidats = $reponses_candidats;
+        $this->concours = $concours;
     }
 
     public static function formatLong(Session $session): string
     {
-        return $session->id . " | " . $session->test->nom . " | " . $session->date->format("d-m-Y") . " | " . $session->sgap->nom;
+        return $session->date->format("d-m-Y") . " | " . Sgap::affichage($session->sgap) . " | " . $session->concours->intitule ;
     }
 }

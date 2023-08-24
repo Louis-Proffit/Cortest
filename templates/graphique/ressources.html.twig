@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <h1>Ressources graphiques</h1>
+    <div class="row row-cols-auto">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path('graphique_index') }}">Retour</a>
+        </div>
+    </div>
+    <b>Ressources :</b>
+    <ul>
+        <li><b>Format batonnets</b> <a class="fa fa-download"
+                                       href="{{ asset('/res_graphique/profil_batonnets.tex.twig') }}"
+                                       target="_blank"></a></li>
+        <li><b>Format plan</b> <a class="fa fa-download"
+                                                 href="{{ asset('/res_graphique/profil_plan.tex.twig') }}"
+                                                 target="_blank"></a></li>
+    </ul>
+{% endblock %}

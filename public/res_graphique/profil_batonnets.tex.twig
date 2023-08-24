@@ -1,0 +1,187 @@
+\documentclass[10pt, letterpaper, twoside]{article} % '10pt' correspond à la police, on peut aussi mettre 11pt et 12pt
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}  % Définition de la police de caractères à helvetica
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, total={19cm, 27cm}, top=0cm, headsep=0pt]{geometry}
+\usepackage{tabularx}
+\usepackage{textcomp}
+\usepackage{caption}
+\usepackage{pgfplots}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{xcolor}
+\setlength\headheight{70pt}
+\usepackage{multirow}
+\graphicspath{ {{ "\{" ~ dossier_images ~ "\}" }} }
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+% Ci-dessous création de l'environnement qui permet d'ombrer les boites
+\newenvironment{ombrageBoite}
+{\tcolorbox[
+    enhanced,
+    boxrule=0pt,
+    colback=white,
+    arc=0pt, outer arc=0pt,
+    drop shadow=black!100,
+    sharp corners,
+    hbox,
+    left=-3pt,
+    right=-3pt,
+    top=-3pt,
+    bottom=-3pt
+]}
+{
+\endtcolorbox
+}
+
+% Ci-dessous, définition de la fonction qui crée les graphiques en boites qui représentent les classes.
+% Les entrées sont la valeur du profil de l'échelle en question, la valeur de la zone grisée (inutilisée dans ce cadre) et le nombre de classes d'étalonnage.
+\newcommand{\printChartResult}[3]{
+    \begin{tikzpicture}
+        \begin{axis}[%
+            xmin=0,
+            xmax=#3,
+            ymin=-0.5,
+            ymax=0.5,
+            width=13cm,
+            height=2cm,
+            ticks=none,
+            grid style={line width=.1pt, draw=black!60},
+            grid=major,
+            ymajorgrids=false,
+        ]
+            \addplot+[xbar, fill=gray, draw=gray, mark=none, bar width=20] coordinates { (#2-0.5,0) };
+            \addplot+[xbar, draw=black, fill=black, mark=none, bar width=5] coordinates { (#1-0.5,0) };
+
+        \end{axis}
+    \end{tikzpicture}
+}
+
+% la variable romanNumbers correspond au nom des valeurs de profil affichés en haut des encadrés. Par exemple on peut
+% le remplacer par ['Très faible', 'Faible', 'Moyen', 'Elevé', 'Très élevé']
+{% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
+
+\fancyhf{}
+% Ci dessous la définition du titre de la page, c'est la variable twig 'profil_nom'
+\fancyhead[C]{\Large\textbf{ {{ profil_nom }} }}
+\rhead{\includegraphics[width=3cm]{logo.png}}
+\renewcommand{\headrulewidth}{0pt}
+
+\begin{document}
+    \noindent
+    %Ci-dessous le premier encadré de la feuille qui contient les informations du candidat
+    \begin{ombrageBoite}
+        \begin{tabular}{ | m{3cm} m{4.73cm} m{3.8cm} m{6.2cm} | }
+            \hline
+            \hfill Nom de naissance:  & {{ reponse_nom|raw }}                         & \hfill Type du concours:        & {{ concours_intitule|raw }} -- {{ reponse_eirs|raw }} \\
+            \hfill Prénom:            & {{ reponse_prenom|raw }}                      & \hfill Version Batterie:        & {{ concours_version_batterie|raw }} -- {{ concours_type_concours|raw }} \\
+            \hfill Nom d'usage:       & {{ reponse_nom_jeune_fille|raw }}             & \hfill Date d'examen:           & {{ session_date|date('d/m/Y') }}                              \\
+            \hfill Sexe:              & {{ reponse_sexe|sexe }}                       & \hfill SGAMI/SGAP:              & {{ session_sgap_nom|raw }}                                    \\
+            \hfill Date de naissance: & {{ reponse_date_de_naissance|date('d/m/Y') }} & \hfill Numéro d'identification: & {{ reponse_code_barre|raw }}                                   \\
+            \hfill Niveau scolaire: & {{ reponse_niveau_scolaire_nom|raw }}  & & \\
+            \hline
+        \end{tabular}
+    \end{ombrageBoite}
+
+    \vspace{2.5mm}
+
+    % Ci-dessous la définition du deuxième encadré
+    \noindent
+    \begin{ombrageBoite}
+        \begin{tabular}{ | wr{4.23cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
+            \hline
+
+            \multicolumn{2}{|l}{\underline{\textbf{ \large Aptitudes Cognitives }}} & & \textit{classes} \rule{0pt}{2.25ex} \\
+             & BR & MR &
+            \begin{tabularx}{4.5in}{*{ {{ etalonnage_nombre_classes }} }{|X}|}
+                \rule{0pt}{2.7ex} \centering I {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
+            \end{tabularx}
+            \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+            \hline
+        \end{tabular}
+    \end{ombrageBoite}
+
+    \vspace{2.5mm}
+
+    % Ci-dessous la définition du troisième encadré
+    \noindent
+    \begin{ombrageBoite}
+        \begin{tabular}{ | wr{4.23cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
+            \hline
+            \multicolumn{2}{|l}{\underline{\textbf{ \large Personnalité }}} & \fbox{\textit{\small scores}} &
+            \begin{tabularx}{4.5in}{*{ {{ etalonnage_nombre_classes }} }{|X}|}
+                \centering \rule{0pt}{2.7ex} I {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
+            \end{tabularx}
+            \\
+
+            \multirow[t]{ 5 }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ nom_fp|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil_fp }} } \end{tabular}}
+            \rule{0pt}{5.7mm}
+            & {{ nom_fp1_anx|raw }} & \fbox{ {{ (score_fp1_anx < 10 ? '0') ~ score_fp1_anx }} } & \printChartResult{ {{ profil_fp1_anx }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp2_instros|raw }} & \fbox{ {{ (score_fp2_instros < 10 ? '0') ~ score_fp2_instros }} } & \printChartResult{ {{ profil_fp2_instros }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp3_hdep|raw }} & \fbox{ {{ (score_fp3_hdep < 10 ? '0') ~ score_fp3_hdep }} } & \printChartResult{ {{ profil_fp3_hdep }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp4_dev|raw }} & \fbox{ {{ (score_fp4_dev < 10 ? '0') ~ score_fp4_dev }} } & \printChartResult{ {{ profil_fp4_dev }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp5_gen|raw }} & \fbox{ {{ (score_fp5_gen < 10 ? '0') ~ score_fp5_gen }} } & \printChartResult{ {{ profil_fp5_gen }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+
+            \multirow[t]{ 5 }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ nom_fp|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil_fp }} } \end{tabular}}
+            \rule{0pt}{5.7mm}
+            & {{ nom_fp1_anx|raw }} & \fbox{ {{ (score_fp1_anx < 10 ? '0') ~ score_fp1_anx }} } & \printChartResult{ {{ profil_fp1_anx }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp2_instros|raw }} & \fbox{ {{ (score_fp2_instros < 10 ? '0') ~ score_fp2_instros }} } & \printChartResult{ {{ profil_fp2_instros }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp3_hdep|raw }} & \fbox{ {{ (score_fp3_hdep < 10 ? '0') ~ score_fp3_hdep }} } & \printChartResult{ {{ profil_fp3_hdep }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp4_dev|raw }} & \fbox{ {{ (score_fp4_dev < 10 ? '0') ~ score_fp4_dev }} } & \printChartResult{ {{ profil_fp4_dev }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp5_gen|raw }} & \fbox{ {{ (score_fp5_gen < 10 ? '0') ~ score_fp5_gen }} } & \printChartResult{ {{ profil_fp5_gen }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+
+            \multirow[t]{ 5 }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ nom_fp|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil_fp }} } \end{tabular}}
+            \rule{0pt}{5.7mm}
+            & {{ nom_fp1_anx|raw }} & \fbox{ {{ (score_fp1_anx < 10 ? '0') ~ score_fp1_anx }} } & \printChartResult{ {{ profil_fp1_anx }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp2_instros|raw }} & \fbox{ {{ (score_fp2_instros < 10 ? '0') ~ score_fp2_instros }} } & \printChartResult{ {{ profil_fp2_instros }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp3_hdep|raw }} & \fbox{ {{ (score_fp3_hdep < 10 ? '0') ~ score_fp3_hdep }} } & \printChartResult{ {{ profil_fp3_hdep }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp4_dev|raw }} & \fbox{ {{ (score_fp4_dev < 10 ? '0') ~ score_fp4_dev }} } & \printChartResult{ {{ profil_fp4_dev }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp5_gen|raw }} & \fbox{ {{ (score_fp5_gen < 10 ? '0') ~ score_fp5_gen }} } & \printChartResult{ {{ profil_fp5_gen }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+
+            \multirow[t]{ 5 }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ nom_fp|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil_fp }} } \end{tabular}}
+            \rule{0pt}{5.7mm}
+            & {{ nom_fp1_anx|raw }} & \fbox{ {{ (score_fp1_anx < 10 ? '0') ~ score_fp1_anx }} } & \printChartResult{ {{ profil_fp1_anx }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp2_instros|raw }} & \fbox{ {{ (score_fp2_instros < 10 ? '0') ~ score_fp2_instros }} } & \printChartResult{ {{ profil_fp2_instros }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp3_hdep|raw }} & \fbox{ {{ (score_fp3_hdep < 10 ? '0') ~ score_fp3_hdep }} } & \printChartResult{ {{ profil_fp3_hdep }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp4_dev|raw }} & \fbox{ {{ (score_fp4_dev < 10 ? '0') ~ score_fp4_dev }} } & \printChartResult{ {{ profil_fp4_dev }} }{0}{ {{ etalonnage_nombre_classes }} } \\
+            & {{ nom_fp5_gen|raw }} & \fbox{ {{ (score_fp5_gen < 10 ? '0') ~ score_fp5_gen }} } & \printChartResult{ {{ profil_fp5_gen }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+            \hline
+        \end{tabular}
+    \end{ombrageBoite}
+
+    \vspace{2.5mm}
+
+    % Ci-dessous la définition du quatrième encadré
+    \noindent
+    \begin{ombrageBoite}
+        \begin{tabular}{ | wr{4.23cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
+            \hline
+            \multicolumn{2}{|l}{\underline{\textbf{ \large Fiabilité des résultats }}} & & \rule{0pt}{2.25ex} \\
+            \multicolumn{4}{|p{19cm}|}{
+                \centering
+                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c c c }
+                    \rule{0pt}{2.8ex}
+                    & \hfill \textbf{ {{ nom_ds|raw }} } & \small{\textit{ score }} \fbox{ {{ score_ds|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil_ds }} }
+                    & \vline \hfill \textbf{ {{ nom_at|raw }} } & \textit{ score } \fbox{ {{ score_at|number_format(2) }} }
+                    & RC & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
+                    \\[1mm]
+                \end{tabular}
+            }
+            \\
+            \hline
+        \end{tabular}
+    \end{ombrageBoite}
+    \vspace{2.5mm}
+
+\end{document}

@@ -3,20 +3,20 @@
 {% block content %}
 
     <br>
-    <h1>Créer un correcteur</h1>
+    <h1>Créer une correction</h1>
     <br>
     {{ form_start(form) }}
     {{ form_row(form.nom) }}
     <br>
     <div class="note note-info">
-        Un correcteur peut s'appliquer à un ou plusieurs tests.
+        Une correction peut s'appliquer à un ou plusieurs tests.
         Le choix de ces tests ne s'effectue pas à cette étape.
-        Créez le correcteur puis modifier le pour choisir ces tests.
+        Créez la correction puis modifier le pour choisir ces tests.
     </div>
     <br>
     <div class="note note-info">
         Le mode de calcul des échelles n'est pas défini à cette étape.
-        Créez le correcteur puis modifier le pour définir le mode de calcul.
+        Créez la correction puis modifier le pour définir le mode de calcul.
     </div>
     <br>
     {{ form_row(form.structure) }}
