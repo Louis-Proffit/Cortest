@@ -54,7 +54,8 @@ class ConcoursController extends AbstractController
             id: 0,
             nom: "",
             type_concours: 0,
-            tests: new ArrayCollection()
+            tests: new ArrayCollection(),
+            sessions: new ArrayCollection(),
         );
 
         $form = $this->createForm(ConcoursType::class, $concours);

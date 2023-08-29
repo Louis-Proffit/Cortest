@@ -32,7 +32,8 @@ class CorrecteurChoiceType extends AbstractType
             "correcteur",
             ChoiceType::class,
             [
-                "choices" => $this->definitionCorrecteurChoice($options[self::OPTION_SESSION])
+                "choices" => $this->definitionCorrecteurChoice($options[self::OPTION_SESSION]),
+                "label" => 'Correction',
             ]
         )->add("submit", SubmitType::class, ["label" => "Valider"]);
     }
