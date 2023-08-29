@@ -240,13 +240,13 @@ class GraphiqueController extends AbstractController
             $correcteur = $testCorrecteurEtalonnage->value->correcteur;
             $etalonnage = $testCorrecteurEtalonnage->value->etalonnage;
 
-            $keys = $renderer->optionKeys(
+            $descriptions = $renderer->optionDescriptions(
                 test: $test,
                 correcteur: $correcteur,
                 etalonnage: $etalonnage
             );
 
-            return $this->render("graphique/verifier_variables.html.twig", ["correcteur" => $correcteur, "etalonnage" => $etalonnage, "keys" => $keys]);
+            return $this->render("graphique/verifier_variables.html.twig", ["correcteur" => $correcteur, "etalonnage" => $etalonnage, "descriptions" => $descriptions]);
         }
 
         return $this->render("graphique/verifier_variables_form.html.twig", ["form" => $form->createView()]);

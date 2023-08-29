@@ -28,10 +28,10 @@
             <th>Description</th>
         </tr>
         </thead>
-        {% for key in keys %}
+        {% for key, description in descriptions %}
             <tr>
                 <td>{{ key }}</td>
-                <td>TODO</td>
+                <td>{{ description }}</td>
             </tr>
         {% endfor %}
     </table>
