@@ -62,6 +62,7 @@
 
 % la variable romanNumbers correspond au nom des valeurs de profil affichés en haut des encadrés. Par exemple on peut
 % le remplacer par ['Très faible', 'Faible', 'Moyen', 'Elevé', 'Très élevé']
+% Il faut toujours avoir au moins autant de classes ci-dessous que de classes dans l'étalonnage
 {% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
 
 \fancyhf{}
@@ -71,8 +72,8 @@
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{document}
-    \noindent
     %Ci-dessous le premier encadré de la feuille qui contient les informations du candidat
+    \noindent
     \begin{ombrageBoite}
         \begin{tabular}{ | m{3cm} m{4.73cm} m{3.8cm} m{6.2cm} | }
             \hline
@@ -97,9 +98,10 @@
             \multicolumn{2}{|l}{\underline{\textbf{ \large Aptitudes Cognitives }}} & & \textit{classes} \rule{0pt}{2.25ex} \\
              & BR & MR &
             \begin{tabularx}{4.5in}{*{ {{ etalonnage_nombre_classes }} }{|X}|}
-                \rule{0pt}{2.7ex} \centering I {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
+                \rule{0pt}{2.7ex} \centering {{ romanNumbers[0] }} {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
             \end{tabularx}
             \\
+            % Seules les lignes ci-dessous doivent être changées lorsqu'on crée un encadré de type BR/MR
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
@@ -108,9 +110,26 @@
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             {{ nom_as_br|raw }} & \fbox{ {{ (score_as_br < 10 ? '0') ~ score_as_br }} } & \fbox{ {{ (score_as_mr < 10 ? '0') ~ score_as_mr }} } & \printChartResult{ {{ profil_as_br }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+
+            % Début du bas d'encadré
+            \multicolumn{4}{|p{19cm}|}{
+                \centering
+                % Entre accolades à droite de tabular, le nombre de m{1.5cm} et de c correspond au nombre et au type de colonnes.
+                % Il y a toujours le premier c, le reste dépend du type d'échelles composites à ajouter
+                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c c }
+                    \rule{0pt}{2.8ex}
+                    % échelles composites de type score + classe, ajouter 'm{1.5cm} c c' pour chaque ocurrence et la ligne ci-dessous
+                    &  \hfill \textbf{ {{ nom_eg|raw }} } & \small{\textit{ score }} \fbox{ {{ score_eg|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil_eg }} }
+                    &  \vline  \hfill \textbf{ {{ nom_qr|raw }} } & \small{\textit{ score }} \fbox{ {{ score_qr|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil_qr }} }
+                    \rule{0pt}{2.5ex}
+                \end{tabular}
+            }
+            \\
+            % Fin du bas d'encadré
             \hline
         \end{tabular}
     \end{ombrageBoite}
+    % Fin du deuxième encadré
 
     \vspace{2.5mm}
 
@@ -121,10 +140,13 @@
             \hline
             \multicolumn{2}{|l}{\underline{\textbf{ \large Personnalité }}} & \fbox{\textit{\small scores}} &
             \begin{tabularx}{4.5in}{*{ {{ etalonnage_nombre_classes }} }{|X}|}
-                \centering \rule{0pt}{2.7ex} I {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
+                \centering \rule{0pt}{2.7ex} {{ romanNumbers[0] }} {% for i in 1..(etalonnage_nombre_classes-1) %} & \centering {{ romanNumbers[i] }} {% endfor %}
             \end{tabularx}
             \\
-
+            % Pour créer un bloc d'échelles, il faut toujours commencer par les deux lignes ci-dessous, ensuite il faut
+            % copier coller le nombre de lignes commençant par & . La dernière ligne doit finir par \\[1mm]
+            % Ensuite, dans les accolades twig, il ne faut changer que les noms php des échelles!
+            % Le 5 à droite de multirow correspond au nombre de sous échelles de FP, il faut peut-être le changer
             \multirow[t]{ 5 }*{\begin{tabular}{c c} \\[7mm] & \textbf{ {{ nom_fp|raw }} } \\ \\[2mm] \textit{classe} & \fbox{ {{ profil_fp }} } \end{tabular}}
             \rule{0pt}{5.7mm}
             & {{ nom_fp1_anx|raw }} & \fbox{ {{ (score_fp1_anx < 10 ? '0') ~ score_fp1_anx }} } & \printChartResult{ {{ profil_fp1_anx }} }{0}{ {{ etalonnage_nombre_classes }} } \\
@@ -156,9 +178,11 @@
             & {{ nom_fp3_hdep|raw }} & \fbox{ {{ (score_fp3_hdep < 10 ? '0') ~ score_fp3_hdep }} } & \printChartResult{ {{ profil_fp3_hdep }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             & {{ nom_fp4_dev|raw }} & \fbox{ {{ (score_fp4_dev < 10 ? '0') ~ score_fp4_dev }} } & \printChartResult{ {{ profil_fp4_dev }} }{0}{ {{ etalonnage_nombre_classes }} } \\
             & {{ nom_fp5_gen|raw }} & \fbox{ {{ (score_fp5_gen < 10 ? '0') ~ score_fp5_gen }} } & \printChartResult{ {{ profil_fp5_gen }} }{0}{ {{ etalonnage_nombre_classes }} } \\[1mm]
+            % Fin de la partie à modifier
             \hline
         \end{tabular}
     \end{ombrageBoite}
+    % Fin du troisième encadré
 
     \vspace{2.5mm}
 
@@ -167,14 +191,19 @@
     \begin{ombrageBoite}
         \begin{tabular}{ | wr{4.23cm} wc{0.6cm} wc{0.6cm} wc{12.3cm} | }
             \hline
-            \multicolumn{2}{|l}{\underline{\textbf{ \large Fiabilité des résultats }}} & & \rule{0pt}{2.25ex} \\
+            \multicolumn{2}{|l}{\underline{\textbf{ \large Fiabilité des réponses }}} & & \rule{0pt}{2.25ex} \\
             \multicolumn{4}{|p{19cm}|}{
                 \centering
-                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c c c }
+                % Entre accolades à droite de tabular, le nombre de m{1.5cm} et de c correspond au nombre et au type de colonnes.
+                % Il y a toujours le premier c, le reste dépend du type d'échelles composites à ajouter
+                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c m{1.5cm} c }
                     \rule{0pt}{2.8ex}
+                    % échelle composite de type score + classe, ajouter 'm{1.5cm} c c' pour chaque ocurrence et la ligne ci-dessous
                     & \hfill \textbf{ {{ nom_ds|raw }} } & \small{\textit{ score }} \fbox{ {{ score_ds|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil_ds }} }
+                    % échelle composite de type score, ajouter 'm{1.5cm} c' pour chaque ocurrence et la ligne ci-dessous
                     & \vline \hfill \textbf{ {{ nom_at|raw }} } & \textit{ score } \fbox{ {{ score_at|number_format(2) }} }
-                    & RC & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
+                    % échelle composite de type pourcentage, ajouter 'm{1.5cm} c' pour chaque ocurrence et la ligne ci-dessous
+                    & \vline \hfill \textbf{ RC }  & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
                     \\[1mm]
                 \end{tabular}
             }
@@ -182,6 +211,8 @@
             \hline
         \end{tabular}
     \end{ombrageBoite}
+    % Fin du quatrième encadré
+
     \vspace{2.5mm}
 
 \end{document}

@@ -2,6 +2,7 @@
 
 namespace App\Core\ScoreBrut\ExpressionLanguage\Functions;
 
+use App\Core\Exception\MissingEchelleException;
 use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\ScoreBrut\ExpressionLanguage\CortestFunction;
 
@@ -24,6 +25,13 @@ class Echelle extends CortestFunction
 
     public function evaluer($arguments, $echelle): float
     {
+        if (!array_key_exists(CortestExpressionLanguage::ENVIRONMENT_KEY_ECHELLE_PREFIX . $echelle, $arguments))
+        {
+            throw new MissingEchelleException($echelle, "L'échelle " . $echelle .
+                " est utilisée dans la correction mais n'existe pas. Vérifiez les occurrences de cette échelle dans " .
+                "la correction que vous venez d'utiliser et remplacez-les par le nouveau nom de cette échelle, " .
+                "ou créez cette échelle dans la structure que vous utilisez.");
+        }
         return $arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_ECHELLE_PREFIX . $echelle];
     }
 

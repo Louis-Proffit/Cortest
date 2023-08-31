@@ -72,7 +72,7 @@ class Renderer
     const KEY_GRAPHIQUE_NOM = "graphique_nom";
     const DESCRIPTION_GRAPHIQUE_NOM = "Nom du graphique";
     const KEY_PROFIL_NOM = "profil_nom";
-    const DESCRIPTION_PROFIL_NOM = "Nom du profil";
+    const DESCRIPTION_PROFIL_NOM = "Nom de la structure";
     const KEY_PREFIX_NOM = "nom_";
     const DESCRIPTION_PREFIX_NOM = "Nom de l'échelle ";
     const KEY_CONCOURS_TYPE_CONCOURS = "concours_type_concours";
