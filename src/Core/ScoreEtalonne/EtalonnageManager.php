@@ -43,7 +43,7 @@ class EtalonnageManager
 
                 $bounds = $echelleEtalonnage->bounds;
 
-                $index = 0;
+                $index = 1;
                 $score = $scoreBrut->get($echelleEtalonnage->echelle);
 
                 foreach ($bounds as $bound) {
