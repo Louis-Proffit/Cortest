@@ -66,8 +66,8 @@
 {% set romanNumbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
 
 \fancyhf{}
-% Ci dessous la définition du titre de la page, c'est la variable twig 'profil_nom'
-\fancyhead[C]{\Large\textbf{ {{ profil_nom }} }}
+% Ci dessous la définition du titre de la page, c'est la variable twig 'test_nom'
+\fancyhead[C]{\Large\textbf{ {{ test_nom }} }}
 \rhead{\includegraphics[width=3cm]{logo.png}}
 \renewcommand{\headrulewidth}{0pt}
 
@@ -203,7 +203,8 @@
                     % échelle composite de type score, ajouter 'm{1.5cm} c' pour chaque ocurrence et la ligne ci-dessous
                     & \vline \hfill \textbf{ {{ nom_at|raw }} } & \textit{ score } \fbox{ {{ score_at|number_format(2) }} }
                     & \vline \hfill \textbf{ {{ nom_rc|raw }} } & \textit{ score } \fbox{ {{ score_rc|number_format(2) }} }
-                    % échelle composite de type pourcentage, ajouter ' c' pour chaque ocurrence et la ligne ci-dessous
+                    % échelle composite de type pourcentage, qui complémente une échelle de type score, avec une simple
+                    % case pourcentage en plus. Ajouter ' c' pour chaque ocurrence et la ligne ci-dessous
                     & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
                     \\[1mm]
                 \end{tabular}

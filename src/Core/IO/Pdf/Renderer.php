@@ -157,6 +157,7 @@ class Renderer
             self::KEY_ETALONNAGE_NOMBRE_CLASSES => $etalonnage->nombre_classes,
             self::KEY_CONCOURS_TYPE_CONCOURS => $reponse->session->concours->type_concours,
             self::KEY_CONCOURS_INTITULE => $reponse->session->concours->intitule,
+            self::KEY_TEST_NOM => $reponse->session->test->nom,
         ];
 
         foreach ($scoreBrut->getAll() as $echelle => $scoreValue) {
@@ -215,6 +216,7 @@ class Renderer
             self::KEY_ETALONNAGE_NOMBRE_CLASSES => self::DESCRIPTION_ETALONNAGE_NOMBRE_CLASSES,
             self::KEY_CONCOURS_TYPE_CONCOURS => self::DESCRIPTION_CONCOURS_TYPE_CONCOURS,
             self::KEY_CONCOURS_INTITULE => self::DESCRIPTION_CONCOURS_INTITULE,
+            self::KEY_TEST_NOM => self::DESCRIPTION_TEST_NOM,
         ];
 
         $nom_echelles = $correcteur->get_echelle_noms();
