@@ -196,14 +196,15 @@
                 \centering
                 % Entre accolades à droite de tabular, le nombre de m{1.5cm} et de c correspond au nombre et au type de colonnes.
                 % Il y a toujours le premier c, le reste dépend du type d'échelles composites à ajouter
-                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c m{1.5cm} c }
+                \begin{tabular}{ c m{1.5cm} c c m{1.5cm} c m{1.5cm} c c }
                     \rule{0pt}{2.8ex}
                     % échelle composite de type score + classe, ajouter 'm{1.5cm} c c' pour chaque ocurrence et la ligne ci-dessous
                     & \hfill \textbf{ {{ nom_ds|raw }} } & \small{\textit{ score }} \fbox{ {{ score_ds|number_format(2) }} } & \small{\textit{classe}} \fbox{ {{ profil_ds }} }
                     % échelle composite de type score, ajouter 'm{1.5cm} c' pour chaque ocurrence et la ligne ci-dessous
                     & \vline \hfill \textbf{ {{ nom_at|raw }} } & \textit{ score } \fbox{ {{ score_at|number_format(2) }} }
-                    % échelle composite de type pourcentage, ajouter 'm{1.5cm} c' pour chaque ocurrence et la ligne ci-dessous
-                    & \vline \hfill \textbf{ RC }  & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
+                    & \vline \hfill \textbf{ {{ nom_rc|raw }} } & \textit{ score } \fbox{ {{ score_rc|number_format(2) }} }
+                    % échelle composite de type pourcentage, ajouter ' c' pour chaque ocurrence et la ligne ci-dessous
+                    & \fbox{ {{ score_rc_pourcent|number_format(0) }} {{ "\\%" }} }
                     \\[1mm]
                 \end{tabular}
             }

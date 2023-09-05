@@ -79,6 +79,8 @@ class Renderer
     const DESCRIPTION_CONCOURS_TYPE_CONCOURS = "Type concours";
     const KEY_CONCOURS_INTITULE = "concours_intitule";
     const DESCRIPTION_CONCOURS_INTITULE = "Intitulé du concours";
+    const KEY_TEST_NOM = "test_nom";
+    const DESCRIPTION_TEST_NOM = "Nom du test";
 
     private string $imagesDirectory;
 

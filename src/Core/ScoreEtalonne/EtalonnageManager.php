@@ -48,7 +48,7 @@ class EtalonnageManager
 
                 foreach ($bounds as $bound) {
 
-                    if ($score >= $bound) {
+                    if ($score > $bound) {
                         $index++;
                     } else {
                         break;

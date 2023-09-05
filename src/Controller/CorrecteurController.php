@@ -84,11 +84,11 @@ class CorrecteurController extends AbstractController
                     $activiteLogger->persistAction(
                         action: CortestLogEntry::ACTION_CREER,
                         object: $correcteur,
-                        message: "Import d'un correcteur par un fichier XML"
+                        message: "Import d'une correction par un fichier XML"
                     );
                     $entityManager->flush();
 
-                    $this->addFlash("success", "Correcteur importé");
+                    $this->addFlash("success", "Correction importée");
 
                     return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
                 } else {
@@ -115,14 +115,14 @@ class CorrecteurController extends AbstractController
         $structures = $structureRepository->findAll();
 
         if (empty($structures)) {
-            $this->addFlash("warning", "Pas de structures disponibles, veuillez en créer un.");
+            $this->addFlash("warning", "Pas de structure disponible, veuillez en créer une.");
             return $this->redirectToRoute("structure_index");
         }
 
         $tests = $testRepository->findAll();
 
         if (empty($tests)) {
-            $this->addFlash("warning", "Pas de tests disponible, veuillez en créer au moins un.");
+            $this->addFlash("warning", "Pas de test disponible, veuillez en créer au moins un.");
             return $this->redirectToRoute("test_index");
         }
 
@@ -157,7 +157,7 @@ class CorrecteurController extends AbstractController
             $activiteLogger->persistAction(
                 action: CortestLogEntry::ACTION_CREER,
                 object: $correcteur,
-                message: "Création d'un correcteur par formulaire"
+                message: "Création d'une correction par formulaire"
             );
             $entityManager->flush();
 
@@ -185,7 +185,7 @@ class CorrecteurController extends AbstractController
             $activiteLogger->persistAction(
                 action: CortestLogEntry::ACTION_MODIFIER,
                 object: $correcteur,
-                message: "Modification d'un correcteur par formulaire"
+                message: "Modification d'une correction par formulaire"
             );
             $entityManager->flush();
 
@@ -211,7 +211,7 @@ class CorrecteurController extends AbstractController
 
         if (!$xml) {
 
-            $this->addFlash("danger", "Erreur lors de l'export");
+            $this->addFlash("danger", "Erreur lors de l'export de la correction");
             return $this->redirectToRoute("correcteur_consulter", ["id" => $correcteur->id]);
 
         } else {
@@ -225,7 +225,7 @@ class CorrecteurController extends AbstractController
             $activiteLogger->persistAction(
                 action: CortestLogEntry::ACTION_EXPORTER,
                 object: $correcteur,
-                message: "Export d'un correcteur vers un fichier xml",
+                message: "Export d'une correction vers un fichier xml",
                 data: ["fichier" => $fileName]
             );
 
@@ -249,7 +249,7 @@ class CorrecteurController extends AbstractController
         $activiteLogger->persistAction(
             action: CortestLogEntry::ACTION_SUPPRIMER,
             object: $correcteur,
-            message: "Suppression d'un correcteur"
+            message: "Suppression d'une correction"
         );
         $entityManager->remove($correcteur);
         $entityManager->flush();
