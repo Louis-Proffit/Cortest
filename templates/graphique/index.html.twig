@@ -44,12 +44,12 @@
                        href="{{ path('graphique_download', {"id":graphique.id}) }}">Lien</a>
                 <td>
                     <button class="btn btn-link fw-bold link-danger"
-                            data-mdb-toggle="modal" data-mdb-target="#supprimerGraphique">
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerGraphique_{{ graphique.id }}">
                         <i class="fa fa-check"></i>
                         Lien
                     </button>
                     {{ supprimer(
-                        "supprimerGraphique",
+                        "supprimerGraphique_" ~ graphique.id,
                         "Supprimer le graphique",
                         "Supprimer le graphique ? Le fichier associé sera perdu.",
                         path("graphique_supprimer", {"id":graphique.id})

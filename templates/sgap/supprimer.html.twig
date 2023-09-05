@@ -31,12 +31,12 @@
     <br>
     <div class="row row-cols-auto">
         <button class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
-                data-mdb-toggle="modal" data-mdb-target="#supprimerSgap">
+                data-mdb-toggle="modal" data-mdb-target="#supprimerSgap_{{ sgap.id }}">
             <i class="fa fa-check"></i>
             Supprimer
         </button>
         {{ supprimer(
-            "supprimerSgap",
+            "supprimerSgap_" ~ sgap.id,
             "Supprimer le SGAP",
             "Supprimer le SGAP ?",
             path("sgap_supprimer", {"id":sgap.id})

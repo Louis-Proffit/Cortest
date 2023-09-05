@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% from "_supprimer.html.twig" import supprimer %}
+
 {% block content %}
     <br>
     <h1>Utilisateurs</h1>
@@ -63,7 +65,17 @@
                     <a class="btn btn-link fw-bold" href="{{ path("admin_modifier_mdp", {"id":user.id}) }}">Lien</a>
                 </td>
                 <td>
-                    <a class="btn btn-link fw-bold link-danger" href="{{ path("admin_supprimer", {"id":user.id}) }}">Lien</a>
+                    <button class="btn btn-link fw-bold link-danger"
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerUser_{{ user.id }}">
+                        <i class="fa fa-check"></i>
+                        Supprimer
+                    </button>
+                    {{ supprimer(
+                        "supprimerUser_" ~ user.id,
+                        "Supprimer l'utilisateur",
+                        "Supprimer l'utilisateur " ~ user.username ~ " ?",
+                        path("admin_supprimer", {"id":user.id})
+                    ) }}
                 </td>
             </tr>
         {% endfor %}

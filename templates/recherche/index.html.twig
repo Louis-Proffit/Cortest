@@ -108,7 +108,7 @@
                         <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
                         <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
                         <td>{{ reponse_candidat.vars.value.reponse_candidat.session.sgap.nom }}</td>
-                        <td>{{ form_widget(reponse_candidat.checked) }}</td>
+                        <td>{{ form_widget(reponse_candidat.vars.value.reponse_candidat.checked) }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

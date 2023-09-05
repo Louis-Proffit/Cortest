@@ -47,12 +47,12 @@
                 <td><a class="btn btn-link fw-bold" href="{{ path("session_modifier", {"id":session.id}) }}">Lien</a>
                 <td>
                     <button class="btn btn-link fw-bold link-danger"
-                            data-mdb-toggle="modal" data-mdb-target="#supprimerSession">
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerSession_{{ session.id }}">
                         <i class="fa fa-check"></i>
                         Lien
                     </button>
                     {{ supprimer(
-                        "supprimerSession",
+                        "supprimerSession_" ~ session.id,
                         "Supprimer la session",
                         "Supprimer la session ? Les réponses des candidats associées seront perdues.",
                         path("session_supprimer", {"id":session.id})

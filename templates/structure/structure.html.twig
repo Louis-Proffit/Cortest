@@ -9,7 +9,10 @@
             <a class="btn btn-primary" href="{{ path("structure_modifier", {"id":structure.id}) }}">Modifier</a>
         </div>
         <div class="col">
-            <a class="btn btn-danger" href="{{ path("structure_creer") }}">Supprimer</a>
+            <a class="btn btn-danger"
+               href="{{ path('structure_supprimer_confirmer', {"id":structure.id}) }}">
+                Supprimer&nbsp;<i class="fa fa-check"></i>
+            </a>
         </div>
         <div class="col">
             <a class="btn btn-secondary" href="{{ path("structure_index") }}">Retour à la liste</a>

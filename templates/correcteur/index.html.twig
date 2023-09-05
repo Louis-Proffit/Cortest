@@ -52,14 +52,14 @@
                 </td>
                 <td>
                     <button class="btn btn-link fw-bold link-danger"
-                            data-mdb-toggle="modal" data-mdb-target="#supprimerCorrecteur">
+                            data-mdb-toggle="modal" data-mdb-target="#supprimerCorrecteur_{{ correcteur.id }}">
                         <i class="fa fa-check"></i>
                         Supprimer
                     </button>
                     {{ supprimer(
-                        "supprimerCorrecteur",
-                        "Supprimer le correcteur",
-                        "Supprimer le correcteur ? Toutes les échelles associées seront perdues.",
+                        "supprimerCorrecteur_" ~ correcteur.id,
+                        "Supprimer la correction",
+                        "Supprimer la correction ? Toutes les échelles associées seront perdues.",
                         path("correcteur_supprimer", {"id":correcteur.id})
                     ) }}
                 </td>

@@ -29,12 +29,12 @@
     {% endif %}
     <div class="row row-cols-auto">
         <button class="btn btn-danger {{ supprimable ? '': 'disabled' }}"
-                data-mdb-toggle="modal" data-mdb-target="#supprimerConcours">
+                data-mdb-toggle="modal" data-mdb-target="#supprimerConcours_{{ concours.id }}">
             <i class="fa fa-check"></i>
             Supprimer
         </button>
         {{ supprimer(
-            "supprimerConcours",
+            "supprimerConcours_" ~ concours.id,
             "Supprimer le concours",
             "Supprimer le concours ?",
             path("concours_supprimer", {"id":concours.id})

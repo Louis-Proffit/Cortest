@@ -42,12 +42,12 @@
                 </td>
                 <td>
                     <button class="btn btn-link fw-bold link-danger"
-                    data-mdb-toggle="modal" data-mdb-target="#supprimerEtalonnage">
+                    data-mdb-toggle="modal" data-mdb-target="#supprimerEtalonnage_{{ etalonnage.id }}">
                         <i class="fa fa-check"></i>
                         Lien
                     </button>
                     {{ supprimer(
-                        "supprimerEtalonnage",
+                        "supprimerEtalonnage_" ~ etalonnage.id,
                         "Supprimer l'étalonnage",
                         "Supprimer l'étalonnage ? Toutes les informations sur les bornes seront perdues.",
                         path("etalonnage_supprimer", {"id":etalonnage.id})
