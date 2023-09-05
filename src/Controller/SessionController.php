@@ -153,9 +153,7 @@ class SessionController extends AbstractController
         LoggerInterface         $logger,
         EntityManagerInterface  $entityManager,
         ReponsesCandidatStorage $reponsesCandidatStorage,
-        Session                 $session,
-        SessionRepository       $sessionRepository,
-        int                     $id): Response
+        Session                 $session): Response
     {
         $reponsesCandidatStorage->set(array()); // TODO être un peu plus précis, c'est très conservatif
 
