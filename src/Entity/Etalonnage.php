@@ -30,7 +30,7 @@ class Etalonnage
     #[ORM\Column]
     public int $nombre_classes;
 
-    #[ORM\OrderBy(["id" => "ASC"])]
+    #[ORM\OrderBy(["echelle" => "ASC"])]
     #[ORM\OneToMany(mappedBy: "etalonnage", targetEntity: EchelleEtalonnage::class, cascade: ["remove", "persist"])]
     public Collection $echelles;
 

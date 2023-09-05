@@ -81,17 +81,17 @@ class EtalonnageController extends AbstractController
         if ($form->isSubmitted() and $form->isValid()) {
 
             $nombreClasses = $etalonnageCreer->nombre_classes;
-            $profil = $etalonnageCreer->structure;
+            $structure = $etalonnageCreer->structure;
 
             $etalonnage = new Etalonnage(
                 id: 0,
-                structure: $profil,
+                structure: $structure,
                 nom: $etalonnageCreer->nom,
                 nombre_classes: $nombreClasses,
                 echelles: new ArrayCollection()
             );
 
-            foreach ($profil->echelles as $echelle) {
+            foreach ($structure->echelles as $echelle) {
 
                 $etalonnage->echelles->add(new EchelleEtalonnage(
                     id: 0,

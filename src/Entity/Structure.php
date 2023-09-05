@@ -24,6 +24,7 @@ class Structure
     public string $nom;
 
     #[ORM\OneToMany(mappedBy: "structure", targetEntity: Echelle::class, cascade: ["remove", "persist"])]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     public Collection $echelles;
 
     #[ORM\OneToMany(mappedBy: "structure", targetEntity: Correcteur::class, cascade: ["persist"])]
