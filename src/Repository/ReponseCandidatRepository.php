@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\ReponseCandidat;
+use App\Entity\Session;
 use App\Form\Data\RechercheParameters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -30,8 +32,9 @@ class ReponseCandidatRepository extends ServiceEntityRepository
     public function findAllFromParameters(RechercheParameters $rechercheParameters
     ): array
     {
-        $query_builder = $this->createQueryBuilder("r");
-        $query = $query_builder
+        $queryBuilder = $this->createQueryBuilder("r");
+        $query = $queryBuilder
+            ->innerJoin("r.session", "s")
             ->where("r.nom LIKE :nom")
             ->andWhere("r.prenom LIKE :prenom")
             ->andWhere("r.date_de_naissance BETWEEN :date_de_naissance_min AND :date_de_naissance_max")
@@ -42,13 +45,18 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->setParameter("date_de_naissance_min", $rechercheParameters->filtreDateDeNaissanceMin)
             ->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);
 
+        if ($rechercheParameters->dateSession != null) {
+            $queryBuilder->andWhere("s.date = :dateSession")
+                ->setParameter("dateSession", $rechercheParameters->dateSession);
+        }
+
         if ($rechercheParameters->session != null) {
-            $query_builder->andWhere("r.session = :session")
+            $queryBuilder->andWhere("r.session = :session")
                 ->setParameter("session", $rechercheParameters->session);
         }
 
         if ($rechercheParameters->niveauScolaire != null) {
-            $query_builder->andWhere("r.niveau_scolaire = :niveau_scolaire")
+            $queryBuilder->andWhere("r.niveau_scolaire = :niveau_scolaire")
                 ->setParameter("niveau_scolaire", $rechercheParameters->niveauScolaire);
         }
 

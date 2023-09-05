@@ -13,7 +13,8 @@
         <div class="mb-3 col-md-auto">
             <button class="btn btn-danger" data-mdb-toggle="modal" data-mdb-target="#modalSupprimer">
                 <i class="fa fa-check"></i>
-                Supprimer</button>
+                Supprimer
+            </button>
             {{ supprimer(
                 "modalSupprimer",
                 "Supprimer la session",
@@ -22,17 +23,19 @@
             ) }}
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : ''}} " href="{{ path("calcul_score_brut_session_form", {"session_id":session.id}) }}">Calculer
+            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : '' }} "
+               href="{{ path("calcul_score_brut_session_form", {"session_id":session.id}) }}">Calculer
                 les
                 scores bruts</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : ''}}"
+            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : '' }}"
                href="{{ path("calcul_score_etalonne_form_session", {"session_id":session.id}) }}">Calculer
                 les scores étalonnés</a>
         </div>
         <div class="mb-3 col-md-auto">
-            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : ''}}" href="{{ path("session_csv", {"id":session.id}) }}">Exporter les scores en .csv</a>
+            <a class="btn btn-secondary {{ session.reponses_candidats is empty ? 'disabled' : '' }}"
+               href="{{ path("session_csv", {"id":session.id}) }}">Exporter les scores en .csv</a>
         </div>
         <div class="mb-3 col-md-auto">
             <a class="btn btn-secondary" href="{{ path("lecture_index", {"id":session.id}) }}">Lecture optique</a>
@@ -93,8 +96,17 @@
                 <td>{{ reponse.sexe|sexe }}</td>
                 <td>{{ reponse.niveau_scolaire.nom }}</td>
                 <td>{{ reponse.eirs }}</td>
-                <td><a class="btn btn-primary"
-                       href="{{ path("reponse_candidat_supprimer", {"id":reponse.id}) }}">Supprimer</a>
+                <td>
+                    <button class="btn btn-danger" data-mdb-toggle="modal"
+                            data-mdb-target="#{{ 'supprimerReponseCandidat'~reponse.id }}">
+                        <i class="fa fa-check"></i>Supprimer
+                    </button>
+                    {{ supprimer(
+                        "supprimerReponseCandidat"~reponse.id,
+                        "Supprimer",
+                        "Supprimer la réponse candidat ? Toutes les informations seront perdues",
+                        path("reponse_candidat_supprimer", {"id":reponse.id})
+                    ) }}
                 </td>
                 <td class="text-truncate">{{ reponse.reponses|join("-") }}</td>
             </tr>

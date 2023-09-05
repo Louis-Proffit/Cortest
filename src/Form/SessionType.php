@@ -32,7 +32,7 @@ class SessionType extends AbstractType
             ])
             ->add("concours", ChoiceType::class, [
                 "choices" => $this->concoursRepository->choices(),
-                "label" => "Type Concours",
+                "label" => "Concours",
             ])
             ->add("sgap", ChoiceType::class, [
                 "choices" => $this->sgapRepository->choices(),

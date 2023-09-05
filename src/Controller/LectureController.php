@@ -41,12 +41,13 @@ class LectureController extends AbstractController
 
     #[Route("/form", name: "form")]
     public function form(
-        ActiviteLogger           $activiteLogger,
-        SessionRepository        $sessionRepository,
-        NiveauScolaireRepository $niveauScolaireRepository,
-        GrilleRepository         $grilleRepository,
-        Request                  $request,
-        EntityManagerInterface   $entityManager
+        ReponseCandidatRepository $reponseCandidatRepository,
+        ActiviteLogger            $activiteLogger,
+        SessionRepository         $sessionRepository,
+        NiveauScolaireRepository  $niveauScolaireRepository,
+        GrilleRepository          $grilleRepository,
+        Request                   $request,
+        EntityManagerInterface    $entityManager
     ): Response
     {
 
@@ -57,8 +58,8 @@ class LectureController extends AbstractController
             return $this->redirectToRoute("session_creer");
         }
 
-        $niveau_scolaire = $niveauScolaireRepository->findOneBy([]);
-        if ($niveau_scolaire == null) {
+        $niveauScolaire = $niveauScolaireRepository->findOneBy([]);
+        if ($niveauScolaire == null) {
             $this->addFlash("warning", "Pas de niveau scolaire, veuillez en créer un");
             return $this->redirectToRoute("niveau_scolaire_creer");
         }
@@ -66,14 +67,14 @@ class LectureController extends AbstractController
         $grille = $grilleRepository->getFromIndex($session->test->index_grille);
         $reponses = array_fill(1, $grille->nombre_questions, 0);
 
-        $reponse = new ReponseCandidat(
+        $reponseCandidat = new ReponseCandidat(
             id: 0,
             session: $session,
             reponses: $reponses,
             nom: "",
             prenom: "",
             nom_jeune_fille: "",
-            niveau_scolaire: $niveau_scolaire,
+            niveau_scolaire: $niveauScolaire,
             date_de_naissance: new DateTime("now"),
             sexe: 1,
             reserve: "",
@@ -84,22 +85,26 @@ class LectureController extends AbstractController
             raw: null
         );
 
-        $form = $this->createForm(ReponseCandidatType::class, $reponse);
+        $form = $this->createForm(ReponseCandidatType::class, $reponseCandidat);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            $entityManager->persist($reponse);
+            $entityManager->persist($reponseCandidat);
+            $this->addFlashIfCandidatAlreadyExists(
+                reponseCandidatRepository: $reponseCandidatRepository,
+                reponseCandidat: $reponseCandidat
+            );
             $activiteLogger->persistAction(
                 action: CortestLogEntry::ACTION_CREER,
-                object: $reponse,
+                object: $reponseCandidat,
                 message: "Saisie des réponses d'un candidat par formulaire"
             );
 
             $entityManager->flush();
 
-            return $this->redirectToRoute("session_consulter", ["id" => $reponse->session->id]);
+            return $this->redirectToRoute("session_consulter", ["id" => $reponseCandidat->session->id]);
         }
 
         return $this->render("lecture/from_form.html.twig", ["form" => $form->createView()]);
@@ -107,11 +112,12 @@ class LectureController extends AbstractController
 
     #[Route("/fichier-json", name: 'fichier')]
     public function fichier(
-        ActiviteLogger           $activiteLogger,
-        EntityManagerInterface   $entityManager,
-        NiveauScolaireRepository $niveau_scolaire_repository,
-        Request                  $request,
-        LoggerInterface          $logger): Response
+        ReponseCandidatRepository $reponseCandidatRepository,
+        ActiviteLogger            $activiteLogger,
+        EntityManagerInterface    $entityManager,
+        NiveauScolaireRepository  $niveauScolaireRepository,
+        Request                   $request,
+        LoggerInterface           $logger): Response
     {
         $uploadSessionBase = new ParametresLectureJSON();
         $form = $this->createForm(ParametresLectureFichierType::class, $uploadSessionBase);
@@ -126,19 +132,19 @@ class LectureController extends AbstractController
 
             foreach ($decoded as $reponses_candidat_json) {
 
-                /** @var string $reponse_string */
-                $reponse_string = $reponses_candidat_json["reponses"];
+                /** @var string $reponseString */
+                $reponseString = $reponses_candidat_json["reponses"];
 
-                $reponse_array = str_split($reponse_string);
+                $reponseArray = str_split($reponseString);
 
-                $reponse_candidat = new ReponseCandidat(
+                $reponseCandidat = new ReponseCandidat(
                     id: 0,
                     session: $uploadSessionBase->session,
-                    reponses: $reponse_array,
+                    reponses: $reponseArray,
                     nom: $reponses_candidat_json["nom"],
                     prenom: $reponses_candidat_json["prenom"],
                     nom_jeune_fille: $reponses_candidat_json["nom_jeune_fille"],
-                    niveau_scolaire: $niveau_scolaire_repository->findOneBy([]),
+                    niveau_scolaire: $niveauScolaireRepository->findOneBy([]),
                     date_de_naissance: new DateTime("now"),
                     sexe: $reponses_candidat_json["sexe"],
                     reserve: $reponses_candidat_json["reserve"],
@@ -148,7 +154,11 @@ class LectureController extends AbstractController
                     eirs: $reponses_candidat_json["EIRS"],
                     raw: $reponses_candidat_json
                 );
-                $entityManager->persist($reponse_candidat);
+                $this->addFlashIfCandidatAlreadyExists(
+                    reponseCandidatRepository: $reponseCandidatRepository,
+                    reponseCandidat: $reponseCandidat
+                );
+                $entityManager->persist($reponseCandidat);
             }
 
             $activiteLogger->persistAction(
@@ -169,11 +179,12 @@ class LectureController extends AbstractController
 
     #[Route("/fichier-csv", name: 'fichier_csv')]
     public function importCsv(
-        ActiviteLogger         $activiteLogger,
-        EntityManagerInterface $entityManager,
-        Request                $request,
-        CsvManager             $csvManager,
-        ImportReponsesCandidat $reponsesCandidatImport
+        ReponseCandidatRepository $reponseCandidatRepository,
+        ActiviteLogger            $activiteLogger,
+        EntityManagerInterface    $entityManager,
+        Request                   $request,
+        CsvManager                $csvManager,
+        ImportReponsesCandidat    $reponsesCandidatImport
     ): Response
     {
 
@@ -190,6 +201,10 @@ class LectureController extends AbstractController
                 $reponsesCandidats = $reponsesCandidatImport->import($uploadSessionBase->session, $rawReponsesCandidats);
 
                 foreach ($reponsesCandidats as $reponseCandidat) {
+                    $this->addFlashIfCandidatAlreadyExists(
+                        reponseCandidatRepository: $reponseCandidatRepository,
+                        reponseCandidat: $reponseCandidat
+                    );
                     $entityManager->persist($reponseCandidat);
                 }
 
@@ -264,26 +279,28 @@ class LectureController extends AbstractController
         $session = $sessionRepository->find($request->request->get('session'));
 
         foreach ($data as $i => $ligne) {
-            if (count($reponseCandidatRepository->findBy(["nom" => $ligne['nom'], "prenom" => $ligne['prenom']])) == 0) {
-                $reponseCandidat = new ReponseCandidat(
-                    id: 0,
-                    session: $session,
-                    reponses: $ligne['qcm'],
-                    nom: $ligne['nom'],
-                    prenom: $ligne['prenom'],
-                    nom_jeune_fille: $ligne['nom_jeune_fille'],
-                    niveau_scolaire: $niveauScolaireRepository->find($ligne['niveau_scolaire']),
-                    date_de_naissance: new DateTime($ligne['date_naissance']),
-                    sexe: $ligne['sexe'],
-                    reserve: $ligne['reserve'],
-                    autre_1: $ligne['option_1'],
-                    autre_2: $ligne['option_2'],
-                    code_barre: "" . $i,
-                    eirs: $ligne['concours'],
-                    raw: null
-                );
-                $entityManager->persist($reponseCandidat);
-            }
+            $reponseCandidat = new ReponseCandidat(
+                id: 0,
+                session: $session,
+                reponses: $ligne['qcm'],
+                nom: $ligne['nom'],
+                prenom: $ligne['prenom'],
+                nom_jeune_fille: $ligne['nom_jeune_fille'],
+                niveau_scolaire: $niveauScolaireRepository->find($ligne['niveau_scolaire']),
+                date_de_naissance: new DateTime($ligne['date_naissance']),
+                sexe: $ligne['sexe'],
+                reserve: $ligne['reserve'],
+                autre_1: $ligne['option_1'],
+                autre_2: $ligne['option_2'],
+                code_barre: "" . $i,
+                eirs: $ligne['concours'],
+                raw: null
+            );
+            $this->addFlashIfCandidatAlreadyExists(
+                reponseCandidatRepository: $reponseCandidatRepository,
+                reponseCandidat: $reponseCandidat
+            );
+            $entityManager->persist($reponseCandidat);
         }
 
         $activiteLogger->persistAction(
@@ -294,5 +311,14 @@ class LectureController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
+    }
+
+    private function addFlashIfCandidatAlreadyExists(
+        ReponseCandidatRepository $reponseCandidatRepository,
+        ReponseCandidat           $reponseCandidat): void
+    {
+        if ($reponseCandidatRepository->count(["nom" => $reponseCandidat->nom, "prenom" => $reponseCandidat->prenom, "session" => $reponseCandidat->session]) > 0) {
+            $this->addFlash("warning", "Un candidat avec le nom " . $reponseCandidat->nom . " et le prénom " . $reponseCandidat->prenom . " existe déjà pour la session.");
+        }
     }
 }
