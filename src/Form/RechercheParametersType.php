@@ -37,7 +37,9 @@ class RechercheParametersType extends AbstractType
             ->add("niveauScolaire", ChoiceType::class, [
                 "choices" => $this->niveauScolaireRepository->nullable_choices()
             ])
-            ->add("dateSession", CortestDateType::class)
+            ->add("dateSession", CortestDateType::class, [
+                "required" => false,
+            ])
             ->add("session", ChoiceType::class, [
                 "choices" => $this->sessionRepository->nullable_choices()
             ])
