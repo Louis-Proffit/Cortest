@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Core\Activite\ActiviteLogger;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorage;
 use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\CortestLogEntry;
 use App\Entity\Session;
@@ -159,13 +160,13 @@ class SessionController extends AbstractController
 
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
-        ActiviteLogger          $activiteLogger,
-        LoggerInterface         $logger,
-        EntityManagerInterface  $entityManager,
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        Session                 $session): Response
+        ActiviteLogger                 $activiteLogger,
+        LoggerInterface                $logger,
+        EntityManagerInterface         $entityManager,
+        ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage,
+        Session                        $session): Response
     {
-        $reponsesCandidatStorage->set(array()); // TODO être un peu plus précis, c'est très conservatif
+        $reponsesCandidatSessionStorage->set([]); // TODO être un peu plus précis, c'est très conservatif
 
         $logger->info("Suppression de la session : " . $session->id);
 

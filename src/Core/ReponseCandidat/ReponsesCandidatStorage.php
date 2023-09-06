@@ -39,7 +39,7 @@ readonly class ReponsesCandidatStorage
      * @param ReponseCandidat[] $reponsesCandidats
      * @return void
      */
-    public function set(array $reponsesCandidats): void
+    private function set(array $reponsesCandidats): void
     {
         $reponsesCandidatsIds = array_map(fn(ReponseCandidat $reponseCandidat) => $reponseCandidat->id, $reponsesCandidats);
         $this->reponsesCandidatSessionStorage->set($reponsesCandidatsIds);

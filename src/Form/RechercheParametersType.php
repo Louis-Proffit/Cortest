@@ -43,12 +43,7 @@ class RechercheParametersType extends AbstractType
             ->add("session", ChoiceType::class, [
                 "choices" => $this->sessionRepository->nullable_choices()
             ])
-            ->add(
-                "checkedReponsesCandidat",
-                CollectionType::class,
-                ["entry_type" => ReponsesCandidatCheckedType::class])
-            ->add(self::SUBMIT_FILTRER_KEY, SubmitType::class, ["label" => "Filtrer"])
-            ->add(self::SUBMIT_SELECTIONNER_KEY, SubmitType::class, ["label" => "Sélectionner"]);
+            ->add(self::SUBMIT_FILTRER_KEY, SubmitType::class, ["label" => "Filtrer"]);
 
         /** @var int $pageCount */
         $pageCount = $builder->getOption(self::OPTION_PAGE_COUNT_KEY);

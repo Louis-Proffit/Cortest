@@ -61,35 +61,37 @@
             {% endif %}
         </div>
         <div class="col-6">
-            {{ form_start(form) }}
+            {{ form_start(formParametres) }}
             <h3>Filtres</h3>
             <br>
             <fieldset class="mb-3">
                 <legend class="col-form-label">Identification du candidat</legend>
                 <div class="input-group">
                     <div class="input-group-text">Prénom</div>
-                    {{ form_widget(form.filtrePrenom) }}
+                    {{ form_widget(formParametres.filtrePrenom) }}
                     <div class="input-group-text">Nom</div>
-                    {{ form_widget(form.filtreNom) }}
+                    {{ form_widget(formParametres.filtreNom) }}
                 </div>
             </fieldset>
-            {{ form_row(form.filtreDateDeNaissanceMin) }}
-            {{ form_row(form.filtreDateDeNaissanceMax) }}
-            {{ form_row(form.niveauScolaire) }}
-            {{ form_row(form.dateSession) }}
-            {{ form_row(form.session) }}
-            {{ form_row(form.submit_filtrer) }}
+            {{ form_row(formParametres.filtreDateDeNaissanceMin) }}
+            {{ form_row(formParametres.filtreDateDeNaissanceMax) }}
+            {{ form_row(formParametres.niveauScolaire) }}
+            {{ form_row(formParametres.dateSession) }}
+            {{ form_row(formParametres.session) }}
+            {{ form_row(formParametres.submit_filtrer) }}
             <br>
             <hr class="hr hr-blurry">
             <br>
             <h3>Candidats</h3>
             <br>
             <div class="input-group">
-                {% for key, value in properties_starting_with(form.children,"submit_page_") %}
+                {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
                     {{ form_widget(value) }}
                 {% endfor %}
             </div>
+            {{ form_end(formParametres) }}
             <br>
+            {{ form_start(formReponsesCandidat) }}
             <table class="table">
                 <thead>
                 <tr>
@@ -102,7 +104,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for reponse_candidat in form.checkedReponsesCandidat %}
+                {% for reponse_candidat in formReponsesCandidat %}
                     <tr>
                         <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
                         <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
@@ -114,8 +116,8 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {{ form_row(form.submit_selectionner) }}
-            {{ form_end(form) }}
+            {{ form_row(formReponsesCandidat.submit_selectionner) }}
+            {{ form_end(formReponsesCandidat) }}
         </div>
     </div>
 {% endblock %}
