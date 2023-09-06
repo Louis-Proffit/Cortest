@@ -68,11 +68,11 @@ class RechercheController extends AbstractController
             page: $page,
             filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
             filtreDateDeNaissanceMax: new DateTime("now"),
+            dateSession: null,
             niveauScolaire: null,
             session: null,
             checkedReponsesCandidat: []
         );
-
 
         $reponsesAtPage = $reponseCandidatRepository->findAllFromParameters($parameters);
         $checkedReponsesAtPage = $this->reponsesToCheckedReponses($reponsesAtPage, $cachedReponsesIds);

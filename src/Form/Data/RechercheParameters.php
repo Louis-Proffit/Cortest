@@ -15,6 +15,7 @@ class RechercheParameters
     public int $page;
     public DateTime $filtreDateDeNaissanceMin;
     public DateTime $filtreDateDeNaissanceMax;
+    public ?DateTime $dateSession;
     public ?NiveauScolaire $niveauScolaire;
     public ?Session $session;
     /**
@@ -28,17 +29,19 @@ class RechercheParameters
      * @param int $page
      * @param DateTime $filtreDateDeNaissanceMin
      * @param DateTime $filtreDateDeNaissanceMax
+     * @param DateTime|null $dateSession
      * @param NiveauScolaire|null $niveauScolaire
      * @param Session|null $session
      * @param ReponseCandidatChecked[] $checkedReponsesCandidat
      */
-    public function __construct(string $filtrePrenom, string $filtreNom, int $page, DateTime $filtreDateDeNaissanceMin, DateTime $filtreDateDeNaissanceMax, ?NiveauScolaire $niveauScolaire, ?Session $session, array $checkedReponsesCandidat)
+    public function __construct(string $filtrePrenom, string $filtreNom, int $page, DateTime $filtreDateDeNaissanceMin, DateTime $filtreDateDeNaissanceMax, ?DateTime $dateSession, ?NiveauScolaire $niveauScolaire, ?Session $session, array $checkedReponsesCandidat)
     {
         $this->filtrePrenom = $filtrePrenom;
         $this->filtreNom = $filtreNom;
         $this->page = $page;
         $this->filtreDateDeNaissanceMin = $filtreDateDeNaissanceMin;
         $this->filtreDateDeNaissanceMax = $filtreDateDeNaissanceMax;
+        $this->dateSession = $dateSession;
         $this->niveauScolaire = $niveauScolaire;
         $this->session = $session;
         $this->checkedReponsesCandidat = $checkedReponsesCandidat;
