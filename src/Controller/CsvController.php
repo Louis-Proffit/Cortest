@@ -19,6 +19,7 @@ use App\Core\SessionCorrecteurMatcher;
 use App\Entity\Correcteur;
 use App\Entity\CortestLogEntry;
 use App\Entity\Etalonnage;
+use App\Repository\TestRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,6 +41,32 @@ class CsvController extends AbstractController
         $reponsesCandidats = $reponsesCandidatStorage->get();
 
         $content = $exportReponsesCandidat->export($reponsesCandidats);
+
+        $fileName = $fileNameManager->reponsesCsvFileName($reponsesCandidats);
+
+        $activiteLogger->persist(
+            action: CortestLogEntry::ACTION_EXPORTER,
+            message: "Export de réponses de candidats",
+            data: ["fichier" => $fileName, "nombre" => count($reponsesCandidats)]
+        );
+        $activiteLogger->flush();
+
+        return $csvManager->export($content, $fileName);
+    }
+
+    #[Route("/reponses_triees", name: "reponses_triees")]
+    public function reponsesTriees(
+        ActiviteLogger          $activiteLogger,
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        ExportReponsesCandidat  $exportReponsesCandidat,
+        CsvManager              $csvManager,
+        FileNameManager         $fileNameManager,
+        TestRepository          $testRepository,
+    ): Response
+    {
+        $reponsesCandidats = $reponsesCandidatStorage->get();
+
+        $content = $exportReponsesCandidat->exportOrderedByIntitule($reponsesCandidats, $testRepository);
 
         $fileName = $fileNameManager->reponsesCsvFileName($reponsesCandidats);
 

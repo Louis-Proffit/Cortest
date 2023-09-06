@@ -147,6 +147,16 @@ class SessionController extends AbstractController
         return $this->redirectToRoute("csv_reponses");
     }
 
+    #[Route("/csv_trie/{id}", name: "csv_trie")]
+    public function csvTrie(
+        ReponsesCandidatStorage $reponsesCandidatStorage,
+        Session                 $session
+    ): Response
+    {
+        $reponsesCandidatStorage->setFromSession($session);
+        return $this->redirectToRoute("csv_reponses_triees");
+    }
+
     #[Route("/supprimer/{id}", name: "supprimer")]
     public function supprimer(
         ActiviteLogger          $activiteLogger,
