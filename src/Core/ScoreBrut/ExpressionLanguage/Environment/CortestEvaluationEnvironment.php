@@ -2,6 +2,7 @@
 
 namespace App\Core\ScoreBrut\ExpressionLanguage\Environment;
 
+use App\Core\Exception\CalculScoreBrutException;
 use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\ScoreBrut\ScoreBrut;
 use App\Entity\Echelle;
@@ -34,6 +35,11 @@ readonly class CortestEvaluationEnvironment
     }
 
 
+    /**
+     * @return ScoreBrut
+     * @throws CalculScoreBrutException
+     * @noinspection PhpDocRedundantThrowsInspection
+     */
     public function computeScores(): ScoreBrut
     {
         $result = new ScoreBrut();

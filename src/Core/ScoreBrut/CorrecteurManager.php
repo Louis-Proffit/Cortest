@@ -2,6 +2,8 @@
 
 namespace App\Core\ScoreBrut;
 
+use App\Core\Exception\CalculScoreBrutCandidatException;
+use App\Core\Exception\CalculScoreBrutException;
 use App\Core\ScoreBrut\ExpressionLanguage\CortestExpressionLanguage;
 use App\Core\ScoreBrut\ExpressionLanguage\Environment\CortestEvaluationEnvironment;
 use App\Entity\Correcteur;
@@ -21,6 +23,7 @@ readonly class CorrecteurManager
      * @param Correcteur $correcteur
      * @param ReponseCandidat[] $reponseCandidats
      * @return ScoresBruts
+     * @throws CalculScoreBrutCandidatException
      */
     public function corriger(Correcteur $correcteur, array $reponseCandidats): ScoresBruts
     {
@@ -35,7 +38,12 @@ readonly class CorrecteurManager
             );
 
 
-            $corrige->set($reponseCandidat, $cortestEvaluationEnvironment->computeScores());
+            try {
+                $scores = $cortestEvaluationEnvironment->computeScores();
+                $corrige->set($reponseCandidat, $scores);
+            } catch (CalculScoreBrutException $e) {
+                throw new CalculScoreBrutCandidatException($reponseCandidat, $e);
+            }
         }
 
         return $corrige;

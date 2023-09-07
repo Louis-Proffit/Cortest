@@ -2,6 +2,8 @@
 
 namespace App\Core\ScoreBrut\ExpressionLanguage;
 
+use App\Core\Exception\CalculScoreBrutException;
+use App\Entity\ReponseCandidat;
 use Closure;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
@@ -30,17 +32,25 @@ class CortestFunction
         $this->compiler = $compiler;
     }
 
+    /**
+     * @throws CalculScoreBrutException
+     */
     protected function innerEvaluer(array $arguments, int $index, float $siVide, float $siA, float $siB, float $siC, float $siD, float $siE): float
     {
         $trueIndex = $index - 1;
-        return match ($arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_REPONSES][$trueIndex]) {
+        $reponses = $arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_REPONSES];
+        if (!in_array($trueIndex, $reponses)) {
+            throw new CalculScoreBrutException(message: "La réponse d'indice " . $index . " n'existe pas");
+        }
+        $reponse = $reponses[$trueIndex];
+        return match ($reponse) {
             0 => $siVide,
             1 => $siA,
             2 => $siB,
             3 => $siC,
             4 => $siD,
             5 => $siE,
-            default => 0
+            default => throw new CalculScoreBrutException("La réponse enregistrée pour l'indice $index est $reponse. Veuillez le corriger.")
         };
     }
 
