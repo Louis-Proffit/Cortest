@@ -8,7 +8,7 @@
     <br>
     <div class="row row-cols-auto">
         <div class="col-6 border-end">
-            {% if selectionnes is empty %}
+            {% if checkedReponsesCandidat is empty %}
 
                 <div class="note note-warning">
                     <div class="text-center">
@@ -43,7 +43,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for candidat in selectionnes %}
+                        {% for candidat in checkedReponsesCandidat %}
                             <tr>
                                 <td>{{ candidat.nom }}</td>
                                 <td>{{ candidat.prenom }}</td>
@@ -61,35 +61,37 @@
             {% endif %}
         </div>
         <div class="col-6">
-            {{ form_start(form) }}
+            {{ form_start(formParametres) }}
             <h3>Filtres</h3>
             <br>
             <fieldset class="mb-3">
                 <legend class="col-form-label">Identification du candidat</legend>
                 <div class="input-group">
                     <div class="input-group-text">Prénom</div>
-                    {{ form_widget(form.filtrePrenom) }}
+                    {{ form_widget(formParametres.filtrePrenom) }}
                     <div class="input-group-text">Nom</div>
-                    {{ form_widget(form.filtreNom) }}
+                    {{ form_widget(formParametres.filtreNom) }}
                 </div>
             </fieldset>
-            {{ form_row(form.filtreDateDeNaissanceMin) }}
-            {{ form_row(form.filtreDateDeNaissanceMax) }}
-            {{ form_row(form.niveauScolaire) }}
-            {{ form_row(form.dateSession) }}
-            {{ form_row(form.session) }}
-            {{ form_row(form.submit_filtrer) }}
+            {{ form_row(formParametres.filtreDateDeNaissanceMin) }}
+            {{ form_row(formParametres.filtreDateDeNaissanceMax) }}
+            {{ form_row(formParametres.niveauScolaire) }}
+            {{ form_row(formParametres.dateSession) }}
+            {{ form_row(formParametres.session) }}
+            {{ form_row(formParametres.submit_filtrer) }}
             <br>
             <hr class="hr hr-blurry">
             <br>
             <h3>Candidats</h3>
             <br>
             <div class="input-group">
-                {% for key, value in properties_starting_with(form.children,"submit_page_") %}
+                {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
                     {{ form_widget(value) }}
                 {% endfor %}
             </div>
+            {{ form_end(formParametres) }}
             <br>
+            {{ form_start(formReponsesCandidat) }}
             <table class="table">
                 <thead>
                 <tr>
@@ -98,24 +100,25 @@
                     <th>Date de naissance</th>
                     <th>Date d'examen</th>
                     <th>SGAP</th>
-                    <th>Sélectionné</th>
+                    <th>Sélectionner</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for reponse_candidat in form.checkedReponsesCandidat %}
+                {% for id, reponseCandidat in formReponsesCandidat.checked %}
+                    {% set item = reponsesCandidat[id] %}
                     <tr>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.sgap.nom }}</td>
-                        <td>{{ form_widget(reponse_candidat.checked) }}</td>
+                        <td>{{ item.nom }}</td>
+                        <td>{{ item.prenom }}</td>
+                        <td>{{ item.date_de_naissance|date('d/m/y') }}</td>
+                        <td>{{ item.session.date_examen|date('d/m/y') }}</td>
+                        <td>{{ item.session.sgap.nom }}</td>
+                        <td>{{ form_widget(reponseCandidat) }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-            {{ form_row(form.submit_selectionner) }}
-            {{ form_end(form) }}
+            {{ form_row(formReponsesCandidat.submit) }}
+            {{ form_end(formReponsesCandidat) }}
         </div>
     </div>
 {% endblock %}

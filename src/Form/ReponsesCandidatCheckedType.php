@@ -2,29 +2,33 @@
 
 namespace App\Form;
 
-use App\Form\Data\ReponseCandidatChecked;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
 class ReponsesCandidatCheckedType extends AbstractType
 {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function __construct(
+        private readonly RouterInterface $router
+    )
     {
-        $builder->add(
-            "checked",
-            CheckboxType::class,
-            [
-                "required" => false,
-                "label" => " "
-            ]
-        );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $resolver->setDefault("data_class", ReponseCandidatChecked::class);
+        $builder
+            ->setAction($this->router->generate("recherche_selectionner"))
+            ->add(
+                "checked",
+                CollectionType::class,
+                [
+                    "entry_type" => CheckboxType::class,
+                    "entry_options" => ["label" => false, "required" => false]
+                ])
+            ->add("submit", SubmitType::class, ["label" => "Sélectionner"]);
     }
 }

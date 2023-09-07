@@ -8,7 +8,7 @@ use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\NoReponsesCandidatException;
 use App\Core\ReponseCandidat\CheckSingleSession;
 use App\Core\ReponseCandidat\ReponsesCandidatSessionStorage;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorageHelper;
 use App\Core\ScoreBrut\CorrecteurManager;
 use App\Entity\Correcteur;
 use App\Entity\ReponseCandidat;
@@ -47,9 +47,9 @@ class ScoresBrutsController extends AbstractController
      */
     #[Route('/form', name: "form")]
     public function form(
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        CheckSingleSession      $checkSingleSession,
-        Request                 $request): Response
+        ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage,
+        CheckSingleSession                   $checkSingleSession,
+        Request                              $request): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
         $session = $checkSingleSession->findCommonSession($reponsesCandidats);
@@ -81,7 +81,7 @@ class ScoresBrutsController extends AbstractController
     #[Route("/index/{correcteur_id}", name: "index")]
     public function consulter(
         ActiviteLogger                               $activiteLogger,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
         #[MapEntity(id: "correcteur_id")] Correcteur $correcteur

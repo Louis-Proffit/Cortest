@@ -7,7 +7,7 @@ use App\Core\CorrecteurEtalonnageMatcher;
 use App\Core\Exception\DifferentSessionException;
 use App\Core\Exception\NoReponsesCandidatException;
 use App\Core\ReponseCandidat\CheckSingleSession;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorageHelper;
 use App\Core\ScoreBrut\CorrecteurManager;
 use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Core\SessionCorrecteurMatcher;
@@ -30,13 +30,13 @@ class ScoresEtalonnesController extends AbstractController
 
     /**
      * Présélectionne toutes les réponses d'une session et redirige vers le formulaire correspondant
-     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage
      * @param Session $session
      * @return Response
      */
     #[Route("/form/session/{session_id}", name: "form_session")]
     public function formSession(
-        ReponsesCandidatStorage                $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper   $reponsesCandidatStorage,
         #[MapEntity(id: "session_id")] Session $session
     ): Response
     {
@@ -52,9 +52,9 @@ class ScoresEtalonnesController extends AbstractController
      */
     #[Route("/form", name: "form")]
     public function form(
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        CheckSingleSession      $checkSingleSession,
-        Request                 $request,
+        ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage,
+        CheckSingleSession                   $checkSingleSession,
+        Request                              $request,
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
@@ -84,7 +84,7 @@ class ScoresEtalonnesController extends AbstractController
 
     #[Route("/form/score-brut/session/{session_id}/{correcteur_id}", name: "form_score_session")]
     public function formScoreSession(
-        ReponsesCandidatStorage                $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper   $reponsesCandidatStorage,
         #[MapEntity(id: "session_id")] Session $session,
         int                                    $correcteur_id
     ): Response
@@ -100,7 +100,7 @@ class ScoresEtalonnesController extends AbstractController
      */
     #[Route('/form/score-brut/{correcteur_id}', name: "form_score")]
     public function sessionProfilForm(
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
         Request                                      $request,
@@ -155,7 +155,7 @@ class ScoresEtalonnesController extends AbstractController
     #[Route("/index/{correcteur_id}/{etalonnage_id}", name: "index")]
     public function index(
         ActiviteLogger                               $activiteLogger,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,

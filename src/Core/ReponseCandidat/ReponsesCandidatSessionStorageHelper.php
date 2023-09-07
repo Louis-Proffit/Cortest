@@ -17,7 +17,7 @@ use App\Repository\ReponseCandidatRepository;
  * Si ce n'est pas le cas, une exception {@link DifferentSessionException} doit être lancée, à la responsabilité de l'appelant
  * Seuls les identifiants de la réponse sont stockés, et l'ORM est appelé dès qu'une réponse est demandée.
  */
-readonly class ReponsesCandidatStorage
+readonly class ReponsesCandidatSessionStorageHelper
 {
 
     public function __construct(
@@ -39,7 +39,7 @@ readonly class ReponsesCandidatStorage
      * @param ReponseCandidat[] $reponsesCandidats
      * @return void
      */
-    public function set(array $reponsesCandidats): void
+    private function set(array $reponsesCandidats): void
     {
         $reponsesCandidatsIds = array_map(fn(ReponseCandidat $reponseCandidat) => $reponseCandidat->id, $reponsesCandidats);
         $this->reponsesCandidatSessionStorage->set($reponsesCandidatsIds);

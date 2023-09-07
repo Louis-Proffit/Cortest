@@ -9,7 +9,7 @@ use App\Core\Exception\NoReponsesCandidatException;
 use App\Core\IO\Pdf\Compiler\LatexCompilationFailedException;
 use App\Core\IO\Pdf\PdfManager;
 use App\Core\ReponseCandidat\CheckSingleSession;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorageHelper;
 use App\Core\ScoreBrut\CorrecteurManager;
 use App\Core\ScoreEtalonne\EtalonnageManager;
 use App\Entity\Correcteur;
@@ -186,7 +186,7 @@ class PdfController extends AbstractController
      * @param CorrecteurManager $correcteurManager
      * @param EtalonnageManager $etalonnageManager
      * @param PdfManager $pdfManager
-     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage
      * @param CheckSingleSession $checkSingleSession
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
@@ -205,7 +205,7 @@ class PdfController extends AbstractController
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
         PdfManager                                   $pdfManager,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         #[MapEntity(id: "correcteur_id")] Correcteur $correcteur,
         #[MapEntity(id: "etalonnage_id")] Etalonnage $etalonnage,
@@ -240,7 +240,7 @@ class PdfController extends AbstractController
      * @param CorrecteurManager $correcteurManager
      * @param EtalonnageManager $etalonnageManager
      * @param PdfManager $pdfManager
-     * @param ReponsesCandidatStorage $reponsesCandidatStorage
+     * @param ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage
      * @param CheckSingleSession $checkSingleSession
      * @param Correcteur $correcteur
      * @param Etalonnage $etalonnage
@@ -259,7 +259,7 @@ class PdfController extends AbstractController
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,
         PdfManager                                   $pdfManager,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         #[MapEntity(id: "correcteur_id")] Correcteur $correcteur,
         #[MapEntity(id: "etalonnage_id")] Etalonnage $etalonnage,

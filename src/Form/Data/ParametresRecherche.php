@@ -6,7 +6,7 @@ use App\Entity\NiveauScolaire;
 use App\Entity\Session;
 use DateTime;
 
-class RechercheParameters
+class ParametresRecherche
 {
     const PAGE_SIZE = 100;
 
@@ -18,10 +18,6 @@ class RechercheParameters
     public ?DateTime $dateSession;
     public ?NiveauScolaire $niveauScolaire;
     public ?Session $session;
-    /**
-     * @var ReponseCandidatChecked[]
-     */
-    public array $checkedReponsesCandidat;
 
     /**
      * @param string $filtrePrenom
@@ -32,9 +28,8 @@ class RechercheParameters
      * @param DateTime|null $dateSession
      * @param NiveauScolaire|null $niveauScolaire
      * @param Session|null $session
-     * @param ReponseCandidatChecked[] $checkedReponsesCandidat
      */
-    public function __construct(string $filtrePrenom, string $filtreNom, int $page, DateTime $filtreDateDeNaissanceMin, DateTime $filtreDateDeNaissanceMax, ?DateTime $dateSession, ?NiveauScolaire $niveauScolaire, ?Session $session, array $checkedReponsesCandidat)
+    public function __construct(string $filtrePrenom, string $filtreNom, int $page, DateTime $filtreDateDeNaissanceMin, DateTime $filtreDateDeNaissanceMax, ?DateTime $dateSession, ?NiveauScolaire $niveauScolaire, ?Session $session)
     {
         $this->filtrePrenom = $filtrePrenom;
         $this->filtreNom = $filtreNom;
@@ -44,7 +39,6 @@ class RechercheParameters
         $this->dateSession = $dateSession;
         $this->niveauScolaire = $niveauScolaire;
         $this->session = $session;
-        $this->checkedReponsesCandidat = $checkedReponsesCandidat;
     }
 
 
