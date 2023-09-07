@@ -78,47 +78,51 @@
             {{ form_row(formParametres.niveauScolaire) }}
             {{ form_row(formParametres.dateSession) }}
             {{ form_row(formParametres.session) }}
-            {{ form_row(formParametres.submit_filtrer) }}
+            {{ form_row(formParametres.submit) }}
             <br>
             <hr class="hr hr-blurry">
             <br>
             <h3>Candidats</h3>
             <br>
-            <div class="input-group">
-                {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
-                    {{ form_widget(value) }}
-                {% endfor %}
-            </div>
-            {{ form_end(formParametres) }}
-            <br>
-            {{ form_start(formReponsesCandidat) }}
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Date de naissance</th>
-                    <th>Date d'examen</th>
-                    <th>SGAP</th>
-                    <th>Sélectionner</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for id, reponseCandidat in formReponsesCandidat.checked %}
-                    {% set item = reponsesCandidat[id] %}
+            {% if formReponsesCandidat.checked is empty %}
+                Aucun candidat ne correspond au filtre, veuillez l'élargir.
+            {% else %}
+                <div class="input-group">
+                    {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
+                        {{ form_widget(value) }}
+                    {% endfor %}
+                </div>
+                {{ form_end(formParametres) }}
+                {{ form_start(formReponsesCandidat) }}
+                <br>
+                <table class="table">
+                    <thead>
                     <tr>
-                        <td>{{ item.nom }}</td>
-                        <td>{{ item.prenom }}</td>
-                        <td>{{ item.date_de_naissance|date('d/m/y') }}</td>
-                        <td>{{ item.session.date_examen|date('d/m/y') }}</td>
-                        <td>{{ item.session.sgap.nom }}</td>
-                        <td>{{ form_widget(reponseCandidat) }}</td>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Date de naissance</th>
+                        <th>Date de la session</th>
+                        <th>SGAP</th>
+                        <th>Sélectionner</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {{ form_row(formReponsesCandidat.submit) }}
-            {{ form_end(formReponsesCandidat) }}
+                    </thead>
+                    <tbody>
+                    {% for id, reponseCandidat in formReponsesCandidat.checked %}
+                        {% set item = reponsesCandidat[id] %}
+                        <tr>
+                            <td>{{ item.nom }}</td>
+                            <td>{{ item.prenom }}</td>
+                            <td>{{ item.date_de_naissance|date('d/m/y') }}</td>
+                            <td>{{ item.session.date|date('d/m/y') }}</td>
+                            <td>{{ item.session.sgap.nom }}</td>
+                            <td>{{ form_widget(reponseCandidat) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {{ form_row(formReponsesCandidat.submit) }}
+                {{ form_end(formReponsesCandidat) }}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -27,7 +27,8 @@ class ReponsesCandidatCheckedType extends AbstractType
                 CollectionType::class,
                 [
                     "entry_type" => CheckboxType::class,
-                    "entry_options" => ["label" => false, "required" => false]
+                    "entry_options" => ["label" => false, "required" => false],
+                    "label" => false
                 ])
             ->add("submit", SubmitType::class, ["label" => "Sélectionner"]);
     }

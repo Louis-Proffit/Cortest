@@ -46,8 +46,13 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);
 
         if ($rechercheParameters->dateSession != null) {
-            $query->andWhere("s.date = :dateSession")
-                ->setParameter("dateSession", $rechercheParameters->dateSession);
+            $debut = $rechercheParameters->dateSession;
+            $debut = $debut->setTime(0, 0);
+            $fin = clone $debut;
+            $fin->setTime(13, 59, 59);
+            $query->andWhere("s.date BETWEEN :dateSessionDebut AND :dateSessionFin")
+                ->setParameter("dateSessionDebut", $debut)
+                ->setParameter("dateSessionFin", $fin);
         }
 
         if ($rechercheParameters->session != null) {

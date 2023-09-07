@@ -16,8 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ParametresRechercheType extends AbstractType
 {
     const OPTION_PAGE_COUNT_KEY = "page_count";
-    const SUBMIT_SELECTIONNER_KEY = "submit_selectionner";
-    const SUBMIT_FILTRER_KEY = "submit_filtrer";
     const SUBMIT_PAGE_PREFIX_KEY = "submit_page_";
 
     public function __construct(
@@ -43,7 +41,7 @@ class ParametresRechercheType extends AbstractType
             ->add("session", ChoiceType::class, [
                 "choices" => $this->sessionRepository->nullable_choices()
             ])
-            ->add(self::SUBMIT_FILTRER_KEY, SubmitType::class, ["label" => "Filtrer"]);
+            ->add("submit", SubmitType::class, ["label" => "Filtrer"]);
 
         /** @var int $pageCount */
         $pageCount = $builder->getOption(self::OPTION_PAGE_COUNT_KEY);
@@ -54,7 +52,7 @@ class ParametresRechercheType extends AbstractType
             } else {
                 $class = "btn btn-secondary";
             }
-            $builder->add(self::SUBMIT_PAGE_PREFIX_KEY . $page, SubmitType::class, ["label" => "" . ($page + 1), "attr" => ["class" => $class]]);
+            $builder->add(self::SUBMIT_PAGE_PREFIX_KEY . $page, SubmitType::class, ["label" => "" . ($page + 1) . "/" . $pageCount, "attr" => ["class" => $class]]);
         }
     }
 
