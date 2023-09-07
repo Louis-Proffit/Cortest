@@ -16,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ParametresRechercheType extends AbstractType
 {
     const OPTION_PAGE_COUNT_KEY = "page_count";
+    const SUBMIT_RESET_KEY = "reset";
     const SUBMIT_PAGE_PREFIX_KEY = "submit_page_";
 
     public function __construct(
@@ -41,6 +42,7 @@ class ParametresRechercheType extends AbstractType
             ->add("session", ChoiceType::class, [
                 "choices" => $this->sessionRepository->nullable_choices()
             ])
+            ->add(self::SUBMIT_RESET_KEY, SubmitType::class, ["label" => "R.A.Z", "attr" => ["class" => "btn-secondary"]])
             ->add("submit", SubmitType::class, ["label" => "Filtrer"]);
 
         /** @var int $pageCount */

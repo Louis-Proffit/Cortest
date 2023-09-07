@@ -78,21 +78,31 @@
             {{ form_row(formParametres.niveauScolaire) }}
             {{ form_row(formParametres.dateSession) }}
             {{ form_row(formParametres.session) }}
-            {{ form_row(formParametres.submit) }}
+            {{ form_row(formParametres._token) }}
+            <duv class="row row-cols-auto">
+                <div class="col">
+                    {{ form_row(formParametres.submit) }}
+                </div>
+                <div class="col">
+                    {{ form_row(formParametres.reset) }}
+                </div>
+            </duv>
             <br>
             <hr class="hr hr-blurry">
             <br>
             <h3>Candidats</h3>
             <br>
+            <div class="input-group" {{ formReponsesCandidat.checked is empty ? 'hidden' :'' }}>
+                {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
+                    {{ form_widget(value) }}
+                {% endfor %}
+            </div>
+            {{ form_end(formParametres) }}
             {% if formReponsesCandidat.checked is empty %}
-                Aucun candidat ne correspond au filtre, veuillez l'élargir.
-            {% else %}
-                <div class="input-group">
-                    {% for key, value in properties_starting_with(formParametres.children,"submit_page_") %}
-                        {{ form_widget(value) }}
-                    {% endfor %}
+                <div class="note note-danger">
+                    Aucun candidat ne correspond au filtre, veuillez l'élargir.
                 </div>
-                {{ form_end(formParametres) }}
+            {% else %}
                 {{ form_start(formReponsesCandidat) }}
                 <br>
                 <table class="table">

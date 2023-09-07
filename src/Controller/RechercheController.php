@@ -69,7 +69,7 @@ class RechercheController extends AbstractController
         Request                   $request
     ): RedirectResponse
     {
-        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultRechercheParametres());
+        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultParametresRecherche());
 
         $checkedReponsesIds = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
 
@@ -101,7 +101,7 @@ class RechercheController extends AbstractController
         Request                   $request
     ): Response
     {
-        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultRechercheParametres());
+        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultParametresRecherche());
 
         $pageCount = $this->pageCount();
         $form = $this->formParametres($parametresRecherche, $pageCount);
@@ -109,6 +109,14 @@ class RechercheController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            /** @var ClickableInterface $reset */
+            $reset = $form->get(ParametresRechercheType::SUBMIT_RESET_KEY);
+
+            if ($reset->isClicked()) {
+                $parametreRechercheStorage->set($this->getDefaultParametresRecherche());
+                return $this->redirectToRoute("recherche_index");
+            }
 
             for ($page = 0; $page < $pageCount; $page++) {
 
@@ -214,7 +222,7 @@ class RechercheController extends AbstractController
         );
     }
 
-    private function getDefaultRechercheParametres(): ParametresRecherche
+    private function getDefaultParametresRecherche(): ParametresRecherche
     {
         return new ParametresRecherche(
             filtrePrenom: "",
