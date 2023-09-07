@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RechercheParametersType extends AbstractType
+class ParametresRechercheType extends AbstractType
 {
     const OPTION_PAGE_COUNT_KEY = "page_count";
     const SUBMIT_SELECTIONNER_KEY = "submit_selectionner";

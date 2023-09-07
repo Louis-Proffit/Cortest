@@ -2,16 +2,11 @@
 
 namespace App\Form;
 
-use App\Form\Generic\CortestDateType;
-use App\Repository\NiveauScolaireRepository;
-use App\Repository\SessionRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
 class ReponsesCandidatCheckedType extends AbstractType
@@ -28,9 +23,12 @@ class ReponsesCandidatCheckedType extends AbstractType
         $builder
             ->setAction($this->router->generate("recherche_selectionner"))
             ->add(
-                "this",
+                "checked",
                 CollectionType::class,
-                ["entry_type" => ReponseCandidatCheckedType::class])
+                [
+                    "entry_type" => CheckboxType::class,
+                    "entry_options" => ["label" => false, "required" => false]
+                ])
             ->add("submit", SubmitType::class, ["label" => "Sélectionner"]);
     }
 }

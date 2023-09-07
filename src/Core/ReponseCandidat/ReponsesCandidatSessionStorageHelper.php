@@ -17,7 +17,7 @@ use App\Repository\ReponseCandidatRepository;
  * Si ce n'est pas le cas, une exception {@link DifferentSessionException} doit être lancée, à la responsabilité de l'appelant
  * Seuls les identifiants de la réponse sont stockés, et l'ORM est appelé dès qu'une réponse est demandée.
  */
-readonly class ReponsesCandidatStorage
+readonly class ReponsesCandidatSessionStorageHelper
 {
 
     public function __construct(

@@ -4,15 +4,14 @@ namespace App\Controller;
 
 use App\Core\Recherche\ParametreRechercheStorage;
 use App\Core\ReponseCandidat\ReponsesCandidatSessionStorage;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
 use App\Entity\ReponseCandidat;
 use App\Form\Data\ParametresRecherche;
-use App\Form\Data\ReponseCandidatChecked;
-use App\Form\RechercheParametersType;
+use App\Form\Data\CheckableReponsesCandidatWrapper;
+use App\Form\ParametresRechercheType;
 use App\Form\ReponsesCandidatCheckedType;
 use App\Repository\ReponseCandidatRepository;
+use DateInterval;
 use DateTime;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\ClickableInterface;
@@ -45,48 +44,50 @@ class RechercheController extends AbstractController
     }
 
     /**
-     * TODO ne pas passer par sessionStorage, mais par storage directement (encapsulation correcte)
-     * @param ReponsesCandidatSessionStorage $reponsesCandidatSessionStorage
      * @param int $reponse_id
      * @return RedirectResponse
      */
     #[Route("/deselectionner/{reponse_id}", "deselectionner")]
     public function removeReponseCandidat(int $reponse_id): RedirectResponse
     {
-        $cached_reponses = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
-        $this->reponsesCandidatSessionStorage->set(array_diff($cached_reponses, array($reponse_id)));
-        $this->addFlash("success", "Le candidat a été retiré.");
+        $checkedReponsesIds = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
+        $this->reponsesCandidatSessionStorage->set(array_diff($checkedReponsesIds, [$reponse_id]));
+        $this->addFlash("success", "Le candidat a été désélectionné.");
         return $this->redirectToRoute("recherche_index");
     }
 
+    /**
+     * Route atteinte par le clic sur le bouton de sélection.
+     * Ajoute les réponses sélectionnées éventuellement nouvelles, et redirige vers l'index.
+     * @param ParametreRechercheStorage $parametreRechercheStorage
+     * @param Request $request
+     * @return RedirectResponse
+     */
     #[Route("/selectionner", name: "selectionner")]
     public function selectionner(
         ParametreRechercheStorage $parametreRechercheStorage,
         Request                   $request
     ): RedirectResponse
     {
-        $parametresRecherche = $parametreRechercheStorage->get();
+        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultRechercheParametres());
 
-        if ($parametresRecherche == null) {
-            throw new LogicException("TODO");
-        }
+        $checkedReponsesIds = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
 
-        $sessionCheckedReponsesIds = $this->getSessionCheckedReponsesIds();
-        $checkedReponses = $this->getDisplayableCheckedReponses($parametresRecherche, $sessionCheckedReponsesIds);
-        $form = $this->formReponsesCandidats($checkedReponses);
+        $reponsesCandidatWrapper = $this->getCheckableReponsesCandidat(
+            parametresRecherche: $parametresRecherche,
+            checkedReponsesIds: $checkedReponsesIds
+        );
+        $form = $this->formReponsesCandidats($reponsesCandidatWrapper);
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            foreach ($checkedReponses as $id => $checked) {
-                if ($checked && !in_array($id, $sessionCheckedReponsesIds)) {
-                    $sessionCheckedReponsesIds[] = $id;
-                }
+        foreach ($reponsesCandidatWrapper->checked as $id => $checked) {
+            if ($checked && !in_array($id, $checkedReponsesIds)) {
+                $checkedReponsesIds[] = $id;
             }
-
-            $this->reponsesCandidatSessionStorage->set($sessionCheckedReponsesIds);
         }
+
+        $this->reponsesCandidatSessionStorage->set($checkedReponsesIds);
 
         return $this->redirectToRoute("recherche_index");
     }
@@ -100,16 +101,7 @@ class RechercheController extends AbstractController
         Request                   $request
     ): Response
     {
-        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault(new ParametresRecherche(
-            filtrePrenom: "",
-            filtreNom: "",
-            page: 1,
-            filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
-            filtreDateDeNaissanceMax: new DateTime("now"),
-            dateSession: null,
-            niveauScolaire: null,
-            session: null
-        ));
+        $parametresRecherche = $parametreRechercheStorage->getOrSetDefault($this->getDefaultRechercheParametres());
 
         $pageCount = $this->pageCount();
         $form = $this->formParametres($parametresRecherche, $pageCount);
@@ -121,7 +113,7 @@ class RechercheController extends AbstractController
             for ($page = 0; $page < $pageCount; $page++) {
 
                 /** @var ClickableInterface $submitPage */
-                $submitPage = $form->get(RechercheParametersType::SUBMIT_PAGE_PREFIX_KEY . $page);
+                $submitPage = $form->get(ParametresRechercheType::SUBMIT_PAGE_PREFIX_KEY . $page);
 
                 if ($submitPage->isClicked()) {
                     $logger->debug("Choix de la page " . $page);
@@ -132,39 +124,45 @@ class RechercheController extends AbstractController
             $parametreRechercheStorage->set($parametresRecherche);
         }
 
-        $selectionnesIds = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
-        $selectionnes = $reponseCandidatRepository->findAllByIds($selectionnesIds);
+        $checkedReponsesCandidatIds = $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
+        $checkedReponsesCandidat = $reponseCandidatRepository->findAllByIds($checkedReponsesCandidatIds);
 
-        $sessionCheckedReponsesIds = $this->getSessionCheckedReponsesIds();
-        $checkedReponses = $this->getDisplayableCheckedReponses(
-            parametresRecherche: $parametresRecherche,
-            sessionCheckedReponsesIds: $sessionCheckedReponsesIds
+        $reponsesCandidatWrapper = $this->getCheckableReponsesCandidat($parametresRecherche, $checkedReponsesCandidatIds);
+
+        $formReponsesCandidats = $this->formReponsesCandidats(
+            $reponsesCandidatWrapper
         );
-        $formReponsesCandidats = $this->formReponsesCandidats($checkedReponses);
+
+        $reponsesCandidat = $this->reponseCandidatRepository->findAllByIdsIndexById(array_keys($reponsesCandidatWrapper->checked));
 
         return $this->renderIndexForm(
             formParametres: $form,
             formReponsesCandidats: $formReponsesCandidats,
-            selectionnes: $selectionnes
+            reponsesCandidat: $reponsesCandidat,
+            checkedReponsesCandidat: $checkedReponsesCandidat
         );
     }
 
     /**
      * @param FormInterface $formParametres
      * @param FormInterface $formReponsesCandidats
-     * @param ReponseCandidat[] $selectionnes
+     * @param ReponseCandidat[] $reponsesCandidat
+     * @param ReponseCandidat[] $checkedReponsesCandidat
      * @return Response
      */
     private function renderIndexForm(
         FormInterface $formParametres,
         FormInterface $formReponsesCandidats,
-        array         $selectionnes
+        array         $reponsesCandidat,
+        array         $checkedReponsesCandidat
     ): Response
     {
+
         return $this->render("recherche/index.html.twig", [
             "formReponsesCandidat" => $formReponsesCandidats->createView(),
             "formParametres" => $formParametres->createView(),
-            "selectionnes" => $selectionnes
+            "reponsesCandidat" => $reponsesCandidat,
+            "checkedReponsesCandidat" => $checkedReponsesCandidat
         ]);
     }
 
@@ -174,48 +172,59 @@ class RechercheController extends AbstractController
         return (int)ceil($reponsesCount / ParametresRecherche::PAGE_SIZE);
     }
 
-    private function getSessionCheckedReponsesIds(): array
-    {
-        return $this->reponsesCandidatSessionStorage->getOrSetDefault([]);
-    }
-
-    /**
-     * @param ParametresRecherche $parametresRecherche
-     * @param int[] $sessionCheckedReponsesIds
-     * @return ReponseCandidatChecked[]
-     */
-    private function getDisplayableCheckedReponses(
+    private function getCheckableReponsesCandidat(
         ParametresRecherche $parametresRecherche,
-        array               $sessionCheckedReponsesIds
-    ): array
+        array               $checkedReponsesIds
+    ): CheckableReponsesCandidatWrapper
     {
-        $reponsesCandidat = $this->reponseCandidatRepository->findAllFromParameters($parametresRecherche);
+        $ids = $this->reponseCandidatRepository->findAllIdsFromParameters($parametresRecherche);
 
-        $checkedReponses = [];
-        foreach ($reponsesCandidat as $reponseCandidat) {
-            $checked = in_array($reponseCandidat->id, $sessionCheckedReponsesIds);
-            $checkedReponses[$reponseCandidat->id] = new ReponseCandidatChecked($reponseCandidat, $checked);
+        $result = [];
+
+        foreach ($ids as $id => $_) {
+            $result[$id] = in_array($id, $checkedReponsesIds);
         }
 
-        return $checkedReponses;
+        return new CheckableReponsesCandidatWrapper($result);
     }
 
     /**
-     * @param ReponseCandidatChecked[] $checkedReponses
      * @return FormInterface
      */
     private function formReponsesCandidats(
-        array $checkedReponses
+        CheckableReponsesCandidatWrapper $reponsesCandidatWrapper,
     ): FormInterface
     {
-        return $this->createForm(ReponsesCandidatCheckedType::class, $checkedReponses);
+        return $this->createForm(
+            ReponsesCandidatCheckedType::class,
+            $reponsesCandidatWrapper
+        );
     }
 
-    private function formParametres(
+    private
+    function formParametres(
         ParametresRecherche $parametres,
         int                 $pageCount
     ): FormInterface
     {
-        return $this->createForm(RechercheParametersType::class, $parametres, [RechercheParametersType::OPTION_PAGE_COUNT_KEY => $pageCount]);
+        return $this->createForm(
+            ParametresRechercheType::class,
+            $parametres,
+            [ParametresRechercheType::OPTION_PAGE_COUNT_KEY => $pageCount]
+        );
+    }
+
+    private function getDefaultRechercheParametres(): ParametresRecherche
+    {
+        return new ParametresRecherche(
+            filtrePrenom: "",
+            filtreNom: "",
+            page: 0,
+            filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
+            filtreDateDeNaissanceMax: (new DateTime("now"))->add(new DateInterval("P1D")),
+            dateSession: null,
+            niveauScolaire: null,
+            session: null
+        );
     }
 }

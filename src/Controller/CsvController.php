@@ -10,7 +10,7 @@ use App\Core\IO\CsvManager;
 use App\Core\IO\FileNameManager;
 use App\Core\ReponseCandidat\CheckSingleSession;
 use App\Core\ReponseCandidat\ExportReponsesCandidat;
-use App\Core\ReponseCandidat\ReponsesCandidatStorage;
+use App\Core\ReponseCandidat\ReponsesCandidatSessionStorageHelper;
 use App\Core\ScoreBrut\CorrecteurManager;
 use App\Core\ScoreBrut\ExportScoresBruts;
 use App\Core\ScoreEtalonne\EtalonnageManager;
@@ -31,11 +31,11 @@ class CsvController extends AbstractController
 
     #[Route("/reponses", name: "reponses")]
     public function reponses(
-        ActiviteLogger          $activiteLogger,
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        ExportReponsesCandidat  $exportReponsesCandidat,
-        CsvManager              $csvManager,
-        FileNameManager         $fileNameManager
+        ActiviteLogger                       $activiteLogger,
+        ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage,
+        ExportReponsesCandidat               $exportReponsesCandidat,
+        CsvManager                           $csvManager,
+        FileNameManager                      $fileNameManager
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
@@ -56,12 +56,12 @@ class CsvController extends AbstractController
 
     #[Route("/reponses_triees", name: "reponses_triees")]
     public function reponsesTriees(
-        ActiviteLogger          $activiteLogger,
-        ReponsesCandidatStorage $reponsesCandidatStorage,
-        ExportReponsesCandidat  $exportReponsesCandidat,
-        CsvManager              $csvManager,
-        FileNameManager         $fileNameManager,
-        TestRepository          $testRepository,
+        ActiviteLogger                       $activiteLogger,
+        ReponsesCandidatSessionStorageHelper $reponsesCandidatStorage,
+        ExportReponsesCandidat               $exportReponsesCandidat,
+        CsvManager                           $csvManager,
+        FileNameManager                      $fileNameManager,
+        TestRepository                       $testRepository,
     ): Response
     {
         $reponsesCandidats = $reponsesCandidatStorage->get();
@@ -88,7 +88,7 @@ class CsvController extends AbstractController
     public function scores(
         ActiviteLogger                               $activiteLogger,
         SessionCorrecteurMatcher                     $sessionCorrecteurMatcher,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
         ExportScoresBruts                            $exportScores,
@@ -129,7 +129,7 @@ class CsvController extends AbstractController
     #[Route("/scores-etalonnes/{correcteur_id}/{etalonnage_id}", name: "scores_etalonnes")]
     public function profils(
         ActiviteLogger                               $activiteLogger,
-        ReponsesCandidatStorage                      $reponsesCandidatStorage,
+        ReponsesCandidatSessionStorageHelper         $reponsesCandidatStorage,
         CheckSingleSession                           $checkSingleSession,
         CorrecteurManager                            $correcteurManager,
         EtalonnageManager                            $etalonnageManager,

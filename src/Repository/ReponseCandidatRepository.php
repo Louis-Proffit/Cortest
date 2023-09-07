@@ -7,6 +7,7 @@ use App\Entity\Session;
 use App\Form\Data\ParametresRecherche;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -26,14 +27,13 @@ class ReponseCandidatRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param ParametresRecherche $rechercheParameters
-     * @return ReponseCandidat[]
+     * @throws QueryException
      */
-    public function findAllFromParameters(ParametresRecherche $rechercheParameters
-    ): array
+    public function findAllIdsFromParameters(ParametresRecherche $rechercheParameters): array
     {
-        $queryBuilder = $this->createQueryBuilder("r");
+        $queryBuilder = $this->createQueryBuilder("r", "r.id");
         $query = $queryBuilder
+            ->select("r.id")
             ->innerJoin("r.session", "s")
             ->where("r.nom LIKE :nom")
             ->andWhere("r.prenom LIKE :prenom")
@@ -46,21 +46,32 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);
 
         if ($rechercheParameters->dateSession != null) {
-            $queryBuilder->andWhere("s.date = :dateSession")
+            $query->andWhere("s.date = :dateSession")
                 ->setParameter("dateSession", $rechercheParameters->dateSession);
         }
 
         if ($rechercheParameters->session != null) {
-            $queryBuilder->andWhere("r.session = :session")
+            $query->andWhere("r.session = :session")
                 ->setParameter("session", $rechercheParameters->session);
         }
 
         if ($rechercheParameters->niveauScolaire != null) {
-            $queryBuilder->andWhere("r.niveau_scolaire = :niveau_scolaire")
+            $query->andWhere("r.niveau_scolaire = :niveau_scolaire")
                 ->setParameter("niveau_scolaire", $rechercheParameters->niveauScolaire);
         }
 
-        return $query
+        return $query->getQuery()->execute();
+    }
+
+    /**
+     * @param array $ids
+     * @return ReponseCandidat[]
+     */
+    public function findAllByIdsIndexById(array $ids): array
+    {
+        return $this->createQueryBuilder("r", "r.id")
+            ->where("r.id IN (:ids)")
+            ->setParameter("ids", $ids)
             ->getQuery()
             ->execute();
     }
@@ -77,6 +88,4 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
-
-
 }

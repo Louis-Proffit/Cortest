@@ -8,7 +8,7 @@
     <br>
     <div class="row row-cols-auto">
         <div class="col-6 border-end">
-            {% if selectionnes is empty %}
+            {% if checkedReponsesCandidat is empty %}
 
                 <div class="note note-warning">
                     <div class="text-center">
@@ -43,7 +43,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for candidat in selectionnes %}
+                        {% for candidat in checkedReponsesCandidat %}
                             <tr>
                                 <td>{{ candidat.nom }}</td>
                                 <td>{{ candidat.prenom }}</td>
@@ -100,23 +100,24 @@
                     <th>Date de naissance</th>
                     <th>Date d'examen</th>
                     <th>SGAP</th>
-                    <th>Sélectionné</th>
+                    <th>Sélectionner</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for reponse_candidat in formReponsesCandidat %}
+                {% for id, reponseCandidat in formReponsesCandidat.checked %}
+                    {% set item = reponsesCandidat[id] %}
                     <tr>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.nom }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.prenom }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.date_de_naissance|date("d/m/Y") }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.date|date("d/m/Y") }}</td>
-                        <td>{{ reponse_candidat.vars.value.reponse_candidat.session.sgap.nom }}</td>
-                        <td>{{ form_widget(reponse_candidat.checked) }}</td>
+                        <td>{{ item.nom }}</td>
+                        <td>{{ item.prenom }}</td>
+                        <td>{{ item.date_de_naissance|date('d/m/y') }}</td>
+                        <td>{{ item.session.date_examen|date('d/m/y') }}</td>
+                        <td>{{ item.session.sgap.nom }}</td>
+                        <td>{{ form_widget(reponseCandidat) }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-            {{ form_row(formReponsesCandidat.submit_selectionner) }}
+            {{ form_row(formReponsesCandidat.submit) }}
             {{ form_end(formReponsesCandidat) }}
         </div>
     </div>
