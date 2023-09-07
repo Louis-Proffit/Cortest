@@ -5,16 +5,14 @@ namespace App\Core\Exception;
 use Exception;
 use Throwable;
 
-class MissingEchelleException extends Exception
+class MissingEchelleException extends CalculScoreBrutException
 {
 
     public function __construct(
         readonly mixed $entity,
-        string         $message = "",
-        int            $code = 0,
-        Throwable|null $throwable = null
+        string         $message = ""
     )
     {
-        parent::__construct($message, $code, $throwable);
+        parent::__construct($message);
     }
 }

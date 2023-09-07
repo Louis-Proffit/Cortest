@@ -23,10 +23,12 @@ class Echelle extends CortestFunction
             compiler: $this->compiler(...));
     }
 
+    /**
+     * @throws MissingEchelleException
+     */
     public function evaluer($arguments, $echelle): float
     {
-        if (!array_key_exists(CortestExpressionLanguage::ENVIRONMENT_KEY_ECHELLE_PREFIX . $echelle, $arguments))
-        {
+        if (!array_key_exists(CortestExpressionLanguage::ENVIRONMENT_KEY_ECHELLE_PREFIX . $echelle, $arguments)) {
             throw new MissingEchelleException($echelle, "L'échelle " . $echelle .
                 " est utilisée dans la correction mais n'existe pas. Vérifiez les occurrences de cette échelle dans " .
                 "la correction que vous venez d'utiliser et remplacez-les par le nouveau nom de cette échelle, " .
