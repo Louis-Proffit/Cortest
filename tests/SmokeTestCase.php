@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests;
+
 use App\Entity\Concours;
 use App\Entity\Correcteur;
 use App\Entity\CortestUser;
@@ -19,7 +21,10 @@ use App\Repository\GrilleRepository;
 use App\Tests\CortestTestTrait;
 use App\Tests\DoctrineTestTrait;
 use App\Tests\LoginTestTrait;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
+use Generator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -61,7 +66,8 @@ class SmokeTestCase extends WebTestCase
             id: 1,
             nom: "concours",
             type_concours: 1,
-            tests: new ArrayCollection()
+            tests: new ArrayCollection(),
+            sessions: new ArrayCollection()
         );
         $administrateur = new CortestUser(
             id: 1,
@@ -86,7 +92,8 @@ class SmokeTestCase extends WebTestCase
             observations: "observations",
             test: $test,
             sgap: $sgap,
-            reponses_candidats: new ArrayCollection()
+            reponses_candidats: new ArrayCollection(),
+            concours: $concours
         );
         $niveauScolaire = new NiveauScolaire(
             id: 0,
@@ -328,7 +335,7 @@ class SmokeTestCase extends WebTestCase
 
         yield "reponse_candidat_supprimer" => [fn() => "/reponse-candidat/supprimer/" . self::$reponseCandidatId, fn() => "/session/consulter/" . self::$sessionId];
 
-        yield "resource_download" => [fn() => "/resource/download/" . self::$resourceId, null];
+        yield "resource_telecharger" => [fn() => "/resource/telecharger/" . self::$resourceId, null];
         yield "resource_creer" => [fn() => "/resource/creer", null];
         yield "resource_supprimer" => [fn() => "/resource/supprimer/" . self::$resourceId, "/"];
 

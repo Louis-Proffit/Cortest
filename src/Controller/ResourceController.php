@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ResourceController extends CortestAbstractController
 {
 
-    #[Route("/download/{id}", name: "download")]
+    #[Route("/telecharger/{id}", name: "telecharger")]
     public function download(
         ResourceFileRepository $resourceFileManager,
         EntityManagerInterface $entityManager,
