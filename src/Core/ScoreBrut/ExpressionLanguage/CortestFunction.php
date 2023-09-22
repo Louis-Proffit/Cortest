@@ -39,7 +39,7 @@ class CortestFunction
     {
         $trueIndex = $index - 1;
         $reponses = $arguments[CortestExpressionLanguage::ENVIRONMENT_KEY_REPONSES];
-        if (!in_array($trueIndex, $reponses)) {
+        if (!key_exists($trueIndex, $reponses)) {
             throw new CalculScoreBrutException(message: "La réponse d'indice " . $index . " n'existe pas");
         }
         $reponse = $reponses[$trueIndex];
