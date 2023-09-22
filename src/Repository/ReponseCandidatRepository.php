@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\ReponseCandidat;
 use App\Entity\Session;
 use App\Form\Data\ParametresRecherche;
+use DateInterval;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\QueryException;
@@ -41,15 +43,25 @@ class ReponseCandidatRepository extends ServiceEntityRepository
             ->setFirstResult(ParametresRecherche::PAGE_SIZE * $rechercheParameters->page)
             ->setMaxResults(ParametresRecherche::PAGE_SIZE)
             ->setParameter("nom", "%" . $rechercheParameters->filtreNom . "%")
-            ->setParameter("prenom", "%" . $rechercheParameters->filtrePrenom . "%")
-            ->setParameter("date_de_naissance_min", $rechercheParameters->filtreDateDeNaissanceMin)
-            ->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);
+            ->setParameter("prenom", "%" . $rechercheParameters->filtrePrenom . "%");
+
+        if ($rechercheParameters->filtreDateDeNaissanceMin != null){
+            $query->setParameter("date_de_naissance_min", $rechercheParameters->filtreDateDeNaissanceMin);
+        }
+        else {
+            $query->setParameter("date_de_naissance_min", new DateTime('1900-01-01'));
+        }
+        if ($rechercheParameters->filtreDateDeNaissanceMax != null){
+            $query->setParameter("date_de_naissance_max", $rechercheParameters->filtreDateDeNaissanceMax);        }
+        else {
+            $query->setParameter("date_de_naissance_max", (new DateTime("now"))->add(new DateInterval("P1D")));
+        }
 
         if ($rechercheParameters->dateSession != null) {
             $debut = $rechercheParameters->dateSession;
             $debut = $debut->setTime(0, 0);
             $fin = clone $debut;
-            $fin->setTime(13, 59, 59);
+            $fin->setTime(23, 59, 59);
             $query->andWhere("s.date BETWEEN :dateSessionDebut AND :dateSessionFin")
                 ->setParameter("dateSessionDebut", $debut)
                 ->setParameter("dateSessionFin", $fin);

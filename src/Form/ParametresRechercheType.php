@@ -31,8 +31,12 @@ class ParametresRechercheType extends AbstractType
         $builder
             ->add("filtrePrenom", TextType::class, ["empty_data" => "", "required" => false])
             ->add("filtreNom", TextType::class, ["empty_data" => "", "required" => false])
-            ->add("filtreDateDeNaissanceMin", CortestDateType::class)
-            ->add("filtreDateDeNaissanceMax", CortestDateType::class)
+            ->add("filtreDateDeNaissanceMin", CortestDateType::class, [
+                "required" => false,
+            ])
+            ->add("filtreDateDeNaissanceMax", CortestDateType::class, [
+                "required" => false,
+            ])
             ->add("niveauScolaire", ChoiceType::class, [
                 "choices" => $this->niveauScolaireRepository->nullable_choices()
             ])

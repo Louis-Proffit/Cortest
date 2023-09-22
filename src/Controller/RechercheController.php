@@ -228,8 +228,8 @@ class RechercheController extends AbstractController
             filtrePrenom: "",
             filtreNom: "",
             page: 0,
-            filtreDateDeNaissanceMin: new DateTime(self::LOWEST_TIME),
-            filtreDateDeNaissanceMax: (new DateTime("now"))->add(new DateInterval("P1D")),
+            filtreDateDeNaissanceMin: null,
+            filtreDateDeNaissanceMax: null,
             dateSession: null,
             niveauScolaire: null,
             session: null

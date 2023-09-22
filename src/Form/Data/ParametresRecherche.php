@@ -13,8 +13,8 @@ class ParametresRecherche
     public string $filtrePrenom;
     public string $filtreNom;
     public int $page;
-    public DateTime $filtreDateDeNaissanceMin;
-    public DateTime $filtreDateDeNaissanceMax;
+    public ?DateTime $filtreDateDeNaissanceMin;
+    public ?DateTime $filtreDateDeNaissanceMax;
     public ?DateTime $dateSession;
     public ?NiveauScolaire $niveauScolaire;
     public ?Session $session;
@@ -29,7 +29,7 @@ class ParametresRecherche
      * @param NiveauScolaire|null $niveauScolaire
      * @param Session|null $session
      */
-    public function __construct(string $filtrePrenom, string $filtreNom, int $page, DateTime $filtreDateDeNaissanceMin, DateTime $filtreDateDeNaissanceMax, ?DateTime $dateSession, ?NiveauScolaire $niveauScolaire, ?Session $session)
+    public function __construct(string $filtrePrenom, string $filtreNom, int $page, ?DateTime $filtreDateDeNaissanceMin, ?DateTime $filtreDateDeNaissanceMax, ?DateTime $dateSession, ?NiveauScolaire $niveauScolaire, ?Session $session)
     {
         $this->filtrePrenom = $filtrePrenom;
         $this->filtreNom = $filtreNom;
