@@ -240,9 +240,9 @@ class GrilleManager {
                         if (fid[field] !== requestField.expected) {
                             //si ce n'est pas celle fournie
                             forms.push(formConfirm(field, ligne.name, fid[field], requestField.expected,
-                                    function () {
-                                        fid[field] = my.request[field].expected;
-                                    }, function () {}));
+                                function () {
+                                    fid[field] = my.request[field].expected;
+                                }, function () {}));
                         }
                     }
                 } else {
@@ -250,9 +250,9 @@ class GrilleManager {
 
                     if (requestField.expected !== false) {
                         forms.push(formConfirm(field, ligne.name, fid[field], requestField.expected,
-                                function () {
-                                    fid[field] = my.request[field].expected;
-                                }, function () {}));
+                            function () {
+                                fid[field] = my.request[field].expected;
+                            }, function () {}));
                     } else {
 
                         if (ligne.type === 'choice') {
@@ -319,8 +319,8 @@ class GrilleManager {
         const notasked = 0;
         const corresp = {'A': 1, 'B': 2, 'D': 3, 'H': 4, 'P': 5};
         var toCorrect = [];
-        for (let i = 1; i <= this.nbQuestions; i++) {
-            if ((i).toString() in this.questions) {
+        for (let i = 0; i < this.nbQuestions; i++) {
+            if ((i + 1).toString() in this.questions) {
                 if (['A', 'B', 'D', 'H', 'P'].includes(qcm[i])) {
                     qcm[i] = corresp[qcm[i]];
                 } else {
@@ -387,8 +387,8 @@ class GrilleManager {
 
     readQCM(text) {
         var qcm = [];
-        for (let i = 1; i <= this.nbQuestions; i++) {
-            qcm[i] = text[8 + i - 1];
+        for (let i = 0; i < this.nbQuestions; i++) {
+            qcm[i] = text[8 + i];
         }
         if (this.hasQCM(text.slice(0, 8))) {
             tell('G');

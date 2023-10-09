@@ -279,6 +279,10 @@ class LectureController extends AbstractController
         $session = $sessionRepository->find($request->request->get('session'));
 
         foreach ($data as $i => $ligne) {
+            $qcm = array();
+            foreach ($ligne['qcm'] as $key => $reponse) {
+                $qcm[$key + 1] = $reponse;
+            }
             $reponseCandidat = new ReponseCandidat(
                 id: 0,
                 session: $session,
