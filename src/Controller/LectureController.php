@@ -286,7 +286,7 @@ class LectureController extends AbstractController
             $reponseCandidat = new ReponseCandidat(
                 id: 0,
                 session: $session,
-                reponses: $ligne['qcm'],
+                reponses: $qcm,
                 nom: $ligne['nom'],
                 prenom: $ligne['prenom'],
                 nom_jeune_fille: $ligne['nom_jeune_fille'],
