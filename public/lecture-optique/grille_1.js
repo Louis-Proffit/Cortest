@@ -54,8 +54,8 @@ class GrilleManager {
 
         this.contentFID = {
             code_barre: {name: 'Code barre', type: 'number', length: 8, regex: /^.{8}$/},
-            nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+[\s]*$/},
-            prenom: {name: 'Prénom', type: 'string', length: 11, regex: /^[A-Z]+[\s]*$/},
+            nom: {name: 'Nom', type: 'string', length: 15, regex: /^[A-Z]+(?:\s[A-Z]+){0,2}\s*$/},
+            prenom: {name: 'Prénom', type: 'string', length: 11, regex: /^[A-Z]+(?:\s[A-Z]+){0,2}\s*$/},
             nom_jeune_fille: {name: 'Nom de jeune fille', type: 'string', length: 12, regex: /^[A-Z]*[\s]*$/},
             niveau_scolaire: {name: 'Niveau scolaire', type: 'choice', length: 1, regex: /^[1-8]$/, choice: [
                     {read: '1', print: 'CEP', store: 'CEP'},

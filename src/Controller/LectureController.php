@@ -90,7 +90,7 @@ class LectureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() and $form->isValid()) {
-
+            $reponseCandidat->trimNames();
             $entityManager->persist($reponseCandidat);
             $this->addFlashIfCandidatAlreadyExists(
                 reponseCandidatRepository: $reponseCandidatRepository,
@@ -158,6 +158,7 @@ class LectureController extends AbstractController
                     reponseCandidatRepository: $reponseCandidatRepository,
                     reponseCandidat: $reponseCandidat
                 );
+                $reponseCandidat->trimNames();
                 $entityManager->persist($reponseCandidat);
             }
 
@@ -205,6 +206,7 @@ class LectureController extends AbstractController
                         reponseCandidatRepository: $reponseCandidatRepository,
                         reponseCandidat: $reponseCandidat
                     );
+                    $reponseCandidat->trimNames();
                     $entityManager->persist($reponseCandidat);
                 }
 
@@ -300,6 +302,7 @@ class LectureController extends AbstractController
                 reponseCandidatRepository: $reponseCandidatRepository,
                 reponseCandidat: $reponseCandidat
             );
+            $reponseCandidat->trimNames();
             $entityManager->persist($reponseCandidat);
         }
 
@@ -313,7 +316,7 @@ class LectureController extends AbstractController
         return new JsonResponse(['session' => $request->request->get('session'), 'data' => $data]);
     }
 
-    private function addFlashIfCandidatAlreadyExists(
+    public function addFlashIfCandidatAlreadyExists(
         ReponseCandidatRepository $reponseCandidatRepository,
         ReponseCandidat           $reponseCandidat): void
     {

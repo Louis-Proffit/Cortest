@@ -108,7 +108,7 @@ function formDate(field, field_name, value, valid) {
  */
 function formConfirm(field, field_name, value, expected, correct, ignore) {
     var html = "<div class='col-3'><span>" + field_name + "</span></div>\n\
-<div class='col-4'><span>Reseigné : <strong>" + value + "</strong>  /   Attendu : <strong>" + expected + "</strong></span></div>\n\
+<div class='col-4'><span>Renseigné : <strong>" + value + "</strong>  /   Attendu : <strong>" + expected + "</strong></span></div>\n\
 <div class='col-2 offset-1'><div class='form-check'>\n\
   <input class='form-check-input correct' type='radio' name='radio-" + field + "' checked>\n\
   <label class='form-check-label'>\n\
@@ -202,7 +202,7 @@ function askAlready(code_barre, valider, annuler) {
 function makeHTMLQCM(question, blanck, unknown, initial_blank, inital_unknown) {
     return "<div class='row mt-3 mb-3 qcm-" + question + "'>\n\
 <div class='col-2'>\n\
-<strong>" + (question + 1).toString() + "</strong>\n\
+<strong>" + (question).toString() + "</strong>\n\
 </div>\n\
                             <div class='form-check col-1'>\n\
                                 <input class='form-check-input' type='radio' value='1' name='ligne-" + question + "'>\n\
@@ -313,5 +313,31 @@ function askManualLink(nb, FIDs, QCMs, valider, annuler) {
     });
     $("#manual-link .annuler").click(function () {
         return annuler();
+    });
+}
+
+function main(){
+    const field = {
+        name: 'Nom',
+        type: 'string',
+        length: 15,
+        regex: /^[A-Z]+(?:\s[A-Z]+){0,2}\s*$/
+    };
+
+    const testNames = [
+        "HELLO",          // true
+        "HELLO WORLD",    // true
+        "JEAN MARC DE",
+        "JEAN MARC DE TROYE",
+        "H E L L O",      // true
+        "HELLO     ",     // true
+        "",                // false (empty)
+        "hello",          // false (lowercase)
+        "HELLO123",       // false (contains numbers)
+        "   ",            // false (only spaces)
+    ];
+
+    testNames.forEach(name => {
+        console.log(`"${name}" matches:`, field.regex.test(name));
     });
 }
