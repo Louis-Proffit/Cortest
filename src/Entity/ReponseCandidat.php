@@ -122,4 +122,10 @@ class ReponseCandidat
         $this->eirs = $eirs;
         $this->raw = $raw;
     }
+
+    public function trimNames(): void
+    {
+        $this->nom = trim($this->nom);
+        $this->prenom = trim($this->prenom);
+    }
 }

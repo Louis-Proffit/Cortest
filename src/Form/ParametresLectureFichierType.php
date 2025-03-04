@@ -22,23 +22,13 @@ class ParametresLectureFichierType extends AbstractType
     {
     }
 
-    private function sessionDisplay(Session $session): string
-    {
-        return "Session : "
-            . $session->date->format('Y-m-d')
-            . " | "
-            . $session->sgap->nom
-            . " | "
-            . $session->test->nom;
-    }
-
     private function sessionChoices(): array
     {
         $sessions = $this->session_repository->findAll();
         $result = [];
 
         foreach ($sessions as $session) {
-            $result[$this->sessionDisplay($session)] = $session;
+            $result[$session->sessionDisplay()] = $session;
         }
 
         return $result;

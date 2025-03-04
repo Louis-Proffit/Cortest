@@ -89,6 +89,8 @@ class ReponseCandidatRepository extends ServiceEntityRepository
         return $this->createQueryBuilder("r", "r.id")
             ->where("r.id IN (:ids)")
             ->setParameter("ids", $ids)
+            ->orderBy('r.nom', 'ASC')
+            ->addOrderBy('r.prenom', 'ASC')
             ->getQuery()
             ->execute();
     }
@@ -102,6 +104,8 @@ class ReponseCandidatRepository extends ServiceEntityRepository
         return $this->createQueryBuilder("r")
             ->where("r.id IN (:ids)")
             ->setParameter("ids", $ids)
+            ->orderBy('r.nom', 'ASC')
+            ->addOrderBy('r.prenom', 'ASC')
             ->getQuery()
             ->execute();
     }

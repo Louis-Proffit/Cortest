@@ -54,14 +54,16 @@
     <h3>Informations générales</h3>
     <br>
     <dl class="row">
+        <dt class="col-md-3">Numéro de lot</dt>
+        <dd class="col-md-9">{{ session.id }}</dd>
         <dt class="col-md-3">Date</dt>
         <dd class="col-md-9">{{ session.date|date('d-m-Y') }}</dd>
         <dt class="col-md-3">SGAP</dt>
         <dd class="col-md-9">{{ session.sgap.indice }} - {{ session.sgap.nom }}</dd>
         <dt class="col-md-3">Concours</dt>
         <dd class="col-md-9">{{ session.concours.intitule }}</dd>
-        <dt class="col-md-3">Test</dt>
-        <dd class="col-md-9">{{ session.test.nom }}</dd>
+        <dt class="col-md-3">Type concours</dt>
+        <dd class="col-md-9">{{ session.concours.type_concours }}</dd>
         <dt class="col-md-3">Version batterie</dt>
         <dd class="col-md-9">{{ session.test.version_batterie }}</dd>
         <dt class="col-md-3">Observations</dt>
@@ -85,6 +87,7 @@
             <th scope="col">Sexe</th>
             <th scope="col">Niveau scolaire</th>
             <th scope="col">Type de candidat (E-I-R-S)</th>
+            <th scope="col">Modifier</th>
             <th scope="col">Supprimer</th>
             <th scope="col">Reponses brutes</th>
         </tr>
@@ -101,9 +104,12 @@
                 <td>{{ reponse.niveau_scolaire.nom }}</td>
                 <td>{{ reponse.eirs }}</td>
                 <td>
+                    <a class="btn btn-secondary" href="{{ path("reponse_candidat_modifier", {"id":reponse.id}) }}">Modifier</a>
+                </td>
+                <td>
                     <button class="btn btn-danger" data-mdb-toggle="modal"
                             data-mdb-target="#{{ 'supprimerReponseCandidat'~reponse.id }}">
-                        <i class="fa fa-check"></i>Supprimer
+                        Supprimer
                     </button>
                     {{ supprimer(
                         "supprimerReponseCandidat"~reponse.id,

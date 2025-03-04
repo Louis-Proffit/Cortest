@@ -12,7 +12,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Session|null find($id, $lockMode = null, $lockVersion = null)
  * @method Session|null findOneBy(array $criteria, array $orderBy = null)
- * @method Session[]    findAll()
  * @method Session[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SessionRepository extends ServiceEntityRepository
@@ -47,6 +46,14 @@ class SessionRepository extends ServiceEntityRepository
         $choices = $this->choices();
         $choices["Vide"] = null;
         return $choices;
+    }
+
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.date', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function choices(): array

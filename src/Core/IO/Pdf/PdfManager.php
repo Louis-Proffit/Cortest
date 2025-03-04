@@ -181,8 +181,7 @@ class PdfManager
      * @throws MissingFileException
      * @throws LatexCompilationFailedException
      */
-    public
-    function createPdfFile(
+    public function createPdfFile(
         Graphique       $graphique,
         ReponseCandidat $reponseCandidat,
         Correcteur      $correcteur,

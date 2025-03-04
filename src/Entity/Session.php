@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\ParametresLectureFichierType;
 use App\Repository\SessionRepository;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
@@ -42,6 +43,7 @@ class Session
     public Sgap $sgap;
 
     #[ORM\OneToMany(mappedBy: "session", targetEntity: ReponseCandidat::class, cascade: ["remove", "persist"], fetch: 'EAGER')]
+    #[ORM\OrderBy(["nom" => "ASC", "prenom" => "ASC"])]
     public Collection $reponses_candidats;
 
     /**
@@ -68,5 +70,15 @@ class Session
     public static function formatLong(Session $session): string
     {
         return $session->date->format("d-m-Y") . " | " . Sgap::affichage($session->sgap) . " | " . $session->concours->intitule ;
+    }
+
+    public function sessionDisplay(): string
+    {
+        return "Session : "
+            . $this->date->format('Y-m-d')
+            . " | "
+            . $this->sgap->nom
+            . " | "
+            . $this->test->nom;
     }
 }

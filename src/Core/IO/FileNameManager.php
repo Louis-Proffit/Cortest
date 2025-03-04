@@ -58,7 +58,8 @@ class FileNameManager
      */
     public function singlePdfFileName(ReponseCandidat $reponseCandidat): string
     {
-        return str_replace(" ", "_", "profil_" . $reponseCandidat->nom . "_" . $reponseCandidat->prenom . "_" . $this->formatDate($reponseCandidat->date_de_naissance));
+        $reponseCandidat->trimNames();
+        return str_replace(" ", "_", $reponseCandidat->nom . "_" . $reponseCandidat->prenom . "_" . $this->formatDate($reponseCandidat->date_de_naissance));
     }
 
     /**
